@@ -46,4 +46,15 @@ class Comment extends Model
     {
         return $this->hasMany(Comment::class, 'parent_id')->where('is_approved', true);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
+
+    public function isLikedBy($user)
+    {
+        if (!$user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
 }

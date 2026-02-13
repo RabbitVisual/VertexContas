@@ -1,30 +1,34 @@
 <?php
 
-/**
- * Autor: Reinan Rodrigues
- * Empresa: Vertex Solutions LTDA © 2026
- * Email: r.rodriguesjs@gmail.com
- */
-
 namespace Modules\Blog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\BlogCategory;
 use Modules\Blog\Models\Comment;
+use Modules\Blog\Models\CommentLike;
 use Modules\Blog\Models\PostLike;
 use Modules\Blog\Models\SavedPost;
-use Modules\Notifications\Services\NotificationService;
 
 class BlogController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::where('status', 'published')->with('author', 'category')->orderBy('created_at', 'desc')->paginate(12);
-        return view('blog::index', compact('posts'));
+        $query = Post::where('status', 'published')->with('author', 'category');
+
+        if ($request->has('category') && $request->category) {
+            $category = BlogCategory::where('slug', $request->category)->firstOrFail();
+            $query->where('category_id', $category->id);
+        }
+
+        $posts = $query->orderBy('created_at', 'desc')->paginate(12);
+        $categories = BlogCategory::all();
+
+        return view('blog::index', compact('posts', 'categories'));
     }
 
     /**
@@ -32,7 +36,7 @@ class BlogController extends Controller
      */
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->where('status', 'published')->with('author', 'category', 'comments.user')->firstOrFail();
+        $post = Post::where('slug', $slug)->where('status', 'published')->with(['author', 'category', 'approvedComments.user'])->firstOrFail();
 
         // Increment views
         $post->increment('views');
@@ -57,9 +61,6 @@ class BlogController extends Controller
 
         $post = Post::findOrFail($postId);
 
-        // Check settings for guest comments (if not auth) - but middleware usually requires auth
-        // Assuming this route is protected by auth
-
         // Check auto-approve setting
         $settingService = app(\Modules\Core\Services\SettingService::class);
         $autoApprove = $settingService->get('auto_approve_comments', false, 'blog');
@@ -79,7 +80,7 @@ class BlogController extends Controller
     }
 
     /**
-     * Toggle Like.
+     * Toggle Like on Post.
      */
     public function toggleLike($postId)
     {
@@ -100,6 +101,30 @@ class BlogController extends Controller
         }
 
         return response()->json(['success' => true, 'liked' => $liked, 'count' => $post->likes()->count()]);
+    }
+
+    /**
+     * Toggle Like on Comment.
+     */
+    public function toggleCommentLike($commentId)
+    {
+        $comment = Comment::findOrFail($commentId);
+        $user = auth()->user();
+
+        $like = CommentLike::where('comment_id', $comment->id)->where('user_id', $user->id)->first();
+
+        if ($like) {
+            $like->delete();
+            $liked = false;
+        } else {
+            CommentLike::create([
+                'comment_id' => $comment->id,
+                'user_id' => $user->id,
+            ]);
+            $liked = true;
+        }
+
+        return response()->json(['success' => true, 'liked' => $liked, 'count' => $comment->likes()->count()]);
     }
 
     /**
@@ -124,5 +149,15 @@ class BlogController extends Controller
         }
 
         return response()->json(['success' => true, 'saved' => $isSaved]);
+    }
+
+    /**
+     * Track Conversion (Click on Upgrade).
+     */
+    public function trackConversion($postId)
+    {
+        $post = Post::findOrFail($postId);
+        $post->increment('conversion_clicks');
+        return response()->json(['success' => true]);
     }
 }

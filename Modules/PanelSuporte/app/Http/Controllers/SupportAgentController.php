@@ -8,6 +8,7 @@ use Modules\Core\Models\Ticket;
 use Modules\Core\Models\TicketMessage;
 use Illuminate\Support\Facades\Auth;
 use Modules\Notifications\Services\NotificationService;
+use Modules\Blog\Models\Comment;
 
 class SupportAgentController extends Controller
 {
@@ -26,7 +27,10 @@ class SupportAgentController extends Controller
 
         $recentTickets = Ticket::with('user')->latest()->take(5)->get();
 
-        return view('panelsuporte::dashboard', compact('openTickets', 'pendingTickets', 'highPriority', 'recentTickets'));
+        // Blog: Pending Comments
+        $pendingComments = Comment::where('is_approved', false)->with('post', 'user')->orderBy('created_at', 'desc')->take(5)->get();
+
+        return view('panelsuporte::dashboard', compact('openTickets', 'pendingTickets', 'highPriority', 'recentTickets', 'pendingComments'));
     }
 
     public function index(Request $request)

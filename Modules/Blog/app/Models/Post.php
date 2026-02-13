@@ -5,7 +5,7 @@ namespace Modules\Blog\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
@@ -20,7 +20,10 @@ class Post extends Model
         'featured_image',
         'status',
         'is_premium',
-        'views'
+        'views',
+        'meta_description',
+        'og_image',
+        'conversion_clicks'
     ];
 
     protected $casts = [
@@ -68,5 +71,12 @@ class Post extends Model
     {
         if (!$user) return false;
         return $this->savedBy()->where('user_id', $user->id)->exists();
+    }
+
+    public function getReadTimeAttribute()
+    {
+        $words = str_word_count(strip_tags($this->content));
+        $minutes = ceil($words / 200);
+        return $minutes . ' min de leitura';
     }
 }

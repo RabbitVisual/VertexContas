@@ -42,7 +42,9 @@ class BlogManagerController extends Controller
             'status' => 'required|in:draft,pending_review,published',
             'is_premium' => 'boolean',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'notify_users' => 'boolean', // Custom field for notification
+            'meta_description' => 'nullable|string|max:255',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'notify_users' => 'boolean',
         ]);
 
         $slug = Str::slug($validated['title']);
@@ -57,6 +59,12 @@ class BlogManagerController extends Controller
             $imagePath = 'storage/' . $imagePath;
         }
 
+        $ogImagePath = null;
+        if ($request->hasFile('og_image')) {
+            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
+            $ogImagePath = 'storage/' . $ogImagePath;
+        }
+
         $post = Post::create([
             'author_id' => auth()->id(),
             'category_id' => $validated['category_id'],
@@ -66,6 +74,8 @@ class BlogManagerController extends Controller
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
             'featured_image' => $imagePath,
+            'meta_description' => $validated['meta_description'],
+            'og_image' => $ogImagePath,
         ]);
 
         // Send notification if requested and published
@@ -75,6 +85,18 @@ class BlogManagerController extends Controller
                 'Confira nosso novo artigo financeiro!',
                 'info',
                 route('blog.show', $post->slug)
+            );
+        }
+
+        // Check for Urgent Financial Alert
+        $category = BlogCategory::find($validated['category_id']);
+        if ($post->status === 'published' && $category && Str::slug($category->name) === 'alerta-financeiro') {
+             app(NotificationService::class)->sendSystemWide(
+                'ALERTA FINANCEIRO URGENTE',
+                'Atenção! ' . $post->title,
+                'danger', // Or warning, using danger for urgency
+                route('blog.show', $post->slug),
+                'bolt-lightning' // Icon name
             );
         }
 
@@ -105,6 +127,8 @@ class BlogManagerController extends Controller
             'status' => 'required|in:draft,pending_review,published',
             'is_premium' => 'boolean',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta_description' => 'nullable|string|max:255',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->title !== $post->title) {
@@ -121,13 +145,23 @@ class BlogManagerController extends Controller
             $post->featured_image = 'storage/' . $imagePath;
         }
 
+        if ($request->hasFile('og_image')) {
+            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
+            $post->og_image = 'storage/' . $ogImagePath;
+        }
+
         $post->update([
             'title' => $validated['title'],
             'category_id' => $validated['category_id'],
             'content' => $validated['content'],
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
+            'meta_description' => $validated['meta_description'],
+            // 'og_image' is handled above if present, otherwise keeps old one if not updated via update() without assignment
         ]);
+
+        // Explicitly saving if not handled by update array for file paths
+        $post->save();
 
         return redirect()->route('suporte.blog.index')->with('success', 'Post atualizado com sucesso!');
     }

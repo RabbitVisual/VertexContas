@@ -1,30 +1,38 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@props(['title' => 'Vertex Insights', 'description' => '', 'image' => ''])
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<x-paneluser::layouts.master :title="$title">
+    @push('styles')
+        <style>
+            .glass-card {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.5);
+            }
+            .dark .glass-card {
+                background: rgba(30, 41, 59, 0.6);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .glass-hero {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            }
+        </style>
+        @if($description)
+            <meta name="description" content="{{ $description }}">
+            <meta property="og:description" content="{{ $description }}">
+        @endif
+        @if($image)
+            <meta property="og:image" content="{{ asset($image) }}">
+            <meta name="twitter:image" content="{{ asset($image) }}">
+        @endif
+    @endpush
 
-        <title>Blog Module - {{ config('app.name', 'Laravel') }}</title>
+    {{ $slot }}
 
-        <meta name="description" content="{{ $description ?? '' }}">
-        <meta name="keywords" content="{{ $keywords ?? '' }}">
-        <meta name="author" content="{{ $author ?? '' }}">
+    @push('scripts')
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        {{-- Vite CSS --}}
-        {{-- {{ module_vite('build-blog', 'resources/assets/sass/app.scss') }} --}}
-    </head>
-
-    <body>
-        {{ $slot }}
-
-        {{-- Vite JS --}}
-        {{-- {{ module_vite('build-blog', 'resources/assets/js/app.js') }} --}}
-    </body>
-</html>
+    @endpush
+</x-paneluser::layouts.master>

@@ -214,7 +214,25 @@
     </div>
 
     <!-- Blog Analytics -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Blog Stats -->
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl shadow-lg p-6 text-white">
+            <h2 class="text-lg font-bold flex items-center gap-2 mb-6">
+                <x-icon name="chart-line-up" />
+                Performance do Blog
+            </h2>
+            <div class="space-y-6">
+                <div>
+                    <p class="text-indigo-200 text-sm font-medium uppercase tracking-wider">Taxa de Conversão (PRO)</p>
+                    <p class="text-4xl font-black tracking-tight">{{ $blogConversionRate }}</p>
+                </div>
+                 <div>
+                    <p class="text-indigo-200 text-sm font-medium uppercase tracking-wider">Leituras Totais</p>
+                    <p class="text-2xl font-bold">{{ number_format($mostReadPosts->sum("views"), 0, ",", ".") }}</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Most Read Posts -->
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700">

@@ -1,106 +1,40 @@
 <x-panelsuporte::layouts.master>
-
-
-<div class="space-y-8 animate-in fade-in duration-500">
-    <!-- Welcome Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard de Suporte</h1>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Bem-vindo de volta, {{ explode(' ', Auth::user()->name)[0] }}. Aqui está o resumo dos atendimentos.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <a href="{{ route('support.tickets.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-white font-bold text-sm rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm">
-                <x-icon name="list-tree" style="duotone" class="text-primary" />
-                Todos os Chamados
-            </a>
-            <a href="{{ route('support.manual.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold text-sm rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
-                <x-icon name="book-user" style="solid" />
-                Manual
-            </a>
-        </div>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Stat Card 1 -->
-        <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Abertos</p>
-                    <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $openTickets }}</h3>
-                </div>
-                <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-500 group-hover:scale-110 transition-transform duration-300">
-                    <x-icon name="folder-open" style="duotone" class="w-6 h-6" />
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-2">
-                <span class="text-[10px] font-bold py-0.5 px-2 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full">Ativo</span>
-                <span class="text-[11px] text-gray-400 font-medium">Aguardando resposta</span>
-            </div>
-        </div>
-
-        <!-- Stat Card 2 -->
-        <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Pendentes</p>
-                    <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $pendingTickets }}</h3>
-                </div>
-                <div class="p-3 bg-amber-50 dark:bg-amber-500/10 rounded-2xl text-amber-500 group-hover:scale-110 transition-transform duration-300">
-                    <x-icon name="clock" style="duotone" class="w-6 h-6" />
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-2">
-                <span class="text-[10px] font-bold py-0.5 px-2 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full">Urgente</span>
-                <span class="text-[11px] text-gray-400 font-medium">Requer atenção</span>
-            </div>
-        </div>
-
-        <!-- Stat Card 3 -->
-        <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Alta Prioridade</p>
-                    <h3 class="text-3xl font-black text-red-600 dark:text-red-500 mt-2">{{ $highPriority }}</h3>
-                </div>
-                <div class="p-3 bg-red-50 dark:bg-red-500/10 rounded-2xl text-red-500 group-hover:scale-110 transition-transform duration-300">
-                    <x-icon name="fire" style="duotone" class="w-6 h-6" />
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-2">
-                <span class="text-[10px] font-bold py-0.5 px-2 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full">Crítico</span>
-                <span class="text-[11px] text-gray-400 font-medium">Check imediato</span>
-            </div>
-        </div>
-
-        <!-- Help Card (Call to action) -->
-        <div class="bg-gradient-to-br from-primary to-primary-dark p-6 rounded-3xl shadow-lg shadow-primary/20 flex flex-col justify-between relative overflow-hidden group">
-            <div class="relative z-10">
-                <h4 class="text-white font-black text-lg leading-tight mb-2 flex items-center gap-2">
-                    Precisa de Ajuda?
-                    <x-icon name="circle-question" style="solid" class="text-white/50 animate-pulse" />
-                </h4>
-                <p class="text-white/80 text-xs font-medium">Consulte a base de conhecimento técnica em caso de dúvidas.</p>
-            </div>
-            <a href="{{ route('support.wiki.index') }}" class="relative z-10 mt-4 w-full py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold text-xs rounded-xl transition-all border border-white/10 flex items-center justify-center">
-                Acessar Wiki
-            </a>
-            <!-- Decorative Icon -->
-            <x-icon name="headset" style="duotone" class="absolute -right-4 -bottom-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-125 transition-transform duration-700" />
-        </div>
-    </div>
-
-    <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Recent Tickets Table -->
-        <div class="lg:col-span-2 space-y-4">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg group">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/30 transition-all duration-1000"></div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest backdrop-blur-sm border border-white/10">
+                            Painel do Agente
+                        </span>
+                        <span class="text-xs text-gray-400 font-medium">{{ now()->format('d M, Y') }}</span>
+                    </div>
+
+                    <h1 class="text-3xl font-black mb-2 tracking-tight">
+                        Olá, {{ auth()->user()->first_name }} 👋
+                    </h1>
+                    <p class="text-gray-400 text-sm max-w-md leading-relaxed">
+                        Você tem <strong class="text-white">{{ $openTickets }} chamados abertos</strong> e <strong class="text-white">{{ $pendingTickets }} pendentes</strong>. Mantenha o foco na excelência!
+                    </p>
+                </div>
+
+                <div class="absolute bottom-6 right-8 opacity-50 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500">
+                    <x-icon name="headset" style="duotone" class="w-24 h-24 text-white/10" />
+                </div>
+            </div>
+
+            <!-- Recent Tickets -->
             <div class="flex items-center justify-between px-2">
-                <h3 class="font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wider text-xs">
-                    <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                <h2 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-icon name="ticket" class="text-primary" />
                     Chamados Recentes
-                </h3>
-                <a href="{{ route('support.tickets.index') }}" class="text-primary hover:text-primary-dark text-xs font-bold flex items-center gap-1 group">
-                    Explorar todos
+                </h2>
+                <a href="{{ route('support.tickets.index') }}" class="group flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-primary transition-colors uppercase tracking-wider">
+                    Ver todos
                     <x-icon name="arrow-right" class="group-hover:translate-x-1 transition-transform" />
                 </a>
             </div>
@@ -181,6 +115,56 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Blog Comments Widget -->
+            <div class="flex items-center justify-between px-2 pt-4">
+                <h2 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-icon name="comments" class="text-indigo-500" />
+                    Comentários Pendentes
+                </h2>
+                <a href="{{ route('suporte.blog.comments') }}" class="group flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-indigo-500 transition-colors uppercase tracking-wider">
+                    Ver todos
+                    <x-icon name="arrow-right" class="group-hover:translate-x-1 transition-transform" />
+                </a>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div class="divide-y divide-gray-50 dark:divide-gray-800">
+                    @forelse($pendingComments as $comment)
+                        <div class="p-6 flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-gray-500">
+                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $comment->user->name ?? 'Usuário Desconhecido' }}
+                                    <span class="text-gray-400 font-normal">em</span>
+                                    <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank" class="text-indigo-600 hover:text-indigo-500">{{ $comment->post->title }}</a>
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ $comment->content }}</p>
+                                <div class="mt-2 flex space-x-3">
+                                    <form action="{{ route('suporte.blog.comments.approve', $comment->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Aprovar</button>
+                                    </form>
+                                    <form action="{{ route('suporte.blog.comments.reject', $comment->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs font-bold text-red-600 hover:text-red-700">Rejeitar</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-400 whitespace-nowrap">{{ $comment->created_at->diffForHumans() }}</span>
+                        </div>
+                    @empty
+                        <div class="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                            Nenhum comentário pendente.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar Activity / Stats -->
@@ -229,5 +213,4 @@
             </div>
         </div>
     </div>
-</div>
 </x-panelsuporte::layouts.master>
