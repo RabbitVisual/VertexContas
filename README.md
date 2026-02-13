@@ -121,7 +121,7 @@ Os recursos visuais oficiais do projeto estão localizados em `storage/app/publi
 
   <!-- Developer Profile -->
   <a href="https://github.com/RabbitVisual/">
-    <img src="storage/app/public/business/ReinanRodrigues.png" alt="Reinan Rodrigues" width="100" height="100" style="border-radius: 50%; border: 3px solid #6366f1; object-fit: cover;">
+    <img src="storage/app/public/business/ReinanRodrigues.png" alt="Reinan Rodrigues" width="200" style="border-radius: 12px; border: 3px solid #6366f1; object-fit: contain;">
   </a>
   <h3>Reinan Rodrigues</h3>
   <p><b>CEO / Lead Architect</b></p>
