@@ -1,0 +1,149 @@
+<?php
+
+namespace Modules\PanelSuporte\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Modules\Core\Models\Inspection;
+use Modules\Core\Models\Ticket;
+use Modules\Core\Models\TicketMessage;
+use Modules\Notifications\Services\NotificationService;
+
+class InspectionController extends Controller
+{
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
+    /**
+     * Request a new inspection.
+     */
+    public function request(Ticket $ticket)
+    {
+        // Check if there is already a pending or active inspection for this ticket/user
+        $existing = Inspection::where('ticket_id', $ticket->id)
+            ->whereIn('status', ['pending', 'active'])
+            ->first();
+
+        if ($existing) {
+            return back()->with('warning', 'Já existe uma solicitação de inspeção em andamento para este ticket.');
+        }
+
+        $inspection = Inspection::create([
+            'ticket_id' => $ticket->id,
+            'agent_id' => Auth::id(),
+            'user_id' => $ticket->user_id,
+            'status' => 'pending',
+            'token' => Str::random(64),
+        ]);
+
+        // Send notification to User
+        $this->notificationService->sendToUser(
+            $ticket->user,
+            'Solicitação de Inspeção Remota',
+            'O agente '.Auth::user()->name." solicitou acesso ao seu painel para auxiliar no chamado #{$ticket->id}.",
+            'warning',
+            route('user.notifications.index'), // actionUrl
+            'magnifying-glass-chart',         // icon
+            'text-amber-500'                 // color
+        );
+
+        return back()->with('success', 'Solicitação de inspeção enviada ao cliente com sucesso!');
+    }
+
+    /**
+     * Enter the user's dashboard (Impersonation).
+     */
+    public function enter(Inspection $inspection)
+    {
+        if ($inspection->agent_id !== Auth::id() || $inspection->status !== 'active') {
+            abort(403, 'Acesso não autorizado ou inspeção não está ativa.');
+        }
+
+        // Store current agent ID to return later
+        session(['original_agent_id' => Auth::id()]);
+        session(['impersonate_inspection_id' => $inspection->id]);
+
+        // Login as the client
+        Auth::loginUsingId($inspection->user_id);
+
+        // Auto-post to ticket history
+        TicketMessage::create([
+            'ticket_id' => $inspection->ticket_id,
+            'user_id' => $inspection->agent_id,
+            'message' => '🛡️ **AUDITORIA:** O agente iniciou o modo de inspeção remota para auxiliar na resolução do chamado.',
+            'is_admin_reply' => true,
+        ]);
+
+        return redirect()->route('paneluser.index')
+            ->with('success', 'Você entrou no modo de inspeção. O banner superior indica sua sessão ativa.');
+    }
+
+    /**
+     * Stop an active inspection.
+     */
+    public function stop(Inspection $inspection)
+    {
+        // If we are currently impersonating, the Auth::id() is the client's ID.
+        // We need to check if the original agent is the one stopping.
+        $originalAgentId = session('original_agent_id');
+
+        if (! $originalAgentId) {
+            // Fallback for direct agent access if session lost but db active
+            if ($inspection->agent_id !== Auth::id()) {
+                abort(403);
+            }
+            $originalAgentId = $inspection->agent_id;
+        }
+
+        $inspection->update([
+            'status' => 'completed',
+            'ended_at' => now(),
+        ]);
+
+        // Clear session
+        session()->forget('impersonate_inspection_id');
+        session()->forget('original_agent_id');
+
+        // Logout from client and log back in as agent
+        Auth::logout();
+        Auth::loginUsingId($originalAgentId);
+
+        // Auto-post to ticket history
+        TicketMessage::create([
+            'ticket_id' => $inspection->ticket_id,
+            'user_id' => $originalAgentId,
+            'message' => '✅ **AUDITORIA:** A inspeção remota foi finalizada com sucesso e a sessão foi encerrada.',
+            'is_admin_reply' => true,
+        ]);
+
+        // Notify user
+        $this->notificationService->sendToUser(
+            $inspection->client,
+            'Inspeção Concluída',
+            'A inspeção remota do suporte foi finalizada com sucesso.',
+            'success',
+            null, // actionUrl
+            'door-open',
+            'text-emerald-500'
+        );
+
+        return redirect()->route('support.tickets.show', $inspection->ticket_id)
+            ->with('success', 'Inspeção finalizada. Você retornou ao seu painel de suporte.');
+    }
+
+    /**
+     * Check if the current user has an active inspection session.
+     */
+    public function checkSession()
+    {
+        return response()->json([
+            'active' => session()->has('impersonate_inspection_id')
+        ]);
+    }
+}

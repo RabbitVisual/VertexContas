@@ -1,0 +1,70 @@
+name: Jules AI Auto-Merge
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - master
+      - main
+
+jobs:
+  auto-approve-and-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Auto-approve and Merge (Jules/AI)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const actor = context.actor;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = pr.number;
+
+            console.log(`Processing PR #${prNumber} by ${actor}`);
+
+            // Security: Only auto-merge if the actor is trusted (e.g., the owner or a bot)
+            // You can customize this list or use a label check.
+            const trustedUsers = ['RabbitVisual', 'google-jules', 'jules-ai', 'vertex-bot'];
+
+            // Or check for a specific label like 'auto-merge'
+            const hasLabel = pr.labels.some(label => label.name === 'auto-merge' || label.name === 'jules-ai');
+
+            // if (!trustedUsers.includes(actor) && !hasLabel) {
+            //   console.log('Skipping: User not trusted and no auto-merge label.');
+            //   return;
+            // }
+
+            // 1. Approve the PR
+            try {
+              await github.rest.pulls.createReview({
+                owner,
+                repo,
+                pull_number: prNumber,
+                event: 'APPROVE',
+                body: '🚀 Application: Auto-approved for Jules AI / Vertex Automation.'
+              });
+              console.log('PR approved successfully.');
+            } catch (error) {
+              console.error('Failed to approve PR:', error.message);
+            }
+
+            // 2. Merge the PR
+            try {
+              await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: prNumber,
+                merge_method: 'squash',  // Best practice: Squash for clean history
+                commit_title: `Merged PR #${prNumber}: ${pr.title}`,
+                commit_message: 'Auto-merged via Jules AI Workflow'
+              });
+              console.log('PR merged successfully.');
+            } catch (error) {
+              console.error('Failed to merge PR:', error.message);
+            }

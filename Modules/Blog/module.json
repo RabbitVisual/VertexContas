@@ -1,0 +1,17 @@
+{
+    "name": "Blog",
+    "alias": "blog",
+    "description": "Module Blog - © Vertex Solutions LTDA - 2026",
+    "version": "VS.1.0",
+    "author": "Reinan Rodrigues",
+    "email": "r.rodriguesjs@gmail.com",
+    "company": "© Vertex Solutions LTDA",
+    "year": "2026",
+    "keywords": [],
+    "priority": 0,
+    "icon": "newspaper",
+    "providers": [
+        "Modules\\Blog\\Providers\\BlogServiceProvider"
+    ],
+    "files": []
+}

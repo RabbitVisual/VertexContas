@@ -1,0 +1,90 @@
+@import './font.css';
+@import '../fw-pro/css/fontawesome.css';
+@import '../fw-pro/css/duotone.css';
+@import '../fw-pro/css/brands.css';
+@import '../fw-pro/css/solid.css';
+@import '../fw-pro/css/regular.css';
+@import '../fw-pro/css/light.css';
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../Modules/**/*.blade.php';
+@source '../../Modules/**/*.js';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* Define que o dark mode é ativado pela classe .dark no <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Professional Defaults - Enhanced UX */
+@layer base {
+    html {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    * {
+        @apply transition-all duration-200 ease-in-out;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    /* Headings default to Poppins */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-display);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        @apply ring-2 ring-primary border-transparent outline-none;
+    }
+}
+
+/* Dark Mode Configuration - Tailwind CSS v4.1 Official */
+@theme {
+    /* Fonts */
+    --font-display: 'Poppins', sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+
+    /* Light Mode Colors - Default */
+    --color-background: #ffffff;
+    --color-surface: #f9fafb;
+    --color-text: #111827;
+    --color-text-muted: #6b7280;
+    --color-border: #e5e7eb;
+    --color-primary: #3b82f6;
+    --color-primary-dark: #2563eb;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+}
+
+/* Dark Mode Colors - Tailwind CSS v4.1 Official Pattern */
+:root.dark {
+    --color-background: #111827;
+    --color-surface: #1f2937;
+    --color-text: #f9fafb;
+    --color-text-muted: #9ca3af;
+    --color-border: #374151;
+    --color-primary: #60a5fa;
+    --color-primary-dark: #3b82f6;
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+}

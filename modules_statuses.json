@@ -1,0 +1,10 @@
+{
+    "PanelAdmin": true,
+    "PanelUser": true,
+    "PanelSuporte": true,
+    "HomePage": true,
+    "Blog": true,
+    "Core": true,
+    "Gateways": true,
+    "Notifications": true
+}

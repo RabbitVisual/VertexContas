@@ -1,0 +1,17 @@
+{
+    "name": "PanelAdmin",
+    "alias": "paneladmin",
+    "description": "Module PanelAdmin - © Vertex Solutions LTDA - 2026",
+    "version": "VS.1.0",
+    "author": "Reinan Rodrigues",
+    "email": "r.rodriguesjs@gmail.com",
+    "company": "© Vertex Solutions LTDA",
+    "year": "2026",
+    "keywords": [],
+    "priority": 0,
+    "icon": "shield-halved",
+    "providers": [
+        "Modules\\PanelAdmin\\Providers\\PanelAdminServiceProvider"
+    ],
+    "files": []
+}

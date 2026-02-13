@@ -1,0 +1,33 @@
+{
+    "name": "vertex/panelsuporte",
+    "version": "1.0.0",
+    "description": "Module panelsuporte - © Vertex Solutions LTDA - 2026 - VS.1.0",
+    "authors": [
+        {
+            "name": "Reinan Rodrigues",
+            "email": "r.rodriguesjs@gmail.com",
+            "homepage": "https://vertexsolutions.com.br",
+            "role": "Developer"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PanelSuporte\\": "app/",
+            "Modules\\PanelSuporte\\Database\\Factories\\": "database/factories/",
+            "Modules\\PanelSuporte\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PanelSuporte\\Tests\\": "tests/"
+        }
+    }
+}
