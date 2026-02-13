@@ -183,6 +183,41 @@
             </div>
         </div>
 
+        <!-- Pending Comments -->
+        <div class="mt-8 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-50 dark:border-gray-800">
+                <h2 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <x-icon name="comments" class="text-indigo-500" />
+                    Comentários Pendentes
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800 text-sm">
+                        @forelse($pendingComments as $comment)
+                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-slate-700 dark:text-gray-200 block">{{ $comment->user->name }}</span>
+                                    <span class="text-xs text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-slate-600 dark:text-gray-300 line-clamp-2 text-xs">{{ $comment->content }}</p>
+                                    <span class="text-[10px] text-indigo-500 font-bold uppercase">Post: {{ $comment->post->title }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <a href="{{ route('suporte.blog.comments') }}" class="text-xs font-bold text-indigo-500 hover:underline">Gerenciar</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-400 text-xs uppercase font-bold tracking-wider">Nenhum comentário pendente</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Sidebar Activity / Stats -->
         <div class="space-y-6">
             <h3 class="font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wider text-xs px-2">

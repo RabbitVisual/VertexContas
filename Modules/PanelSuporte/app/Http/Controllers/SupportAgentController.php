@@ -25,8 +25,9 @@ class SupportAgentController extends Controller
         $highPriority = Ticket::where('status', 'open')->where('priority', 'high')->count();
 
         $recentTickets = Ticket::with('user')->latest()->take(5)->get();
+        $pendingComments = \Modules\Blog\Models\Comment::where('is_approved', false)->take(5)->get();
 
-        return view('panelsuporte::dashboard', compact('openTickets', 'pendingTickets', 'highPriority', 'recentTickets'));
+        return view('panelsuporte::dashboard', compact('openTickets', 'pendingTickets', 'highPriority', 'recentTickets', 'pendingComments'));
     }
 
     public function index(Request $request)
