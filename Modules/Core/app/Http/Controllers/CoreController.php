@@ -51,17 +51,15 @@ class CoreController extends Controller
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
-        $monthlyIncome = Transaction::where('user_id', $user->id)
-            ->where('type', 'income')
+        $monthlyStats = Transaction::where('user_id', $user->id)
             ->where('status', 'completed')
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->sum('amount');
+            ->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
+            ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
+            ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
+            ->first();
 
-        $monthlyExpenses = Transaction::where('user_id', $user->id)
-            ->where('type', 'expense')
-            ->where('status', 'completed')
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->sum('amount');
+        $monthlyIncome = $monthlyStats->income ?? 0;
+        $monthlyExpenses = $monthlyStats->expense ?? 0;
 
         $monthlyBalance = $monthlyIncome - $monthlyExpenses;
 
@@ -69,17 +67,15 @@ class CoreController extends Controller
         $previousMonthStart = now()->subMonth()->startOfMonth();
         $previousMonthEnd = now()->subMonth()->endOfMonth();
 
-        $previousMonthIncome = Transaction::where('user_id', $user->id)
-            ->where('type', 'income')
+        $previousMonthStats = Transaction::where('user_id', $user->id)
             ->where('status', 'completed')
-            ->whereBetween('date', [$previousMonthStart, $previousMonthEnd])
-            ->sum('amount');
+            ->whereBetween('date', [$previousMonthStart->format('Y-m-d'), $previousMonthEnd->format('Y-m-d')])
+            ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
+            ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
+            ->first();
 
-        $previousMonthExpenses = Transaction::where('user_id', $user->id)
-            ->where('type', 'expense')
-            ->where('status', 'completed')
-            ->whereBetween('date', [$previousMonthStart, $previousMonthEnd])
-            ->sum('amount');
+        $previousMonthIncome = $previousMonthStats->income ?? 0;
+        $previousMonthExpenses = $previousMonthStats->expense ?? 0;
 
         $incomeTrendPercentage = $previousMonthIncome > 0
             ? (($monthlyIncome - $previousMonthIncome) / $previousMonthIncome) * 100
@@ -141,24 +137,27 @@ class CoreController extends Controller
         $income = [];
         $expenses = [];
 
+        $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
+
+        $cashFlowStats = Transaction::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->where('date', '>=', $sixMonthsAgo->format('Y-m-d'))
+            ->selectRaw("substr(date, 1, 7) as month_key")
+            ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
+            ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
+            ->groupBy('month_key')
+            ->get()
+            ->keyBy('month_key');
+
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $startOfMonth = $date->copy()->startOfMonth();
-            $endOfMonth = $date->copy()->endOfMonth();
+            $monthKey = $date->format('Y-m');
 
             $months[] = $date->translatedFormat('M');
 
-            $income[] = Transaction::where('user_id', $user->id)
-                ->where('type', 'income')
-                ->where('status', 'completed')
-                ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                ->sum('amount');
-
-            $expenses[] = Transaction::where('user_id', $user->id)
-                ->where('type', 'expense')
-                ->where('status', 'completed')
-                ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                ->sum('amount');
+            $stats = $cashFlowStats->get($monthKey);
+            $income[] = $stats ? (float)$stats->income : 0;
+            $expenses[] = $stats ? (float)$stats->expense : 0;
         }
 
         return [
