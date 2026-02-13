@@ -15,14 +15,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
-    // UI Pages (Contextual)
+    // UI Pages (Contextual) - Note: Admin is now managed in routes/admin.php
     Route::get('/user/notifications', function () {
         return view('paneluser::notifications.index');
     })->name('user.notifications.index');
-
-    Route::get('/admin/notifications', function () {
-        return view('paneladmin::notifications.index');
-    })->name('admin.notifications.index');
 
     Route::get('/support/notifications', function () {
         return view('panelsuporte::notifications.index');

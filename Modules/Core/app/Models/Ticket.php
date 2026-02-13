@@ -12,6 +12,7 @@ class Ticket extends Model
 
     protected $fillable = [
         'user_id',
+        'assigned_agent_id',
         'subject',
         'priority',
         'status',
@@ -30,6 +31,11 @@ class Ticket extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignedAgent()
+    {
+        return $this->belongsTo(User::class, 'assigned_agent_id');
     }
 
     public function closedBy()

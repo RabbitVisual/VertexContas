@@ -24,9 +24,16 @@
 
         <!-- Header -->
         <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-slate-700/50">
-            <h3 class="font-bold text-sm text-gray-900 dark:text-white">Notificações</h3>
-            <button @click="markAllRead()" x-show="count > 0" class="text-xs text-primary hover:text-primary-dark font-medium transition-colors">
-                Marcar todas como lidas
+            <div class="flex items-center gap-2">
+                <h3 class="font-bold text-sm text-gray-900 dark:text-white">Notificações</h3>
+                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('super-admin'))
+                    <a href="{{ route('admin.notifications.create') }}" class="w-6 h-6 rounded-lg bg-[#11C76F]/10 text-[#11C76F] flex items-center justify-center hover:bg-[#11C76F] hover:text-white transition-all shadow-sm" title="Nova Notificação">
+                        <x-icon name="plus" class="text-xs" />
+                    </a>
+                @endif
+            </div>
+            <button @click="markAllRead()" x-show="count > 0" class="text-[10px] font-black uppercase tracking-widest text-[#11C76F] hover:text-[#0EA85A] transition-colors">
+                Limpar Tudo
             </button>
         </div>
 

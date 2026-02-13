@@ -1,14 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\PanelAdmin\Http\Controllers\AdminBlogController;
+use Modules\PanelAdmin\Http\Controllers\AdminProfileController;
+use Modules\PanelAdmin\Http\Controllers\AdminSupportController;
+use Modules\PanelAdmin\Http\Controllers\AdminUserController;
 use Modules\PanelAdmin\Http\Controllers\GatewayConfigController;
 use Modules\PanelAdmin\Http\Controllers\PanelAdminController;
-use Modules\PanelAdmin\Http\Controllers\SettingsController;
-use Modules\PanelAdmin\Http\Controllers\PlanController;
-use Modules\PanelAdmin\Http\Controllers\AdminUserController;
-use Modules\PanelAdmin\Http\Controllers\RoleController;
 use Modules\PanelAdmin\Http\Controllers\PaymentController;
-use Modules\PanelAdmin\Http\Controllers\SupportController;
+use Modules\PanelAdmin\Http\Controllers\PlanController;
+use Modules\PanelAdmin\Http\Controllers\RoleController;
+use Modules\PanelAdmin\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     // Dashboard
     Route::get('/', [PanelAdminController::class, 'index'])->name('index');
 
+    // Admin Profile
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [AdminProfileController::class, 'show'])->name('show');
+        Route::get('/edit', [AdminProfileController::class, 'edit'])->name('edit');
+        Route::put('/update', [AdminProfileController::class, 'update'])->name('update');
+        Route::post('/update-photo', [AdminProfileController::class, 'updatePhoto'])->name('update-photo');
+    });
+
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.general');
@@ -34,8 +44,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Notifications Center
     Route::get('/notifications', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/create', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'create'])->name('notifications.create');
     Route::post('/notifications/send', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'send'])->name('notifications.send');
     Route::get('/notifications/search', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'searchUser'])->name('notifications.search');
+    Route::get('/notifications/{id}', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'show'])->name('notifications.show');
+    Route::get('/notifications/{id}/edit', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'edit'])->name('notifications.edit');
+    Route::delete('/notifications/{id}', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // Gateways
     Route::resource('gateways', GatewayConfigController::class)->only(['index', 'edit', 'update']);
@@ -57,8 +71,36 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     // Global Payments
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
 
-    // Support Bridge
-    Route::get('/support', [SupportController::class, 'index'])->name('support.index')->middleware('role:admin');
+    // Admin Support Center (Global Management)
+    Route::prefix('support')->name('support.')->group(function () {
+        Route::get('/', [AdminSupportController::class, 'index'])->name('index');
+        Route::get('/{ticket}', [AdminSupportController::class, 'show'])->name('show');
+        Route::post('/{ticket}/reply', [AdminSupportController::class, 'reply'])->name('reply');
+        Route::post('/{ticket}/assign', [AdminSupportController::class, 'assign'])->name('assign');
+        Route::post('/{ticket}/takeover', [AdminSupportController::class, 'takeover'])->name('takeover');
+    });
+
+    // Blog Management
+    Route::prefix('blog')->name('blog.')->group(function () {
+        // Posts
+        Route::get('/', [AdminBlogController::class, 'index'])->name('index');
+        Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
+        Route::post('/', [AdminBlogController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminBlogController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminBlogController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminBlogController::class, 'destroy'])->name('destroy');
+
+        // Categories
+        Route::get('/categories', [AdminBlogController::class, 'categories'])->name('categories');
+        Route::post('/categories', [AdminBlogController::class, 'storeCategory'])->name('categories.store');
+        Route::put('/categories/{id}', [AdminBlogController::class, 'updateCategory'])->name('categories.update');
+        Route::delete('/categories/{id}', [AdminBlogController::class, 'destroyCategory'])->name('categories.destroy');
+
+        // Comments
+        Route::get('/comments', [AdminBlogController::class, 'comments'])->name('comments');
+        Route::post('/comments/{id}/approve', [AdminBlogController::class, 'approveComment'])->name('comments.approve');
+        Route::delete('/comments/{id}/reject', [AdminBlogController::class, 'rejectComment'])->name('comments.reject');
+    });
     // Wiki Management
     Route::prefix('wiki')->name('wiki.')->group(function () {
         // Suggestions
@@ -79,4 +121,6 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::put('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'updateArticle'])->name('articles.update');
         Route::delete('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'destroyArticle'])->name('articles.destroy');
     });
+    // User Management Extensions
+    Route::post('users/{user}/update-photo', [AdminSupportController::class, 'updateUserPhoto'])->name('users.update-photo');
 });

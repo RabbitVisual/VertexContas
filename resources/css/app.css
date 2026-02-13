@@ -53,6 +53,17 @@
     textarea:focus {
         @apply ring-2 ring-primary border-transparent outline-none;
     }
+
+    /* Force appearance-none to remove browser arrows */
+    select.appearance-none {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+    }
+
+    select.appearance-none::-ms-expand {
+        display: none !important;
+    }
 }
 
 /* Dark Mode Configuration - Tailwind CSS v4.1 Official */
