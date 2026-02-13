@@ -188,11 +188,22 @@ class HomePageTest extends TestCase
      */
     public function test_admin_login_redirects_to_dashboard(): void
     {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Create role if it doesn't exist
+        if (! \Spatie\Permission\Models\Role::where('name', 'admin')->exists()) {
+            \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        }
+
         $admin = User::factory()->create([
             'email' => 'admin@exemplo.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
         $admin->assignRole('admin');
+
+        // Verify role assignment
+        $this->assertTrue($admin->hasRole('admin'), 'Admin role was not assigned correctly.');
 
         $response = $this->post(route('login'), [
             'login_type' => 'email',
@@ -209,11 +220,22 @@ class HomePageTest extends TestCase
      */
     public function test_support_login_redirects_to_panel(): void
     {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Create role if it doesn't exist
+        if (! \Spatie\Permission\Models\Role::where('name', 'suporte')->exists()) {
+            \Spatie\Permission\Models\Role::create(['name' => 'suporte', 'guard_name' => 'web']);
+        }
+
         $agent = User::factory()->create([
             'email' => 'agent@exemplo.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
         $agent->assignRole('suporte');
+
+        // Verify role assignment
+        $this->assertTrue($agent->hasRole('suporte'), 'Support role was not assigned correctly.');
 
         $response = $this->post(route('login'), [
             'login_type' => 'email',
