@@ -16,8 +16,6 @@ class WebhookController extends Controller
      */
     public function handleStripe(Request $request)
     {
-        Log::info('Stripe Webhook Received', ['payload' => $request->all()]);
-
         $gateway = GatewayFactory::make('stripe');
 
         if (!$gateway->verifyWebhook($request)) {
@@ -26,6 +24,8 @@ class WebhookController extends Controller
         }
 
         $payload = json_decode($request->getContent(), true);
+        Log::info('Stripe Webhook Received and Verified', ['type' => $payload['type'] ?? 'unknown']);
+
         $type = $payload['type'] ?? null;
 
         if ($type === 'payment_intent.succeeded') {
@@ -46,14 +46,14 @@ class WebhookController extends Controller
      */
     public function handleMercadoPago(Request $request)
     {
-        Log::info('Mercado Pago Webhook Received', ['payload' => $request->all()]);
-
         $gateway = GatewayFactory::make('mercadopago');
 
         if (!$gateway->verifyWebhook($request)) {
             Log::warning('Mercado Pago webhook signature verification failed.');
             return response()->json(['error' => 'Invalid signature'], 400);
         }
+
+        Log::info('Mercado Pago Webhook Received and Verified', ['type' => $request->input('type'), 'id' => $request->input('data.id')]);
 
         // For Mercado Pago, we prefer handling "payment.created" or "payment.updated"
         // In a real scenario, we fetch the payment status from API using the ID in payload
