@@ -23,8 +23,9 @@ class SettingsController extends Controller
         $general = $this->settingService->getByGroup('general');
         $branding = $this->settingService->getByGroup('branding');
         $mail = $this->settingService->getByGroup('mail');
+        $blog = $this->settingService->getByGroup('blog');
 
-        return view('paneladmin::settings.index', compact('general', 'branding', 'mail'));
+        return view('paneladmin::settings.index', compact('general', 'branding', 'mail', 'blog'));
     }
 
     /**
@@ -158,5 +159,19 @@ class SettingsController extends Controller
         }
 
         return back()->with('success', 'Notificação enviada com sucesso!');
+    }
+
+    /**
+     * Update blog settings.
+     */
+    public function updateBlog(Request $request)
+    {
+        $enableGuestComments = $request->has('enable_guest_comments');
+        $this->settingService->set('enable_guest_comments', $enableGuestComments, 'blog', 'boolean');
+
+        $autoApproveComments = $request->has('auto_approve_comments');
+        $this->settingService->set('auto_approve_comments', $autoApproveComments, 'blog', 'boolean');
+
+        return back()->with('success', 'Configurações do blog atualizadas com sucesso!');
     }
 }
