@@ -1,4 +1,4 @@
-<x-blog::layouts.master>
+<x-blog::layouts.master :description="$post->meta_description ?? Str::limit(strip_tags($post->content), 160)" :ogImage="$post->og_image ? asset($post->og_image) : null">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="lg:grid lg:grid-cols-12 lg:gap-8">
             <!-- Main Content -->

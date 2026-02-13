@@ -42,6 +42,8 @@ class BlogManagerController extends Controller
             'status' => 'required|in:draft,pending_review,published',
             'is_premium' => 'boolean',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta_description' => 'nullable|string|max:160',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'notify_users' => 'boolean', // Custom field for notification
         ]);
 
@@ -57,6 +59,12 @@ class BlogManagerController extends Controller
             $imagePath = 'storage/' . $imagePath;
         }
 
+        $ogImagePath = null;
+        if ($request->hasFile('og_image')) {
+            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
+            $ogImagePath = 'storage/' . $ogImagePath;
+        }
+
         $post = Post::create([
             'author_id' => auth()->id(),
             'category_id' => $validated['category_id'],
@@ -66,6 +74,8 @@ class BlogManagerController extends Controller
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
             'featured_image' => $imagePath,
+            'meta_description' => $validated['meta_description'] ?? null,
+            'og_image' => $ogImagePath,
         ]);
 
         // Send notification if requested and published
@@ -105,6 +115,8 @@ class BlogManagerController extends Controller
             'status' => 'required|in:draft,pending_review,published',
             'is_premium' => 'boolean',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta_description' => 'nullable|string|max:160',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->title !== $post->title) {
@@ -121,12 +133,18 @@ class BlogManagerController extends Controller
             $post->featured_image = 'storage/' . $imagePath;
         }
 
+        if ($request->hasFile('og_image')) {
+            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
+            $post->og_image = 'storage/' . $ogImagePath;
+        }
+
         $post->update([
             'title' => $validated['title'],
             'category_id' => $validated['category_id'],
             'content' => $validated['content'],
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
+            'meta_description' => $validated['meta_description'] ?? null,
         ]);
 
         return redirect()->route('suporte.blog.index')->with('success', 'Post atualizado com sucesso!');

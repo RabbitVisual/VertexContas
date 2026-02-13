@@ -18,6 +18,8 @@ class Post extends Model
         'slug',
         'content',
         'featured_image',
+        'meta_description',
+        'og_image',
         'status',
         'is_premium',
         'views'

@@ -100,6 +100,25 @@
                 </div>
             </div>
         </div>
+        <!-- Blog Conversion Rate -->
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <x-icon name="chart-simple" class="w-24 h-24 text-white" />
+            </div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-indigo-100/80 font-semibold text-sm uppercase tracking-wider">Conversão Blog</p>
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
+                        <x-icon name="arrow-right-arrow-left" class="w-5 h-5 text-white" />
+                    </div>
+                </div>
+                <h3 class="text-3xl font-black mb-1">{{ number_format($blogConversionRate, 1) }}%</h3>
+                <div class="flex items-center text-xs text-indigo-100/90 font-medium">
+                    <x-icon name="users" class="w-3 h-3 mr-1" />
+                    <span>Visitantes > Assinantes</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Charts & Lists Grid -->
