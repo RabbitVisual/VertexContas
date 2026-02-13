@@ -28,7 +28,7 @@ class SubscriptionLimitService
     public function canCreate(User $user, string $entity): bool
     {
         // Pro users have unlimited access
-        if ($user->hasRole('pro_user') || $user->hasRole('admin')) {
+        if ($user->isPro()) {
             return true;
         }
 
@@ -71,7 +71,7 @@ class SubscriptionLimitService
      */
     public function getLimit(User $user, string $entity): int|string
     {
-        if ($user->hasRole('pro_user') || $user->hasRole('admin')) {
+        if ($user->isPro()) {
             return 'unlimited';
         }
 

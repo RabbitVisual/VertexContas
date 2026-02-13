@@ -14,7 +14,11 @@ class ReportsController extends Controller
     public function __construct(ReportService $reportService)
     {
         $this->middleware(['auth', 'verified']);
-        // Export permissions handled in methods
+        $this->middleware('pro')->only([
+            'exportCashFlowCsv',
+            'exportCategoryRankingCsv',
+            'exportCashFlowPdf',
+        ]);
         $this->reportService = $reportService;
     }
 
@@ -60,10 +64,6 @@ class ReportsController extends Controller
      */
     public function exportCashFlowCsv(Request $request)
     {
-        if (!auth()->user()->hasRole('pro_user') && !auth()->user()->hasRole('admin')) {
-            return back()->with('error', 'Recurso exclusivo para assinantes Pro.');
-        }
-
         $months = $request->input('months', 6);
         $user = auth()->user();
 
@@ -80,10 +80,6 @@ class ReportsController extends Controller
      */
     public function exportCategoryRankingCsv(Request $request)
     {
-        if (!auth()->user()->hasRole('pro_user') && !auth()->user()->hasRole('admin')) {
-            return back()->with('error', 'Recurso exclusivo para assinantes Pro.');
-        }
-
         $user = auth()->user();
         $startDate = $request->input('start_date')
             ? Carbon::parse($request->input('start_date'))
@@ -105,10 +101,6 @@ class ReportsController extends Controller
      */
     public function exportCashFlowPdf(Request $request)
     {
-        if (!auth()->user()->hasRole('pro_user') && !auth()->user()->hasRole('admin')) {
-            return back()->with('error', 'Recurso exclusivo para assinantes Pro.');
-        }
-
         $months = $request->input('months', 6);
         $user = auth()->user();
 
