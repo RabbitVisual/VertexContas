@@ -213,6 +213,53 @@
         </div>
     </div>
 
+    <!-- Blog Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Most Read Posts -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-icon name="newspaper" class="text-indigo-500" />
+                    Artigos Mais Lidos
+                </h2>
+            </div>
+            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+                @foreach($mostReadPosts as $post)
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="text-sm font-bold text-slate-800 dark:text-white truncate max-w-[200px]">{{ $post->title }}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-500">{{ $post->views }} views</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Top Authors -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-icon name="feather-pointed" class="text-amber-500" />
+                    Top Autores
+                </h2>
+            </div>
+            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+                @foreach($topAuthors as $stat)
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="text-sm font-bold text-slate-800 dark:text-white">{{ $stat->author->name ?? "Unknown" }}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-500">{{ $stat->total }} posts</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions Grid -->
     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
         <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">

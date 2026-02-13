@@ -1,13 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\PanelAdmin\Http\Controllers\SettingsController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Admin routes have been moved to routes/admin.php as per the new architecture.
-| This file is kept for module structure compatibility but remains empty.
-|
-*/
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::post('/settings/blog', [SettingsController::class, 'updateBlog'])->name('settings.blog');
+});
