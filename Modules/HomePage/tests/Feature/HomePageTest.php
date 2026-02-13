@@ -2,9 +2,9 @@
 
 namespace Modules\HomePage\Tests\Feature;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class HomePageTest extends TestCase
 {
@@ -75,7 +75,7 @@ class HomePageTest extends TestCase
         $pages = [
             route('features.index') => 'Gestão de Receitas',
             route('features.goals') => 'Metas Financeiras',
-            route('features.reports') => 'Distribuição de Gastos'
+            route('features.reports') => 'Distribuição de Gastos',
         ];
 
         foreach ($pages as $route => $content) {
@@ -102,14 +102,14 @@ class HomePageTest extends TestCase
     public function test_user_can_register(): void
     {
         $userData = [
-            'first_name'            => 'João',
-            'last_name'             => 'Silva',
-            'email'                 => 'joao@exemplo.com',
-            'password'              => 'password123',
+            'first_name' => 'João',
+            'last_name' => 'Silva',
+            'email' => 'joao@exemplo.com',
+            'password' => 'password123',
             'password_confirmation' => 'password123',
-            'cpf'                   => '123.456.789-00',
-            'birth_date'            => '1990-01-01',
-            'phone'                 => '(11) 98765-4321',
+            'cpf' => '123.456.789-00',
+            'birth_date' => '1990-01-01',
+            'phone' => '(11) 98765-4321',
         ];
 
         $response = $this->post(route('register'), $userData);
@@ -117,7 +117,7 @@ class HomePageTest extends TestCase
         $response->assertRedirect('/');
         $this->assertDatabaseHas('users', [
             'email' => 'joao@exemplo.com',
-            'cpf'   => '123.456.789-00',
+            'cpf' => '123.456.789-00',
         ]);
         $this->assertAuthenticated();
     }
@@ -130,10 +130,10 @@ class HomePageTest extends TestCase
         User::factory()->create(['email' => 'duplicate@exemplo.com']);
 
         $userData = [
-            'first_name'            => 'Maria',
-            'last_name'             => 'Oliveira',
-            'email'                 => 'duplicate@exemplo.com',
-            'password'              => 'password123',
+            'first_name' => 'Maria',
+            'last_name' => 'Oliveira',
+            'email' => 'duplicate@exemplo.com',
+            'password' => 'password123',
             'password_confirmation' => 'password123',
         ];
 
@@ -149,17 +149,17 @@ class HomePageTest extends TestCase
     public function test_user_can_login_with_email(): void
     {
         $user = User::factory()->create([
-            'email'    => 'test@exemplo.com',
+            'email' => 'test@exemplo.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
 
         $response = $this->post(route('login'), [
             'login_type' => 'email',
-            'email'      => 'test@exemplo.com',
-            'password'   => 'password123',
+            'email' => 'test@exemplo.com',
+            'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/');
+        $response->assertRedirect('/user');
         $this->assertAuthenticatedAs($user);
     }
 
@@ -169,18 +169,60 @@ class HomePageTest extends TestCase
     public function test_user_can_login_with_cpf(): void
     {
         $user = User::factory()->create([
-            'cpf'      => '111.222.333-44',
+            'cpf' => '111.222.333-44',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
 
         $response = $this->post(route('login'), [
             'login_type' => 'cpf',
-            'cpf'        => '111.222.333-44',
-            'password'   => 'password123',
+            'cpf' => '111.222.333-44',
+            'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/');
+        $response->assertRedirect('/user');
         $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test admin login redirects to admin panel.
+     */
+    public function test_admin_login_redirects_to_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin@exemplo.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        ]);
+        $admin->assignRole('admin');
+
+        $response = $this->post(route('login'), [
+            'login_type' => 'email',
+            'email' => 'admin@exemplo.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertRedirect('/admin');
+        $this->assertAuthenticatedAs($admin);
+    }
+
+    /**
+     * Test support agent login redirects to support panel.
+     */
+    public function test_support_login_redirects_to_panel(): void
+    {
+        $agent = User::factory()->create([
+            'email' => 'agent@exemplo.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        ]);
+        $agent->assignRole('suporte');
+
+        $response = $this->post(route('login'), [
+            'login_type' => 'email',
+            'email' => 'agent@exemplo.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertRedirect('/support');
+        $this->assertAuthenticatedAs($agent);
     }
 
     /**
@@ -189,14 +231,14 @@ class HomePageTest extends TestCase
     public function test_user_cannot_login_with_invalid_credentials(): void
     {
         $user = User::factory()->create([
-            'email'    => 'test@exemplo.com',
+            'email' => 'test@exemplo.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
 
         $response = $this->post(route('login'), [
             'login_type' => 'email',
-            'email'      => 'test@exemplo.com',
-            'password'   => 'wrong-password',
+            'email' => 'test@exemplo.com',
+            'password' => 'wrong-password',
         ]);
 
         $response->assertSessionHasErrors('email');
