@@ -70,6 +70,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user has a Pro or Admin role.
+     */
+    public function isPro(): bool
+    {
+        return $this->hasRole('pro_user') || $this->hasRole('admin');
+    }
+
+    /**
      * Get the user's photo URL.
      */
     public function getPhotoUrlAttribute(): string

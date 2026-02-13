@@ -29,7 +29,7 @@ class CategoryController extends Controller
     public function create()
     {
         // Enforce Pro-only for custom categories
-        if (! auth()->user()->hasRole('pro_user') && ! auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->isPro()) {
             return view('core::limits.reached-category');
         }
 
@@ -39,7 +39,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         // Enforce Pro-only for custom categories
-        if (! auth()->user()->hasRole('pro_user') && ! auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->isPro()) {
             return view('core::limits.reached-category');
         }
 
