@@ -34,11 +34,11 @@
         <button @click="activeTab = 'mail'" :class="{ 'border-primary text-primary': activeTab === 'mail', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'mail' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="envelope" style="solid" class="mr-2" /> E-mail (SMTP)
         </button>
-        <button @click="activeTab = 'notifications'
-                <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center" :class="{ 'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'blog' }" x-on:click.prevent="activeTab = 'blog'">
-                    <x-icon name="newspaper" class="w-5 h-5 mr-2" /> Blog
-                </a>" :class="{ 'border-primary text-primary': activeTab === 'notifications', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'notifications' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+        <button @click="activeTab = 'notifications'" :class="{ 'border-primary text-primary': activeTab === 'notifications', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'notifications' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="bell" style="solid" class="mr-2" /> Notificações
+        </button>
+        <button @click="activeTab = 'blog'" :class="{ 'border-primary text-primary': activeTab === 'blog', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'blog' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+            <x-icon name="newspaper" style="solid" class="mr-2" /> Blog
         </button>
     </div>
 
@@ -270,7 +270,7 @@
                         <p class="text-sm text-gray-500">Permitir que usuários não registrados comentem?</p>
                     </div>
                     <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" name="enable_guest_comments" id="enable_guest_comments" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" {{ ->get('enable_guest_comments') ? 'checked' : ' }}/>
+                        <input type="checkbox" name="enable_guest_comments" id="enable_guest_comments" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" {{ $blog->get('enable_guest_comments') ? 'checked' : '' }}/>
                         <label for="enable_guest_comments" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                     </div>
                 </div>
@@ -281,7 +281,7 @@
                         <p class="text-sm text-gray-500">Comentários são publicados imediatamente?</p>
                     </div>
                     <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" name="auto_approve_comments" id="auto_approve_comments" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" {{ ->get('auto_approve_comments') ? 'checked' : ' }}/>
+                        <input type="checkbox" name="auto_approve_comments" id="auto_approve_comments" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" {{ $blog->get('auto_approve_comments') ? 'checked' : '' }}/>
                         <label for="auto_approve_comments" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                     </div>
                 </div>

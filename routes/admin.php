@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/settings/branding', [SettingsController::class, 'updateBranding'])->name('settings.branding');
     Route::post('/settings/mail', [SettingsController::class, 'updateMail'])->name('settings.mail');
     Route::post('/settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
-    Route::post('/settings/mail/test', [SettingsController::class, 'testMail'])->name('settings.mail.test');
+    Route::post('/settings/blog', [SettingsController::class, 'updateBlog'])->name('settings.blog');
 
     // Notifications Center
     Route::get('/notifications', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'index'])->name('notifications.index');
