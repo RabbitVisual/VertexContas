@@ -107,7 +107,7 @@
                         </button>
                     </div>
 
-                    <form :action="'{{ route('admin.wiki.suggestions.update', '') }}/' + selectedSuggestion?.id" method="POST" class="space-y-4">
+                    <form :action="'/admin/wiki/suggestions/' + selectedSuggestion?.id" method="POST" class="space-y-4">
                         @csrf @method('PUT')
 
                         <div class="space-y-2">

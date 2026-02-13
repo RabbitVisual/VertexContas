@@ -10,7 +10,8 @@
                 <x-icon name="plus" /> Nova Categoria
             </button>
         </div>
-\n        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($categories as $category)
                 <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all group">
                     <div class="flex items-start justify-between mb-4">
@@ -39,7 +40,8 @@
             @endforeach
         </div>
     </div>
-\n    <!-- Add Category Modal -->
+
+    <!-- Add Category Modal -->
     <div id="modal-add-category" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.parentElement.classList.add('hidden')"></div>
@@ -67,7 +69,8 @@
             </div>
         </div>
     </div>
-\n    <!-- Edit Category Modal -->
+
+    <!-- Edit Category Modal -->
     <div id="modal-edit-category" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.parentElement.classList.add('hidden')"></div>
@@ -95,7 +98,8 @@
             </div>
         </div>
     </div>
-\n    @push('scripts')
+
+    @push('scripts')
     <script>
         function editCategory(category) {
             document.getElementById('edit-category-form').action = `/admin/wiki/categories/${category.id}`;

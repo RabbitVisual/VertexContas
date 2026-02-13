@@ -34,9 +34,6 @@
         <button @click="activeTab = 'mail'" :class="{ 'border-primary text-primary': activeTab === 'mail', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'mail' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="envelope" style="solid" class="mr-2" /> E-mail (SMTP)
         </button>
-        <button @click="activeTab = 'notifications'" :class="{ 'border-primary text-primary': activeTab === 'notifications', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'notifications' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
-            <x-icon name="bell" style="solid" class="mr-2" /> Notificações
-        </button>
         <button @click="activeTab = 'blog'" :class="{ 'border-primary text-primary': activeTab === 'blog', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'blog' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="newspaper" style="solid" class="mr-2" /> Blog
         </button>
@@ -203,61 +200,6 @@
         </form>
     </div>
 
-    <!-- Notification Settings -->
-    <div x-show="activeTab === 'notifications'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
-        <div class="mb-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Enviar Notificação Manual</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Envie alertas em tempo real para os usuários do sistema.</p>
-        </div>
-
-        <form action="{{ route('admin.notifications.send') }}" method="POST">
-            @csrf
-            <div class="grid grid-cols-1 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
-                    <input type="text" name="title" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensagem</label>
-                    <textarea name="message" rows="3" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Alerta</label>
-                        <select name="type" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="info">Informação (Azul)</option>
-                            <option value="success">Sucesso (Verde)</option>
-                            <option value="warning">Aviso (Amarelo)</option>
-                            <option value="danger">Erro/Perigo (Vermelho)</option>
-                        </select>
-                    </div>
-
-                    <div x-data="{ audience: 'all' }">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Público Alvo</label>
-                        <select name="audience" x-model="audience" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 mb-3">
-                            <option value="all">Todos os Usuários</option>
-                            <option value="role">Por Função (Role)</option>
-                        </select>
-
-                        <div x-show="audience === 'role'" x-transition>
-                             <select name="role" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                                <option value="free_user">Usuários Gratuitos</option>
-                                <option value="pro_user">Usuários PRO</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
-                        <x-icon name="paper-plane" style="solid" class="mr-2" /> Enviar Notificação
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <!-- Blog Settings -->
     <div x-show="activeTab === 'blog'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>

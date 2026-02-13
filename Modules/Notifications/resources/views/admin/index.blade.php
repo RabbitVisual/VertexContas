@@ -1,185 +1,174 @@
-@extends('paneladmin::layouts.master')
+<x-paneladmin::layouts.master>
+    <div class="container mx-auto px-4 py-8">
 
-@section('title', 'Central de Avisos')
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div class="space-y-1">
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic">
+                    Central de Avisos
+                </h1>
+                <p class="text-sm text-slate-500 font-medium italic">Gerencie e envie notificações para toda a plataforma.</p>
+            </div>
 
-@section('content')
-<div class="container mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <x-icon name="bullhorn" style="solid" class="text-primary" />
-            Central de Avisos
-        </h1>
-    </div>
-
-    @if(session('success'))
-        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+            <a href="{{ route('admin.notifications.create') }}" class="inline-flex items-center gap-3 px-8 py-5 bg-[#11C76F] text-white font-black rounded-3xl shadow-2xl shadow-[#11C76F]/30 hover:bg-[#0EA85A] hover:-translate-y-1 active:scale-95 transition-all text-xs uppercase tracking-[0.2em]">
+                <x-icon name="plus" class="text-lg" />
+                Nova Notificação
+            </a>
         </div>
-    @endif
 
-    <div class="bg-white dark:bg-slate-800 shadow-lg rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-        <form action="{{ route('admin.notifications.send') }}" method="POST" x-data="notificationForm()">
-            @csrf
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Content Section -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
-                        Conteúdo da Mensagem
-                    </h3>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
-                        <input type="text" name="title" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary" placeholder="Ex: Manutenção Programada" required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensagem</label>
-                        <textarea name="message" rows="4" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary" placeholder="Digite sua mensagem aqui..." required></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Alerta</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="type" value="info" class="peer sr-only" checked>
-                                <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
-                                    <x-icon name="circle-info" class="w-6 h-6 mx-auto mb-1 text-blue-500" />
-                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Info</span>
-                                </div>
-                            </label>
-
-                            <label class="cursor-pointer">
-                                <input type="radio" name="type" value="success" class="peer sr-only">
-                                <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
-                                    <x-icon name="circle-check" class="w-6 h-6 mx-auto mb-1 text-emerald-500" />
-                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Sucesso</span>
-                                </div>
-                            </label>
-
-                            <label class="cursor-pointer">
-                                <input type="radio" name="type" value="warning" class="peer sr-only">
-                                <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-600 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-900/20 text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
-                                    <x-icon name="triangle-exclamation" class="w-6 h-6 mx-auto mb-1 text-amber-500" />
-                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Aviso</span>
-                                </div>
-                            </label>
-
-                            <label class="cursor-pointer">
-                                <input type="radio" name="type" value="danger" class="peer sr-only">
-                                <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-600 peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/20 text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
-                                    <x-icon name="circle-xmark" class="w-6 h-6 mx-auto mb-1 text-red-500" />
-                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Erro</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
+        @if(session('success'))
+            <div class="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] flex items-center gap-4 text-emerald-600 dark:text-emerald-400">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <x-icon name="check" class="text-xl" />
                 </div>
+                <p class="font-black uppercase tracking-widest text-xs">{{ session('success') }}</p>
+            </div>
+        @endif
 
-                <!-- Audience Section -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
-                        Público Alvo
-                    </h3>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quem deve receber?</label>
-                        <select name="audience" x-model="audience" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary">
-                            <option value="all">📢 Todos os Usuários do Sistema</option>
-                            <option value="role">👥 Grupo Específico (Role)</option>
-                            <option value="user">👤 Usuário Individual</option>
-                        </select>
-                    </div>
-
-                    <!-- Role Selector -->
-                    <div x-show="audience === 'role'" x-transition>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selecione o Grupo</label>
-                        <select name="role" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->name }}">{{ ucfirst(str_replace('_', ' ', $role->name)) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- User Search -->
-                    <div x-show="audience === 'user'" x-transition class="relative">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buscar Usuário</label>
-                        <div class="relative">
-                            <input type="text"
-                                   x-model="searchQuery"
-                                   @input.debounce.300ms="searchUsers()"
-                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white pl-10 focus:ring-primary focus:border-primary"
-                                   placeholder="Nome, E-mail ou CPF...">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                <x-icon name="magnifying-glass" class="w-4 h-4" />
-                            </span>
-                        </div>
-
-                        <!-- Search Results Dropdown -->
-                        <div x-show="users.length > 0" @click.away="users = []" class="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                            <template x-for="user in users" :key="user.id">
-                                <div @click="selectUser(user)" class="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-0">
-                                    <p class="text-sm font-bold text-gray-900 dark:text-white" x-text="user.name"></p>
-                                    <p class="text-xs text-gray-500" x-text="user.email"></p>
-                                </div>
-                            </template>
-                        </div>
-
-                        <!-- Selected User Display -->
-                        <div x-show="selectedUser" class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-bold text-blue-900 dark:text-blue-100">Usuário Selecionado:</p>
-                                <p class="text-sm text-blue-800 dark:text-blue-200" x-text="selectedUser ? selectedUser.name : ''"></p>
-                            </div>
-                            <button type="button" @click="selectedUser = null; userId = ''" class="text-blue-500 hover:text-blue-700">
-                                <x-icon name="xmark" class="w-4 h-4" />
-                            </button>
-                        </div>
-
-                        <input type="hidden" name="user_id" x-model="userId">
+        <!-- Stats Grid (Aesthetic) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="relative z-10 flex flex-col">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Total de Disparos</span>
+                    <div class="flex items-end gap-3">
+                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">{{ $recentNotifications->sum('count') }}</span>
+                        <x-icon name="paper-plane" class="text-xl text-blue-500 mb-1" />
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700">
-                <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-lg shadow transition-all transform hover:scale-105 flex items-center gap-2">
-                    <x-icon name="paper-plane" class="w-4 h-4" />
-                    Enviar Notificação Agora
-                </button>
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="relative z-10 flex flex-col">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Alcance Médio</span>
+                    <div class="flex items-end gap-3">
+                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">98%</span>
+                        <x-icon name="users" class="text-xl text-emerald-500 mb-1" />
+                    </div>
+                </div>
             </div>
-        </form>
+
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="relative z-10 flex flex-col">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Taxa de Leitura</span>
+                    <div class="flex items-end gap-3">
+                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">74%</span>
+                        <x-icon name="eye" class="text-xl text-amber-500 mb-1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
+            <div class="p-10 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01]">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight italic">Histórico de Disparos</h3>
+                <p class="text-xs text-slate-400 font-black uppercase tracking-widest mt-1">Últimas 10 notificações enviadas</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-gray-50/30 dark:bg-transparent">
+                            <th class="px-10 py-6">Notificação</th>
+                            <th class="px-10 py-6">Tipo / Ícone</th>
+                            <th class="px-10 py-6">Alcance</th>
+                            <th class="px-10 py-6">Data de Envio</th>
+                            <th class="px-10 py-6 text-right">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                        @forelse($recentNotifications as $notification)
+                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
+                                <td class="px-10 py-8">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-black text-slate-900 dark:text-white tracking-tight">{{ $notification->data->title }}</p>
+                                        <p class="text-xs text-slate-500 line-clamp-1 max-w-md italic">{{ $notification->data->message }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-8">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center
+                                            {{ match($notification->data->type ?? 'info') {
+                                                'success' => 'bg-emerald-500/10 text-emerald-500',
+                                                'warning' => 'bg-amber-500/10 text-amber-500',
+                                                'danger' => 'bg-red-500/10 text-red-500',
+                                                default => 'bg-blue-500/10 text-blue-500'
+                                            } }}">
+                                            <x-icon :name="$notification->data->icon ?? 'bell'" class="text-lg" />
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                            {{ match($notification->data->type ?? 'info') {
+                                                'success' => 'Sucesso',
+                                                'warning' => 'Atenção',
+                                                'danger' => 'Crítico',
+                                                default => 'Informativo'
+                                            } }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-8">
+                                    <div class="flex items-center gap-2">
+                                        <div class="px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest border border-gray-100 dark:border-white/5">
+                                            {{ $notification->count }} Usuários
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-8">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic leading-none">
+                                        {{ \Carbon\Carbon::parse($notification->created_at)->format('d/m/Y - H:i') }}
+                                    </span>
+                                </td>
+                                <td class="px-10 py-8 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('admin.notifications.show', $notification->id) }}" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-[#11C76F] hover:bg-[#11C76F]/10 transition-all active:scale-90" title="Ver Detalhes">
+                                            <x-icon name="eye" class="text-lg" />
+                                        </a>
+                                        <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all active:scale-90" title="Usar como Template">
+                                            <x-icon name="copy" class="text-lg" />
+                                        </a>
+                                        <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Apagar este histórico?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-90" title="Excluir">
+                                                <x-icon name="trash" class="text-lg" />
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-10 py-20 text-center">
+                                    <div class="flex flex-col items-center gap-4">
+                                        <div class="w-20 h-20 rounded-[2rem] bg-gray-50 dark:bg-white/5 flex items-center justify-center text-slate-300">
+                                            <x-icon name="bullhorn" class="text-4xl" />
+                                        </div>
+                                        <div>
+                                            <p class="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">Nenhuma notificação enviada</p>
+                                            <p class="text-xs text-slate-400 font-medium italic mt-1">Comece criando sua primeira mensagem para os usuários.</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-10 bg-gray-50/50 dark:bg-white/[0.01] border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Mostrando últimos registros</span>
+                <div class="flex gap-2">
+                    <button class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all shadow-sm">
+                        <x-icon name="chevron-left" class="text-xs" />
+                    </button>
+                    <button class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all shadow-sm">
+                        <x-icon name="chevron-right" class="text-xs" />
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-<script>
-    function notificationForm() {
-        return {
-            audience: 'all',
-            searchQuery: '',
-            users: [],
-            selectedUser: null,
-            userId: '',
-
-            searchUsers() {
-                if (this.searchQuery.length < 2) {
-                    this.users = [];
-                    return;
-                }
-
-                fetch(`{{ route('admin.notifications.search') }}?term=${this.searchQuery}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        this.users = data;
-                    });
-            },
-
-            selectUser(user) {
-                this.selectedUser = user;
-                this.userId = user.id;
-                this.users = [];
-                this.searchQuery = '';
-            }
-        }
-    }
-</script>
-@endsection
+</x-paneladmin::layouts.master>

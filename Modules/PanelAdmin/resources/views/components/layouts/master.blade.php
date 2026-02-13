@@ -47,20 +47,8 @@
 
         <!-- Content Area -->
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            <!-- Header -->
-            <header class="bg-white dark:bg-slate-900 shadow-sm border-b border-gray-200 dark:border-gray-800 h-16 flex items-center px-6 justify-between transform transition-all duration-300">
-                <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                     <x-icon name="bars" style="solid" class="text-xl" />
-                </button>
-
-                <div class="flex items-center gap-4">
-                     <!-- Notifications -->
-                     <x-notifications::bell />
-
-                     <!-- User Menu could go here -->
-                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ Auth::user()->name ?? 'Admin' }}</span>
-                </div>
-            </header>
+            <!-- Navbar -->
+            <x-paneladmin::navbar />
 
             <!-- Main Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-background p-6">
