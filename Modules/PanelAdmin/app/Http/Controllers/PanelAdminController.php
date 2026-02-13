@@ -10,6 +10,7 @@ namespace Modules\PanelAdmin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PanelAdminController extends Controller
 {
@@ -49,6 +50,18 @@ class PanelAdminController extends Controller
             ->take(5)
             ->get();
 
+        // Blog Analytics
+        $mostReadPosts = \Modules\Blog\Models\Post::where('status', 'published')->orderBy('views', 'desc')->take(5)->get();
+
+        // Top Authors (Safe approach without assuming User model has posts relationship)
+        $topAuthors = \Modules\Blog\Models\Post::select('author_id', DB::raw('count(*) as total'))
+            ->where('status', 'published')
+            ->groupBy('author_id')
+            ->orderBy('total', 'desc')
+            ->take(5)
+            ->with('author')
+            ->get();
+
         // Chart Data (Last 6 Months Revenue)
         $revenueData = [];
         $monthLabels = [];
@@ -73,7 +86,9 @@ class PanelAdminController extends Controller
             'recentUsers',
             'recentPayments',
             'revenueData',
-            'monthLabels'
+            'monthLabels',
+            'mostReadPosts',
+            'topAuthors'
         ));
     }
 
