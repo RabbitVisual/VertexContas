@@ -43,6 +43,9 @@ jobs:
       - name: Install Node deps
         run: npm ci
 
+      - name: Build assets (Vite)
+        run: npm run build
+
       - name: Prepare .env.testing
         run: |
           cp .env.example .env.testing
