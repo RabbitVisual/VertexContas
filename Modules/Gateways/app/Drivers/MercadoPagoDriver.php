@@ -17,7 +17,7 @@ class MercadoPagoDriver implements PaymentGatewayInterface
         $this->gateway = Gateway::where('slug', 'mercadopago')->firstOrFail();
 
         MercadoPagoConfig::setAccessToken($this->gateway->secret_key);
-        MercadoPagoConfig::setRuntimeEnviroment($this->gateway->isSandbox() ? 'sandbox' : 'production');
+        MercadoPagoConfig::setRuntimeEnviroment('server');
     }
 
     /**
