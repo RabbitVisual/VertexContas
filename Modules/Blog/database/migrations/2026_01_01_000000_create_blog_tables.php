@@ -11,50 +11,54 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('blog_categories', function (Blueprint ) {
-            ->id();
-            ->string('name');
-            ->string('slug')->unique();
-            ->string('icon')->nullable();
-            ->timestamps();
+        Schema::create('blog_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('icon')->nullable();
+            $table->timestamps();
         });
 
-        Schema::create('posts', function (Blueprint ) {
-            ->id();
-            ->foreignId('author_id')->constrained('users')->onDelete('cascade');
-            ->foreignId('category_id')->constrained('blog_categories')->onDelete('cascade');
-            ->string('title');
-            ->string('slug')->unique();
-            ->longText('content');
-            ->string('featured_image')->nullable();
-            ->enum('status', ['draft', 'pending_review', 'published'])->default('draft');
-            ->boolean('is_premium')->default(false);
-            ->unsignedBigInteger('views')->default(0);
-            ->timestamps();
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('blog_categories')->onDelete('cascade');
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->longText('content');
+            $table->string('featured_image')->nullable();
+            // Campos de SEO
+            $table->text('meta_description')->nullable();
+            $table->string('og_image')->nullable();
+
+            $table->enum('status', ['draft', 'pending_review', 'published'])->default('draft');
+            $table->boolean('is_premium')->default(false);
+            $table->unsignedBigInteger('views')->default(0);
+            $table->timestamps();
         });
 
-        Schema::create('comments', function (Blueprint ) {
-            ->id();
-            ->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            ->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            ->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
-            ->text('content');
-            ->boolean('is_approved')->default(false);
-            ->timestamps();
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
+            $table->text('content');
+            $table->boolean('is_approved')->default(false);
+            $table->timestamps();
         });
 
-        Schema::create('post_likes', function (Blueprint ) {
-            ->id();
-            ->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            ->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            ->timestamps();
+        Schema::create('post_likes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
         });
 
-        Schema::create('saved_posts', function (Blueprint ) {
-            ->id();
-            ->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            ->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            ->timestamps();
+        Schema::create('saved_posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
