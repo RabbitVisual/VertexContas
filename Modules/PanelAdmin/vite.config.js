@@ -15,8 +15,7 @@ export default defineConfig({
             publicDirectory: '../../public',
             buildDirectory: 'build-paneladmin',
             input: [
-                // MUDAR AQUI: De sass/app.scss para css/app.css
-                __dirname + '/resources/assets/css/app.css',
+                __dirname + '/resources/assets/sass/app.scss',
                 __dirname + '/resources/assets/js/app.js'
             ],
             refresh: true,
