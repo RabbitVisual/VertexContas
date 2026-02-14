@@ -126,7 +126,7 @@
             </div>
         @endif
 
-        {{-- Cards tipo cartão físico --}}
+        {{-- Cards: Pro = layout cartão virtual (flip); Free = cartão físico simples --}}
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @forelse($accounts as $index => $account)
                 @php
@@ -139,53 +139,60 @@
                         'from-slate-700 to-slate-900',
                     ];
                     $bgGradient = $gradients[$index % count($gradients)];
-                    $cardIcon = match($account->type) {
-                        'cash' => 'money-bill-wave',
-                        'savings' => 'piggy-bank',
-                        default => 'credit-card'
-                    };
                 @endphp
-                <div class="group relative">
-                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br {{ $bgGradient }} shadow-lg h-60 flex flex-col justify-between p-6 text-white transition-all hover:shadow-xl hover:scale-[1.02]">
-                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,white,transparent)]"></div>
-                        <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
+                @if($isPro)
+                    <div class="flex justify-center md:justify-start">
+                        <x-core::account-card-pro :account="$account" :gradient="$bgGradient" :show-actions="true" />
+                    </div>
+                @else
+                    @php
+                        $cardIcon = match($account->type) {
+                            'cash' => 'money-bill-wave',
+                            'savings' => 'piggy-bank',
+                            default => 'credit-card'
+                        };
+                    @endphp
+                    <div class="group relative">
+                        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br {{ $bgGradient }} shadow-lg h-60 flex flex-col justify-between p-6 text-white transition-all hover:shadow-xl hover:scale-[1.02]">
+                            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,white,transparent)]"></div>
+                            <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
 
-                        <div class="relative z-10 flex justify-between items-start">
-                            <x-icon name="{{ $cardIcon }}" style="solid" class="w-9 h-9 opacity-90" />
-                            <span class="px-3 py-1.5 bg-white/20 rounded-xl text-xs font-bold uppercase tracking-wider backdrop-blur-sm">{{ $account->type === 'checking' ? 'Corrente' : ($account->type === 'savings' ? 'Poupança' : 'Dinheiro') }}</span>
-                        </div>
-
-                        <div class="relative z-10">
-                            <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                            <p class="sensitive-value text-2xl font-mono font-black tracking-tight tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
-                        </div>
-
-                        <div class="relative z-10 flex justify-between items-end">
-                            <div>
-                                <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
-                                <p class="font-semibold tracking-wider text-sm">{{ Str::upper($account->name) }}</p>
+                            <div class="relative z-10 flex justify-between items-start">
+                                <x-icon name="{{ $cardIcon }}" style="solid" class="w-9 h-9 opacity-90" />
+                                <span class="px-3 py-1.5 bg-white/20 rounded-xl text-xs font-bold uppercase tracking-wider backdrop-blur-sm">{{ $account->type === 'checking' ? 'Corrente' : ($account->type === 'savings' ? 'Poupança' : 'Dinheiro') }}</span>
                             </div>
-                            <x-icon name="cc-visa" style="brands" class="w-10 h-10 opacity-80" />
-                        </div>
 
-                        {{-- Hover: ações --}}
-                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20 rounded-3xl">
-                            <a href="{{ route('core.accounts.show', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Ver">
-                                <x-icon name="eye" style="solid" class="w-5 h-5" />
-                            </a>
-                            <a href="{{ route('core.accounts.edit', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Editar">
-                                <x-icon name="pencil" style="solid" class="w-5 h-5" />
-                            </a>
-                            <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors" title="Excluir">
-                                    <x-icon name="trash-can" style="solid" class="w-5 h-5" />
-                                </button>
-                            </form>
+                            <div class="relative z-10">
+                                <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
+                                <p class="sensitive-value text-2xl font-mono font-black tracking-tight tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                            </div>
+
+                            <div class="relative z-10 flex justify-between items-end">
+                                <div>
+                                    <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
+                                    <p class="font-semibold tracking-wider text-sm">{{ Str::upper($account->name) }}</p>
+                                </div>
+                                <x-icon name="cc-visa" style="brands" class="w-10 h-10 opacity-80" />
+                            </div>
+
+                            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20 rounded-3xl">
+                                <a href="{{ route('core.accounts.show', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Ver">
+                                    <x-icon name="eye" style="solid" class="w-5 h-5" />
+                                </a>
+                                <a href="{{ route('core.accounts.edit', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Editar">
+                                    <x-icon name="pencil" style="solid" class="w-5 h-5" />
+                                </a>
+                                <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors" title="Excluir">
+                                        <x-icon name="trash-can" style="solid" class="w-5 h-5" />
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             @empty
                 <div class="col-span-full flex flex-col items-center justify-center py-24 text-center rounded-3xl border-2 border-dashed border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950/50">
                     <div class="w-24 h-24 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center text-gray-300 dark:text-gray-700 mb-6 shadow-sm border border-gray-100 dark:border-white/5">
