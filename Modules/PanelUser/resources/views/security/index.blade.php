@@ -1,68 +1,21 @@
-<x-paneluser::layouts.master>
-    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-
-        <div class="mb-10">
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Segurança da Conta</h1>
-            <p class="mt-2 text-lg text-slate-600 dark:text-slate-400">Gerencie suas credenciais e monitore o acesso à sua conta.</p>
+<x-paneluser::layouts.master :title="__('Security Settings')">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('Security & Activity') }}</h1>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ __('Manage your password and view your login activity.') }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Support Access & Password Column -->
-            <div class="lg:col-span-1 space-y-8">
-                <!-- Support Access Card -->
+            <!-- Password Change Column -->
+            <div class="lg:col-span-1">
                 @if(!session()->has('impersonate_inspection_id'))
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
-                            <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg mr-3">
-                                <x-icon name="headset" class="text-amber-600 dark:text-amber-400" />
-                            </div>
-                            Acesso para Suporte
-                        </h3>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            Ao habilitar, você autoriza nossa equipe de suporte a visualizar e editar seus dados cadastrais por <strong>24 horas</strong> para auxiliar em chamados técnicos.
-                        </p>
-
-                        @if(auth()->user()->support_access_expires_at && auth()->user()->support_access_expires_at->isFuture())
-                            <div class="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20 mb-4">
-                                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs uppercase tracking-widest">
-                                    <x-icon name="shield-check" class="w-4 h-4" />
-                                    Acesso Autorizado
-                                </div>
-                                <p class="text-[10px] text-emerald-600/70 dark:text-emerald-400/60 mt-1 uppercase tracking-tighter">
-                                    Expira em: {{ auth()->user()->support_access_expires_at->format('d/m/Y H:i') }}
-                                </p>
-                            </div>
-                            <form action="{{ route('user.security.support-access.revoke') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm text-sm font-bold text-red-600 bg-white dark:bg-slate-900 hover:bg-red-50 transition-all">
-                                    Revogar Acesso Agora
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('user.security.support-access.grant') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
-                                    Autorizar Acesso (24h)
-                                </button>
-                            </form>
-                        @endif
-                    </div>
-                </div>
-                @endif
-
-                @if(!session()->has('impersonate_inspection_id'))
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
-                            <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-3">
-                                <x-icon name="key" class="text-indigo-600 dark:text-indigo-400" />
-                            </div>
-                            Alterar Senha
-                        </h3>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex items-center">
+                        <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-3">
+                            <i class="fa-solid fa-key text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Change Password') }}</h3>
                     </div>
 
                     <div class="p-6">
@@ -71,104 +24,116 @@
                             @method('PUT')
 
                             <div class="space-y-5">
-                                <div class="relative z-0 w-full group">
-                                    <input type="password" name="current_password" id="current_password" class="block py-2.5 px-0 w-full text-sm text-slate-900 dark:text-white bg-transparent border-0 border-b-2 border-slate-300 dark:border-slate-600 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer" placeholder=" " required />
-                                    <label for="current_password" class="peer-focus:font-medium absolute text-sm text-slate-500 dark:text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Senha Atual</label>
-                                    @error('current_password') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                                <div>
+                                    <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Current Password') }}</label>
+                                    <input type="password" name="current_password" id="current_password" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-white sm:text-sm" required />
+                                    @error('current_password') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
                                 </div>
 
-                                <div class="relative z-0 w-full group">
-                                    <input type="password" name="password" id="password" class="block py-2.5 px-0 w-full text-sm text-slate-900 dark:text-white bg-transparent border-0 border-b-2 border-slate-300 dark:border-slate-600 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer" placeholder=" " required />
-                                    <label for="password" class="peer-focus:font-medium absolute text-sm text-slate-500 dark:text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nova Senha</label>
-                                    @error('password') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                                <div>
+                                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('New Password') }}</label>
+                                    <input type="password" name="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-white sm:text-sm" required />
+                                    @error('password') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
                                 </div>
 
-                                <div class="relative z-0 w-full group">
-                                    <input type="password" name="password_confirmation" id="password_confirmation" class="block py-2.5 px-0 w-full text-sm text-slate-900 dark:text-white bg-transparent border-0 border-b-2 border-slate-300 dark:border-slate-600 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer" placeholder=" " required />
-                                    <label for="password_confirmation" class="peer-focus:font-medium absolute text-sm text-slate-500 dark:text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Confirmar Nova Senha</label>
+                                <div>
+                                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Confirm New Password') }}</label>
+                                    <input type="password" name="password_confirmation" id="password_confirmation" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:text-white sm:text-sm" required />
                                 </div>
                             </div>
 
                             <div class="mt-8">
                                 <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
-                                    Atualizar Segurança
+                                    {{ __('Update Security') }}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
                 @else
-                <div class="p-8 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-center">
-                    <x-icon name="lock" class="text-3xl text-slate-300 dark:text-slate-600 mb-3 mx-auto" />
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight">Configurações Restritas</p>
-                    <p class="text-[9px] text-slate-400/60 mt-1 uppercase tracking-tighter">O suporte não pode alterar senhas ou permissões de acesso durante a inspeção.</p>
+                <div class="p-8 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 text-center flex flex-col items-center justify-center h-full">
+                    <div class="w-16 h-16 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-lock text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-xs font-black text-gray-500 uppercase tracking-widest leading-tight mb-2">{{ __('Restricted Settings') }}</p>
+                    <p class="text-xs text-gray-400 max-w-[200px] mx-auto">{{ __('Support cannot change passwords or access permissions during inspection.') }}</p>
                 </div>
                 @endif
             </div>
 
             <!-- Activity Log Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
                              <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg mr-3">
-                                <x-icon name="shield-halved" class="text-emerald-600 dark:text-emerald-400" />
+                                <i class="fa-solid fa-shield-halved text-emerald-600 dark:text-emerald-400"></i>
                             </div>
-                            Registro de Atividades
+                            {{ __('Activity Log') }}
                         </h3>
-                         <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                             Últimos acessos
+                         <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                             {{ __('Recent Access') }}
                          </span>
                     </div>
 
                     <div class="p-6">
-                        <div class="relative border-l-2 border-slate-200 dark:border-slate-700 ml-3 space-y-8">
+                        <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 space-y-8">
+                            @php
+                                $getBrowserIcon = function($ua) {
+                                    $ua = strtolower($ua);
+                                    if (str_contains($ua, 'chrome')) return 'fa-brands fa-chrome';
+                                    if (str_contains($ua, 'firefox')) return 'fa-brands fa-firefox';
+                                    if (str_contains($ua, 'safari') && !str_contains($ua, 'chrome')) return 'fa-brands fa-safari';
+                                    if (str_contains($ua, 'edge')) return 'fa-brands fa-edge';
+                                    if (str_contains($ua, 'opera')) return 'fa-brands fa-opera';
+                                    return 'fa-solid fa-globe';
+                                };
+                                $getDeviceIcon = function($ua) {
+                                     $ua = strtolower($ua);
+                                     if (str_contains($ua, 'mobile') || str_contains($ua, 'android') || str_contains($ua, 'iphone')) return 'fa-solid fa-mobile-screen';
+                                     return 'fa-solid fa-desktop';
+                                };
+                            @endphp
+
                             @forelse($logs as $log)
                                 <div class="relative pl-8 group">
                                     <!-- Dot -->
-                                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-800 bg-emerald-500 shadow-sm z-10 transition-transform group-hover:scale-125"></div>
+                                    <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 bg-emerald-500 shadow-sm z-10 transition-transform group-hover:scale-125"></div>
 
                                     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                         <div>
-                                            <h4 class="font-bold text-slate-800 dark:text-white text-sm">
-                                                Login Realizado com Sucesso
+                                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">
+                                                {{ __('Login Successful') }}
                                             </h4>
-                                            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-col sm:flex-row gap-1 sm:gap-3">
-                                                 <span class="flex items-center">
-                                                    <x-icon name="{{ Str::contains(strtolower($log->user_agent), 'mobile') ? 'mobile-screen' : 'desktop' }}" class="mr-1.5 text-slate-400" />
-                                                    <span class="truncate max-w-[200px]" title="{{ $log->user_agent }}">{{ $log->user_agent }}</span>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex flex-col sm:flex-row gap-1 sm:gap-3 items-start sm:items-center">
+                                                 <span class="flex items-center" title="{{ $log->user_agent }}">
+                                                    <i class="{{ $getDeviceIcon($log->user_agent) }} mr-1.5 text-gray-400"></i>
+                                                    <i class="{{ $getBrowserIcon($log->user_agent) }} mr-1.5 text-gray-400"></i>
+                                                    <span class="truncate max-w-[200px]">{{ Str::limit($log->user_agent, 40) }}</span>
                                                 </span>
-                                                <span class="hidden sm:inline">•</span>
+                                                <span class="hidden sm:inline text-gray-300">•</span>
                                                 <span class="flex items-center">
-                                                    <x-icon name="globe" class="mr-1.5 text-slate-400" />
+                                                    <i class="fa-solid fa-network-wired mr-1.5 text-gray-400"></i>
                                                     {{ $log->ip_address }}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="text-right">
-                                            <time class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">
-                                                {{ $log->created_at->format('d/m/Y \à\s H:i') }}
+                                        <div class="text-right whitespace-nowrap">
+                                            <time class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md block sm:inline-block mb-1 sm:mb-0">
+                                                {{ $log->created_at->format('d/m/Y H:i') }}
                                             </time>
-                                            <p class="text-[10px] text-slate-400 mt-1">{{ $log->created_at->diffForHumans() }}</p>
+                                            <p class="text-[10px] text-gray-400">{{ $log->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>
-
-                                    <!-- Location Badge (Mockup/Optional) -->
-                                    @if($log->location)
-                                        <div class="mt-2 text-xs text-slate-500 flex items-center">
-                                            <x-icon name="location-dot" class="mr-1 text-slate-400" />
-                                            {{ $log->location }}
-                                        </div>
-                                    @endif
                                 </div>
                             @empty
-                                <div class="pl-8 text-slate-500 text-sm">
-                                    Nenhuma atividade registrada recentemente.
+                                <div class="pl-8 text-gray-500 text-sm">
+                                    {{ __('No activity recorded recently.') }}
                                 </div>
                             @endforelse
                         </div>
 
-                        <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <div class="mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
                              {{ $logs->links() }}
                         </div>
                     </div>
