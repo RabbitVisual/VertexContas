@@ -51,6 +51,7 @@ class FinancialHealthService
         $totals = RecurringTransaction::query()
             ->whereIn('user_id', $userIds)
             ->where('type', 'income')
+            ->where('is_baseline', true)
             ->active()
             ->get()
             ->groupBy('user_id')
@@ -74,25 +75,40 @@ class FinancialHealthService
     }
 
     /**
-     * Sum of monthly income from all active recurring income sources.
+     * Sum of monthly capacity (Income - Recurring Expenses).
      * For frequency = 'monthly', amount is used as-is.
      */
     public function calculateMonthlyCapacity(User $user): float
     {
-        return (float) RecurringTransaction::query()
+        $recurring = RecurringTransaction::query()
             ->where('user_id', $user->id)
-            ->where('type', 'income')
+            ->where('is_baseline', true)
             ->active()
-            ->get()
-            ->sum(function (RecurringTransaction $rt) {
-                return match ($rt->frequency) {
-                    'monthly' => (float) $rt->amount,
-                    'yearly' => (float) $rt->amount / 12,
-                    'weekly' => (float) $rt->amount * 4.33,
-                    'daily' => (float) $rt->amount * 30,
-                    default => (float) $rt->amount,
-                };
-            });
+            ->get();
+
+        $income = $recurring->where('type', 'income')->sum(function (RecurringTransaction $rt) {
+            return $this->getNormalizedMonthlyAmount($rt);
+        });
+
+        $expenses = $recurring->where('type', 'expense')->sum(function (RecurringTransaction $rt) {
+            return $this->getNormalizedMonthlyAmount($rt);
+        });
+
+        return (float) ($income - $expenses);
+    }
+
+    /**
+     * Normalize amounts based on frequency.
+     */
+    private function getNormalizedMonthlyAmount(RecurringTransaction $rt): float
+    {
+        return match ($rt->frequency) {
+            'monthly' => (float) $rt->amount,
+            'yearly' => (float) $rt->amount / 12,
+            'weekly' => (float) $rt->amount * 4.33,
+            'daily' => (float) $rt->amount * 30,
+            default => (float) $rt->amount,
+        };
     }
 
     /**
@@ -104,6 +120,7 @@ class FinancialHealthService
         return RecurringTransaction::query()
             ->where('user_id', $user->id)
             ->where('type', 'income')
+            ->where('is_baseline', true)
             ->active()
             ->orderBy('description')
             ->get()
@@ -111,5 +128,86 @@ class FinancialHealthService
                 'description' => $rt->description ?? 'Receita',
                 'amount' => (float) $rt->amount,
             ]);
+    }
+    /**
+     * Centralized logic to sync user budget planning (Baseline).
+     * Now supports both Income and Expense with Account linkage.
+     */
+    public function syncUserPlanning(\App\Models\User $user, array $incomes, array $expenses = []): void
+    {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $incomes, $expenses) {
+            // 1. Soft delete only baseline (Planejamento); keep scheduled "Repetir" recurrences
+            RecurringTransaction::where('user_id', $user->id)
+                ->where('is_baseline', true)
+                ->delete();
+
+            // 2. Create incomes
+            foreach ($incomes as $item) {
+                $this->createRecurringFromBaseline($user, $item, 'income');
+            }
+
+            // 3. Create recurring expenses (fixed costs)
+            foreach ($expenses as $item) {
+                $this->createRecurringFromBaseline($user, $item, 'expense');
+            }
+        });
+    }
+
+    private function createRecurringFromBaseline(\App\Models\User $user, array $item, string $type): void
+    {
+        // Parse amount if it's a string with "R$" or similar (common in current views)
+        $amount = (float) $this->parseMoneyAmount($item['amount'] ?? 0);
+        if ($amount <= 0) return;
+
+        $day = (int) ($item['day'] ?? 1);
+        $day = max(1, min(31, $day));
+        $nextDate = $this->calculateNextDateFromDay($day);
+
+        RecurringTransaction::create([
+            'user_id' => $user->id,
+            'category_id' => !empty($item['category_id']) ? $item['category_id'] : null,
+            'account_id' => !empty($item['account_id']) ? $item['account_id'] : null,
+            'type' => $type,
+            'amount' => $amount,
+            'frequency' => 'monthly',
+            'recurrence_day' => $day,
+            'next_date' => $nextDate,
+            'description' => $item['description'] ?? ($type === 'income' ? 'Receita' : 'Despesa Fixa'),
+            'is_active' => true,
+            'is_baseline' => true,
+        ]);
+    }
+
+    private function parseMoneyAmount(mixed $value): float
+    {
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        $str = preg_replace('/[^\d,.-]/', '', (string) $value);
+        $str = str_replace('.', '', $str);
+        $str = str_replace(',', '.', $str);
+
+        return (float) ($str ?: 0);
+    }
+
+    /**
+     * Helper to calculate next date from recurrence day.
+     */
+    private function calculateNextDateFromDay(int $day): \Carbon\Carbon
+    {
+        $now = now();
+        $thisMonth = $now->copy()->startOfMonth();
+        $safeDay = min($day, $thisMonth->daysInMonth);
+        $thisMonth->day($safeDay);
+
+        if ($thisMonth->gte($now)) {
+            return $thisMonth;
+        }
+
+        $nextMonth = $now->copy()->addMonth()->startOfMonth();
+        $safeDayNext = min($day, $nextMonth->daysInMonth);
+        $nextMonth->day($safeDayNext);
+
+        return $nextMonth;
     }
 }

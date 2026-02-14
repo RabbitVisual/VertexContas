@@ -88,4 +88,63 @@ class Budget extends Model
     {
         return $this->spent_amount > $this->limit_amount;
     }
+
+    /**
+     * Check if adding an expense would exceed a budget that has allow_exceed = false.
+     * Returns the Budget that would be exceeded, or null.
+     *
+     * @param  int  $userId
+     * @param  int  $categoryId
+     * @param  float  $amount
+     * @param  string  $date  (Y-m-d)
+     * @param  int|null  $excludeTransactionId  For update: exclude this transaction from spent sum
+     * @return Budget|null
+     */
+    public static function getBlockingBudgetIfExceeded(
+        int $userId,
+        int $categoryId,
+        float $amount,
+        string $date,
+        ?int $excludeTransactionId = null
+    ): ?Budget {
+        $dateObj = \Carbon\Carbon::parse($date);
+
+        $budgets = self::where('user_id', $userId)
+            ->where('category_id', $categoryId)
+            ->where('allow_exceed', false)
+            ->get();
+
+        foreach ($budgets as $budget) {
+            $startDate = $budget->period === 'monthly'
+                ? $dateObj->copy()->startOfMonth()
+                : $dateObj->copy()->startOfYear();
+
+            $spentQuery = Transaction::where('user_id', $userId)
+                ->where('category_id', $categoryId)
+                ->where('type', 'expense')
+                ->where('status', 'completed')
+                ->where('date', '>=', $startDate);
+
+            if ($budget->period === 'monthly') {
+                $endDate = $dateObj->copy()->endOfMonth();
+                $spentQuery->where('date', '<=', $endDate);
+            } else {
+                $endDate = $dateObj->copy()->endOfYear();
+                $spentQuery->where('date', '<=', $endDate);
+            }
+
+            if ($excludeTransactionId !== null) {
+                $spentQuery->where('id', '!=', $excludeTransactionId);
+            }
+
+            $spent = (float) $spentQuery->sum('amount');
+            $limit = (float) $budget->limit_amount;
+
+            if ($spent + $amount > $limit) {
+                return $budget;
+            }
+        }
+
+        return null;
+    }
 }

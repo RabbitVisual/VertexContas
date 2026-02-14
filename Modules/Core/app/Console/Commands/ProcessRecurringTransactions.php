@@ -3,6 +3,7 @@
 namespace Modules\Core\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 use Modules\Core\Models\RecurringTransaction;
 
 class ProcessRecurringTransactions extends Command
@@ -15,7 +16,7 @@ class ProcessRecurringTransactions extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Process all due recurring transactions';
+    protected $description = 'Process all due recurring transactions (only scheduled "Repetir", not baseline planning)';
 
     /**
      * Execute the console command.
@@ -24,11 +25,16 @@ class ProcessRecurringTransactions extends Command
     {
         $this->info('Processing recurring transactions...');
 
-        $recurringTransactions = RecurringTransaction::active()
+        $query = RecurringTransaction::active()
             ->due()
             ->processable()
-            ->with(['user', 'account', 'category'])
-            ->get();
+            ->with(['user', 'account', 'category']);
+
+        if (Schema::hasColumn('recurring_transactions', 'is_baseline')) {
+            $query->where('is_baseline', false);
+        }
+
+        $recurringTransactions = $query->get();
 
         if ($recurringTransactions->isEmpty()) {
             $this->info('No recurring transactions to process.');

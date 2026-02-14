@@ -106,20 +106,20 @@ class PanelUserController extends Controller
         $monthlyCapacity = $financialHealthService->calculateMonthlyCapacity($user);
         $incomeBreakdown = $financialHealthService->getIncomeBreakdown($user);
 
-        return view('paneluser::index', compact(
-            'totalBalance',
-            'monthlyIncome',
-            'monthlyExpense',
-            'goals',
-            'user',
-            'chartLabels',
-            'incomeData',
-            'expenseData',
-            'spendingByCategory',
-            'recentTransactions',
-            'monthlyCapacity',
-            'incomeBreakdown'
-        ));
+        return view('paneluser::index', [
+            'stockBalance' => $totalBalance,
+            'monthlyIncome' => $monthlyIncome,
+            'monthlyExpense' => $monthlyExpense,
+            'goals' => $goals,
+            'user' => $user,
+            'chartLabels' => $chartLabels,
+            'incomeData' => $incomeData,
+            'expenseData' => $expenseData,
+            'spendingByCategory' => $spendingByCategory,
+            'recentTransactions' => $recentTransactions,
+            'flowCapacity' => $monthlyCapacity,
+            'incomeBreakdown' => $incomeBreakdown
+        ]);
     }
 
     public function completeOnboarding()

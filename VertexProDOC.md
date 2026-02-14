@@ -140,6 +140,32 @@ public function isPro(): bool
 
 ---
 
+## 7.1 Orçamentos Premium (Vertex Premium)
+
+**Arquivos:**  
+`Modules/Core/app/Models/Budget.php`  
+`Modules/Core/app/Http/Controllers/BudgetController.php`  
+`Modules/Core/resources/views/budgets/index.blade.php`  
+`Modules/Core/resources/views/budgets/create.blade.php`  
+`Modules/Core/resources/views/budgets/edit.blade.php`  
+`Modules/Core/resources/views/components/budget-card.blade.php`
+
+O módulo de Orçamentos oferece recursos exclusivos PRO, invisíveis para usuários gratuitos.
+
+| Recurso | Quem vê | Descrição |
+|---------|---------|-----------|
+| **Alertas customizados** | **Apenas PRO** | Campo `alert_threshold` (50–100%): o usuário escolhe em qual percentual de consumo deseja ser alertado. FREE usa 80% fixo. |
+| **Bloquear excessos** | **Apenas PRO** | Campo `allow_exceed`: quando desativado, novas despesas na categoria são bloqueadas se ultrapassarem o limite do orçamento (validação em `TransactionController::store` e `update`; `Budget::getBlockingBudgetIfExceeded()`). FREE sempre permite exceder. |
+| **Análise de Desvio** | **Apenas PRO** | Na página de orçamentos (`budgets/index`), bloco "Análise de Desvio Pro" com as top 3 categorias cujo consumo supera o `alert_threshold` do próprio orçamento. FREE não vê este bloco. |
+| **Stats bar (Total Orçado, Total Utilizado, Consumo Médio)** | **Apenas PRO** | Barra de estatísticas no hero da página de orçamentos. FREE não vê. |
+| **Limit status (Orçamentos Ativos X/Y)** | Apenas FREE | Barra de limite de orçamentos; PRO não vê. |
+
+**Banco de dados:** tabela `budgets` com colunas `alert_threshold` (integer, default 80) e `allow_exceed` (boolean, default true), adicionadas pela migration `add_pro_fields_to_budgets_table`.
+
+**Formulários create/edit:** os campos "Alerta de Consumo" (slider) e "Bloquear Excessos" (toggle) são exibidos apenas quando `$isPro` é verdadeiro; caso contrário, o backend persiste 80 e true respectivamente.
+
+---
+
 ## 8. Categorias Personalizadas
 
 **Arquivo:** `Modules/Core/app/Models/Category.php`
@@ -322,6 +348,12 @@ Design alinhado ao padrão de perfil (breadcrumb, header, cards em grid, ícones
 | `Modules/Core/resources/views/invoices/index.blade.php` | View de faturas (histórico + próxima cobrança) |
 | `Modules/Core/app/Http/Middleware/EnsureUserIsPro.php` | Proteção de rotas PRO |
 | `Modules/Core/app/Models/Category.php` | Categorias personalizadas (PRO) |
+| `Modules/Core/app/Models/Budget.php` | Orçamentos: `alert_threshold`, `allow_exceed`, `getBlockingBudgetIfExceeded()` |
+| `Modules/Core/app/Http/Controllers/BudgetController.php` | Persiste alert_threshold/allow_exceed apenas para PRO |
+| `Modules/Core/app/Http/Controllers/TransactionController.php` | Bloqueio de despesa quando orçamento com allow_exceed=false seria excedido |
+| `Modules/Core/resources/views/budgets/index.blade.php` | Análise de Desvio e stats bar (PRO) |
+| `Modules/Core/resources/views/budgets/create.blade.php` | Campos PRO: alerta e bloquear excessos |
+| `Modules/Core/resources/views/components/budget-card.blade.php` | Usa alert_threshold por orçamento |
 | `Modules/Gateways/app/Http/Controllers/WebhookController.php` | Upgrade via pagamento |
 | `database/seeders/DatabaseSeeder.php` | Conta demo PRO |
 | `Modules/HomePage/resources/views/auth/login.blade.php` | Auto login PRO |

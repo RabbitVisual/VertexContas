@@ -6,11 +6,12 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RecurringTransaction extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -23,6 +24,7 @@ class RecurringTransaction extends Model
         'next_date',
         'description',
         'is_active',
+        'is_baseline',
     ];
 
     protected $casts = [
@@ -30,6 +32,7 @@ class RecurringTransaction extends Model
         'next_date' => 'date',
         'recurrence_day' => 'integer',
         'is_active' => 'boolean',
+        'is_baseline' => 'boolean',
         'type' => 'string',
         'frequency' => 'string',
     ];

@@ -4,9 +4,11 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Core\Http\Requests\StoreTransactionRequest;
 use Modules\Core\Http\Requests\UpdateTransactionRequest;
 use Modules\Core\Models\Account;
+use Modules\Core\Models\Budget;
 use Modules\Core\Models\Category;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\SubscriptionLimitService;
@@ -29,10 +31,9 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $query = Transaction::where('user_id', auth()->id())
+        $query = Transaction::where('user_id', Auth::id())
             ->with(['account', 'category']);
 
-        // Filter by month/year
         if ($request->filled('month')) {
             $query->whereMonth('date', $request->month);
         }
@@ -42,35 +43,67 @@ class TransactionController extends Controller
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
+        if ($request->filled('search')) {
+            $query->where('description', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('min_amount') && is_numeric($request->min_amount)) {
+            $query->where('amount', '>=', (float) $request->min_amount);
+        }
 
         $transactions = $query->orderBy('date', 'desc')->paginate(20);
 
-        return view('core::transactions.index', compact('transactions'));
+        // Apenas baseline (Planejamento) para o widget de comparação
+        $recurringTransactions = \Modules\Core\Models\RecurringTransaction::where('user_id', Auth::id())
+            ->where('is_baseline', true)
+            ->active()
+            ->get();
+
+        return view('core::transactions.index', compact('transactions', 'recurringTransactions'));
     }
 
     public function create(Request $request)
     {
         $this->authorize('create', Transaction::class);
 
-        $accounts = Account::where('user_id', auth()->id())->get();
-        // Fetch system categories + user custom categories (if Pro)
-        $categories = Category::forUser(auth()->user())->get();
+        $accounts = Account::where('user_id', Auth::id())->get();
+        $categories = Category::forUser(Auth::user())->get();
         $type = $request->query('type', 'expense');
+        $recurringTransactions = \Modules\Core\Models\RecurringTransaction::where('user_id', Auth::id())
+            ->where('is_baseline', true)
+            ->active()
+            ->get();
 
-        return view('core::transactions.create', compact('accounts', 'categories', 'type'));
+        return view('core::transactions.create', compact('accounts', 'categories', 'type', 'recurringTransactions'));
     }
 
     public function store(StoreTransactionRequest $request)
     {
         // Check limit
-        if (! $this->limitService->canCreate(auth()->user(), $request->type)) {
+        if (! $this->limitService->canCreate(Auth::user(), $request->type)) {
             return view('core::limits.reached-transaction', ['type' => $request->type]);
         }
 
         $this->authorize('create', Transaction::class);
 
-        Transaction::create([
-            'user_id' => auth()->id(),
+        if ($request->type === 'expense' && $request->status === 'completed') {
+            $blocking = Budget::getBlockingBudgetIfExceeded(
+                (int) Auth::id(),
+                (int) $request->category_id,
+                (float) $request->amount,
+                $request->date
+            );
+            if ($blocking !== null) {
+                $categoryName = $blocking->category?->name ?? 'Categoria';
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'amount' => "O orçamento da categoria \"{$categoryName}\" não permite ultrapassar o limite (bloqueio de excessos ativo).",
+                    ]);
+            }
+        }
+
+        $transaction = Transaction::create([
+            'user_id' => Auth::id(),
             'account_id' => $request->account_id,
             'category_id' => $request->category_id,
             'type' => $request->type,
@@ -80,27 +113,71 @@ class TransactionController extends Controller
             'status' => $request->status,
         ]);
 
+        // PRO: Create automated recurrence if requested
+        if (Auth::user()->isPro() && $request->boolean('is_recurring')) {
+            $day = (int) date('d', strtotime($request->date));
+            $nextDate = \Carbon\Carbon::parse($request->date)->addMonth();
+
+            \Modules\Core\Models\RecurringTransaction::create([
+                'user_id' => Auth::id(),
+                'account_id' => $request->account_id,
+                'category_id' => $request->category_id,
+                'type' => $request->type,
+                'amount' => $request->amount,
+                'frequency' => 'monthly',
+                'recurrence_day' => $day,
+                'next_date' => $nextDate,
+                'description' => $request->description,
+                'is_active' => true,
+                'is_baseline' => false,
+            ]);
+        }
+
         return redirect()->route('core.transactions.index')
-            ->with('success', 'Transação criada com sucesso!');
+            ->with('success', $request->boolean('is_recurring')
+                ? 'Transação registrada e agendamento recorrente criado!'
+                : 'Transação criada com sucesso!');
     }
 
     public function edit(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
 
-        $accounts = Account::where('user_id', auth()->id())->get();
+        $accounts = Account::where('user_id', Auth::id())->get();
 
         // Fetch categories + ensure current category is included (handling expired Pro case)
-        $categories = Category::forUser(auth()->user())
+        $categories = Category::forUser(Auth::user())
             ->orWhere('id', $transaction->category_id)
             ->get();
+        $recurringTransactions = \Modules\Core\Models\RecurringTransaction::where('user_id', Auth::id())
+            ->where('is_baseline', true)
+            ->active()
+            ->get();
 
-        return view('core::transactions.edit', compact('transaction', 'accounts', 'categories'));
+        return view('core::transactions.edit', compact('transaction', 'accounts', 'categories', 'recurringTransactions'));
     }
 
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
     {
         $this->authorize('update', $transaction);
+
+        if ($request->type === 'expense' && $request->status === 'completed') {
+            $blocking = Budget::getBlockingBudgetIfExceeded(
+                (int) Auth::id(),
+                (int) $request->category_id,
+                (float) $request->amount,
+                $request->date,
+                $transaction->id
+            );
+            if ($blocking !== null) {
+                $categoryName = $blocking->category?->name ?? 'Categoria';
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'amount' => "O orçamento da categoria \"{$categoryName}\" não permite ultrapassar o limite (bloqueio de excessos ativo).",
+                    ]);
+            }
+        }
 
         $transaction->update([
             'account_id' => $request->account_id,
@@ -131,8 +208,8 @@ class TransactionController extends Controller
      */
     public function transfer()
     {
-        $accounts = Account::where('user_id', auth()->id())->get();
-        $categories = Category::where('user_id', auth()->id())->get();
+        $accounts = Account::where('user_id', Auth::id())->get();
+        $categories = Category::where('user_id', Auth::id())->get();
 
         return view('core::transactions.transfer', compact('accounts', 'categories'));
     }
