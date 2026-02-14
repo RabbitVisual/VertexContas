@@ -10,7 +10,15 @@
         (function() {
             var isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark', isDark);
-            document.body.classList.toggle('sensitive-hidden', localStorage.getItem('sensitive-hidden') === 'true');
+
+            var isHidden = localStorage.getItem('sensitive-hidden') === 'true';
+            if (document.body) {
+                document.body.classList.toggle('sensitive-hidden', isHidden);
+            } else {
+                window.addEventListener('DOMContentLoaded', function() {
+                    document.body.classList.toggle('sensitive-hidden', isHidden);
+                });
+            }
         })();
     </script>
 

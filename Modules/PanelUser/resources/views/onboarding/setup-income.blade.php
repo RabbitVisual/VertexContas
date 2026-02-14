@@ -64,6 +64,7 @@
                             </div>
                             <div class="w-full sm:w-28">
                                 <label :for="'day-' + index" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dia do recebimento</label>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 block mb-0.5">31 = último dia do mês</span>
                                 <select
                                     :name="'incomes[' + index + '][day]'"
                                     :id="'day-' + index"

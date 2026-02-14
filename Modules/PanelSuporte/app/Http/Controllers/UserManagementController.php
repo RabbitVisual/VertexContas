@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Modules\Core\Services\FinancialHealthService;
 
 class UserManagementController extends Controller
 {
@@ -21,7 +22,10 @@ class UserManagementController extends Controller
             return redirect()->route('support.tickets.index')->with('error', 'Acesso ao perfil do usuário não autorizado ou expirado.');
         }
 
-        return view('panelsuporte::users.show', compact('user'));
+        $financialHealthService = app(FinancialHealthService::class);
+        $financialSnapshot = $financialHealthService->getUserFinancialSnapshot($user);
+
+        return view('panelsuporte::users.show', compact('user', 'financialSnapshot'));
     }
 
     /**

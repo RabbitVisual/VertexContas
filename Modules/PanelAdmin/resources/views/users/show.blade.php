@@ -71,7 +71,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Saldo Total</div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($totalBalance, 2, ',', '.') }}</div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['account_balance'], 2, ',', '.') }}</div>
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Contas</div>
@@ -81,6 +81,30 @@
                     <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Transações</div>
                     <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $transactionCount }}</div>
                 </div>
+            </div>
+
+            <!-- Financial Health Card (Glassmorphism) -->
+            <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-lg p-6">
+                <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <x-icon name="chart-line" class="text-primary" />
+                    Saúde Financeira
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Renda Mensal Declarada</span>
+                        <div class="text-xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['monthly_income'], 2, ',', '.') }}</div>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Saldo em Contas</span>
+                        <div class="text-xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['account_balance'], 2, ',', '.') }}</div>
+                    </div>
+                </div>
+                @if($financialSnapshot['monthly_income'] > 0)
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
+                        Active Earner
+                    </span>
+                @endif
             </div>
 
             @if(isset($supportStats))
