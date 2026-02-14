@@ -72,11 +72,28 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fuso Horário</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fuso Horário (GMT)</label>
                         <select name="app_timezone" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
-                            <option value="America/Sao_Paulo" {{ $general->get('app_timezone') == 'America/Sao_Paulo' ? 'selected' : '' }}>America/Sao_Paulo</option>
-                            <option value="UTC" {{ $general->get('app_timezone') == 'UTC' ? 'selected' : '' }}>UTC</option>
+                            <optgroup label="Brasil">
+                                <option value="America/Sao_Paulo" {{ $general->get('app_timezone') == 'America/Sao_Paulo' ? 'selected' : '' }}>Brasília (GMT-3)</option>
+                                <option value="America/Bahia" {{ $general->get('app_timezone') == 'America/Bahia' ? 'selected' : '' }}>Bahia (GMT-3)</option>
+                                <option value="America/Fortaleza" {{ $general->get('app_timezone') == 'America/Fortaleza' ? 'selected' : '' }}>Fortaleza / Nordeste (GMT-3)</option>
+                                <option value="America/Recife" {{ $general->get('app_timezone') == 'America/Recife' ? 'selected' : '' }}>Recife (GMT-3)</option>
+                                <option value="America/Belem" {{ $general->get('app_timezone') == 'America/Belem' ? 'selected' : '' }}>Belém (GMT-3)</option>
+                                <option value="America/Cuiaba" {{ $general->get('app_timezone') == 'America/Cuiaba' ? 'selected' : '' }}>Cuiabá (GMT-4)</option>
+                                <option value="America/Campo_Grande" {{ $general->get('app_timezone') == 'America/Campo_Grande' ? 'selected' : '' }}>Campo Grande (GMT-4)</option>
+                                <option value="America/Manaus" {{ $general->get('app_timezone') == 'America/Manaus' ? 'selected' : '' }}>Manaus (GMT-4)</option>
+                                <option value="America/Porto_Velho" {{ $general->get('app_timezone') == 'America/Porto_Velho' ? 'selected' : '' }}>Porto Velho (GMT-4)</option>
+                                <option value="America/Rio_Branco" {{ $general->get('app_timezone') == 'America/Rio_Branco' ? 'selected' : '' }}>Rio Branco (GMT-5)</option>
+                            </optgroup>
+                            <optgroup label="Outros">
+                                <option value="UTC" {{ $general->get('app_timezone') == 'UTC' ? 'selected' : '' }}>UTC (GMT+0)</option>
+                                <option value="America/New_York" {{ $general->get('app_timezone') == 'America/New_York' ? 'selected' : '' }}>Nova York (GMT-5/-4)</option>
+                                <option value="Europe/Lisbon" {{ $general->get('app_timezone') == 'Europe/Lisbon' ? 'selected' : '' }}>Lisboa (GMT+0/+1)</option>
+                                <option value="Europe/London" {{ $general->get('app_timezone') == 'Europe/London' ? 'selected' : '' }}>Londres (GMT+0/+1)</option>
+                            </optgroup>
                         </select>
+                        <p class="text-xs text-gray-500 mt-1">Usado globalmente em todo o sistema para datas e horários.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Idioma Padrão</label>

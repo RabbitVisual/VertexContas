@@ -15,8 +15,8 @@ class EnsureFinancialSetup
      * Routes that do not require income setup (avoid redirect loop).
      */
     private const EXCLUDED_ROUTES = [
-        'paneluser.onboarding.setup-income',
-        'paneluser.onboarding.store-income',
+        'core.income.index',
+        'core.income.store',
         'paneluser.onboarding.complete',
         'user.subscription.index',
         'login',
@@ -48,8 +48,8 @@ class EnsureFinancialSetup
             ->count();
 
         if ($count === 0) {
-            return redirect()->route('paneluser.onboarding.setup-income')
-                ->with('info', __('Configure suas fontes de receita para continuar.'));
+            return redirect()->route('core.income.index')
+                ->with('info', 'Configure suas fontes de receita para continuar.');
         }
 
         return $next($request);

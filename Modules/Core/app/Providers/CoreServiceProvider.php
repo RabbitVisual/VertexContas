@@ -54,13 +54,20 @@ class CoreServiceProvider extends ServiceProvider
 
             $settings = app(\Modules\Core\Services\SettingService::class);
 
-            // Override app configs
+            // Override app configs from admin panel
+            $timezone = $settings->get('app_timezone', 'America/Sao_Paulo');
+            $locale = $settings->get('app_locale', 'pt_BR');
+
             config([
                 'app.name' => $settings->get('app_name', env('APP_NAME', 'Vertex Contas')),
                 'app.url' => $settings->get('app_url', env('APP_URL', 'http://localhost')),
-                'app.timezone' => $settings->get('app_timezone', 'America/Sao_Paulo'),
-                'app.locale' => $settings->get('app_locale', 'pt_BR'),
+                'app.timezone' => $timezone,
+                'app.locale' => $locale,
             ]);
+
+            // Apply timezone and locale globally (datas e Carbon)
+            date_default_timezone_set($timezone);
+            \Carbon\Carbon::setLocale($locale);
 
             // Override mail configs
             config([

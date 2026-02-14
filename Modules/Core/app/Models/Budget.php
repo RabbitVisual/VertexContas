@@ -5,8 +5,8 @@ namespace Modules\Core\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Budget extends Model
 {
@@ -17,11 +17,15 @@ class Budget extends Model
         'category_id',
         'limit_amount',
         'period',
+        'alert_threshold',
+        'allow_exceed',
     ];
 
     protected $casts = [
         'limit_amount' => 'decimal:2',
         'period' => 'string',
+        'alert_threshold' => 'integer',
+        'allow_exceed' => 'boolean',
     ];
 
     /**

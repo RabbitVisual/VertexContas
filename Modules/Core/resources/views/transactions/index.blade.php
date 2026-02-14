@@ -136,8 +136,10 @@
 
             <div class="p-6">
                 @php
-                    $groupedTransactions = $transactions->groupBy(function($date) {
-                        return \Carbon\Carbon::parse($date->date)->isoFormat('ODD [de] MMMM [de] YYYY');
+                    $groupedTransactions = $transactions->groupBy(function($tx) {
+                        return \Carbon\Carbon::parse($tx->date, config('app.timezone'))
+                            ->locale(config('app.locale', 'pt_BR'))
+                            ->translatedFormat('j \d\e F \d\e Y');
                     });
                 @endphp
 

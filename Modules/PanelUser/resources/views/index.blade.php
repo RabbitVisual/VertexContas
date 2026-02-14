@@ -39,11 +39,13 @@
                         <x-icon name="plus" style="solid" class="w-5 h-5 text-primary-600" />
                         Nova Transação
                     </a>
-                    <a href="{{ route('paneluser.onboarding.setup-income') }}"
+                    @if(Route::has('core.income.index'))
+                    <a href="{{ route('core.income.index') }}"
                        class="inline-flex items-center gap-2 px-5 py-3 bg-white/10 border border-white/20 text-white font-bold rounded-2xl hover:bg-white/20 transition-all">
                         <x-icon name="sack-dollar" style="solid" class="w-5 h-5 text-emerald-400" />
-                        Fontes de Receita
+                        Minha Renda
                     </a>
+                    @endif
                 </div>
             </div>
         </div>
