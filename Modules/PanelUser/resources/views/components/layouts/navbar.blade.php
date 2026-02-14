@@ -5,12 +5,12 @@
     $photoUrl = $user?->photo_url ?? asset('assets/images/default-avatar.png');
     $hasPhoto = !empty($user?->photo);
 @endphp
-<nav class="fixed top-0 left-0 right-0 z-50 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+<nav class="fixed top-0 left-0 right-0 z-50 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
     <div class="px-4 py-3 lg:px-6">
         <div class="flex items-center justify-between">
             {{-- Logo + Mobile Toggle --}}
             <div class="flex items-center gap-2 md:gap-4">
-                <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button"
+                <button id="drawer-toggle-btn" data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button"
                     class="inline-flex items-center justify-center p-2.5 text-gray-500 rounded-xl hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 md:hidden">
                     <span class="sr-only">Abrir menu lateral</span>
                     <x-icon name="bars" style="solid" class="w-5 h-5" />
@@ -24,22 +24,17 @@
 
             {{-- Right: Theme, Notifications, Profile --}}
             <div class="flex items-center gap-1 sm:gap-2">
-                {{-- Theme Toggle (Alpine - um ícone por vez) --}}
-                <div x-data="{ dark: false }" x-init="dark = document.documentElement.classList.contains('dark')">
-                    <button @click="
-                        dark = !dark;
-                        if (dark) { document.documentElement.classList.add('dark'); localStorage.setItem('color-theme', 'dark'); }
-                        else { document.documentElement.classList.remove('dark'); localStorage.setItem('color-theme', 'light'); }
-                    " type="button" aria-label="Alternar tema"
-                        class="p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-colors">
-                        <span x-show="dark" x-transition class="block w-5 h-5">
-                            <x-icon name="sun" style="solid" class="w-5 h-5" />
-                        </span>
-                        <span x-show="!dark" x-transition class="block w-5 h-5">
-                            <x-icon name="moon" style="solid" class="w-5 h-5" />
-                        </span>
-                    </button>
-                </div>
+                {{-- Theme Toggle (liga/desliga com ícones sol e lua - Font Awesome local) --}}
+                <label for="theme-toggle-checkbox" class="relative block h-8 w-14 rounded-full bg-gray-300 transition-colors cursor-pointer [-webkit-tap-highlight-color:transparent] has-checked:bg-primary-500 dark:has-checked:bg-primary-600" aria-label="Alternar tema claro/escuro">
+                    <input type="checkbox" id="theme-toggle-checkbox" class="peer sr-only">
+                    <span class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-white shadow-sm ring-4 ring-white ring-inset transition-all duration-200 ease-out peer-checked:start-7 pointer-events-none"></span>
+                    <span class="absolute inset-y-0 start-0 m-1 size-6 rounded-full flex items-center justify-center text-amber-500 transition-all duration-200 ease-out peer-checked:start-7 pointer-events-none opacity-100 peer-checked:opacity-0 peer-checked:invisible">
+                        <x-icon name="sun" style="solid" class="w-3.5 h-3.5" />
+                    </span>
+                    <span class="absolute inset-y-0 start-0 m-1 size-6 rounded-full flex items-center justify-center text-indigo-200 transition-all duration-200 ease-out peer-checked:start-7 pointer-events-none opacity-0 invisible peer-checked:opacity-100 peer-checked:visible">
+                        <x-icon name="moon" style="solid" class="w-3.5 h-3.5" />
+                    </span>
+                </label>
 
                 {{-- Notifications Bell (full component with dropdown) --}}
                 <div class="relative">
@@ -137,4 +132,15 @@
         </div>
     </div>
 </nav>
-
+<script>
+(function(){
+    var cb = document.getElementById('theme-toggle-checkbox');
+    if (!cb) return;
+    cb.checked = document.documentElement.classList.contains('dark');
+    cb.addEventListener('change', function(){
+        var isDark = cb.checked;
+        document.documentElement.classList.toggle('dark', isDark);
+        localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+    });
+})();
+</script>

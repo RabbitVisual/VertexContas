@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
       x-data="{
-          darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          darkMode: localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
       }"
       :class="{ 'dark': darkMode }"
       x-init="$watch('darkMode', val => {
-          localStorage.setItem('theme', val ? 'dark' : 'light');
-          if (val) {
-              document.documentElement.classList.add('dark');
-          } else {
-              document.documentElement.classList.remove('dark');
-          }
+          localStorage.setItem('color-theme', val ? 'dark' : 'light');
+          document.documentElement.classList.toggle('dark', val);
       })"
 >
 <head>
@@ -19,26 +15,21 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+    {{-- Anti-FOUC: Flowbite/Tailwind dark mode --}}
+    <script>
+        (function(){var d=localStorage.getItem('color-theme')==='dark'||(!('color-theme' in localStorage)&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();
+    </script>
+
     <title>{{ $title ?? 'Vertex Contas - Support Panel' }}</title>
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
 
-    <!-- Anti-Flicker Script -->
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-
-    <!-- Fonts & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Module Specific Assets --}}
     @stack('styles')
 </head>
-<body class="font-sans text-gray-900 bg-background dark:bg-background antialiased" x-data="{ sidebarOpen: true }">
+<body class="font-sans text-gray-900 dark:text-gray-100 bg-background dark:bg-background antialiased" x-data="{ sidebarOpen: true }">
     <x-loading-overlay />
 
     <div class="flex h-screen overflow-hidden">

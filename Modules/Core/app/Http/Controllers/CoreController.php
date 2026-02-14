@@ -112,6 +112,14 @@ class CoreController extends Controller
         // Prepare category spending data for chart
         $categoryData = $this->prepareCategoryData($user);
 
+        // Recent transactions for Pro dashboard table
+        $recentTransactions = Transaction::where('user_id', $user->id)
+            ->with('category')
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
         return view('core::dashboard', compact(
             'accounts',
             'totalBalance',
@@ -124,7 +132,8 @@ class CoreController extends Controller
             'budgets',
             'limits',
             'cashFlowData',
-            'categoryData'
+            'categoryData',
+            'recentTransactions'
         ));
     }
 

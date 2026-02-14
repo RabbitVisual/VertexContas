@@ -1,40 +1,40 @@
 /**
- * Dark Mode & Theme Management
- *
- * Logic to sync Alpine.js state with localStorage and matchMedia.
- * Note: The critical anti-flicker script is located in the head of the layout file.
+ * Dark Mode - Flowbite/Tailwind v4 Best Practices
+ * Centraliza a lógica de tema usando localStorage 'color-theme'
+ * @see https://flowbite.com/docs/customize/dark-mode/
  */
-
 (function () {
-    const THEME_STORAGE_KEY = 'theme';
+    const STORAGE_KEY = 'color-theme';
 
-    // Helper to manually set theme if needed (e.g., from external unrelated JS)
-    window.setTheme = function (theme) {
-        localStorage.setItem(THEME_STORAGE_KEY, theme);
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+    function applyTheme(isDark) {
+        document.documentElement.classList.toggle('dark', isDark);
+        localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
+    }
+
+    function getPreferredTheme() {
+        if (localStorage.getItem(STORAGE_KEY)) {
+            return localStorage.getItem(STORAGE_KEY) === 'dark';
         }
-        // Dispatch event for Alpine or other listeners to pick up if they are watching localStorage
-        window.dispatchEvent(new Event('storage'));
+        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    window.Theme = {
+        set: function (mode) {
+            applyTheme(mode === 'dark');
+        },
+        toggle: function () {
+            applyTheme(!document.documentElement.classList.contains('dark'));
+        },
+        isDark: function () {
+            return document.documentElement.classList.contains('dark');
+        },
     };
 
-    // Helper to toggle
-    window.toggleTheme = function () {
-        const current = localStorage.getItem(THEME_STORAGE_KEY) === 'dark' ? 'dark' : 'light';
-        window.setTheme(current === 'dark' ? 'light' : 'dark');
-    };
-
-    // Listen for system changes if no preference is saved
+    // Respeita preferência do sistema quando não há escolha salva
     if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (!localStorage.getItem(THEME_STORAGE_KEY)) {
-                if (event.matches) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            if (!('color-theme' in localStorage)) {
+                applyTheme(e.matches);
             }
         });
     }
