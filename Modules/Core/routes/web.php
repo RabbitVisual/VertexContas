@@ -28,6 +28,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Budgets CRUD
     Route::resource('budgets', \Modules\Core\Http\Controllers\BudgetController::class)->names('core.budgets');
 
+    // Minha Renda (Financial Baseline - fontes de receita recorrente)
+    Route::get('/minha-renda', [\Modules\Core\Http\Controllers\IncomeController::class, 'index'])->name('core.income.index');
+    Route::post('/minha-renda', [\Modules\Core\Http\Controllers\IncomeController::class, 'store'])->name('core.income.store');
+
     // Reports (Pro only exports)
     Route::prefix('reports')->name('core.reports.')->group(function () {
         Route::get('/', [\Modules\Core\Http\Controllers\ReportsController::class, 'index'])->name('index');

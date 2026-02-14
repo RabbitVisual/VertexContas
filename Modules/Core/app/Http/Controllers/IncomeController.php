@@ -2,62 +2,49 @@
 
 declare(strict_types=1);
 
-namespace Modules\PanelUser\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Modules\Core\Models\RecurringTransaction;
 
-class OnboardingController extends Controller
+/**
+ * Gerencia fontes de receita recorrente (Financial Baseline).
+ * Usado por FinancialHealthService para cálculo de capacidade mensal.
+ */
+class IncomeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+    }
+
     /**
-     * Show the Financial Baseline (income) setup wizard.
+     * Exibe o formulário de Minha Renda (linha de base financeira).
      */
-    public function showSetupIncome(): View
+    public function index(): View
     {
         $user = Auth::user();
-        $hasIncome = RecurringTransaction::where('user_id', $user->id)
-            ->where('type', 'income')
-            ->exists();
-        $isEditMode = $user->onboarding_completed || $hasIncome;
+        $existingIncomes = $this->getExistingIncomes($user);
+        $hasIncome = ! empty($existingIncomes);
+        $isEditMode = (bool) ($user->onboarding_completed ?? false) || $hasIncome;
 
-        return view('paneluser::onboarding.setup-income', [
+        return view('core::income.index', [
             'isPro' => $user->isPro(),
             'isEditMode' => $isEditMode,
-            'existingIncomes' => $this->getExistingIncomes($user),
+            'existingIncomes' => $existingIncomes,
         ]);
     }
 
     /**
-     * Get user's existing recurring income records for pre-fill in edit mode.
-     *
-     * @return array<int, array{description: string, amount: float, day: int}>
+     * Atualiza as fontes de receita recorrente do usuário.
      */
-    private function getExistingIncomes(\App\Models\User $user): array
-    {
-        return RecurringTransaction::where('user_id', $user->id)
-            ->where('type', 'income')
-            ->where('is_active', true)
-            ->orderBy('recurrence_day')
-            ->get()
-            ->map(fn ($r) => [
-                'description' => $r->description,
-                'amount' => $r->amount,
-                'day' => (string) ($r->recurrence_day ?? 1),
-            ])
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Store recurring income sources from the onboarding wizard.
-     */
-    public function storeIncome(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();
         $isPro = $user->isPro();
@@ -113,14 +100,36 @@ class OnboardingController extends Controller
             }
         });
 
+        $redirectTo = $user->isPro() && \Illuminate\Support\Facades\Route::has('core.dashboard')
+            ? route('core.dashboard')
+            : route('paneluser.index');
+
         return redirect()
-            ->route('paneluser.index')
+            ->to($redirectTo)
             ->with('success', $hadExisting ? 'Renda atualizada com sucesso.' : 'Fontes de receita cadastradas com sucesso.');
     }
 
     /**
-     * Parse money input (e.g. "R$ 1.500,50" or "1500.50") to float.
+     * Retorna as receitas recorrentes do usuário para preenchimento do formulário.
+     *
+     * @return array<int, array{description: string, amount: float, day: string}>
      */
+    private function getExistingIncomes(\App\Models\User $user): array
+    {
+        return RecurringTransaction::where('user_id', $user->id)
+            ->where('type', 'income')
+            ->where('is_active', true)
+            ->orderBy('recurrence_day')
+            ->get()
+            ->map(fn ($r) => [
+                'description' => $r->description,
+                'amount' => $r->amount,
+                'day' => (string) ($r->recurrence_day ?? 1),
+            ])
+            ->values()
+            ->all();
+    }
+
     private function parseMoneyAmount(mixed $value): float
     {
         if (is_numeric($value)) {
@@ -129,12 +138,10 @@ class OnboardingController extends Controller
         $str = preg_replace('/[^\d,.-]/', '', (string) $value);
         $str = str_replace('.', '', $str);
         $str = str_replace(',', '.', $str);
+
         return (float) ($str ?: 0);
     }
 
-    /**
-     * Next occurrence date for a given day of month (1-31).
-     */
     private function nextDateFromRecurrenceDay(int $day): Carbon
     {
         $now = now();
@@ -149,6 +156,7 @@ class OnboardingController extends Controller
         $nextMonth = $now->copy()->addMonth()->startOfMonth();
         $safeDayNext = min($day, $nextMonth->daysInMonth);
         $nextMonth->day($safeDayNext);
+
         return $nextMonth;
     }
 }

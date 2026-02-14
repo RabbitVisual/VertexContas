@@ -37,7 +37,7 @@ class SettingsController extends Controller
             'app_name' => 'required|string|max:255',
             'app_description' => 'required|string|max:500',
             'app_url' => 'required|url',
-            'app_timezone' => 'required|string',
+            'app_timezone' => ['required', 'string', 'timezone'],
             'app_locale' => 'required|string|in:pt_BR,en',
         ]);
 

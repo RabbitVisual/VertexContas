@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\PanelUser\Http\Controllers\OnboardingController;
 use Modules\PanelUser\Http\Controllers\PanelUserController;
 use Modules\PanelUser\Http\Controllers\ProfileController;
 use Modules\PanelUser\Http\Controllers\SecurityController;
@@ -24,9 +23,8 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::post('/onboarding/complete', [PanelUserController::class, 'completeOnboarding'])->name('paneluser.onboarding.complete');
     Route::post('/cta-sidebar/dismiss', [PanelUserController::class, 'dismissSidebarCta'])->name('user.cta-sidebar.dismiss');
 
-    // Financial Baseline (Income) Onboarding
-    Route::get('/onboarding/setup-income', [OnboardingController::class, 'showSetupIncome'])->name('paneluser.onboarding.setup-income');
-    Route::post('/onboarding/setup-income', [OnboardingController::class, 'storeIncome'])->name('paneluser.onboarding.store-income');
+    // Financial Baseline (legado) → redireciona para Core
+    Route::get('/onboarding/setup-income', fn () => redirect('/minha-renda', 301))->name('paneluser.onboarding.setup-income');
 
     // Subscription
     Route::get('/subscription', [SubscriptionController::class, 'index'])->name('user.subscription.index');

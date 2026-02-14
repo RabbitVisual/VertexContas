@@ -88,6 +88,13 @@
                         Orçamentos
                     </a>
                     @endif
+                    @if(Route::has('core.income.index'))
+                    <a href="{{ route('core.income.index') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('core.income.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="money-bill-trend-up" style="duotone" class="w-5 shrink-0 mr-3 {{ request()->routeIs('core.income.*') ? $proIconActive : $proIconInactive }}" />
+                        Minha Renda
+                    </a>
+                    @endif
                     @if(Route::has('core.categories.index'))
                     <a href="{{ route('core.categories.index') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('core.categories.*') ? $proNavActive : $proNavInactive }}">
@@ -215,6 +222,14 @@
                             <x-icon name="chart-pie" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.budgets.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Orçamentos</span>
                             <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $budgetCount }}/1</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Route::has('core.income.index'))
+                    <li>
+                        <a href="{{ route('core.income.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.income.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="money-bill-trend-up" style="duotone" class="w-5 shrink-0 transition duration-75 {{ request()->routeIs('core.income.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Minha Renda</span>
                         </a>
                     </li>
                     @endif

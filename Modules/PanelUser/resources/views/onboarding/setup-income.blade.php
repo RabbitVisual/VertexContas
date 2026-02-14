@@ -1,10 +1,19 @@
 @php
     $isPro = auth()->user()?->isPro() ?? false;
+    $isEditMode = $isEditMode ?? false;
+    $existingIncomes = $existingIncomes ?? [];
+    $initialRows = !empty($existingIncomes)
+        ? collect($existingIncomes)->map(fn ($i) => [
+            'description' => $i['description'] ?? '',
+            'amount' => isset($i['amount']) ? number_format((float) $i['amount'], 2, ',', '.') : '',
+            'day' => (string) ($i['day'] ?? '1'),
+        ])->values()->all()
+        : [['description' => '', 'amount' => '', 'day' => '1']];
 @endphp
-<x-paneluser::layouts.master :title="'Configurar receitas'">
+<x-paneluser::layouts.master :title="$isEditMode ? 'Gerenciar Renda Mensal' : 'Configurar receitas'">
     <div
         x-data="{
-            rows: [{ description: '', amount: '', day: '1' }],
+            rows: @json($initialRows),
             isPro: @json($isPro),
             showUpgradeModal: false,
             add() {
@@ -22,10 +31,24 @@
         x-init="rows = rows.map(r => ({ ...r, day: r.day || '1' }))"
         class="max-w-3xl mx-auto py-8 px-4"
     >
+        {{-- Breadcrumb / Back to Dashboard --}}
+        <nav class="mb-6 flex items-center gap-2 text-sm">
+            <a href="{{ route('paneluser.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-flex items-center gap-1">
+                <x-icon name="arrow-left" style="solid" size="xs" />
+                Dashboard
+            </a>
+            <span class="text-slate-400 dark:text-slate-500">/</span>
+            <span class="font-medium text-slate-700 dark:text-slate-300">{{ $isEditMode ? 'Gerenciar Renda' : 'Configurar receitas' }}</span>
+        </nav>
+
         <div class="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-slate-200/20 dark:shadow-slate-900/20 overflow-hidden">
             <div class="p-6 md:p-10 border-b border-slate-200 dark:border-slate-700">
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                    Sua linha de base financeira
+                    @if($isEditMode)
+                        Gerenciar Renda Mensal
+                    @else
+                        Sua linha de base financeira
+                    @endif
                 </h1>
                 <p class="mt-2 text-slate-600 dark:text-slate-400">
                     Cadastre suas fontes de receita recorrente (salário, pensão, bônus, vale-refeição). Assim calculamos sua capacidade mensal.
@@ -85,7 +108,7 @@
                                     class="p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-2 focus:ring-primary-500 transition-colors"
                                     aria-label="Remover fonte"
                                 >
-                                    <i class="fa-pro fa-solid fa-trash text-sm"></i>
+                                    <x-icon name="trash" style="solid" size="sm" />
                                 </button>
                             </div>
                         </div>
@@ -98,14 +121,18 @@
                         @click="add()"
                         class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all font-medium"
                     >
-                        <i class="fa-pro fa-solid fa-plus-circle"></i>
+                        <x-icon name="circle-plus" style="solid" />
                         Adicionar outra fonte de receita
                     </button>
                     <button
                         type="submit"
                         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 dark:bg-primary-500 dark:hover:bg-primary-600 shadow-lg shadow-primary-500/25 transition-all focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                     >
-                        Salvar e continuar
+                        @if($isEditMode)
+                            Atualizar Renda Base
+                        @else
+                            Salvar e continuar
+                        @endif
                     </button>
                 </div>
             </form>
@@ -134,7 +161,7 @@
             >
                 <div class="p-6 md:p-8">
                     <div class="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mb-4">
-                        <i class="fa-pro fa-solid fa-crown text-2xl text-amber-600 dark:text-amber-400"></i>
+                        <x-icon name="crown" style="solid" size="2xl" class="text-amber-600 dark:text-amber-400" />
                     </div>
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">
                         Recurso Premium
@@ -147,7 +174,7 @@
                             href="{{ route('user.subscription.index') }}"
                             class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold transition-colors shadow-lg shadow-amber-500/25"
                         >
-                            <i class="fa-pro fa-solid fa-crown"></i>
+                            <x-icon name="crown" style="solid" />
                             Conhecer Vertex PRO
                         </a>
                         <button

@@ -52,11 +52,15 @@ class BudgetController extends Controller
 
         $this->authorize('create', Budget::class);
 
+        $isPro = auth()->user()?->isPro() ?? false;
+
         Budget::create([
             'user_id' => auth()->id(),
             'category_id' => $request->category_id,
             'limit_amount' => $request->limit_amount,
             'period' => $request->period,
+            'alert_threshold' => $isPro ? $request->alert_threshold : 80,
+            'allow_exceed' => $isPro ? $request->boolean('allow_exceed') : true,
         ]);
 
         return redirect()->route('core.dashboard')
@@ -75,10 +79,14 @@ class BudgetController extends Controller
     {
         $this->authorize('update', $budget);
 
+        $isPro = auth()->user()?->isPro() ?? false;
+
         $budget->update([
             'category_id' => $request->category_id,
             'limit_amount' => $request->limit_amount,
             'period' => $request->period,
+            'alert_threshold' => $isPro ? $request->alert_threshold : $budget->alert_threshold,
+            'allow_exceed' => $isPro ? $request->boolean('allow_exceed') : $budget->allow_exceed,
         ]);
 
         return redirect()->route('core.dashboard')
