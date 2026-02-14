@@ -17,7 +17,7 @@
             </form>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" x-data="notificationCenter()">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
 
             @php
                 $notifications = auth()->user()->notifications()->paginate(15);

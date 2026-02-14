@@ -1,44 +1,40 @@
-<x-homepage::layouts.master>
-    <div class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white relative overflow-hidden">
-
-        <!-- Background Elements -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-            <div class="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-blue-500/20 rounded-full blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+<x-homepage::layouts.master :title="'Em Manutenção - ' . config('app.name')">
+    <div class="flex flex-col justify-center items-center px-6 mx-auto min-h-screen xl:px-0 bg-gray-50 dark:bg-gray-900">
+        <div class="block mb-5 md:max-w-md w-full">
+            @include('homepage::partials.maintenance-illustration')
+        </div>
+        <div class="text-center xl:max-w-4xl">
+            <h1 class="mb-3 text-2xl font-bold leading-tight text-gray-900 sm:text-4xl lg:text-5xl dark:text-white">
+                Em Manutenção
+            </h1>
+            <p class="mb-6 text-base font-normal text-gray-500 md:text-lg dark:text-gray-400">
+                Pedimos desculpas pelo inconveniente. Estamos realizando manutenção no momento. Se precisar, você pode sempre
+                <a href="{{ route('help-center') }}" class="text-primary-600 hover:underline dark:text-primary-500 font-medium">entrar em contato</a>,
+                caso contrário voltaremos em breve!
+            </p>
+            <a href="{{ route('homepage') }}"
+               class="inline-flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 transition-colors">
+                <x-icon name="arrow-left" style="solid" class="w-5 h-5 mr-2 -ml-1" />
+                Voltar ao início
+            </a>
         </div>
 
-        <div class="relative z-10 text-center max-w-2xl mx-auto">
-            <div class="mb-8 transform scale-150">
-                <x-logo variant="icon" class="h-24 w-auto mx-auto mb-6 drop-shadow-lg" />
-            </div>
-
-            <h1 class="text-4xl sm:text-6xl font-black mb-4 tracking-tight drop-shadow-md">
-                Estamos em <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Manutenção</span>
-            </h1>
-
-            <p class="text-xl sm:text-2xl text-slate-300 mb-10 font-light leading-relaxed">
-                Estamos fazendo atualizações importantes para melhorar sua experiência. Voltaremos em breve com novidades incríveis!
+        {{-- Footer --}}
+        <div class="mt-16 text-center">
+            <p class="text-sm text-gray-400 dark:text-gray-500">
+                &copy; {{ date('Y') }} {{ config('app.name') }}. Todos os direitos reservados.
             </p>
-
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <div class="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-lg">
-                    <x-icon name="clock" class="w-5 h-5 text-primary" />
-                    <span class="font-medium">Previsão de retorno: Em alguns minutos</span>
-                </div>
-            </div>
-
-            <div class="mt-12 text-slate-400 text-sm">
-                <p>&copy; {{ date('Y') }} {{ config('app.name') }}. Todos os direitos reservados.</p>
-                @auth
-                    @if(request()->user()->hasRole('admin'))
-                        <div class="mt-4">
-                            <a href="{{ route('admin.index') }}" class="text-primary hover:text-white transition-colors underline decoration-dotted">
-                                Acessar Painel Admin (Bypass Ativo)
-                            </a>
-                        </div>
-                    @endif
-                @endauth
-            </div>
+            @auth
+                @if(request()->user()->hasRole('admin'))
+                    <div class="mt-4">
+                        <a href="{{ route('admin.index') }}"
+                           class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-400 text-sm font-medium underline decoration-dotted underline-offset-2 transition-colors">
+                            <x-icon name="shield-halved" style="solid" class="w-4 h-4" />
+                            Acessar Painel Admin (Bypass Ativo)
+                        </a>
+                    </div>
+                @endif
+            @endauth
         </div>
     </div>
 </x-homepage::layouts.master>

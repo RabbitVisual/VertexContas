@@ -7,6 +7,9 @@
 @import '../fw-pro/css/light.css';
 @import 'tailwindcss';
 
+/* Dark mode via classe .dark no <html> (Flowbite/Tailwind v4 best practice) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../../node_modules/flowbite";
@@ -21,9 +24,6 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
-/* Define que o dark mode é ativado pela classe .dark no <html> */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* Professional Defaults - Enhanced UX */
 @layer base {
     html {
@@ -34,8 +34,9 @@
         color-scheme: dark;
     }
 
-    * {
-        @apply transition-all duration-200 ease-in-out;
+    /* Evita transition-all em * que causa lag na troca de tema (todos os elementos animavam) */
+    a, button, input, select, textarea, [role="button"] {
+        @apply transition-colors duration-150 ease-in-out;
     }
 
     [x-cloak] {
@@ -70,35 +71,56 @@
     }
 }
 
-/* Dark Mode Configuration - Tailwind CSS v4.1 Official */
+/* PicPay + Excel Theme - Fintech Premium */
 @theme {
     /* Fonts */
     --font-display: 'Poppins', sans-serif;
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-
-    /* Light Mode Colors - Default */
+    /* PicPay-inspired Light Mode - primary scale */
+    --color-primary-50: #ecfdf5;
+    --color-primary-100: #d1fae5;
+    --color-primary-200: #a7f3d0;
+    --color-primary-300: #6ee7b7;
+    --color-primary-400: #34d399;
+    --color-primary-500: #11c76f;
+    --color-primary-600: #0d8f51;
+    --color-primary-700: #0b7a44;
+    --color-primary-800: #096537;
+    --color-primary-900: #07502b;
+    --color-primary: #11c76f;
+    --color-primary-dark: #0d8f51;
     --color-background: #ffffff;
-    --color-surface: #f9fafb;
-    --color-text: #111827;
-    --color-text-muted: #6b7280;
-    --color-border: #e5e7eb;
-    --color-primary: #3b82f6;
-    --color-primary-dark: #2563eb;
+    --color-surface: #f8fafc;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
+    /* Excel-inspired table accent */
+    --color-excel-header: #217346;
 }
 
-/* Dark Mode Colors - Tailwind CSS v4.1 Official Pattern */
+/* PicPay-inspired Dark Mode - primary scale */
 :root.dark {
-    --color-background: #111827;
-    --color-surface: #1f2937;
-    --color-text: #f9fafb;
-    --color-text-muted: #9ca3af;
-    --color-border: #374151;
-    --color-primary: #60a5fa;
-    --color-primary-dark: #3b82f6;
+    --color-primary-50: #ecfdf5;
+    --color-primary-100: #d1fae5;
+    --color-primary-200: #a7f3d0;
+    --color-primary-300: #6ee7b7;
+    --color-primary-400: #34d399;
+    --color-primary-500: #34d399;
+    --color-primary-600: #10b981;
+    --color-primary-700: #0d9668;
+    --color-primary-800: #0b7552;
+    --color-primary-900: #095c40;
+    --color-primary: #34d399;
+    --color-primary-dark: #10b981;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
     --color-success: #34d399;
     --color-warning: #fbbf24;
     --color-danger: #f87171;
