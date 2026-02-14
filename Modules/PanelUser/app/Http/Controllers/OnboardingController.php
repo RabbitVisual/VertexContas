@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace Modules\PanelUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Modules\Core\Models\RecurringTransaction;
 
 class OnboardingController extends Controller
 {
+    protected \Modules\Core\Services\FinancialHealthService $financialService;
+
+    public function __construct(\Modules\Core\Services\FinancialHealthService $financialService)
+    {
+        $this->financialService = $financialService;
+    }
+
     /**
      * Show the Financial Baseline (income) setup wizard.
      */
@@ -85,42 +90,15 @@ class OnboardingController extends Controller
         $request->validate($rules);
 
         $incomes = $request->input('incomes', []);
-        $hadExisting = RecurringTransaction::where('user_id', $user->id)->where('type', 'income')->exists();
+        $hadExisting = RecurringTransaction::where('user_id', $user->id)->exists();
 
-        DB::transaction(function () use ($user, $incomes) {
-            RecurringTransaction::where('user_id', $user->id)
-                ->where('type', 'income')
-                ->delete();
-
-            foreach ($incomes as $index => $item) {
-                $amount = $this->parseMoneyAmount($item['amount'] ?? 0);
-                $day = (int) ($item['day'] ?? 1);
-                $day = max(1, min(31, $day));
-                $nextDate = $this->nextDateFromRecurrenceDay($day);
-
-                RecurringTransaction::create([
-                    'user_id' => $user->id,
-                    'category_id' => null,
-                    'account_id' => null,
-                    'type' => 'income',
-                    'amount' => $amount,
-                    'frequency' => 'monthly',
-                    'recurrence_day' => $day,
-                    'next_date' => $nextDate,
-                    'description' => $item['description'] ?? 'Receita',
-                    'is_active' => true,
-                ]);
-            }
-        });
+        $this->financialService->syncUserPlanning($user, $incomes, []);
 
         return redirect()
             ->route('paneluser.index')
             ->with('success', $hadExisting ? 'Renda atualizada com sucesso.' : 'Fontes de receita cadastradas com sucesso.');
     }
 
-    /**
-     * Parse money input (e.g. "R$ 1.500,50" or "1500.50") to float.
-     */
     private function parseMoneyAmount(mixed $value): float
     {
         if (is_numeric($value)) {
@@ -129,26 +107,7 @@ class OnboardingController extends Controller
         $str = preg_replace('/[^\d,.-]/', '', (string) $value);
         $str = str_replace('.', '', $str);
         $str = str_replace(',', '.', $str);
-        return (float) ($str ?: 0);
-    }
 
-    /**
-     * Next occurrence date for a given day of month (1-31).
-     */
-    private function nextDateFromRecurrenceDay(int $day): Carbon
-    {
-        $now = now();
-        $day = max(1, min(31, $day));
-        $thisMonth = $now->copy()->startOfMonth();
-        $daysInThisMonth = $thisMonth->daysInMonth;
-        $safeDay = min($day, $daysInThisMonth);
-        $thisMonth->day($safeDay);
-        if ($thisMonth->gte($now)) {
-            return $thisMonth;
-        }
-        $nextMonth = $now->copy()->addMonth()->startOfMonth();
-        $safeDayNext = min($day, $nextMonth->daysInMonth);
-        $nextMonth->day($safeDayNext);
-        return $nextMonth;
+        return (float) ($str ?: 0);
     }
 }

@@ -3,163 +3,140 @@
 @endphp
 
 <x-paneluser::layouts.master :title="'Criar Nova Meta'">
-    <div class="space-y-8 pb-8" x-data="{
-        targetAmount: '',
-        currentAmount: '',
-        isPriority: false,
-        formatCurrency(field) {
-            let value = this[field].replace(/\D/g, '');
-            if (value === '') {
-                this[field] = '';
-                return;
-            }
-            value = (parseInt(value) / 100).toFixed(2);
-            this[field] = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-        }
-    }">
-        {{-- Hero Header --}}
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900/80 text-white shadow-xl">
-            <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
-            <div class="relative p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div class="flex-1">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-400/30 rounded-full backdrop-blur-md mb-4">
-                        <x-icon name="plus-circle" class="w-4 h-4 text-indigo-300" />
-                        <span class="text-indigo-200 text-xs font-black uppercase tracking-[0.2em]">Planejamento</span>
-                    </div>
-                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">Nova Meta</h1>
-                    <p class="text-slate-400 font-medium max-w-xl mt-2 text-base leading-relaxed">Defina o alvo da sua independência financeira</p>
-                </div>
-                <a href="{{ route('core.goals.index') }}" class="shrink-0 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold transition-all backdrop-blur-md">
-                    <x-icon name="arrow-left" class="w-4 h-4 text-white/70" />
-                    Cancelar
-                </a>
+<div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{
+    targetAmount: '',
+    currentAmount: '',
+    isPriority: false,
+    formatCurrency(field) {
+        let value = String(this[field] || '').replace(/\D/g, '');
+        if (value === '') { this[field] = ''; return; }
+        value = (parseInt(value) / 100).toFixed(2);
+        this[field] = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    }
+}">
+    {{-- Hero CBAV --}}
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-teal-600/5 dark:bg-teal-600/10 rounded-full blur-[100px]"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <nav class="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-4">
+                    <a href="{{ route('core.goals.index') }}" class="hover:underline">Metas</a>
+                    <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800"></span>
+                    <span class="text-gray-400 dark:text-gray-500">Nova meta</span>
+                </nav>
+                <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Nova <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Meta</span></h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina o alvo e o prazo. Acompanhe o progresso no painel de metas.</p>
             </div>
-        </div>
-
-        <div class="max-w-4xl mx-auto">
-            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <form action="{{ route('core.goals.store') }}" method="POST">
-                    @csrf
-
-                    <div class="p-8 lg:p-12 space-y-10">
-                        {{-- Name --}}
-                        <div class="space-y-3">
-                            <label for="name" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Como você chama este sonho? *</label>
-                            <div class="relative group">
-                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
-                                    <x-icon name="flag" style="solid" />
-                                </div>
-                                <input type="text" name="name" id="name" value="{{ old('name') }}"
-                                       class="w-full pl-12 pr-6 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none font-bold text-slate-700 dark:text-white"
-                                       placeholder="Ex: Reserva de Emergência, Viagem Disney..." required>
-                            </div>
-                            @error('name')
-                                <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Amounts Grid --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {{-- Target Amount --}}
-                            <div class="space-y-3">
-                                <label for="target_amount_display" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Qual é o valor alvo? *</label>
-                                <div class="relative">
-                                    <div class="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                                        <span class="text-xl font-black text-slate-400">R$</span>
-                                    </div>
-                                    <input type="text"
-                                           id="target_amount_display"
-                                           x-model="targetAmount"
-                                           @input="formatCurrency('targetAmount')"
-                                           placeholder="0,00"
-                                           class="w-full pl-16 pr-6 py-6 text-3xl font-black rounded-3xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none text-slate-900 dark:text-white"
-                                           required>
-                                    <input type="hidden" name="target_amount" :value="targetAmount.replace(/\./g, '').replace(',', '.')">
-                                </div>
-                                @error('target_amount')
-                                    <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            {{-- Current Amount --}}
-                            <div class="space-y-3">
-                                <label for="current_amount_display" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Já possui algum valor?</label>
-                                <div class="relative">
-                                    <div class="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                                        <span class="text-xl font-black text-slate-400">R$</span>
-                                    </div>
-                                    <input type="text"
-                                           id="current_amount_display"
-                                           x-model="currentAmount"
-                                           @input="formatCurrency('currentAmount')"
-                                           placeholder="0,00"
-                                           class="w-full pl-16 pr-6 py-6 text-3xl font-black rounded-3xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none text-slate-900 dark:text-white">
-                                    <input type="hidden" name="current_amount" :value="currentAmount.replace(/\./g, '').replace(',', '.')">
-                                </div>
-                                @error('current_amount')
-                                    <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-
-                        {{-- Deadline --}}
-                        <div class="space-y-3">
-                            <label for="deadline" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Quando deseja realizar este objetivo? (Prazo)</label>
-                            <div class="relative group">
-                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                    <x-icon name="calendar-clock" />
-                                </div>
-                                <input type="date" name="deadline" id="deadline" value="{{ old('deadline') }}"
-                                       class="w-full pl-12 pr-6 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none font-bold text-slate-700 dark:text-white">
-                            </div>
-                            @error('deadline')
-                                <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- PRO Features --}}
-                        @if($isPro)
-                            <div class="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="p-6 bg-amber-50 dark:bg-amber-900/10 rounded-3xl border border-amber-200 dark:border-amber-900/30">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="flex items-center gap-2">
-                                            <x-icon name="star" class="text-amber-600 dark:text-amber-400" />
-                                            <span class="text-xs font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">Prioritária</span>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" x-model="isPriority" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                                        </label>
-                                    </div>
-                                    <p class="text-[11px] text-amber-800 dark:text-amber-500/80 leading-relaxed">Metas prioritárias aparecem em destaque no seu painel principal.</p>
-                                </div>
-
-                                <div class="p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-3xl border border-indigo-200 dark:border-indigo-900/30 relative opacity-60">
-                                    <div class="absolute inset-0 flex items-center justify-center z-10">
-                                        <span class="bg-indigo-600 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-widest">Em breve</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <x-icon name="list-check" class="text-indigo-600 dark:text-indigo-400" />
-                                        <span class="text-xs font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-300">Etapas (Múltiplas)</span>
-                                    </div>
-                                    <p class="text-[11px] text-indigo-800 dark:text-indigo-500/80 leading-relaxed">Quebre sua meta em pequenos passos para facilitar a realização.</p>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Form Actions --}}
-                    <div class="p-8 lg:p-12 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-3 px-8 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider rounded-2xl shadow-xl shadow-indigo-900/30 transition-all transform hover:-translate-y-1">
-                            <x-icon name="check" size="lg" />
-                            Começar este Planejamento
-                        </button>
-                        <a href="{{ route('core.goals.index') }}" class="inline-flex items-center justify-center gap-2 px-8 py-5 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm uppercase tracking-widest font-black">
-                            Desistir
-                        </a>
-                    </div>
-                </form>
-            </div>
+            <a href="{{ route('core.goals.index') }}" class="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                Voltar às metas
+            </a>
         </div>
     </div>
+
+    <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <form action="{{ route('core.goals.store') }}" method="POST">
+            @csrf
+            <div class="p-6 sm:p-8 lg:p-10 space-y-8">
+                {{-- Nome --}}
+                <div>
+                    <label for="name" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Nome da meta *</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <x-icon name="flag" style="duotone" class="w-5 h-5" />
+                        </div>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                               class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none font-medium text-gray-900 dark:text-white"
+                               placeholder="Ex: Reserva de emergência, Viagem...">
+                    </div>
+                    @error('name')
+                        <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Valores --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="target_amount_display" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Valor alvo (R$) *</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">R$</span>
+                            <input type="text" id="target_amount_display" x-model="targetAmount" @input="formatCurrency('targetAmount')" required
+                                   class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-xl font-black text-gray-900 dark:text-white tabular-nums"
+                                   placeholder="0,00">
+                            <input type="hidden" name="target_amount" :value="(typeof targetAmount === 'string' ? targetAmount : '').replace(/\./g, '').replace(',', '.')">
+                        </div>
+                        @error('target_amount')
+                            <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="current_amount_display" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Já possui (R$)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">R$</span>
+                            <input type="text" id="current_amount_display" x-model="currentAmount" @input="formatCurrency('currentAmount')"
+                                   class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-xl font-black text-gray-900 dark:text-white tabular-nums"
+                                   placeholder="0,00">
+                            <input type="hidden" name="current_amount" :value="(typeof currentAmount === 'string' ? currentAmount : '').replace(/\./g, '').replace(',', '.')">
+                        </div>
+                        @error('current_amount')
+                            <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Prazo --}}
+                <div>
+                    <label for="deadline" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Prazo desejado</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <x-icon name="calendar-days" style="duotone" class="w-5 h-5" />
+                        </div>
+                        <input type="date" name="deadline" id="deadline" value="{{ old('deadline') }}"
+                               class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none font-medium text-gray-900 dark:text-white">
+                    </div>
+                    @error('deadline')
+                        <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Recursos Pro (ocultos para free) --}}
+                @if($isPro)
+                    <div class="pt-6 border-t border-gray-200 dark:border-white/5 space-y-4">
+                        <p class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                            <x-icon name="sparkles" style="duotone" class="w-4 h-4" />
+                            Vertex Pro
+                        </p>
+                        <div class="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-800/30 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                    <x-icon name="star" style="duotone" class="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900 dark:text-white text-sm">Meta prioritária</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Aparece em destaque no painel.</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_priority" value="1" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                            </label>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="px-6 sm:px-8 lg:px-10 py-5 border-t border-gray-200 dark:border-white/5 flex flex-col-reverse sm:flex-row gap-3">
+                <a href="{{ route('core.goals.index') }}" class="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 font-bold text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                    <x-icon name="check" style="solid" class="w-5 h-5" />
+                    Criar meta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 </x-paneluser::layouts.master>

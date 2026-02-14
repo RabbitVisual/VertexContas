@@ -3,158 +3,144 @@
 @endphp
 
 <x-paneluser::layouts.master :title="'Novo Orçamento'">
-    <div class="space-y-8 pb-8" x-data="{
-        limitAmount: '',
-        alertThreshold: 80,
-        allowExceed: true,
-        formatCurrency() {
-            let value = this.limitAmount.replace(/\D/g, '');
-            if (value === '') {
-                this.limitAmount = '';
-                return;
-            }
-            value = (parseInt(value) / 100).toFixed(2);
-            this.limitAmount = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-        }
-    }">
-        {{-- Hero Header --}}
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900/80 text-white shadow-xl">
-            <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px] opacity-50"></div>
-            <div class="relative p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div class="flex-1">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-400/30 rounded-full backdrop-blur-md mb-4">
-                        <x-icon name="plus-circle" class="w-4 h-4 text-indigo-300" />
-                        <span class="text-indigo-200 text-xs font-black uppercase tracking-[0.2em]">Planejamento Financeiro</span>
-                    </div>
-                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">Novo Orçamento</h1>
-                    <p class="text-slate-400 font-medium max-w-xl mt-2 text-base leading-relaxed">Defina limites inteligentes para economizar todos os meses</p>
-                </div>
-                <a href="{{ route('core.budgets.index') }}" class="shrink-0 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold transition-all backdrop-blur-md">
-                    <x-icon name="arrow-left" class="w-4 h-4 text-white/70" />
-                    Cancelar
-                </a>
+<div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{
+    limitAmount: '',
+    alertThreshold: 80,
+    allowExceed: true,
+    formatCurrency() {
+        let value = String(this.limitAmount || '').replace(/\D/g, '');
+        if (value === '') { this.limitAmount = ''; return; }
+        value = (parseInt(value) / 100).toFixed(2);
+        this.limitAmount = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    }
+}">
+    {{-- Hero CBAV --}}
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-teal-600/5 dark:bg-teal-600/10 rounded-full blur-[100px]"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <nav class="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-4">
+                    <a href="{{ route('core.budgets.index') }}" class="hover:underline">Orçamentos</a>
+                    <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800"></span>
+                    <span class="text-gray-400 dark:text-gray-500">Novo</span>
+                </nav>
+                <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Novo <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Orçamento</span></h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina o limite de gastos por categoria e a periodicidade (mensal ou anual).</p>
             </div>
-        </div>
-
-        <div class="max-w-4xl mx-auto">
-            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <form action="{{ route('core.budgets.store') }}" method="POST">
-                    @csrf
-
-                    <div class="p-8 lg:p-12 space-y-10">
-                        {{-- Category --}}
-                        <div class="space-y-3">
-                            <label for="category_id" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Para qual categoria? *</label>
-                            <div class="relative group">
-                                <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">
-                                    <x-icon name="tags" style="solid" />
-                                </div>
-                                <select name="category_id" id="category_id"
-                                        class="w-full pl-12 pr-6 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none font-bold text-slate-700 dark:text-white appearance-none" required>
-                                    <option value="">Selecione a categoria</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('category_id')
-                                <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Limit Amount --}}
-                        <div class="space-y-3">
-                            <label for="limit_amount_display" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Qual é o limite de gastos? *</label>
-                            <div class="relative">
-                                <div class="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                                    <span class="text-xl font-black text-slate-400">R$</span>
-                                </div>
-                                <input type="text"
-                                       id="limit_amount_display"
-                                       x-model="limitAmount"
-                                       @input="formatCurrency()"
-                                       placeholder="0,00"
-                                       class="w-full pl-16 pr-6 py-6 text-3xl font-black rounded-3xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none text-slate-900 dark:text-white"
-                                       required>
-                                <input type="hidden" name="limit_amount" :value="limitAmount.replace(/\./g, '').replace(',', '.')">
-                            </div>
-                            @error('limit_amount')
-                                <p class="mt-1 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Period --}}
-                        <div class="space-y-3">
-                            <label for="period" class="block text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1">Periodicidade do controle *</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative cursor-pointer group">
-                                    <input type="radio" name="period" value="monthly" class="peer sr-only" {{ old('period', 'monthly') == 'monthly' ? 'checked' : '' }}>
-                                    <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/5 transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
-                                        <x-icon name="calendar-days" class="text-xl text-slate-400 peer-checked:text-indigo-600 mb-2 transition-colors" />
-                                        <span class="text-xs font-black uppercase tracking-widest text-slate-500 peer-checked:text-indigo-600">Mensal</span>
-                                    </div>
-                                </label>
-                                <label class="relative cursor-pointer group">
-                                    <input type="radio" name="period" value="yearly" class="peer sr-only" {{ old('period') == 'yearly' ? 'checked' : '' }}>
-                                    <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/5 transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-800">
-                                        <x-icon name="calendar-check" class="text-xl text-slate-400 peer-checked:text-indigo-600 mb-2 transition-colors" />
-                                        <span class="text-xs font-black uppercase tracking-widest text-slate-500 peer-checked:text-indigo-600">Anual</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- PRO Features - Silent for Free --}}
-                        @if($isPro)
-                            <div class="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-3xl border border-indigo-200 dark:border-indigo-900/30">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="flex items-center gap-2">
-                                            <x-icon name="bell" class="text-indigo-600 dark:text-indigo-400" />
-                                            <span class="text-xs font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-300">Alerta de Consumo</span>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notificar em: <span x-text="alertThreshold + '%'"></span></span>
-                                        </div>
-                                        <input type="range" name="alert_threshold" x-model="alertThreshold" min="50" max="100" step="5"
-                                               class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                        <p class="text-[11px] text-indigo-800/60 dark:text-indigo-500/60 leading-relaxed italic">Receba um alerta quando atingir este limite.</p>
-                                    </div>
-                                </div>
-
-                                <div class="p-6 bg-rose-50 dark:bg-rose-900/10 rounded-3xl border border-rose-200 dark:border-rose-900/30">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="flex items-center gap-2">
-                                            <x-icon name="circle-xmark" class="text-rose-600 dark:text-rose-400" />
-                                            <span class="text-xs font-black uppercase tracking-widest text-rose-700 dark:text-rose-300">Bloquear Excessos</span>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="allow_exceed" x-model="allowExceed" value="0" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-rose-500"></div>
-                                        </label>
-                                    </div>
-                                    <p class="text-[11px] text-rose-800/60 dark:text-rose-500/60 leading-relaxed italic">Impedir novas transações nesta categoria se o limite for atingido.</p>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Form Actions --}}
-                    <div class="p-8 lg:p-12 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-3 px-8 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-wider rounded-2xl shadow-xl shadow-indigo-900/30 transition-all transform hover:-translate-y-1">
-                            <x-icon name="check" size="lg" />
-                            Ativar Orçamento
-                        </button>
-                        <a href="{{ route('core.budgets.index') }}" class="inline-flex items-center justify-center gap-2 px-8 py-5 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm uppercase tracking-widest font-black">
-                            Desistir
-                        </a>
-                    </div>
-                </form>
-            </div>
+            <a href="{{ route('core.budgets.index') }}" class="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                Voltar
+            </a>
         </div>
     </div>
+
+    <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <form action="{{ route('core.budgets.store') }}" method="POST">
+            @csrf
+            <div class="p-6 sm:p-8 lg:p-10 space-y-8">
+                {{-- Categoria --}}
+                <div>
+                    <label for="category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Categoria *</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <x-icon name="tags" style="duotone" class="w-5 h-5" />
+                        </div>
+                        <select name="category_id" id="category_id" required
+                                class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none font-medium text-gray-900 dark:text-white appearance-none">
+                            <option value="">Selecione a categoria</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('category_id')
+                        <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Limite --}}
+                <div>
+                    <label for="limit_amount_display" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Limite de gastos (R$) *</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">R$</span>
+                        <input type="text" id="limit_amount_display" x-model="limitAmount" @input="formatCurrency()" required
+                               class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-xl font-black text-gray-900 dark:text-white tabular-nums"
+                               placeholder="0,00">
+                        <input type="hidden" name="limit_amount" :value="(typeof limitAmount === 'string' ? limitAmount : '').replace(/\./g, '').replace(',', '.')">
+                    </div>
+                    @error('limit_amount')
+                        <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Periodicidade --}}
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Periodicidade *</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="period" value="monthly" class="peer sr-only" {{ old('period', 'monthly') == 'monthly' ? 'checked' : '' }}>
+                            <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/5 transition-all group-hover:bg-gray-100 dark:group-hover:bg-white/5">
+                                <x-icon name="calendar-days" style="duotone" class="w-6 h-6 text-gray-400 peer-checked:text-emerald-600 mb-2" />
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 peer-checked:text-emerald-600">Mensal</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="period" value="yearly" class="peer sr-only" {{ old('period') == 'yearly' ? 'checked' : '' }}>
+                            <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/5 transition-all group-hover:bg-gray-100 dark:group-hover:bg-white/5">
+                                <x-icon name="calendar-check" style="duotone" class="w-6 h-6 text-gray-400 peer-checked:text-emerald-600 mb-2" />
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 peer-checked:text-emerald-600">Anual</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Recursos Pro (ocultos para free) --}}
+                @if($isPro)
+                    <div class="pt-6 border-t border-gray-200 dark:border-white/5 space-y-4">
+                        <p class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                            <x-icon name="sparkles" style="duotone" class="w-4 h-4" />
+                            Vertex Pro
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-200/50 dark:border-emerald-800/30">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <x-icon name="bell" style="duotone" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                    <span class="font-bold text-gray-900 dark:text-white text-sm">Alerta de consumo</span>
+                                </div>
+                                <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Notificar em: <span x-text="alertThreshold + '%'"></span></p>
+                                <input type="range" name="alert_threshold" x-model="alertThreshold" min="50" max="100" step="5" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg accent-emerald-600">
+                            </div>
+                            <div class="p-4 rounded-2xl bg-rose-500/5 dark:bg-rose-500/10 border border-rose-200/50 dark:border-rose-800/30">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <x-icon name="circle-xmark" style="duotone" class="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                                        <span class="font-bold text-gray-900 dark:text-white text-sm">Bloquear excessos</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="hidden" name="allow_exceed" value="1">
+                                        <input type="checkbox" name="allow_exceed" x-model="allowExceed" value="0" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full peer peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Impedir novas despesas nesta categoria ao atingir o limite.</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="px-6 sm:px-8 lg:px-10 py-5 border-t border-gray-200 dark:border-white/5 flex flex-col-reverse sm:flex-row gap-3">
+                <a href="{{ route('core.budgets.index') }}" class="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 font-bold text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                    <x-icon name="check" style="solid" class="w-5 h-5" />
+                    Criar orçamento
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 </x-paneluser::layouts.master>

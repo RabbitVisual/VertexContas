@@ -60,13 +60,26 @@
                         Contas
                     </a>
                     @endif
+                    {{-- Extrato e movimentações (mesma categoria) --}}
+                    <div class="pt-2 pb-1">
+                        <p class="{{ $proSectionLabel }}">Extrato e movimentações</p>
+                    </div>
                     @if(Route::has('core.transactions.index'))
                     <a href="{{ route('core.transactions.index') }}"
-                        class="{{ $proNavBase }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.create') || request()->routeIs('core.transactions.edit')) ? $proNavActive : $proNavInactive }}">
-                        <x-icon name="receipt" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ (request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer')) ? $proIconActive : $proIconInactive }}" />
-                        Transações
+                        class="{{ $proNavBase }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.edit')) ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="receipt" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ (request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer') && !request()->routeIs('core.transactions.create')) ? $proIconActive : $proIconInactive }}" />
+                        Extrato
                     </a>
                     @endif
+                    @can('create', \Modules\Core\Models\Transaction::class)
+                    @if(Route::has('core.transactions.create'))
+                    <a href="{{ route('core.transactions.create') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('core.transactions.create') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="plus" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('core.transactions.create') ? $proIconActive : $proIconInactive }}" />
+                        Nova transação
+                    </a>
+                    @endif
+                    @endcan
                     @if(Route::has('core.transactions.transfer'))
                     <a href="{{ route('core.transactions.transfer') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('core.transactions.transfer') ? $proNavActive : $proNavInactive }}">
@@ -190,15 +203,26 @@
                         </a>
                     </li>
                     @endif
+                    <li class="pt-3 pb-1"><span class="{{ $sectionLabelClass }}">Extrato e movimentações</span></li>
                     @if(Route::has('core.transactions.index'))
                     <li>
-                        <a href="{{ route('core.transactions.index') }}" class="{{ $navItemClass }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.create') || request()->routeIs('core.transactions.edit')) ? $navItemActiveClass : '' }}">
-                            <x-icon name="receipt" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
-                            <span class="ms-3 flex-1">Transações</span>
+                        <a href="{{ route('core.transactions.index') }}" class="{{ $navItemClass }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.edit')) ? $navItemActiveClass : '' }}">
+                            <x-icon name="receipt" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ (request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer') && !request()->routeIs('core.transactions.create')) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3 flex-1">Extrato</span>
                             <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded" title="Receitas/Despesas">{{ $transactionCount }}/10</span>
                         </a>
                     </li>
                     @endif
+                    @can('create', \Modules\Core\Models\Transaction::class)
+                    @if(Route::has('core.transactions.create'))
+                    <li>
+                        <a href="{{ route('core.transactions.create') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.transactions.create') ? $navItemActiveClass : '' }}">
+                            <x-icon name="plus" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.transactions.create') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Nova transação</span>
+                        </a>
+                    </li>
+                    @endif
+                    @endcan
                     @if(Route::has('core.transactions.transfer'))
                     <li>
                         <a href="{{ route('core.transactions.transfer') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.transactions.transfer') ? $navItemActiveClass : '' }}">

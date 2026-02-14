@@ -1,52 +1,72 @@
-**Role:** Senior Laravel Frontend Architect & UI Migration Specialist.
+https://www.hyperui.dev/
+https://github.com/markmead/hyperui
+-------------------------------------------
+Application Components:
+https://www.hyperui.dev/components/application/accordions
+https://www.hyperui.dev/components/application/badges
+https://www.hyperui.dev/components/application/breadcrumbs
+https://www.hyperui.dev/components/application/button-groups
+https://www.hyperui.dev/components/application/checkboxes
+https://www.hyperui.dev/components/application/details-list
+https://www.hyperui.dev/components/application/dividers
+https://www.hyperui.dev/components/application/dropdown
+https://www.hyperui.dev/components/application/empty-states
+https://www.hyperui.dev/components/application/file-uploaders
+https://www.hyperui.dev/components/application/filters
+https://www.hyperui.dev/components/application/grids
+https://www.hyperui.dev/components/application/inputs
+https://www.hyperui.dev/components/application/loaders
+https://www.hyperui.dev/components/application/media
+https://www.hyperui.dev/components/application/modals
+https://www.hyperui.dev/components/application/pagination
+https://www.hyperui.dev/components/application/progress-bars
+https://www.hyperui.dev/components/application/quantity-inputs
+https://www.hyperui.dev/components/application/radio-groups
+https://www.hyperui.dev/components/application/selects
+https://www.hyperui.dev/components/application/side-menu
+https://www.hyperui.dev/components/application/skip-links
+https://www.hyperui.dev/components/application/stats
+https://www.hyperui.dev/components/application/steps
+https://www.hyperui.dev/components/application/tables
+https://www.hyperui.dev/components/application/tabs
+https://www.hyperui.dev/components/application/textareas
+https://www.hyperui.dev/components/application/timelines
+https://www.hyperui.dev/components/application/toasts
+https://www.hyperui.dev/components/application/toggles
+https://www.hyperui.dev/components/application/vertical-menu
 
-**Goal:** Port the UI design from the local `tailadmin/tailadmin-laravel` folder into our `Modules/PanelAdmin` module, creating a "Vertex Premium Admin" theme.
+Marketing Components:
+https://www.hyperui.dev/components/marketing/announcements
+https://www.hyperui.dev/components/marketing/banners
+https://www.hyperui.dev/components/marketing/blog-cards
+https://www.hyperui.dev/components/marketing/buttons
+https://www.hyperui.dev/components/marketing/cards
+https://www.hyperui.dev/components/marketing/carts
+https://www.hyperui.dev/components/marketing/contact-forms
+https://www.hyperui.dev/components/marketing/ctas
+https://www.hyperui.dev/components/marketing/empty-content
+https://www.hyperui.dev/components/marketing/faqs
+https://www.hyperui.dev/components/marketing/feature-grids
+https://www.hyperui.dev/components/marketing/footers
+https://www.hyperui.dev/components/marketing/headers
+https://www.hyperui.dev/components/marketing/logo-clouds
+https://www.hyperui.dev/components/marketing/newsletter-signup
+https://www.hyperui.dev/components/marketing/polls
+https://www.hyperui.dev/components/marketing/pricing
+https://www.hyperui.dev/components/marketing/product-cards
+https://www.hyperui.dev/components/marketing/product-collections
+https://www.hyperui.dev/components/marketing/sections
+https://www.hyperui.dev/components/marketing/team-sections
 
-**Constraints:**
-1.  **100% Local:** No CDNs. Use our local Tailwind CSS v4.1 build process.
-2.  **Icon Swap:** The source uses raw SVGs. You MUST replace ALL SVGs with our local FontAwesome 7.1 Pro icons (`<i class="fa-pro fa-solid fa-icon-name"></i>`).
-3.  **Logic Preservation:** Keep existing backend logic (Routes, Controllers, `$menu` loops) intact. Only change the HTML/CSS wrapping.
-
-**Source Path:** `tailadmin/tailadmin-laravel/resources/views`
-**Target Path:** `Modules/PanelAdmin/resources/views`
-
----
-
-**Phase 1: The Master Layout (The Skeleton)**
-* **Source:** Analyze `tailadmin/.../layouts/app.blade.php` and `sidebar.blade.php`.
-* **Action:** Rebuild `Modules/PanelAdmin/resources/views/components/layouts/master.blade.php`.
-    * Implement the Sidebar + Header + Content layout structure using the TailAdmin CSS classes.
-    * Ensure the `x-data` (Alpine.js) logic for opening/closing the sidebar is migrated but simplified.
-    * **Crucial:** Inject our `@vite` directives and ensure `<body class="bg-gray-100 dark:bg-boxdark-2 ...">` matches the premium dark mode of the source.
-
-**Phase 2: The Sidebar (Menu Navigation)**
-* **Source:** Analyze `tailadmin/.../layouts/sidebar.blade.php`.
-* **Target:** `Modules/PanelAdmin/resources/views/components/sidebar.blade.php`.
-* **Action:**
-    * Recreate the sidebar container and header (Logo area).
-    * Use our existing `$menu` loop (from `PanelAdminController`) but wrap each item in the TailAdmin sidebar classes (`group relative flex items-center gap-2.5 rounded-sm px-4 py-2...`).
-    * **Icon Task:** Map the source SVGs to FA Pro icons.
-        * Example: If source has a "Dashboard" SVG, use `<i class="fa-pro fa-solid fa-grid-2"></i>`.
-        * If source has "Settings" SVG, use `<i class="fa-pro fa-solid fa-gears"></i>`.
-
-**Phase 3: The Header (Navbar)**
-* **Source:** Analyze `tailadmin/.../layouts/header.blade.php` (or similar component).
-* **Target:** `Modules/PanelAdmin/resources/views/components/layouts/navbar.blade.php`.
-* **Action:**
-    * Implement the top bar with the "Hamburger Menu" toggle.
-    * Migrate the "User Dropdown" and "Notification Bell".
-    * Replace the search icon SVG with `fa-magnifying-glass`.
-
-**Phase 4: Dashboard Widgets (The "Wow" Factor)**
-* **Source:** Analyze `tailadmin/.../pages/dashboard/ecommerce.blade.php` and components like `ecommerce-metrics.blade.php`.
-* **Target:** `Modules/PanelAdmin/resources/views/index.blade.php`.
-* **Action:**
-    * Replace our simple cards with the TailAdmin "Card Data Stats" structure (white bg, rounded, shadow, icon container).
-    * Ensure the numbers (Revenue, Users) are dynamic variables from our controller.
-
-**Execution Order:**
-1.  Analyze the `tailadmin` CSS file (`resources/css/app.css`) to see if custom `@layer components` are defined. If so, copy them to our `Modules/PanelAdmin/resources/assets/sass/app.scss` (or CSS equivalent).
-2.  Build the **Layout** and **Sidebar** first.
-3.  Refactor the **Dashboard** view.
-
-**Start with Phase 1 & 2.**
+Neobrutalism Components:
+https://www.hyperui.dev/components/neobrutalism/accordions
+https://www.hyperui.dev/components/neobrutalism/alerts
+https://www.hyperui.dev/components/neobrutalism/badges
+https://www.hyperui.dev/components/neobrutalism/buttons
+https://www.hyperui.dev/components/neobrutalism/cards
+https://www.hyperui.dev/components/neobrutalism/checkboxes
+https://www.hyperui.dev/components/neobrutalism/inputs
+https://www.hyperui.dev/components/neobrutalism/progress-bars
+https://www.hyperui.dev/components/neobrutalism/selects
+https://www.hyperui.dev/components/neobrutalism/tabs
+https://www.hyperui.dev/components/neobrutalism/textareas

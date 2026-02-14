@@ -3,6 +3,7 @@
 namespace Modules\Core\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTransactionRequest extends FormRequest
 {
@@ -13,9 +14,11 @@ class UpdateTransactionRequest extends FormRequest
 
     public function rules(): array
     {
+        $userId = $this->user()?->id;
+
         return [
-            'account_id' => ['required', 'exists:accounts,id'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'account_id' => ['required', Rule::exists('accounts', 'id')->where('user_id', $userId)],
+            'category_id' => ['required', Rule::exists('categories', 'id')->where(fn ($q) => $q->whereNull('user_id')->orWhere('user_id', $userId))],
             'type' => ['required', 'in:income,expense'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'date' => ['required', 'date'],

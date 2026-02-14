@@ -17,7 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Transactions CRUD + Transfer
     Route::resource('transactions', \Modules\Core\Http\Controllers\TransactionController::class)->names('core.transactions');
     Route::get('/transfer', [\Modules\Core\Http\Controllers\TransactionController::class, 'transfer'])->name('core.transactions.transfer');
-    Route::post('/transfer', [\Modules\Core\Http\Controllers\TransactionController::class, 'processTransfer'])->name('core.transactions.process-transfer');
+    Route::post('/transfer', [\Modules\Core\Http\Controllers\TransactionController::class, 'processTransfer'])->name('core.transactions.processTransfer');
 
     // Goals CRUD
     Route::resource('goals', \Modules\Core\Http\Controllers\GoalController::class)->names('core.goals');

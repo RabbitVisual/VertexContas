@@ -1,9 +1,9 @@
 @php
     $isPro = auth()->user()?->isPro() ?? false;
-    $balance = $totalBalance ?? 0;
+    $stockBalance = $stockBalance ?? 0;
     $totalIncome = $monthlyIncome ?? 0;
     $totalExpense = $monthlyExpense ?? 0;
-    $monthlyCapacity = $monthlyCapacity ?? 0;
+    $flowCapacity = $flowCapacity ?? 0;
     $incomeBreakdown = $incomeBreakdown ?? collect();
     $greeting = match (true) {
         now()->hour < 12 => 'Bom dia',
@@ -59,8 +59,8 @@
                     <div class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-primary-500/20 mb-4">
                         <x-icon name="wallet" style="duotone" class="w-6 h-6" />
                     </div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Atual</p>
-                    <h3 class="sensitive-value text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($balance, 2, ',', '.') }}</h3>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estoque (Saldo Atual)</p>
+                    <h3 class="sensitive-value text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($stockBalance, 2, ',', '.') }}</h3>
                     <div class="flex items-center gap-2 mt-2 px-3 py-1 bg-slate-50 dark:bg-slate-800/50 rounded-full border border-slate-100 dark:border-slate-700/50 w-max">
                         <x-icon name="arrow-trend-up" style="duotone" class="w-3 h-3 text-primary-500" />
                         <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Total Disponível</span>
@@ -104,13 +104,13 @@
                     <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-500/20 mb-4">
                         <x-icon name="chart-line" style="duotone" class="w-6 h-6" />
                     </div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capacidade Mensal</p>
-                    <h3 class="sensitive-value text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyCapacity, 2, ',', '.') }}</h3>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fluxo (Capacidade Mensal)</p>
+                    <h3 class="sensitive-value text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($flowCapacity, 2, ',', '.') }}</h3>
                     <div class="flex items-center gap-2 mt-2 px-3 py-1 bg-slate-50 dark:bg-slate-800/50 rounded-full border border-slate-100 dark:border-slate-700/50 w-max">
                         <x-icon name="arrow-trend-up" style="duotone" class="w-3 h-3 text-indigo-500" />
                         <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Receitas recorrentes</span>
                     </div>
-                    @if($monthlyCapacity > 0 && $incomeBreakdown->count() > 0)
+                    @if($flowCapacity > 0 && $incomeBreakdown->count() > 0)
                         <div class="mt-3" x-data="{ open: false }">
                             <button type="button" @click="open = !open" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium flex items-center gap-1">
                                 Ver fontes

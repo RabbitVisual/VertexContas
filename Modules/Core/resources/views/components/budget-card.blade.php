@@ -5,8 +5,9 @@
 @php
     $usage = $budget->usage_percentage;
     $isExceeded = $budget->is_exceeded;
-    $statusColor = $isExceeded ? 'danger' : ($usage > 80 ? 'warning' : 'success');
-    $barColor = $isExceeded ? 'bg-rose-500' : ($usage > 80 ? 'bg-amber-500' : 'bg-emerald-500');
+    $alertThreshold = (int) ($budget->alert_threshold ?? 80);
+    $statusColor = $isExceeded ? 'danger' : ($usage > $alertThreshold ? 'warning' : 'success');
+    $barColor = $isExceeded ? 'bg-rose-500' : ($usage > $alertThreshold ? 'bg-amber-500' : 'bg-emerald-500');
     $cat = $budget->category;
     $catColor = $cat?->color ?? '#11c76f';
     $catName = $cat?->name ?? 'Geral';
@@ -52,7 +53,7 @@
             <p class="text-xs text-rose-600 dark:text-rose-400 font-semibold mt-2 flex items-center gap-1.5">
                 <x-icon name="triangle-exclamation" style="duotone" class="w-3.5 h-3.5" /> Orçamento excedido!
             </p>
-        @elseif($usage > 80)
+        @elseif($usage > $alertThreshold)
             <p class="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2 flex items-center gap-1.5">
                 <x-icon name="exclamation-circle" style="duotone" class="w-3.5 h-3.5" /> Atenção: {{ number_format(100 - $usage, 1) }}% restante
             </p>

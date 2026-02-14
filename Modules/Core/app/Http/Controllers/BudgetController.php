@@ -38,7 +38,7 @@ class BudgetController extends Controller
         }
 
         $this->authorize('create', Budget::class);
-        $categories = Category::all();
+        $categories = Category::forUser(auth()->user())->get();
 
         return view('core::budgets.create', compact('categories'));
     }
@@ -63,14 +63,14 @@ class BudgetController extends Controller
             'allow_exceed' => $isPro ? $request->boolean('allow_exceed') : true,
         ]);
 
-        return redirect()->route('core.dashboard')
+        return redirect()->route('core.budgets.index')
             ->with('success', 'Orçamento criado com sucesso!');
     }
 
     public function edit(Budget $budget)
     {
         $this->authorize('update', $budget);
-        $categories = Category::all();
+        $categories = Category::forUser(auth()->user())->get();
 
         return view('core::budgets.edit', compact('budget', 'categories'));
     }
@@ -89,7 +89,7 @@ class BudgetController extends Controller
             'allow_exceed' => $isPro ? $request->boolean('allow_exceed') : $budget->allow_exceed,
         ]);
 
-        return redirect()->route('core.dashboard')
+        return redirect()->route('core.budgets.index')
             ->with('success', 'Orçamento atualizado com sucesso!');
     }
 
@@ -99,7 +99,7 @@ class BudgetController extends Controller
 
         $budget->delete();
 
-        return redirect()->route('core.dashboard')
+        return redirect()->route('core.budgets.index')
             ->with('success', 'Orçamento excluído com sucesso!');
     }
 }

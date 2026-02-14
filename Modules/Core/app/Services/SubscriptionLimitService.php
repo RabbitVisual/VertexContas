@@ -27,21 +27,18 @@ class SubscriptionLimitService
      */
     public function canCreate(User $user, string $entity): bool
     {
-        // Pro users have unlimited access
         if ($user->isPro()) {
             return true;
         }
 
-        // Free users have limits
-        if ($user->hasRole('free_user')) {
-            $currentCount = $this->getCurrentCount($user, $entity);
-            $limit = $this->getLimit($user, $entity);
-
-            return $currentCount < $limit;
+        $limit = $this->getLimit($user, $entity);
+        if ($limit === 'unlimited') {
+            return true;
         }
 
-        // Default: deny if no role
-        return false;
+        $currentCount = $this->getCurrentCount($user, $entity);
+
+        return $currentCount < $limit;
     }
 
     /**
