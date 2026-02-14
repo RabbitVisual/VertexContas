@@ -34,12 +34,13 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
                 <thead class="bg-gray-50 dark:bg-slate-700/50 uppercase text-xs font-semibold text-gray-500 dark:text-gray-300">
-                    <tr>
+                        <tr>
                         <th class="px-6 py-4">Data</th>
                         <th class="px-6 py-4">Usuário</th>
                         <th class="px-6 py-4">Gateway</th>
                         <th class="px-6 py-4">Valor</th>
                         <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">Tipo</th>
                         <th class="px-6 py-4">ID Externo</th>
                     </tr>
                 </thead>
@@ -62,21 +63,30 @@
                             <td class="px-6 py-4">
                                 @php
                                     $statusColor = match($payment->status) {
-                                        'succeeded', 'paid' => 'bg-emerald-100 text-emerald-700',
-                                        'pending' => 'bg-amber-100 text-amber-700',
-                                        'failed' => 'bg-red-100 text-red-700',
-                                        default => 'bg-gray-100 text-gray-700'
+                                        'succeeded', 'paid' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                        'pending' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                        'failed' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                        default => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                                     };
                                 @endphp
                                 <span class="inline-flex px-2 py-1 rounded-md text-xs font-bold {{ $statusColor }}">
                                     {{ ucfirst($payment->status) }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4">
+                                @if($payment->subscription_id)
+                                    <span class="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-400">
+                                        Recorrente
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 font-mono text-xs">{{ $payment->external_id }}</td>
                         </tr>
-                    @empty
+                        @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 Nenhum registro de pagamento encontrado.
                             </td>
                         </tr>

@@ -11,6 +11,7 @@ class PaymentLog extends Model
 
     protected $fillable = [
         'user_id',
+        'subscription_id',
         'gateway_slug',
         'external_id',
         'amount',
@@ -27,5 +28,10 @@ class PaymentLog extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
     }
 }

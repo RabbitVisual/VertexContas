@@ -3,9 +3,10 @@
 @php
     $limitService = app(\Modules\Core\Services\SubscriptionLimitService::class);
     $stats = $limitService->getUsageStats(auth()->user(), $entity);
-    $isPro = $stats['limit'] === 'unlimited';
+    $isPro = ($stats['limit'] ?? null) === 'unlimited';
     $pct = min(100, $stats['percentage']);
     $barColor = $pct >= 100 ? 'bg-red-500' : ($pct >= 80 ? 'bg-amber-500' : 'bg-primary');
+    $limitDisplay = $stats['limit_display'] ?? ($stats['limit'] === 'unlimited' ? 'Ilimitado' : $stats['limit']);
 @endphp
 
 @if(!$isPro)
@@ -18,7 +19,7 @@
                         <span class="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-lg">Limite</span>
                     @endif
                 </h3>
-                <span class="text-sm font-medium text-slate-700 dark:text-slate-300 tabular-nums">{{ $stats['current'] }}/{{ $stats['limit'] }}</span>
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-300 tabular-nums">{{ $stats['current'] }}/{{ $limitDisplay }}</span>
             </div>
         </div>
         <div class="flex justify-between mb-1">

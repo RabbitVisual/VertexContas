@@ -15,10 +15,15 @@ class PanelUserController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * Usuários PRO são redirecionados para o Dashboard Financeiro (mais completo).
      */
     public function index()
     {
         $user = auth()->user();
+
+        if ($user->isPro()) {
+            return redirect()->route('core.dashboard');
+        }
 
         // 1. Total Balance
         $totalBalance = \Modules\Core\Models\Account::where('user_id', $user->id)->sum('balance');

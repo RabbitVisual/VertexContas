@@ -61,6 +61,8 @@ class AuthController extends Controller
                 return redirect()->route('admin.index');
             } elseif ($user->hasRole('support')) {
                 return redirect()->route('support.index');
+            } elseif ($user->isPro()) {
+                return redirect()->route('core.dashboard');
             } else {
                 return redirect()->route('paneluser.index');
             }

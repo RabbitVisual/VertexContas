@@ -42,24 +42,33 @@ class StripeDriver implements PaymentGatewayInterface
     }
 
     /**
-     * Create checkout session.
+     * Create checkout session for recurring subscription (Stripe Subscriptions).
+     * @see https://docs.stripe.com/payments/checkout/build-subscriptions
      */
     public function createCheckoutSession(float $amount, array $metadata = []): string
     {
+        $currency = $this->gateway->metadata['currency'] ?? 'brl';
+        $unitAmount = (int) round($amount * 100); // centavos
+
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[
                 'price_data' => [
-                    'currency' => $this->gateway->metadata['currency'] ?? 'brl',
+                    'currency' => $currency,
                     'product_data' => [
                         'name' => 'Vertex Contas PRO',
+                        'description' => 'Assinatura mensal recorrente. Cancele quando quiser.',
                     ],
-                    'unit_amount' => (int) ($amount * 100),
+                    'unit_amount' => $unitAmount,
+                    'recurring' => [
+                        'interval' => 'month',
+                    ],
                 ],
                 'quantity' => 1,
             ]],
-            'mode' => 'payment',
-            'success_url' => route('paneluser.index') . '?payment=success',
+            'mode' => 'subscription',
+            'customer_email' => $metadata['email'] ?? null,
+            'success_url' => route('paneluser.index') . '?payment=success&session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('user.subscription.index') . '?payment=cancelled',
             'metadata' => $metadata,
         ]);

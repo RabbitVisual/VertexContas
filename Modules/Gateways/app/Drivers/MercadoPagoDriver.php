@@ -3,7 +3,7 @@
 namespace Modules\Gateways\Drivers;
 
 use Illuminate\Http\Request;
-use MercadoPago\Client\Preference\PreferenceClient;
+use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
 use Modules\Gateways\Contracts\PaymentGatewayInterface;
 use Modules\Gateways\Models\Gateway;
@@ -21,46 +21,55 @@ class MercadoPagoDriver implements PaymentGatewayInterface
     }
 
     /**
-     * Create a payment intent (Preference in Mercado Pago).
+     * Create a payment intent (legacy one-time preference - kept for interface).
      */
     public function createPaymentIntent(float $amount, array $metadata = []): array
     {
-        $client = new PreferenceClient;
-
-        $preference = $client->create([
-            'items' => [
-                [
-                    'title' => 'Vertex Contas Upgrade',
-                    'quantity' => 1,
-                    'unit_price' => $amount,
-                    'currency_id' => 'BRL',
-                ],
-            ],
-            'metadata' => $metadata,
-            'back_urls' => [
-                'success' => route('paneluser.index'),
-                'failure' => route('paneluser.index'),
-                'pending' => route('paneluser.index'),
-            ],
-            'auto_return' => 'approved',
-        ]);
-
         return [
-            'preference_id' => $preference->id,
-            'init_point' => $this->gateway->isSandbox() ? $preference->sandbox_init_point : $preference->init_point,
+            'init_point' => $this->createCheckoutSession($amount, $metadata),
         ];
     }
 
     /**
-     * Create checkout session (URL).
+     * Create checkout session (assinatura recorrente via PreApproval).
+     * @see https://www.mercadopago.com.br/developers/pt/reference/subscriptions/_preapproval/post
      */
     public function createCheckoutSession(float $amount, array $metadata = []): string
     {
-        // For Mercado Pago, createPaymentIntent already creates a preference
-        // We just need the init_point
-        $result = $this->createPaymentIntent($amount, $metadata);
+        $client = new PreApprovalClient();
 
-        return $result['init_point'];
+        $payerEmail = $metadata['email'] ?? null;
+        if (!$payerEmail) {
+            throw new \InvalidArgumentException('payer_email é obrigatório para assinaturas Mercado Pago.');
+        }
+
+        $userId = $metadata['user_id'] ?? 'unknown';
+        $backUrl = route('paneluser.index');
+
+        $notificationUrl = route('webhooks.mercadopago') . '?source_news=webhooks';
+
+        $request = [
+            'reason' => 'Vertex Contas PRO - Assinatura mensal recorrente',
+            'external_reference' => (string) $userId,
+            'payer_email' => $payerEmail,
+            'auto_recurring' => [
+                'frequency' => 1,
+                'frequency_type' => 'months',
+                'transaction_amount' => (float) $amount,
+                'currency_id' => 'BRL',
+            ],
+            'back_url' => $backUrl,
+            'notification_url' => $notificationUrl,
+        ];
+
+        $preapproval = $client->create($request);
+        $initPoint = $preapproval->init_point ?? null;
+
+        if (!$initPoint) {
+            throw new \RuntimeException('Mercado Pago não retornou URL de checkout para a assinatura.');
+        }
+
+        return $initPoint;
     }
 
     /**

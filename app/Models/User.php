@@ -82,7 +82,7 @@ class User extends Authenticatable
      */
     public function getPhotoUrlAttribute(): string
     {
-        return $this->photo ? asset('storage/'.$this->photo) : asset('assets/images/default-avatar.png');
+        return $this->photo ? asset('storage/'.$this->photo) : asset('images/default-avatar.svg');
     }
 
     /**

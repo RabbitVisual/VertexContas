@@ -2,7 +2,7 @@
     $user = auth()->user();
     $userName = $user?->full_name ?? $user?->first_name ?? 'Usuário';
     $userEmail = $user?->email ?? '';
-    $photoUrl = $user?->photo_url ?? asset('assets/images/default-avatar.png');
+    $photoUrl = $user?->photo_url ?? asset('images/default-avatar.svg');
     $hasPhoto = !empty($user?->photo);
 @endphp
 <nav class="fixed top-0 left-0 right-0 z-50 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -15,7 +15,7 @@
                     <span class="sr-only">Abrir menu lateral</span>
                     <x-icon name="bars" style="solid" class="w-5 h-5" />
                 </button>
-                <a href="{{ route('paneluser.index') }}" class="flex items-center gap-2.5 group">
+                <a href="{{ ($user && $user->isPro() && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index') }}" class="flex items-center gap-2.5 group">
                     <img src="{{ asset('storage/logos/logo.svg') }}" class="h-8 dark:hidden transition-transform group-hover:scale-105" alt="Vertex Contas" />
                     <img src="{{ asset('storage/logos/logo-white.svg') }}" class="h-8 hidden dark:block transition-transform group-hover:scale-105" alt="Vertex Contas" />
                     <span class="self-center text-lg font-bold whitespace-nowrap text-gray-900 dark:text-white hidden sm:inline">Vertex Contas</span>
@@ -82,7 +82,7 @@
                         </div>
                         <ul class="py-2">
                             <li>
-                                <a href="{{ route('paneluser.index') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <a href="{{ ($user && $user->isPro() && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <x-icon name="gauge" style="solid" class="w-4 h-4 text-gray-400" />
                                     Dashboard
                                 </a>

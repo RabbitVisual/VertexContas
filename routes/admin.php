@@ -8,6 +8,7 @@ use Modules\PanelAdmin\Http\Controllers\AdminUserController;
 use Modules\PanelAdmin\Http\Controllers\GatewayConfigController;
 use Modules\PanelAdmin\Http\Controllers\PanelAdminController;
 use Modules\PanelAdmin\Http\Controllers\PaymentController;
+use Modules\PanelAdmin\Http\Controllers\SubscriptionController;
 use Modules\PanelAdmin\Http\Controllers\PlanController;
 use Modules\PanelAdmin\Http\Controllers\RoleController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
@@ -68,8 +69,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::post('/roles', [RoleController::class, 'update'])->name('roles.update');
 
-    // Global Payments
+    // Global Payments & Subscriptions
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
 
     // Admin Support Center (Global Management)
     Route::prefix('support')->name('support.')->group(function () {

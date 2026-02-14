@@ -1,16 +1,91 @@
+@php
+    $isPro = auth()->user()?->isPro() ?? false;
+@endphp
 <x-paneluser::layouts.master :title="'Planos e Assinatura'">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-base font-semibold text-primary-600 uppercase tracking-wide">Preços</h2>
-            <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
-                Evolua seu controle financeiro
-            </p>
-            <p class="mt-4 text-xl text-gray-500 dark:text-gray-400">
-                Escolha o plano ideal para você. Sem taxas ocultas.
-            </p>
-        </div>
+        @if($isPro)
+            {{-- PRO: Mensagem de agradecimento e benefícios --}}
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/10 via-primary/5 to-emerald-500/10 dark:from-amber-500/20 dark:via-primary/10 dark:to-emerald-500/20 border border-amber-200/50 dark:border-amber-500/30 p-8 md:p-12">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full -mr-32 -mt-32"></div>
+                    <div class="relative z-10 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-400/20 dark:bg-amber-500/30 mb-6">
+                            <x-icon name="crown" style="solid" class="w-8 h-8 text-amber-500 dark:text-amber-400" />
+                        </div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
+                            Obrigado por ser Vertex PRO!
+                        </h2>
+                        <p class="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                            Você faz parte de um grupo seleto que tem acesso ao melhor controle financeiro. Aproveite tudo que oferecemos para você.
+                        </p>
+                    </div>
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20 items-stretch">
+                <div class="mt-10">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 text-center">Tudo o que você tem direito</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                        <div class="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <x-icon name="building-columns" style="solid" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-900 dark:text-white">Contas e cartões ilimitados</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Organize todas as suas contas bancárias, cartões e dinheiro em um só lugar.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <x-icon name="chart-simple" style="solid" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-900 dark:text-white">Relatórios completos em PDF e Excel</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Exporte seus dados para análise onde e quando quiser.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <x-icon name="bullseye" style="solid" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-900 dark:text-white">Metas e orçamentos sem limite</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Defina quantas metas quiser e monitore orçamentos por categoria.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <x-icon name="headset" style="solid" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-900 dark:text-white">Suporte prioritário VIP</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Seu chamado é tratado com prioridade pela nossa equipe.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex justify-center gap-4">
+                    <a href="{{ route('core.invoices.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors">
+                        <x-icon name="file-invoice-dollar" style="solid" class="w-5 h-5" />
+                        Ver minhas faturas
+                    </a>
+                    <a href="{{ route('core.accounts.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl transition-colors">
+                        Ir para Contas
+                    </a>
+                </div>
+            </div>
+        @else
+            {{-- FREE: Comparação de planos --}}
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-base font-semibold text-primary-600 uppercase tracking-wide">Preços</h2>
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+                    Evolua seu controle financeiro
+                </p>
+                <p class="mt-4 text-xl text-gray-500 dark:text-gray-400">
+                    Escolha o plano ideal para você. Sem taxas ocultas.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20 items-stretch">
             <!-- Free Plan -->
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 hover:shadow-lg transition-all duration-300 flex flex-col">
                 <div class="mb-4">
@@ -65,9 +140,9 @@
                         </h3>
                          <p class="mt-4 flex items-baseline text-white">
                             <span class="text-5xl font-extrabold tracking-tight">R$ 29,90</span>
-                            <span class="ml-1 text-xl font-semibold text-gray-400">/vitalício</span>
+                            <span class="ml-1 text-xl font-semibold text-gray-400">/mês</span>
                         </p>
-                        <p class="mt-6 text-gray-400 text-sm leading-relaxed">Pagamento único. Acesso completo para sempre.</p>
+                        <p class="mt-6 text-gray-400 text-sm leading-relaxed">Assinatura mensal recorrente. Cancele quando quiser.</p>
                     </div>
 
                     <ul role="list" class="mt-6 space-y-4 flex-1">
@@ -139,8 +214,9 @@
                 </div>
             </div>
         </div>
+        @endif
 
-        <!-- Payment History -->
+        <!-- Payment History (PRO e FREE) -->
         <div class="max-w-5xl mx-auto">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <x-icon name="clock-rotate-left" style="solid" class="mr-2 text-primary-500" />

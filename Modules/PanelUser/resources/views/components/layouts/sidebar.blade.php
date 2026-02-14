@@ -20,27 +20,25 @@
                     <span class="{{ $sectionLabelClass }}">Visão Geral</span>
                 </li>
                 <li>
-                    <a href="{{ route('paneluser.index') }}"
-                       class="{{ $navItemClass }} {{ request()->routeIs('paneluser.index') ? $navItemActiveClass : '' }}">
-                        <x-icon name="gauge" style="solid" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('paneluser.index') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
-                        <span class="ms-3">Dashboard</span>
-                    </a>
+                    @if($isPro && Route::has('core.dashboard'))
+                        <a href="{{ route('core.dashboard') }}"
+                           class="{{ $navItemClass }} {{ request()->routeIs('core.dashboard') ? $navItemActiveClass : '' }}">
+                            <x-icon name="gauge" style="solid" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+                    @else
+                        <a href="{{ route('paneluser.index') }}"
+                           class="{{ $navItemClass }} {{ request()->routeIs('paneluser.index') ? $navItemActiveClass : '' }}">
+                            <x-icon name="gauge" style="solid" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('paneluser.index') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+                    @endif
                 </li>
 
                 {{-- Financeiro --}}
                 <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700">
                     <span class="{{ $sectionLabelClass }}">Financeiro</span>
                 </li>
-                @if($isPro && Route::has('core.dashboard'))
-                <li>
-                    <a href="{{ route('core.dashboard') }}"
-                       class="{{ $navItemClass }} {{ request()->routeIs('core.dashboard') ? $navItemActiveClass : '' }}">
-                        <x-icon name="chart-line" style="solid" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
-                        <span class="ms-3 flex-1">Dashboard Financeiro Pro</span>
-                        <span class="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded">PRO</span>
-                    </a>
-                </li>
-                @endif
                 @if(Route::has('core.accounts.index'))
                 <li>
                     <a href="{{ route('core.accounts.index') }}"
@@ -135,11 +133,20 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="{{ $navItemClass }} opacity-75 cursor-not-allowed" aria-disabled="true">
-                        <x-icon name="file-invoice-dollar" style="solid" class="w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500" />
-                        <span class="ms-3 flex-1">Faturas</span>
-                        <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">Em breve</span>
-                    </a>
+                    @if($isPro && Route::has('core.invoices.index'))
+                        <a href="{{ route('core.invoices.index') }}"
+                           class="{{ $navItemClass }} {{ request()->routeIs('core.invoices.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="file-invoice-dollar" style="solid" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.invoices.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3 flex-1">Faturas</span>
+                            <span class="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded">PRO</span>
+                        </a>
+                    @else
+                        <a href="#" class="{{ $navItemClass }} opacity-75 cursor-not-allowed" aria-disabled="true">
+                            <x-icon name="file-invoice-dollar" style="solid" class="w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500" />
+                            <span class="ms-3 flex-1">Faturas</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">Em breve</span>
+                        </a>
+                    @endif
                 </li>
 
                 {{-- Assinatura --}}

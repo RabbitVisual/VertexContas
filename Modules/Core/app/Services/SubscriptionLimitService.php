@@ -127,7 +127,8 @@ class SubscriptionLimitService
         if ($limit === 'unlimited') {
             return [
                 'current' => $current,
-                'limit' => 'Ilimitado',
+                'limit' => 'unlimited',
+                'limit_display' => 'Ilimitado',
                 'percentage' => 0,
             ];
         }

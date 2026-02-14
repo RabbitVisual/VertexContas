@@ -16,7 +16,7 @@ use Modules\Gateways\Http\Controllers\WebhookController;
 
 // Public webhook routes (excluded from CSRF)
 Route::post('/webhooks/stripe', [WebhookController::class, 'handleStripe'])->name('webhooks.stripe');
-Route::post('/webhooks/mercadopago', [WebhookController::class, 'handleMercadoPago'])->name('webhooks.mercadopago');
+Route::match(['get', 'post'], '/webhooks/mercadopago', [WebhookController::class, 'handleMercadoPago'])->name('webhooks.mercadopago');
 
 // Authenticated Checkout Routes
 Route::middleware(['auth', 'verified'])->group(function () {
