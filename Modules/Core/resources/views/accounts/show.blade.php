@@ -40,27 +40,31 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {{-- Card tipo cartão físico --}}
-            <div class="lg:col-span-1">
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 shadow-xl p-6 h-64 flex flex-col justify-between text-white">
-                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,white,transparent)]"></div>
-                    <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
-                    <div class="relative z-10 flex justify-between items-start">
-                        <x-icon name="{{ $cardIcon }}" style="solid" class="w-9 h-9 opacity-90" />
-                        <span class="px-3 py-1.5 bg-white/20 rounded-xl text-xs font-bold uppercase backdrop-blur-sm">{{ $account->type === 'checking' ? 'Corrente' : ($account->type === 'savings' ? 'Poupança' : 'Dinheiro') }}</span>
+            {{-- Card: Pro = layout cartão virtual (flip); Free = cartão físico --}}
+            <div class="lg:col-span-1 flex justify-center lg:justify-start">
+                @if($isPro)
+                    <x-core::account-card-pro :account="$account" gradient="from-emerald-600 to-teal-700" :show-actions="false" />
+                @else
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 shadow-xl p-6 h-64 w-full max-w-[340px] flex flex-col justify-between text-white">
+                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,white,transparent)]"></div>
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
+                        <div class="relative z-10 flex justify-between items-start">
+                            <x-icon name="{{ $cardIcon }}" style="solid" class="w-9 h-9 opacity-90" />
+                            <span class="px-3 py-1.5 bg-white/20 rounded-xl text-xs font-bold uppercase backdrop-blur-sm">{{ $account->type === 'checking' ? 'Corrente' : ($account->type === 'savings' ? 'Poupança' : 'Dinheiro') }}</span>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
+                            <p class="sensitive-value text-3xl font-mono font-black tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
+                            <p class="font-semibold tracking-wider">{{ Str::upper($account->name) }}</p>
+                        </div>
+                        <div class="relative z-10 flex justify-end">
+                            <x-icon name="cc-visa" style="brands" class="w-10 h-10 opacity-80" />
+                        </div>
                     </div>
-                    <div class="relative z-10">
-                        <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                        <p class="sensitive-value text-3xl font-mono font-black tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
-                    </div>
-                    <div class="relative z-10">
-                        <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
-                        <p class="font-semibold tracking-wider">{{ Str::upper($account->name) }}</p>
-                    </div>
-                    <div class="relative z-10 flex justify-end">
-                        <x-icon name="cc-visa" style="brands" class="w-10 h-10 opacity-80" />
-                    </div>
-                </div>
+                @endif
             </div>
 
             <div class="lg:col-span-2 space-y-6">

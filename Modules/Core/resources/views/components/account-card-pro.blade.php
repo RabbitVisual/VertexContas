@@ -5,17 +5,11 @@
 ])
 
 @php
-    $cardIcon = match($account->type) {
-        'cash' => 'money-bill-wave',
-        'savings' => 'piggy-bank',
-        default => 'credit-card'
-    };
-    $typeLabel = $account->type === 'checking' ? 'Corrente' : ($account->type === 'savings' ? 'Poupança' : 'Dinheiro');
     $displayNumber = '•••• •••• •••• ' . str_pad((string) ($account->id % 10000), 4, '0', STR_PAD_LEFT);
 @endphp
 
-<div class="account-card-pro group relative w-full max-w-[340px] h-[220px] mx-auto" x-data="{ flipped: false }" @mouseenter="if ($refs.card) flipped = true" @mouseleave="flipped = false">
-    <div class="relative w-full h-full cursor-pointer" style="perspective: 2000px;">
+<div class="account-card-pro group relative w-full max-w-[340px] h-[220px] mx-auto" x-data="{ flipped: false }">
+    <div class="relative w-full h-full cursor-pointer" style="perspective: 2000px;" @click="flipped = !flipped" title="Clique para virar o cartão">
         {{-- Front --}}
         <div class="absolute inset-0 rounded-2xl overflow-hidden bg-gradient-to-br {{ $gradient }} shadow-xl transition-all duration-700 ease-[cubic-bezier(0.71,0.03,0.56,0.85)]"
              style="transform-style: preserve-3d; backface-visibility: hidden;"
@@ -70,7 +64,7 @@
     </div>
 
     @if($showActions)
-        <div class="absolute inset-0 rounded-2xl bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20 pointer-events-none">
+        <div class="absolute inset-0 rounded-2xl bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20 pointer-events-none group-hover:pointer-events-auto">
             <span class="pointer-events-auto">
                 <a href="{{ route('core.accounts.show', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Ver">
                     <x-icon name="eye" style="solid" class="w-5 h-5" />
