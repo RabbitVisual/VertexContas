@@ -33,6 +33,7 @@
                     <tr>
                         <th class="px-6 py-4">Usuário</th>
                         <th class="px-6 py-4">Plano/Role</th>
+                        <th class="px-6 py-4">Renda Decl.</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4">Cadastro</th>
                         <th class="px-6 py-4 text-right">Ações</th>
@@ -77,6 +78,9 @@
                                 @endforeach
                             </td>
                             <td class="px-6 py-4">
+                                <span class="font-medium text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($monthlyIncomeByUser[$user->id] ?? 0, 2, ',', '.') }}</span>
+                            </td>
+                            <td class="px-6 py-4">
                                 <span class="inline-flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
                                     Ativo
@@ -93,7 +97,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                 Nenhum usuário encontrado.
                             </td>
                         </tr>

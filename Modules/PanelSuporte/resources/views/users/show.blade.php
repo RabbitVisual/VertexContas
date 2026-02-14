@@ -108,6 +108,37 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Solvência (Financial Health) --}}
+                                <div class="mt-6">
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Solvência</h4>
+                                    @if(($financialSnapshot['free_cashflow'] ?? 0) < 0)
+                                        <div class="p-4 rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-900/20">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-10 h-10 shrink-0 bg-rose-500 text-white rounded-xl flex items-center justify-center">
+                                                    <x-icon name="triangle-exclamation" style="solid" class="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <span class="text-sm font-bold text-rose-700 dark:text-rose-400">High Risk / Negative Cashflow</span>
+                                                    <p class="text-xs text-rose-600 dark:text-rose-400/90 mt-1">O usuário apresenta fluxo de caixa negativo. Despesas do mês superam a renda declarada.</p>
+                                                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-2">Fluxo livre: R$ {{ number_format($financialSnapshot['free_cashflow'] ?? 0, 2, ',', '.') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/20">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center">
+                                                    <x-icon name="shield-check" style="solid" class="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400">Fluxo de Caixa Positivo</span>
+                                                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Fluxo livre: R$ {{ number_format($financialSnapshot['free_cashflow'] ?? 0, 2, ',', '.') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>

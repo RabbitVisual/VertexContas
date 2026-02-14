@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\Transaction;
+use Modules\Core\Services\FinancialHealthService;
 
 class AdminUserController extends Controller
 {
@@ -34,7 +35,10 @@ class AdminUserController extends Controller
 
         $users = $query->paginate(10)->withQueryString();
 
-        return view('paneladmin::users.index', compact('users'));
+        $financialHealthService = app(FinancialHealthService::class);
+        $monthlyIncomeByUser = $financialHealthService->getMonthlyIncomeForUserIds($users->pluck('id')->toArray());
+
+        return view('paneladmin::users.index', compact('users', 'monthlyIncomeByUser'));
     }
 
     /**
@@ -42,10 +46,11 @@ class AdminUserController extends Controller
      */
     public function show(User $user)
     {
-        // Fetch stats
+        $financialHealthService = app(FinancialHealthService::class);
+        $financialSnapshot = $financialHealthService->getUserFinancialSnapshot($user);
+
         $accountCount = Account::where('user_id', $user->id)->count();
         $transactionCount = Transaction::where('user_id', $user->id)->count();
-        $totalBalance = Account::where('user_id', $user->id)->sum('balance');
         $lastLogin = \Modules\Core\Models\AccessLog::where('user_id', $user->id)->latest()->first();
 
         // Support Agent Stats
@@ -66,7 +71,7 @@ class AdminUserController extends Controller
             ];
         }
 
-        return view('paneladmin::users.show', compact('user', 'accountCount', 'transactionCount', 'totalBalance', 'lastLogin', 'supportStats'));
+        return view('paneladmin::users.show', compact('user', 'accountCount', 'transactionCount', 'financialSnapshot', 'lastLogin', 'supportStats'));
     }
 
     /**

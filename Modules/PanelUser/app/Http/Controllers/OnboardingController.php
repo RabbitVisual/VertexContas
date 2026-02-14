@@ -32,6 +32,15 @@ class OnboardingController extends Controller
         $user = auth()->user();
         $isPro = $user->isPro();
 
+        $incomes = $request->input('incomes', []);
+
+        $parsedIncomes = [];
+        foreach ($incomes as $i => $item) {
+            $parsedIncomes[$i] = $item;
+            $parsedIncomes[$i]['amount'] = $this->parseMoneyAmount($item['amount'] ?? 0);
+        }
+        $request->merge(['incomes' => $parsedIncomes]);
+
         $rules = [
             'incomes' => ['required', 'array', 'min:1'],
             'incomes.*.description' => ['required', 'string', 'max:255'],
