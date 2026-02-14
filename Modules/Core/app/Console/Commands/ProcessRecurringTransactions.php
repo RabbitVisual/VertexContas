@@ -26,6 +26,7 @@ class ProcessRecurringTransactions extends Command
 
         $recurringTransactions = RecurringTransaction::active()
             ->due()
+            ->processable()
             ->with(['user', 'account', 'category'])
             ->get();
 
@@ -38,6 +39,9 @@ class ProcessRecurringTransactions extends Command
         $failed = 0;
 
         foreach ($recurringTransactions as $recurring) {
+            if (! $recurring->account_id || ! $recurring->category_id) {
+                continue;
+            }
             try {
                 $transaction = $recurring->process();
 

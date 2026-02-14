@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'pro' => \Modules\Core\Http\Middleware\EnsureUserIsPro::class,
+            'financial.setup' => \Modules\PanelUser\Http\Middleware\EnsureFinancialSetup::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

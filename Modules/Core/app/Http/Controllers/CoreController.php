@@ -15,17 +15,21 @@ use Modules\Core\Models\Account;
 use Modules\Core\Models\Budget;
 use Modules\Core\Models\Goal;
 use Modules\Core\Models\Transaction;
+use Modules\Core\Services\FinancialHealthService;
 use Modules\Core\Services\SubscriptionLimitService;
 
 class CoreController extends Controller
 {
     protected SubscriptionLimitService $limitService;
 
-    public function __construct(SubscriptionLimitService $limitService)
+    protected FinancialHealthService $financialHealthService;
+
+    public function __construct(SubscriptionLimitService $limitService, FinancialHealthService $financialHealthService)
     {
         $this->middleware(['auth', 'verified']);
         $this->middleware('permission:core.view');
         $this->limitService = $limitService;
+        $this->financialHealthService = $financialHealthService;
     }
 
     /**
@@ -120,6 +124,10 @@ class CoreController extends Controller
             ->take(10)
             ->get();
 
+        // Monthly capacity from recurring income (baseline) + income breakdown for Pro
+        $monthlyCapacity = $this->financialHealthService->calculateMonthlyCapacity($user);
+        $incomeBreakdown = $this->financialHealthService->getIncomeBreakdown($user);
+
         return view('core::dashboard', compact(
             'accounts',
             'totalBalance',
@@ -133,7 +141,9 @@ class CoreController extends Controller
             'limits',
             'cashFlowData',
             'categoryData',
-            'recentTransactions'
+            'recentTransactions',
+            'monthlyCapacity',
+            'incomeBreakdown'
         ));
     }
 

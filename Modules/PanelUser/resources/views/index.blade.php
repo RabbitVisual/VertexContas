@@ -3,10 +3,12 @@
     $balance = $totalBalance ?? 0;
     $totalIncome = $monthlyIncome ?? 0;
     $totalExpense = $monthlyExpense ?? 0;
+    $monthlyCapacity = $monthlyCapacity ?? 0;
+    $incomeBreakdown = $incomeBreakdown ?? collect();
 @endphp
 <x-paneluser::layouts.master :title="'Dashboard'">
-    {{-- 3 cards principais - Flowbite básico --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    {{-- 4 cards principais - Flowbite básico --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
@@ -39,6 +41,29 @@
                 <x-icon name="arrow-up" style="duotone" class="w-10 h-10 text-rose-500 opacity-80" />
             </div>
             <span class="inline-flex items-center mt-2 text-xs font-medium text-rose-600 dark:text-rose-400">Gasto este mês</span>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Capacidade Mensal</p>
+                    <p class="sensitive-value text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($monthlyCapacity, 2, ',', '.') }}</p>
+                </div>
+                <x-icon name="chart-line" style="duotone" class="w-10 h-10 text-primary-500 opacity-80" />
+            </div>
+            <span class="inline-flex items-center mt-2 text-xs font-medium text-primary-600 dark:text-primary-400">Receitas recorrentes</span>
+            @if($isPro && $incomeBreakdown->count() > 1)
+                <div class="mt-2" x-data="{ open: false }">
+                    <button type="button" @click="open = !open" class="text-xs text-primary-600 dark:text-primary-400 hover:underline font-medium">Ver detalhe por fonte</button>
+                    <ul x-show="open" x-collapse class="mt-1.5 space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                        @foreach($incomeBreakdown as $item)
+                            <li class="flex justify-between">
+                                <span>{{ $item['description'] }}</span>
+                                <span class="sensitive-value tabular-nums">R$ {{ number_format($item['amount'], 2, ',', '.') }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </div>
 

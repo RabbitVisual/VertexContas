@@ -19,6 +19,7 @@ class RecurringTransaction extends Model
         'type',
         'amount',
         'frequency',
+        'recurrence_day',
         'next_date',
         'description',
         'is_active',
@@ -27,6 +28,7 @@ class RecurringTransaction extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'next_date' => 'date',
+        'recurrence_day' => 'integer',
         'is_active' => 'boolean',
         'type' => 'string',
         'frequency' => 'string',
@@ -66,9 +68,14 @@ class RecurringTransaction extends Model
 
     /**
      * Process this recurring transaction by creating an actual transaction.
+     * Skips (throws) when account_id or category_id is null (baseline-only record).
      */
     public function process(): Transaction
     {
+        if ($this->account_id === null || $this->category_id === null) {
+            throw new \InvalidArgumentException('RecurringTransaction cannot be processed without account_id and category_id (baseline-only record).');
+        }
+
         $transaction = Transaction::create([
             'user_id' => $this->user_id,
             'account_id' => $this->account_id,
@@ -116,5 +123,13 @@ class RecurringTransaction extends Model
     public function scopeDue($query)
     {
         return $query->where('next_date', '<=', now());
+    }
+
+    /**
+     * Scope to get recurring transactions that can be processed (have account and category).
+     */
+    public function scopeProcessable($query)
+    {
+        return $query->whereNotNull('account_id')->whereNotNull('category_id');
     }
 }

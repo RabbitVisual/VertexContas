@@ -100,6 +100,25 @@
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Receitas do Mês</p>
                     <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyIncome, 2, ',', '.') }}</h3>
+                    @if($monthlyCapacity > 0)
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Capacidade mensal (recorrente): <span class="sensitive-value font-semibold text-slate-700 dark:text-slate-300">R$ {{ number_format($monthlyCapacity, 2, ',', '.') }}</span></p>
+                    @endif
+                    @if($user->isPro() && $incomeBreakdown->count() > 1)
+                        <div class="mt-2" x-data="{ open: false }">
+                            <button type="button" @click="open = !open" class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium flex items-center gap-1">
+                                Ver detalhe por fonte
+                                <span class="inline-block transition-transform" :class="open ? 'rotate-180' : ''"><x-icon name="chevron-down" style="solid" class="w-3 h-3" /></span>
+                            </button>
+                            <ul x-show="open" x-collapse class="mt-1.5 space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                                @foreach($incomeBreakdown as $item)
+                                    <li class="flex justify-between">
+                                        <span>{{ $item['description'] }}</span>
+                                        <span class="sensitive-value tabular-nums">R$ {{ number_format($item['amount'], 2, ',', '.') }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 </div>
             </div>
 
