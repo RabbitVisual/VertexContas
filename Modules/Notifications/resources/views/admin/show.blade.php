@@ -1,5 +1,5 @@
 <x-paneladmin::layouts.master>
-    <div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto px-4 py-10">
 
         <!-- Header Section -->
         <div class="mb-10 flex items-center justify-between">
@@ -10,21 +10,21 @@
                         Voltar ao Histórico
                     </a>
                 </div>
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic">
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic uppercase">
                     Detalhes do Disparo
                 </h1>
-                <p class="text-sm text-slate-500 font-medium italic">Análise detalhada do envio de notificação.</p>
+                <p class="text-sm text-slate-500 font-medium italic">Análise técnica e alcance da notificação enviada.</p>
             </div>
 
             <div class="flex gap-4">
-                <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="inline-flex items-center gap-3 px-6 py-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 text-slate-600 dark:text-slate-300 font-black rounded-2xl hover:border-[#11C76F] hover:text-[#11C76F] transition-all text-xs uppercase tracking-widest">
+                <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 text-slate-600 dark:text-slate-300 font-black rounded-xl hover:border-[#11C76F] hover:text-[#11C76F] transition-all text-[10px] uppercase tracking-widest">
                     <x-icon name="copy" />
                     Usar como Template
                 </a>
-                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja remover este histórico? Isso não apagará as notificações já enviadas aos usuários, apenas o registro administrativo.')">
+                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja remover este histórico?')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="p-4 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all">
+                    <button type="submit" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
                         <x-icon name="trash" />
                     </button>
                 </form>
@@ -34,7 +34,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Details Card -->
             <div class="lg:col-span-2 space-y-8">
-                <div class="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl">
                     <div class="flex items-center justify-between mb-10">
                         <div class="flex items-center gap-6">
                             <div class="w-16 h-16 rounded-[2rem] flex items-center justify-center
