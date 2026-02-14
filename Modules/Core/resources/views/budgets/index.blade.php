@@ -1,4 +1,4 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Meus Orçamentos'">
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <h2 class="font-black text-3xl text-slate-800 dark:text-white">
@@ -25,7 +25,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($budgets as $budget)
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-100 dark:border-slate-700">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background-color: {{ $budget->category->color ?? '#6366f1' }}">

@@ -4,7 +4,7 @@
     $user = auth()->user();
 
     // Limits check is only relevant for free users
-    if (!$user->hasRole('free_user')) {
+    if ($user->isPro()) {
         return;
     }
 
@@ -74,7 +74,7 @@
     }
 @endphp
 
-<div class="mb-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 relative overflow-hidden">
+<div class="mb-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 relative overflow-hidden">
     <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
              <span class="flex h-2 w-2 rounded-full {{ $color }}"></span>

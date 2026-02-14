@@ -85,7 +85,14 @@
                                         <div class="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900"></div>
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="font-bold text-slate-800 dark:text-white text-sm">{{ $ticket->user->name }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-800 dark:text-white text-sm">{{ $ticket->user->name }}</span>
+                                            @if($ticket->user->isPro())
+                                                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                                                    <x-icon name="crown" style="solid" class="w-2.5 h-2.5" /> PRO
+                                                </span>
+                                            @endif
+                                        </div>
                                         <span class="text-[11px] text-gray-400 font-medium">{{ $ticket->user->email }}</span>
                                     </div>
                                 </div>

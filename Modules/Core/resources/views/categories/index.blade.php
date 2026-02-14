@@ -1,4 +1,4 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Categorias'">
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <h2 class="font-black text-3xl text-slate-800 dark:text-white">
@@ -44,13 +44,13 @@
 
                                 @if(is_null($category->user_id))
                                     <div class="absolute top-3 right-3 text-slate-300 dark:text-slate-600" title="Categoria Padrão">
-                                        <x-icon name="lock" class="h-3 w-3" />
+                                        <x-icon name="lock" style="solid" class="h-3 w-3" />
                                     </div>
                                 @endif
 
                                 <div class="flex flex-col items-center text-center">
                                     <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-sm" style="background-color: {{ $category->color }}15; color: {{ $category->color }};">
-                                        <x-icon name="{{ $category->icon }}" class="text-2xl" />
+                                        <x-icon name="{{ $category->icon }}" style="duotone" class="text-2xl" />
                                     </div>
                                     <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">{{ $category->name }}</h4>
 
@@ -59,7 +59,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" onclick="return confirm('Excluir categoria?')" class="text-xs text-red-500 hover:text-red-700 flex items-center justify-center bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-md">
-                                                <x-icon name="trash" class="h-3 w-3 mr-1" /> Excluir
+                                                <x-icon name="trash" style="solid" class="h-3 w-3 mr-1" /> Excluir
                                             </button>
                                         </form>
                                     @else
@@ -87,13 +87,13 @@
 
                                 @if(is_null($category->user_id))
                                     <div class="absolute top-3 right-3 text-slate-300 dark:text-slate-600" title="Categoria Padrão">
-                                        <x-icon name="lock" class="h-3 w-3" />
+                                        <x-icon name="lock" style="solid" class="h-3 w-3" />
                                     </div>
                                 @endif
 
                                 <div class="flex flex-col items-center text-center">
                                     <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-sm" style="background-color: {{ $category->color }}15; color: {{ $category->color }};">
-                                        <x-icon name="{{ $category->icon }}" class="text-2xl" />
+                                        <x-icon name="{{ $category->icon }}" style="duotone" class="text-2xl" />
                                     </div>
                                     <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm mb-1">{{ $category->name }}</h4>
 
@@ -102,7 +102,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" onclick="return confirm('Excluir categoria?')" class="text-xs text-red-500 hover:text-red-700 flex items-center justify-center bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-md">
-                                                <x-icon name="trash" class="h-3 w-3 mr-1" /> Excluir
+                                                <x-icon name="trash" style="solid" class="h-3 w-3 mr-1" /> Excluir
                                             </button>
                                         </form>
                                     @else

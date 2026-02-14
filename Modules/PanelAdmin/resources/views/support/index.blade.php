@@ -101,8 +101,13 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <span class="font-black text-slate-900 dark:text-white text-base group-hover:text-[#11C76F] transition-colors line-clamp-1">{{ $ticket->subject }}</span>
-                                            <div class="flex items-center gap-2 mt-0.5">
+                                            <div class="flex items-center gap-2 mt-0.5 flex-wrap">
                                                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">{{ $ticket->user->name }}</span>
+                                                @if($ticket->user->isPro())
+                                                    <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                                                        <x-icon name="crown" style="solid" class="w-2.5 h-2.5" /> PRO
+                                                    </span>
+                                                @endif
                                                 <span class="w-1 h-1 rounded-full bg-slate-300"></span>
                                                 <span class="text-[10px] text-slate-400 font-bold tracking-tight">#{{ $ticket->id }}</span>
                                             </div>

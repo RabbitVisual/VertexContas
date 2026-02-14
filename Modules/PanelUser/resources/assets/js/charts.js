@@ -7,7 +7,7 @@ export function initCashFlowChart(selector, labels, incomeData, expenseData, isD
         chart: {
             type: 'area',
             height: 300,
-            fontFamily: 'Instrument Sans, ui-sans-serif, system-ui, sans-serif',
+            fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif',
             toolbar: { show: false },
             animations: { enabled: true, easing: 'easeinout', speed: 800 },
             background: 'transparent'
@@ -60,7 +60,7 @@ export function initSpendingChart(selector, seriesData, labels, colors, isDark =
         chart: {
             type: 'donut',
             height: 280,
-            fontFamily: 'Instrument Sans, ui-sans-serif, system-ui, sans-serif',
+            fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif',
             background: 'transparent'
         },
         labels: labels,

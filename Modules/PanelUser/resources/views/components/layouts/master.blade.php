@@ -19,22 +19,37 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+@php $isPro = auth()->user()?->isPro() ?? false; @endphp
 <body class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased">
-    <div class="antialiased bg-gray-50 dark:bg-gray-900 min-h-screen">
-
-        <x-paneluser::layouts.navbar />
-
-        <x-paneluser::layouts.sidebar />
-
-        <main class="p-4 md:ml-64 h-auto pt-20">
-            <x-core::inspection-banner />
-
-            {{ $slot }}
-
-            <x-paneluser::inspection-modal />
-            <x-notifications::toast />
-        </main>
-    </div>
+    @if($isPro)
+        {{-- Layout PRO: Vertex CBAV style - sidebar com logo, navbar complementar --}}
+        <div class="flex h-screen overflow-hidden">
+            <x-paneluser::layouts.sidebar />
+            <div class="flex-1 flex flex-col overflow-hidden sm:ml-64 transition-all duration-300">
+                <x-paneluser::layouts.navbar />
+                <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
+                    <x-core::inspection-banner />
+                    @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
+                    {{ $slot }}
+                    <x-paneluser::inspection-modal />
+                    <x-notifications::toast />
+                </main>
+            </div>
+        </div>
+    @else
+        {{-- Layout FREE: navbar full width, sidebar lateral --}}
+        <div class="antialiased bg-gray-50 dark:bg-gray-900 min-h-screen">
+            <x-paneluser::layouts.navbar />
+            <x-paneluser::layouts.sidebar />
+            <main id="main-content" class="p-4 md:ml-64 h-auto pt-20">
+                <x-core::inspection-banner />
+                @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
+                {{ $slot }}
+                <x-paneluser::inspection-modal />
+                <x-notifications::toast />
+            </main>
+        </div>
+    @endif
     <x-loading-overlay />
     @stack('scripts')
 

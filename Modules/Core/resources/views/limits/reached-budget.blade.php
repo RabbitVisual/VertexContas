@@ -1,13 +1,11 @@
-@section('title', 'Limite Atingido')
-
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Limite Atingido'">
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
             <div class="p-8 sm:p-10 text-center">
 
                 <!-- Icon -->
                 <div class="mx-auto h-24 w-24 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full flex items-center justify-center mb-6 ring-8 ring-blue-50 dark:ring-blue-900/10">
-                    <x-icon name="chart-pie" class="h-10 w-10 text-blue-600 dark:text-blue-500" />
+                    <x-icon name="chart-pie" style="duotone" class="h-10 w-10 text-blue-600 dark:text-blue-500" />
                 </div>
 
                 <!-- Headline -->
@@ -26,10 +24,10 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">1 Orçamento</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Controle básico
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Controle básico
                             </li>
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Sem alertas personalizados
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Sem alertas personalizados
                             </li>
                         </ul>
                     </div>
@@ -41,13 +39,13 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Orçamentos Ilimitados</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> <strong>Orçamentos infinitos</strong>
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> <strong>Orçamentos infinitos</strong>
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Metas de economia
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Metas de economia
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Análises avançadas
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Análises avançadas
                             </li>
                         </ul>
                     </div>
@@ -56,7 +54,7 @@
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="{{ route('user.subscription.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3.5 border border-transparent text-base font-semibold rounded-lg text-white bg-gradient-to-r from-primary to-blue-600 hover:from-primary-dark hover:to-blue-700 shadow-lg shadow-primary/20 transition-all transform hover:scale-105">
-                        <x-icon name="rocket" class="w-5 h-5 mr-2" />
+                        <x-icon name="rocket" style="solid" class="w-5 h-5 mr-2" />
                         Desbloquear Orçamentos
                     </a>
 

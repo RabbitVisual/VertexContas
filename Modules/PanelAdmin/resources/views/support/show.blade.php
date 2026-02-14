@@ -10,6 +10,11 @@
                     <div class="flex items-center gap-3">
                         <span class="text-xs font-black text-[#11C76F] bg-[#11C76F]/10 px-3 py-1 rounded-full uppercase tracking-widest">Support Ticket</span>
                         <span class="text-xs font-bold text-slate-400">#{{ $ticket->id }}</span>
+                        @if($ticket->user->isPro())
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                                <x-icon name="crown" style="solid" class="w-3 h-3" /> Cliente PRO
+                            </span>
+                        @endif
                     </div>
                     <h1 class="text-2xl font-black text-slate-900 dark:text-white line-clamp-1 mt-1 tracking-tight">{{ $ticket->subject }}</h1>
                 </div>
@@ -168,7 +173,13 @@
                         <h3 class="text-xl font-black text-slate-900 dark:text-white leading-tight">{{ $ticket->user->name }}</h3>
                         <div class="flex items-center gap-2 mt-2">
                             <span class="px-3 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-widest">{{ $ticket->user->getRoleNames()->first() ?? 'Client' }}</span>
-                            <span class="px-3 py-1 bg-amber-100 dark:bg-amber-500/10 text-amber-600 rounded-lg text-[9px] font-black uppercase tracking-widest">{{ $ticket->user->membership ?? 'Gratuito' }}</span>
+                            @if($ticket->user->isPro())
+                                <span class="px-3 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-1">
+                                    <x-icon name="crown" style="solid" class="w-3 h-3" /> Vertex PRO
+                                </span>
+                            @else
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-widest">Gratuito</span>
+                            @endif
                         </div>
                     </div>
 
@@ -186,6 +197,21 @@
                             <span class="text-xs text-slate-800 dark:text-slate-300 font-black">{{ $ticket->user->cpf ?? '---' }}</span>
                         </div>
                     </div>
+
+                    @if($ticket->user->isPro())
+                    <div class="mt-8 p-5 bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl border border-amber-500/20">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 flex items-center justify-center bg-amber-500/20 rounded-xl">
+                                <x-icon name="crown" style="solid" class="text-amber-600 dark:text-amber-400 w-5 h-5" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">Cliente Vertex PRO</p>
+                                <p class="text-[11px] text-amber-600/80 dark:text-amber-400/80">Atendimento prioritário • Suporte VIP</p>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400">Este cliente tem direito a suporte prioritário. Priorize a resolução deste chamado.</p>
+                    </div>
+                    @endif
 
                     <div class="mt-10 pt-8 border-t border-gray-100 dark:border-white/5">
                         <a href="{{ route('admin.users.show', $ticket->user) }}" class="w-full flex items-center justify-center py-4 rounded-2xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-[10px] font-black uppercase tracking-[0.1em] hover:scale-105 active:scale-95 transition-all shadow-xl">

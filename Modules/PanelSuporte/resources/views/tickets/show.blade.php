@@ -13,6 +13,11 @@
             <div>
                 <div class="flex items-center gap-3">
                     <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight italic-none">Ticket #{{ $ticket->id }}</h1>
+                    @if($ticket->user->isPro())
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
+                            <x-icon name="crown" style="solid" class="w-3.5 h-3.5" /> Cliente PRO
+                        </span>
+                    @endif
                     @php
                         $statusThemes = [
                             'open' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 ring-emerald-100 dark:ring-emerald-500/20',
@@ -236,11 +241,28 @@
                     </div>
                 </div>
 
+                @if($ticket->user->isPro())
+                <div class="mb-8 p-5 bg-amber-50 dark:bg-amber-500/10 rounded-2xl border border-amber-200 dark:border-amber-500/20">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 flex items-center justify-center bg-amber-100 dark:bg-amber-500/20 rounded-xl">
+                            <x-icon name="crown" style="solid" class="text-amber-600 dark:text-amber-400 w-5 h-5" />
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">Atendimento Prioritário</p>
+                            <p class="text-[11px] text-amber-600/80 dark:text-amber-400/80">Cliente Vertex PRO • Suporte VIP</p>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-400">Priorize a resolução deste chamado. Cliente com suporte prioritário.</p>
+                </div>
+                @endif
+
                 <div class="space-y-4 pt-6 border-t border-gray-50 dark:border-gray-800">
                     <div class="flex items-center justify-between">
                         <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none">Plano Atual</span>
-                        @if($ticket->user->hasRole('pro_user'))
-                            <span class="px-2 py-1 bg-amber-400 text-slate-900 text-[9px] font-black uppercase rounded-lg shadow-sm shadow-amber-400/20">👑 PRO</span>
+                        @if($ticket->user->isPro())
+                            <span class="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[9px] font-black uppercase rounded-lg inline-flex items-center gap-1">
+                                <x-icon name="crown" style="solid" class="w-3 h-3" /> PRO
+                            </span>
                         @else
                             <span class="px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-500 text-[9px] font-black uppercase rounded-lg">Gratuito</span>
                         @endif

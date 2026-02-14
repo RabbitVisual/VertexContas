@@ -5,8 +5,10 @@ namespace Modules\PanelUser\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Modules\Core\Models\AccessLog;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SecurityController extends Controller
 {
@@ -61,5 +63,39 @@ class SecurityController extends Controller
         ]);
 
         return back()->with('success', 'Acesso da equipe de suporte revogado com sucesso.');
+    }
+
+    /**
+     * Export access log as CSV (PRO only).
+     */
+    public function exportLogs(): StreamedResponse
+    {
+        if (!auth()->user()->isPro()) {
+            abort(403, 'Recurso exclusivo para Vertex PRO.');
+        }
+
+        $logs = AccessLog::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'historico-acessos-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($logs) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Data', 'Hora', 'IP', 'Navegador/Dispositivo', 'Localização'], ';');
+            foreach ($logs as $log) {
+                fputcsv($handle, [
+                    $log->created_at->format('d/m/Y'),
+                    $log->created_at->format('H:i:s'),
+                    $log->ip_address,
+                    Str::limit($log->user_agent, 80),
+                    $log->location ?? '-',
+                ], ';');
+            }
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
     }
 }

@@ -44,8 +44,8 @@
             background-size: 200% 200%;
             animation: gradient-x 3s ease infinite;
         }
-        /* Offset for the master layout if banner is active */
-        body { padding-top: 48px !important; }
+        /* Offset for main content when inspection banner is active (navbar pt-20 + banner ~48px) */
+        #main-content { padding-top: 8rem !important; }
     </style>
 
     <script>
