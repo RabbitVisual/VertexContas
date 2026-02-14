@@ -78,10 +78,30 @@
             <span>Gestão Wiki</span>
         </a>
 
+        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestão do Blog</p>
+
         <a href="{{ route('admin.blog.index') }}"
-           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.blog.*') ? 'bg-primary/10 text-primary font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.blog.index') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
             <x-icon name="newspaper" style="duotone" class="w-5" />
-            <span>Gestão do Blog</span>
+            <span>Todos os Posts</span>
+        </a>
+
+        <a href="{{ route('admin.blog.create') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.blog.create') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+            <x-icon name="plus" style="duotone" class="w-5" />
+             <span>Novo Post</span>
+        </a>
+
+        <a href="{{ route('admin.blog.categories') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.blog.categories') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+            <x-icon name="tags" style="duotone" class="w-5" />
+            <span>Categorias</span>
+        </a>
+
+        <a href="{{ route('admin.blog.comments') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.blog.comments') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+            <x-icon name="comments" style="duotone" class="w-5" />
+            <span>Comentários</span>
         </a>
 
         <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Configuração</p>

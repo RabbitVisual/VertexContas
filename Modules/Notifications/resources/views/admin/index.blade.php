@@ -1,16 +1,16 @@
 <x-paneladmin::layouts.master>
-    <div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto px-4 py-10">
 
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div class="space-y-1">
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic">
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic uppercase">
                     Central de Avisos
                 </h1>
-                <p class="text-sm text-slate-500 font-medium italic">Gerencie e envie notificações para toda a plataforma.</p>
+                <p class="text-sm text-slate-500 font-medium italic">Gerencie e envie notificações inteligentes para toda a plataforma.</p>
             </div>
 
-            <a href="{{ route('admin.notifications.create') }}" class="inline-flex items-center gap-3 px-8 py-5 bg-[#11C76F] text-white font-black rounded-3xl shadow-2xl shadow-[#11C76F]/30 hover:bg-[#0EA85A] hover:-translate-y-1 active:scale-95 transition-all text-xs uppercase tracking-[0.2em]">
+            <a href="{{ route('admin.notifications.create') }}" class="inline-flex items-center gap-3 px-6 py-4 bg-[#11C76F] text-white font-black rounded-2xl shadow-lg shadow-[#11C76F]/20 hover:bg-[#0EA85A] hover:-translate-y-1 active:scale-95 transition-all text-[10px] uppercase tracking-[0.2em]">
                 <x-icon name="plus" class="text-lg" />
                 Nova Notificação
             </a>
