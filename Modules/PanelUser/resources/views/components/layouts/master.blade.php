@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Vertex Contas - User Panel' }}</title>
+    <title>{{ $title ?? __('Vertex Contas - User Panel') }}</title>
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
 
@@ -25,14 +25,14 @@
         }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
-    <div class="antialiased bg-gray-50 dark:bg-gray-900">
+<body class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 antialiased">
+    <div class="antialiased bg-gray-50 dark:bg-gray-900 min-h-screen">
 
         <x-paneluser::layouts.navbar />
 
         <x-paneluser::layouts.sidebar />
 
-        <main class="p-4 md:ml-64 h-auto pt-20">
+        <main class="p-4 md:ml-64 h-auto pt-20 transition-all duration-300">
             <x-core::inspection-banner />
 
             {{ $slot }}
