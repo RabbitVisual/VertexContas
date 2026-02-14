@@ -1,12 +1,12 @@
-<x-paneluser::layouts.master :title="__('Subscription Plan')">
+<x-paneluser::layouts.master :title="'Planos e Assinatura'">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-base font-semibold text-primary-600 uppercase tracking-wide">{{ __('Pricing') }}</h2>
+            <h2 class="text-base font-semibold text-primary-600 uppercase tracking-wide">Preços</h2>
             <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
-                {{ __('Upgrade your financial control') }}
+                Evolua seu controle financeiro
             </p>
             <p class="mt-4 text-xl text-gray-500 dark:text-gray-400">
-                {{ __('Choose the plan that fits your needs. No hidden fees.') }}
+                Escolha o plano ideal para você. Sem taxas ocultas.
             </p>
         </div>
 
@@ -14,35 +14,35 @@
             <!-- Free Plan -->
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 hover:shadow-lg transition-all duration-300 flex flex-col">
                 <div class="mb-4">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('Free Plan') }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Plano Grátis</h3>
                     <p class="mt-4 flex items-baseline text-gray-900 dark:text-white">
-                        <span class="text-5xl font-extrabold tracking-tight">{{ __('Free') }}</span>
-                        <span class="ml-1 text-xl font-semibold text-gray-500 dark:text-gray-400">/{{ __('forever') }}</span>
+                        <span class="text-5xl font-extrabold tracking-tight">Grátis</span>
+                        <span class="ml-1 text-xl font-semibold text-gray-500 dark:text-gray-400">/sempre</span>
                     </p>
-                    <p class="mt-6 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{{ __('Essential features for personal tracking.') }}</p>
+                    <p class="mt-6 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Funcionalidades essenciais para controle pessoal.</p>
                 </div>
 
                 <ul role="list" class="mt-6 space-y-4 flex-1">
                     <li class="flex items-start">
-                        <i class="fa-solid fa-check text-emerald-500 mt-1 mr-3"></i>
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Basic Income & Expense Tracking') }}</span>
+                        <x-icon name="check" style="solid" class="text-emerald-500 mt-1 mr-3" />
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Controle básico de receitas e despesas</span>
                     </li>
                      <li class="flex items-start">
-                        <i class="fa-solid fa-check text-emerald-500 mt-1 mr-3"></i>
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Limited Accounts (2)') }}</span>
+                        <x-icon name="check" style="solid" class="text-emerald-500 mt-1 mr-3" />
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Até 2 contas</span>
                     </li>
                     <li class="flex items-start text-gray-400 dark:text-gray-500 line-through decoration-gray-400/50">
-                        <i class="fa-solid fa-xmark text-gray-300 dark:text-gray-600 mt-1 mr-3"></i>
-                        <span class="text-sm">{{ __('Advanced Reports (PDF/CSV)') }}</span>
+                        <x-icon name="xmark" style="solid" class="text-gray-300 dark:text-gray-600 mt-1 mr-3" />
+                        <span class="text-sm">Relatórios avançados (PDF/CSV)</span>
                     </li>
                     <li class="flex items-start text-gray-400 dark:text-gray-500 line-through decoration-gray-400/50">
-                        <i class="fa-solid fa-xmark text-gray-300 dark:text-gray-600 mt-1 mr-3"></i>
-                        <span class="text-sm">{{ __('Unlimited Goals') }}</span>
+                        <x-icon name="xmark" style="solid" class="text-gray-300 dark:text-gray-600 mt-1 mr-3" />
+                        <span class="text-sm">Metas ilimitadas</span>
                     </li>
                 </ul>
 
                 <button disabled class="mt-8 w-full py-3 px-6 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 font-bold bg-gray-50 dark:bg-gray-900/50 cursor-not-allowed text-sm uppercase tracking-wide">
-                    {{ __('Current Plan') }}
+                    Plano Atual
                 </button>
             </div>
 
@@ -54,52 +54,52 @@
                 <div class="relative bg-gray-900 rounded-3xl p-8 flex flex-col h-full border border-gray-800">
                     <div class="absolute top-0 right-0 -mr-1 -mt-1 w-24 h-24 overflow-hidden rounded-tr-3xl">
                          <div class="absolute transform rotate-45 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold py-1 right-[-35px] top-[32px] w-[170px] text-center shadow-sm">
-                            {{ __('POPULAR') }}
+                            POPULAR
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <h3 class="text-2xl font-bold text-white flex items-center">
-                            <i class="fa-solid fa-crown text-amber-400 mr-2"></i>
-                            {{ __('Vertex PRO') }}
+                            <x-icon name="crown" style="solid" class="text-amber-400 mr-2" />
+                            Vertex PRO
                         </h3>
                          <p class="mt-4 flex items-baseline text-white">
                             <span class="text-5xl font-extrabold tracking-tight">R$ 29,90</span>
-                            <span class="ml-1 text-xl font-semibold text-gray-400">/{{ __('lifetime') }}</span>
+                            <span class="ml-1 text-xl font-semibold text-gray-400">/vitalício</span>
                         </p>
-                        <p class="mt-6 text-gray-400 text-sm leading-relaxed">{{ __('One-time payment. Full access forever.') }}</p>
+                        <p class="mt-6 text-gray-400 text-sm leading-relaxed">Pagamento único. Acesso completo para sempre.</p>
                     </div>
 
                     <ul role="list" class="mt-6 space-y-4 flex-1">
                         <li class="flex items-start">
                             <div class="bg-amber-500/20 p-1 rounded-full mr-3 shrink-0">
-                                <i class="fa-solid fa-check text-amber-400 text-xs"></i>
+                                <x-icon name="check" style="solid" class="text-amber-400 text-xs" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ __('Unlimited Transactions') }}</span>
+                            <span class="text-gray-300 text-sm font-medium">Transações ilimitadas</span>
                         </li>
                         <li class="flex items-start">
                              <div class="bg-amber-500/20 p-1 rounded-full mr-3 shrink-0">
-                                <i class="fa-solid fa-check text-amber-400 text-xs"></i>
+                                <x-icon name="check" style="solid" class="text-amber-400 text-xs" />
                             </div>
-                            <span class="text-gray-300 text-sm">{{ __('Unlimited Accounts & Cards') }}</span>
+                            <span class="text-gray-300 text-sm">Contas e cartões ilimitados</span>
                         </li>
                         <li class="flex items-start">
                              <div class="bg-amber-500/20 p-1 rounded-full mr-3 shrink-0">
-                                <i class="fa-solid fa-check text-amber-400 text-xs"></i>
+                                <x-icon name="check" style="solid" class="text-amber-400 text-xs" />
                             </div>
-                            <span class="text-gray-300 text-sm">{{ __('Advanced Reports (PDF/CSV)') }}</span>
+                            <span class="text-gray-300 text-sm">Relatórios avançados (PDF/CSV)</span>
                         </li>
                         <li class="flex items-start">
                              <div class="bg-amber-500/20 p-1 rounded-full mr-3 shrink-0">
-                                <i class="fa-solid fa-check text-amber-400 text-xs"></i>
+                                <x-icon name="check" style="solid" class="text-amber-400 text-xs" />
                             </div>
-                            <span class="text-gray-300 text-sm">{{ __('Unlimited Goals & Budgets') }}</span>
+                            <span class="text-gray-300 text-sm">Metas e orçamentos ilimitados</span>
                         </li>
                          <li class="flex items-start">
                              <div class="bg-amber-500/20 p-1 rounded-full mr-3 shrink-0">
-                                <i class="fa-solid fa-check text-amber-400 text-xs"></i>
+                                <x-icon name="check" style="solid" class="text-amber-400 text-xs" />
                             </div>
-                            <span class="text-gray-300 text-sm">{{ __('VIP Priority Support') }}</span>
+                            <span class="text-gray-300 text-sm">Suporte prioritário VIP</span>
                         </li>
                     </ul>
 
@@ -107,30 +107,30 @@
                      <div x-data="{ open: false }" class="mt-8">
                         @if(session()->has('impersonate_inspection_id'))
                              <button disabled class="w-full py-4 px-6 rounded-xl text-gray-500 font-bold bg-gray-800 cursor-not-allowed border border-gray-700">
-                                {{ __('Purchase Disabled (Inspection)') }}
+                                Compra desabilitada (inspeção)
                             </button>
                         @else
                              <button @click="open = !open" type="button" class="w-full py-4 px-6 rounded-xl text-amber-900 font-bold bg-gradient-to-r from-amber-300 to-orange-500 hover:from-amber-400 hover:to-orange-600 shadow-lg shadow-amber-500/20 transform hover:-translate-y-0.5 transition-all flex items-center justify-center text-sm uppercase tracking-wide">
-                                <span x-show="!open">{{ __('Get PRO Now') }}</span>
-                                <span x-show="open">{{ __('Select Method') }}</span>
-                                 <i x-show="!open" class="fa-solid fa-arrow-right ml-2"></i>
-                                 <i x-show="open" class="fa-solid fa-chevron-down ml-2"></i>
+                                <span x-show="!open">Assinar PRO Agora</span>
+                                <span x-show="open">Selecionar Método</span>
+                                 <x-icon x-show="!open" name="arrow-right" style="solid" class="ml-2" />
+                                 <x-icon x-show="open" name="chevron-down" style="solid" class="ml-2" />
                             </button>
 
                             <div x-show="open" x-collapse class="mt-4 space-y-3">
                                  @forelse($gateways as $gateway)
                                     <a href="{{ route('checkout.init', $gateway->slug) }}" class="flex items-center justify-center w-full py-3 px-4 rounded-xl border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white transition-colors gap-2 text-sm font-medium group-link">
                                          @if($gateway->slug === 'stripe')
-                                            <i class="fa-brands fa-stripe text-xl group-link-hover:text-indigo-400 transition-colors"></i> {{ __('Pay with Stripe') }}
+                                            <x-icon name="stripe" style="brands" class="text-xl group-link-hover:text-indigo-400 transition-colors" /> Pagar com Stripe
                                         @elseif($gateway->slug === 'mercadopago')
-                                            <i class="fa-solid fa-handshake text-xl text-blue-400"></i> {{ __('Mercado Pago') }}
+                                            <x-icon name="handshake" style="solid" class="text-xl text-blue-400" /> Mercado Pago
                                         @else
                                             {{ $gateway->name }}
                                         @endif
                                     </a>
                                  @empty
                                     <div class="text-center text-sm text-gray-500 py-2">
-                                        {{ __('No payment methods available.') }}
+                                        Nenhum método de pagamento disponível.
                                     </div>
                                  @endforelse
                             </div>
@@ -143,19 +143,19 @@
         <!-- Payment History -->
         <div class="max-w-5xl mx-auto">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                <i class="fa-solid fa-clock-rotate-left mr-2 text-primary-500"></i>
-                {{ __('Payment History') }}
+                <x-icon name="clock-rotate-left" style="solid" class="mr-2 text-primary-500" />
+                Histórico de Pagamentos
             </h2>
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/50 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
                             <tr>
-                                <th scope="col" class="px-6 py-4">{{ __('Date') }}</th>
-                                <th scope="col" class="px-6 py-4">{{ __('Method') }}</th>
-                                <th scope="col" class="px-6 py-4">{{ __('Amount') }}</th>
-                                <th scope="col" class="px-6 py-4">{{ __('Status') }}</th>
-                                <th scope="col" class="px-6 py-4">{{ __('Reference') }}</th>
+                                <th scope="col" class="px-6 py-4">Data</th>
+                                <th scope="col" class="px-6 py-4">Método</th>
+                                <th scope="col" class="px-6 py-4">Valor</th>
+                                <th scope="col" class="px-6 py-4">Status</th>
+                                <th scope="col" class="px-6 py-4">Referência</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -182,7 +182,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                        {{ __('No payments found.') }}
+                                        Nenhum pagamento encontrado.
                                     </td>
                                 </tr>
                             @endforelse

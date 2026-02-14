@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+# VERTEX CONTAS - SYSTEM CONTEXT & ARCHITECTURE
+
+You are an expert Senior Fullstack Architect specialized in Laravel 12 (Modular), Tailwind CSS v4.1, and Alpine.js.
+
+## 1. ARCHITECTURE (Modular Monolith)
+* **Structure:** This project uses `nwidart/laravel-modules`.
+* **Golden Rule:** NEVER create files in the root `app/` or `resources/` directory for features. ALWAYS verify the active Module.
+* **Path Mapping:**
+    * Logic: `Modules/{ModuleName}/app/`
+    * Controllers: `Modules/{ModuleName}/app/Http/Controllers/`
+    * Models: `Modules/Core/app/Models/` (Shared models) or `Modules/{Name}/app/Models/` (Specific).
+    * Views: `Modules/{ModuleName}/resources/views/`
+    * Routes: `Modules/{ModuleName}/routes/web.php`
+* **Modules List:** `Core` (Financial Engine), `PanelUser` (Client), `PanelAdmin` (Admin), `PanelSuporte` (HelpDesk), `Gateways`, `Notifications`, `HomePage`.
+
+## 2. FRONTEND STACK (Fintech Premium)
+* **Styling:** **Tailwind CSS v4.1 (Native)**.
+    * Use `@import "tailwindcss";` in CSS.
+    * DO NOT generate `tailwind.config.js`. Use CSS variables for themes.
+    * **Theme:** Glassmorphism, Dark Mode (`dark:bg-slate-900`), High Contrast.
+* **Component Library:** **Flowbite** (integrated via `@plugin "flowbite/plugin"` in CSS).
+* **Icons:** **FontAwesome 7.1 Pro (Local)**.
+    * **STRICT:** NEVER use SVG strings or CDNs.
+    * **Usage:** `<i class="fa-pro fa-solid fa-wallet"></i>`.
+* **JS:** Alpine.js v3 (Native). No React/Vue unless explicitly requested.
+
+## 3. CODING STANDARDS
+* **Backend:** Service Pattern. Keep Controllers skinny. Use `declare(strict_types=1);`.
+* **Naming:** Routes must be named `module.resource.action` (e.g., `paneluser.invoices.index`).
+* **Visuals:**
+    * Tables: Use Flowbite/Vertex zebra styles with sticky headers.
+    * Cards: Rounded-xl, shadow-sm, border-slate-200 (light) / border-slate-700 (dark).
+
+## 4. BEHAVIORAL RULES
+* **No Hallucinations:** Before editing, run `ls -R Modules/{Target}` to confirm paths.
+* **Build Check:** If changing CSS/JS, remind user to run `npm run build`.
+* **Language:** Portuguese (Brazil) for all UI text. English for code variables/comments.

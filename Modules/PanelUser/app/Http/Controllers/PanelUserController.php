@@ -119,6 +119,23 @@ class PanelUserController extends Controller
     }
 
     /**
+     * Dismiss sidebar CTA (free users only). Reappears on next login (new session).
+     */
+    public function dismissSidebarCta(Request $request)
+    {
+        $user = auth()->user();
+        if ($user->isPro()) {
+            return response()->json(['success' => false], 403);
+        }
+
+        session(['sidebar_cta_dismissed' => true]);
+
+        return $request->wantsJson()
+            ? response()->json(['success' => true])
+            : back();
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

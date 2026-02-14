@@ -21,6 +21,7 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     // Panel Dashboard
     Route::get('/', [PanelUserController::class, 'index'])->name('paneluser.index');
     Route::post('/onboarding/complete', [PanelUserController::class, 'completeOnboarding'])->name('paneluser.onboarding.complete');
+    Route::post('/cta-sidebar/dismiss', [PanelUserController::class, 'dismissSidebarCta'])->name('user.cta-sidebar.dismiss');
 
     // Subscription
     Route::get('/subscription', [SubscriptionController::class, 'index'])->name('user.subscription.index');

@@ -4,12 +4,18 @@ import './auth-forms';
 import './masks';
 import './cep-lookup';
 
+import 'flowbite';
+
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 window.Chart = Chart;
 
 import ApexCharts from 'apexcharts';
 window.ApexCharts = ApexCharts;
+
+import { initCashFlowChart, initSpendingChart } from '../../Modules/PanelUser/resources/assets/js/charts.js';
+window.initCashFlowChart = initCashFlowChart;
+window.initSpendingChart = initSpendingChart;
 
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
