@@ -57,7 +57,7 @@
             <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Saldo consolidado</p>
-                    <p class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mt-1 font-mono tabular-nums">R$ {{ number_format($totalBalance, 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-3xl md:text-4xl font-black text-slate-900 dark:text-white mt-1 font-mono tabular-nums">R$ {{ number_format($totalBalance, 2, ',', '.') }}</p>
                 </div>
                 <div class="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
                     <div class="w-2.5 h-2.5 rounded-full bg-primary-500"></div>
@@ -88,7 +88,7 @@
                         @if($items->count() > 0)
                             <div class="p-6">
                                 <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $label }}</p>
-                                <p class="text-xl font-black text-slate-900 dark:text-white mt-1 font-mono tabular-nums">R$ {{ number_format($sum, 2, ',', '.') }}</p>
+                                <p class="sensitive-value text-xl font-black text-slate-900 dark:text-white mt-1 font-mono tabular-nums">R$ {{ number_format($sum, 2, ',', '.') }}</p>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $items->count() }} conta(s)</p>
                             </div>
                         @endif
@@ -129,7 +129,7 @@
 
                         <div class="relative z-10">
                             <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                            <p class="text-2xl font-mono font-black tracking-tight tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                            <p class="sensitive-value text-2xl font-mono font-black tracking-tight tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
                         </div>
 
                         <div class="relative z-10 flex justify-between items-end">

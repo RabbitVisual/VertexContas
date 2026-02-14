@@ -54,7 +54,7 @@
                                 </td>
                                 <td class="px-6 py-4 capitalize">{{ $invoice->gateway_slug }}</td>
                                 <td class="px-6 py-4 font-mono font-semibold tabular-nums">
-                                    {{ $invoice->currency }} {{ number_format((float) $invoice->amount, 2, ',', '.') }}
+                                    <span class="sensitive-value">{{ $invoice->currency }} {{ number_format((float) $invoice->amount, 2, ',', '.') }}</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $invoice->status === 'succeeded' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' }}">

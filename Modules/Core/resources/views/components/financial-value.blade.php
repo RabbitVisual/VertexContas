@@ -8,7 +8,7 @@
     $formattedValue = is_numeric($value) ? number_format($value, 2, ',', '.') : $value;
 @endphp
 
-<span {{ $attributes->merge(['class' => 'transition-all duration-500 ' . ($shouldHide ? 'blur-[6px] select-none pointer-events-none opacity-50 grayscale' : '')]) }}
+<span {{ $attributes->merge(['class' => 'sensitive-value transition-all duration-500 ' . ($shouldHide ? 'blur-[6px] select-none pointer-events-none opacity-50 grayscale' : '')]) }}
       @if($shouldHide) title="Oculto por privacidade durante a inspeção" @endif>
     {{ $prefix }} {{ $shouldHide ? '00.000,00' : $formattedValue }}
 </span>

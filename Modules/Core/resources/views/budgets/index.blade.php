@@ -52,9 +52,9 @@
 
                         <div class="mb-4">
                             <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-500">Gasto: R$ {{ number_format($budget->spent_amount, 2, ',', '.') }}</span>
+                                <span class="text-slate-500">Gasto: <span class="sensitive-value">R$ {{ number_format($budget->spent_amount, 2, ',', '.') }}</span></span>
                                 <span class="font-bold {{ $budget->is_exceeded ? 'text-red-500' : 'text-slate-700 dark:text-slate-300' }}">
-                                    Limite: R$ {{ number_format($budget->limit_amount, 2, ',', '.') }}
+                                    Limite: <span class="sensitive-value">R$ {{ number_format($budget->limit_amount, 2, ',', '.') }}</span>
                                 </span>
                             </div>
                             <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">

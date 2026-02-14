@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Anti-FOUC: deve ser o primeiro script (Flowbite/Tailwind dark mode) --}}
+    {{-- Anti-FOUC: deve ser o primeiro script (Flowbite/Tailwind dark mode + modo privacidade) --}}
     <script>
         (function() {
             var isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark', isDark);
+            document.body.classList.toggle('sensitive-hidden', localStorage.getItem('sensitive-hidden') === 'true');
         })();
     </script>
 

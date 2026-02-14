@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Saldo Total</p>
-                    <h3 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($totalBalance, 2, ',', '.') }}</h3>
+                    <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($totalBalance, 2, ',', '.') }}</h3>
                 </div>
             </div>
 
@@ -99,7 +99,7 @@
                         </span>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Receitas do Mês</p>
-                    <h3 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyIncome, 2, ',', '.') }}</h3>
+                    <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyIncome, 2, ',', '.') }}</h3>
                 </div>
             </div>
 
@@ -115,7 +115,7 @@
                         </span>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Despesas do Mês</p>
-                    <h3 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyExpenses, 2, ',', '.') }}</h3>
+                    <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">R$ {{ number_format($monthlyExpenses, 2, ',', '.') }}</h3>
                 </div>
             </div>
 
@@ -128,7 +128,7 @@
                         </div>
                     </div>
                     <p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Balanço Mensal</p>
-                    <h3 class="text-2xl lg:text-3xl font-black mt-1 tabular-nums {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">R$ {{ number_format($monthlyBalance, 2, ',', '.') }}</h3>
+                    <h3 class="sensitive-value text-2xl lg:text-3xl font-black mt-1 tabular-nums {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">R$ {{ number_format($monthlyBalance, 2, ',', '.') }}</h3>
                 </div>
             </div>
         </div>
@@ -159,7 +159,7 @@
                                 <p class="font-semibold text-slate-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300">{{ $account->name }}</p>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 capitalize">{{ $account->type }}</p>
                             </div>
-                            <p class="font-bold text-primary-600 dark:text-primary-400 tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                            <p class="sensitive-value font-bold text-primary-600 dark:text-primary-400 tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
                         </a>
                     @empty
                         <div class="py-12 text-center text-slate-500 dark:text-slate-400">
@@ -190,7 +190,7 @@
                             <x-icon name="ellipsis" style="solid" class="w-5 h-5 text-slate-400" />
                         </a>
                     </div>
-                    <div id="cashFlowChart" class="w-full" style="min-height: 280px;"></div>
+                    <div id="cashFlowChart" class="sensitive-value w-full" style="min-height: 280px;"></div>
                 </div>
                 <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
                     <div class="mb-6">
@@ -202,7 +202,7 @@
                         </h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Distribuição das despesas</p>
                     </div>
-                    <div id="categoryChart" class="w-full" style="min-height: 220px;"></div>
+                    <div id="categoryChart" class="sensitive-value w-full" style="min-height: 220px;"></div>
                 </div>
             </div>
         </div>
@@ -232,7 +232,7 @@
                                     <p class="text-xs text-slate-500 dark:text-slate-400">{{ $transaction->date->format('d/m/Y') }} · {{ $transaction->category->name ?? 'Geral' }}</p>
                                 </div>
                             </div>
-                            <span class="font-mono font-bold tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                            <span class="sensitive-value font-mono font-bold tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                                 {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
                             </span>
                         </a>

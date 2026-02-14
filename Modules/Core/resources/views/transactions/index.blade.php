@@ -140,7 +140,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="block text-lg font-bold font-mono {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                                    <span class="sensitive-value block text-lg font-bold font-mono {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                                         {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
                                     </span>
 
