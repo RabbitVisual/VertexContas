@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="vertex-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#11c76f" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#0d8f51" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="vertex-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#11c76f"/>
+      <stop offset="100%" stop-color="#0d8f51"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="64" fill="url(#vertex-bg)"/>
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#11c76f" stroke-width="1.5" opacity="0.25"/>
+  <!-- User silhouette - Vertex brand colors -->
+  <g fill="url(#vertex-fill)">
+    <circle cx="64" cy="46" r="14"/>
+    <path d="M40 98c0-13 10.7-24 24-24s24 11 24 24v2H40v-2z"/>
+  </g>
+</svg>

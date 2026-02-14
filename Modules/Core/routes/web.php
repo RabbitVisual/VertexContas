@@ -6,6 +6,11 @@ use Modules\Core\Http\Controllers\CoreController;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [CoreController::class, 'dashboard'])->middleware('pro')->name('core.dashboard');
 
+    // Faturas (PRO apenas)
+    Route::get('/invoices', [\Modules\Core\Http\Controllers\InvoiceController::class, 'index'])
+        ->middleware('pro')
+        ->name('core.invoices.index');
+
     // Accounts CRUD
     Route::resource('accounts', \Modules\Core\Http\Controllers\AccountController::class)->names('core.accounts');
 

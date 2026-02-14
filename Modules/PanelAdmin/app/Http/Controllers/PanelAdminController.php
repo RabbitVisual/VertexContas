@@ -36,6 +36,9 @@ class PanelAdminController extends Controller
         $proUsersCount = \App\Models\User::role('pro_user')->count();
         $freeUsersCount = \App\Models\User::role('free_user')->count();
 
+        // Subscription Metrics (assenturas recorrentes)
+        $activeSubscriptionsCount = \Modules\Gateways\Models\Subscription::where('status', 'active')->count();
+
         $newUsersThisMonth = \App\Models\User::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
@@ -84,14 +87,15 @@ class PanelAdminController extends Controller
             'proUsersCount',
             'freeUsersCount',
             'newUsersThisMonth',
+            'activeSubscriptionsCount',
             'openTicketsCount',
             'recentUsers',
             'recentPayments',
             'revenueData',
             'monthLabels',
             'mostReadPosts',
-            'topAuthors'
-            ,'blogConversionRate'
+            'topAuthors',
+            'blogConversionRate'
         ));
     }
 

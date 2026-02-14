@@ -53,6 +53,12 @@
             <span>Pagamentos</span>
         </a>
 
+        <a href="{{ route('admin.subscriptions.index') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.subscriptions.*') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+            <x-icon name="arrows-rotate" style="duotone" class="w-5" />
+            <span>Assinaturas</span>
+        </a>
+
         <a href="{{ route('admin.support.index') }}"
            class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.support.*') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
             <x-icon name="headset" style="duotone" class="w-5" />

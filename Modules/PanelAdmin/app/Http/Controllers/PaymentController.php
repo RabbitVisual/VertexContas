@@ -1,42 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\PanelAdmin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Gateways\Models\PaymentLog; // Assuming this model exists based on previous work
+use Modules\Gateways\Models\PaymentLog;
 
 class PaymentController extends Controller
 {
     /**
-     * Display a listing of payments.
+     * Display a listing of payments (incl. recurring subscription payments).
      */
     public function index(Request $request)
     {
-        $query = PaymentLog::with('user')->latest();
+        $query = PaymentLog::with(['user', 'subscription'])->latest();
 
-        // Filters
-        if ($request->has('gateway') && $request->gateway != '') {
+        if ($request->filled('gateway')) {
             $query->where('gateway_slug', $request->gateway);
         }
 
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $payments = $query->paginate(15)->withQueryString();
 
-        // Stats for Charts
-        // Daily Revenue (Last 30 days)
-        // Group by date, sum amount
-        $dailyRevenue = PaymentLog::where('status', 'succeeded') // or 'paid' depending on logic
+        // Daily revenue chart (last 30 days) - succeeded payments only
+        $dailyRevenue = PaymentLog::where('status', 'succeeded')
             ->where('created_at', '>=', now()->subDays(30))
-            ->orderBy('date')
             ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
-            ->groupBy('date')
+            ->groupByRaw('DATE(created_at)')
+            ->orderByRaw('DATE(created_at)')
             ->get();
 
-        // Prepare chart data
         $chartDates = $dailyRevenue->pluck('date');
         $chartValues = $dailyRevenue->pluck('total');
 

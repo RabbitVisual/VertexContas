@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    {{-- CTA para FREE - card em destaque, botão atrativo, legível em claro e escuro --}}
+    {{-- CTA para FREE - PRO usa o Dashboard completo (sem dois dashboards) --}}
     @if(!$isPro)
         <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 shadow-xl p-8 text-center">
             <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
@@ -115,20 +115,13 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-4">
                     <x-icon name="crown" style="solid" class="w-8 h-8 text-white" />
                 </div>
-                <h4 class="font-bold text-white text-xl mb-2">Desbloqueie o Dashboard Financeiro Pro</h4>
+                <h4 class="font-bold text-white text-xl mb-2">Desbloqueie o Dashboard Completo</h4>
                 <p class="text-blue-100 dark:text-blue-200 text-sm mb-6 max-w-md mx-auto leading-relaxed">Gráficos avançados, contas ilimitadas, metas e orçamentos completos. Assine o Vertex Pro e tenha controle total das suas finanças.</p>
                 <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-700 dark:bg-white dark:text-blue-800 font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-blue-50 dark:hover:bg-blue-50 transition-all hover:scale-105 active:scale-100">
                     <x-icon name="bolt" style="solid" class="w-5 h-5" />
                     Ver Planos e Assinar
                 </a>
             </div>
-        </div>
-    @else
-        <div class="flex justify-center">
-            <a href="{{ route('core.dashboard') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-semibold rounded-lg border border-gray-200 dark:border-gray-600 transition-colors">
-                <x-icon name="chart-line" style="duotone" class="w-5 h-5" />
-                Ver Dashboard Financeiro Pro
-            </a>
         </div>
     @endif
 </x-paneluser::layouts.master>

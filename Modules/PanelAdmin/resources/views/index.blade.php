@@ -62,7 +62,7 @@
         </div>
 
         <!-- Pro Users Card -->
-        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group">
+        <a href="{{ route('admin.subscriptions.index') }}" class="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="crown" class="w-24 h-24 text-white" />
             </div>
@@ -74,12 +74,12 @@
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ number_format($proUsersCount, 0, ',', '.') }}</h3>
-                <div class="flex items-center text-xs text-amber-100/90 font-medium">
-                    <x-icon name="chart-pie" class="w-3 h-3 mr-1" />
-                    <span>{{ $totalUsers > 0 ? number_format(($proUsersCount/$totalUsers)*100, 1) : 0 }}% da base total</span>
+                <div class="flex flex-col gap-1 text-xs text-amber-100/90 font-medium">
+                    <span><x-icon name="chart-pie" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? number_format(($proUsersCount/$totalUsers)*100, 1) : 0 }}% da base total</span>
+                    <span><x-icon name="arrows-rotate" class="w-3 h-3 mr-1 inline" />{{ $activeSubscriptionsCount ?? 0 }} assinaturas recorrentes ativas</span>
                 </div>
             </div>
-        </div>
+        </a>
 
         <!-- Support Card -->
         <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">

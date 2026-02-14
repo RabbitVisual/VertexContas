@@ -25,8 +25,12 @@ return [
     | Global Icon Styles
     |--------------------------------------------------------------------------
     |
-    | Default Font Awesome Pro style for the <x-icon> component.
-    | Options: duotone, solid, regular, light, thin, brands
+    | Default Font Awesome Pro 7.1 style for the <x-icon> component.
+    | Classic: solid, regular, light, thin
+    | Duotone: duotone, duotone-regular, duotone-light, duotone-thin
+    | Sharp: sharp-solid, sharp-regular, sharp-light, sharp-thin
+    | Sharp Duotone: sharp-duotone, sharp-duotone-regular, sharp-duotone-light, sharp-duotone-thin
+    | Brands: brands
     |
     */
     'style' => 'duotone',
