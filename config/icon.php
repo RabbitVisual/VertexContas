@@ -43,5 +43,6 @@ return [
         'terms' => 'scroll',
         'privacy' => 'shield-halved',
         'contact' => 'envelope',
+        'gauge' => 'gauge-high',
     ],
 ];
