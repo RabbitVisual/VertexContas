@@ -50,7 +50,7 @@
                     </div>
                     <div class="relative z-10">
                         <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                        <p class="text-3xl font-mono font-black tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-3xl font-mono font-black tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
                     </div>
                     <div class="relative z-10">
                         <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
@@ -97,9 +97,7 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-slate-600 dark:text-slate-400 font-mono text-xs">{{ $transaction->date->format('d/m/Y') }}</td>
-                                        <td class="px-6 py-4 text-right font-mono font-semibold tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                                            {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
-                                        </td>
+<td class="px-6 py-4 text-right"><span class="sensitive-value font-mono font-semibold tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">{{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}</span></td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -129,7 +127,7 @@
                                     <span class="px-2 py-0.5 text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
                                 </p>
                             </div>
-                            <p class="p-6 text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">R$ {{ number_format($incomeTotal ?? 0, 2, ',', '.') }}</p>
+                            <p class="sensitive-value p-6 text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">R$ {{ number_format($incomeTotal ?? 0, 2, ',', '.') }}</p>
                         </div>
                         <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden relative">
                             <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 dark:bg-rose-900/20 rounded-bl-full -mr-8 -mt-8"></div>
@@ -140,7 +138,7 @@
                                     <span class="px-2 py-0.5 text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
                                 </p>
                             </div>
-                            <p class="p-6 text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">R$ {{ number_format($expenseTotal ?? 0, 2, ',', '.') }}</p>
+                            <p class="sensitive-value p-6 text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">R$ {{ number_format($expenseTotal ?? 0, 2, ',', '.') }}</p>
                         </div>
                     </div>
                 @endif

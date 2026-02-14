@@ -72,13 +72,13 @@
                         <div>
                             <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Atual</span>
                             <div class="text-2xl font-black text-slate-800 dark:text-white">
-                                R$ {{ number_format($goal->current_amount, 2, ',', '.') }}
+                                <span class="sensitive-value">R$ {{ number_format($goal->current_amount, 2, ',', '.') }}</span>
                             </div>
                         </div>
                          <div class="text-right">
                              <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Alvo</span>
                              <div class="text-sm font-bold text-slate-500 dark:text-slate-400">
-                                R$ {{ number_format($goal->target_amount, 2, ',', '.') }}
+                                <span class="sensitive-value">R$ {{ number_format($goal->target_amount, 2, ',', '.') }}</span>
                              </div>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                             {{ number_format($percentage, 0) }}% Concluído
                         </span>
                         @if($remaining > 0)
-                            <span class="text-slate-400">Falta R$ {{ number_format($remaining, 2, ',', '.') }}</span>
+                            <span class="text-slate-400">Falta <span class="sensitive-value">R$ {{ number_format($remaining, 2, ',', '.') }}</span></span>
                         @else
                             <span class="text-emerald-500 font-bold flex items-center"><x-icon name="check" style="solid" class="mr-1" /> Conquista Desbloqueada!</span>
                         @endif

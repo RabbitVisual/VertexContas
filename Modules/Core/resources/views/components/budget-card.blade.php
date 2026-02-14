@@ -35,7 +35,7 @@
     <div class="px-6 pb-6 space-y-2">
         <div class="flex justify-between text-sm">
             <span class="font-semibold text-slate-600 dark:text-slate-300">
-                R$ {{ number_format($budget->spent_amount, 2, ',', '.') }} / R$ {{ number_format($budget->limit_amount, 2, ',', '.') }}
+                <span class="sensitive-value">R$ {{ number_format($budget->spent_amount, 2, ',', '.') }} / R$ {{ number_format($budget->limit_amount, 2, ',', '.') }}</span>
             </span>
             <span class="font-bold {{ $isExceeded ? 'text-rose-500' : 'text-slate-600 dark:text-slate-300' }}">
                 {{ number_format($usage, 1) }}%
@@ -58,7 +58,7 @@
             </p>
         @else
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Restam R$ {{ number_format($budget->remaining_amount, 2, ',', '.') }}
+                Restam <span class="sensitive-value">R$ {{ number_format($budget->remaining_amount, 2, ',', '.') }}</span>
             </p>
         @endif
     </div>

@@ -56,8 +56,10 @@
                 @endif
             </div>
 
-            {{-- Right: Theme, Notifications, Profile --}}
+            {{-- Right: Privacidade, Theme, Notifications, Profile --}}
             <div class="flex items-center gap-1 sm:gap-2">
+                {{-- Toggle privacidade: esconder valores sensíveis em locais públicos --}}
+                <x-paneluser::sensitive-toggle />
                 {{-- Theme Toggle (liga/desliga com ícones sol e lua - Font Awesome local) --}}
                 <label for="theme-toggle-checkbox" class="relative block h-8 w-14 rounded-full bg-gray-300 transition-colors cursor-pointer [-webkit-tap-highlight-color:transparent] has-checked:bg-primary-500 dark:has-checked:bg-primary-600" aria-label="Alternar tema claro/escuro">
                     <input type="checkbox" id="theme-toggle-checkbox" class="peer sr-only">

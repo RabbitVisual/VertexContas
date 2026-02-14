@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Saldo Atual</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($balance, 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($balance, 2, ',', '.') }}</p>
                 </div>
                 <x-icon name="wallet" style="duotone" class="w-10 h-10 text-primary-500 opacity-80" />
             </div>
@@ -24,7 +24,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Receitas (mês)</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($totalIncome, 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($totalIncome, 2, ',', '.') }}</p>
                 </div>
                 <x-icon name="arrow-down" style="duotone" class="w-10 h-10 text-emerald-500 opacity-80" />
             </div>
@@ -34,7 +34,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Despesas (mês)</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($totalExpense, 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-xl font-bold text-gray-900 dark:text-white mt-1">R$ {{ number_format($totalExpense, 2, ',', '.') }}</p>
                 </div>
                 <x-icon name="arrow-up" style="duotone" class="w-10 h-10 text-rose-500 opacity-80" />
             </div>
@@ -59,9 +59,7 @@
                             <p class="font-medium text-gray-900 dark:text-white text-sm">{{ $transaction->description }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $transaction->category->name ?? 'Geral' }} · {{ $transaction->date->format('d/m/Y') }}</p>
                         </div>
-                        <span class="font-semibold {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                            {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
-                        </span>
+                        <span class="sensitive-value font-semibold {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">{{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}</span>
                     </div>
                 @empty
                     <div class="p-8 text-center text-gray-600 dark:text-gray-400">

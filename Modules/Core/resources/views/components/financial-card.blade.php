@@ -51,7 +51,7 @@
             <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                 {{ $title }}
             </p>
-            <h3 class="text-2xl xl:text-3xl font-black text-slate-800 dark:text-white tracking-tight tabular-nums">
+            <h3 class="sensitive-value text-2xl xl:text-3xl font-black text-slate-800 dark:text-white tracking-tight tabular-nums">
                 {{ $value }}
             </h3>
             @if($trend && $trendValue)

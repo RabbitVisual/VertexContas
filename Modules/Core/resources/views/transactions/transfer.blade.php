@@ -57,7 +57,7 @@
                             <option value="">Selecione a conta de origem</option>
                             @foreach($accounts as $account)
                                 <option value="{{ $account->id }}" {{ old('from_account_id') == $account->id ? 'selected' : '' }}>
-                                    {{ $account->name }} (R$ {{ number_format($account->balance, 2, ',', '.') }})
+                                    {{ $account->name }} (<span class="sensitive-value">R$ {{ number_format($account->balance, 2, ',', '.') }}</span>)
                                 </option>
                             @endforeach
                         </select>
@@ -75,7 +75,7 @@
                             <option value="">Selecione a conta de destino</option>
                             @foreach($accounts as $account)
                                 <option value="{{ $account->id }}" {{ old('to_account_id') == $account->id ? 'selected' : '' }}>
-                                    {{ $account->name }} (R$ {{ number_format($account->balance, 2, ',', '.') }})
+                                    {{ $account->name }} (<span class="sensitive-value">R$ {{ number_format($account->balance, 2, ',', '.') }}</span>)
                                 </option>
                             @endforeach
                         </select>

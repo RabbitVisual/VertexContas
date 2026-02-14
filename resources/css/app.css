@@ -197,3 +197,10 @@
 .dashboard-stats-card:nth-child(2) { animation-delay: 80ms; }
 .dashboard-stats-card:nth-child(3) { animation-delay: 160ms; }
 .dashboard-stats-card:nth-child(4) { animation-delay: 240ms; }
+
+/* Modo privacidade - esconder dados sensíveis (toggle no olho) */
+body.sensitive-hidden .sensitive-value {
+    filter: blur(8px);
+    user-select: none;
+    pointer-events: none;
+}

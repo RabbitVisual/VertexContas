@@ -31,7 +31,7 @@
 
     <!-- Chart -->
     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-100 dark:border-slate-700 mb-8">
-        <div id="cashFlowChart"></div>
+        <div id="cashFlowChart" class="sensitive-value"></div>
     </div>
 
     <!-- Table -->
@@ -53,10 +53,10 @@
                     @foreach($cashFlow->reverse() as $item)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-6 py-4 font-bold text-slate-800 dark:text-white">{{ $item['month'] }}</td>
-                            <td class="px-6 py-4 text-emerald-600 font-medium">R$ {{ number_format($item['income'], 2, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-red-600 font-medium">R$ {{ number_format($item['expense'], 2, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-emerald-600 font-medium"><span class="sensitive-value">R$ {{ number_format($item['income'], 2, ',', '.') }}</span></td>
+                            <td class="px-6 py-4 text-red-600 font-medium"><span class="sensitive-value">R$ {{ number_format($item['expense'], 2, ',', '.') }}</span></td>
                             <td class="px-6 py-4 font-bold {{ $item['balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
-                                R$ {{ number_format($item['balance'], 2, ',', '.') }}
+                                <span class="sensitive-value">R$ {{ number_format($item['balance'], 2, ',', '.') }}</span>
                             </td>
                         </tr>
                     @endforeach
