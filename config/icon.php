@@ -48,5 +48,6 @@ return [
         'privacy' => 'shield-halved',
         'contact' => 'envelope',
         'gauge' => 'gauge-high',
+        'arrow-right-left' => 'right-left',
     ],
 ];

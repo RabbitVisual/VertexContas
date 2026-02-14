@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Ticket;
 use Modules\Core\Models\TicketMessage;
 use Modules\Notifications\Services\NotificationService;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SupportTicketController extends Controller
 {
@@ -21,13 +22,16 @@ class SupportTicketController extends Controller
     public function index()
     {
         $tickets = Ticket::where('user_id', Auth::id())->with('messages.user')->latest()->paginate(10);
+        $isPro = Auth::user()->isPro();
 
-        return view('paneluser::tickets.index', compact('tickets'));
+        return view('paneluser::tickets.index', compact('tickets', 'isPro'));
     }
 
     public function create()
     {
-        return view('paneluser::tickets.create');
+        $isPro = Auth::user()->isPro();
+
+        return view('paneluser::tickets.create', compact('isPro'));
     }
 
     public function store(Request $request)
@@ -70,8 +74,9 @@ class SupportTicketController extends Controller
         }
 
         $ticket->load('messages.user');
+        $isPro = Auth::user()->isPro();
 
-        return view('paneluser::tickets.show', compact('ticket'));
+        return view('paneluser::tickets.show', compact('ticket', 'isPro'));
     }
 
     public function reply(Request $request, Ticket $ticket)
@@ -141,5 +146,42 @@ class SupportTicketController extends Controller
         );
 
         return back()->with('success', 'Obrigado por sua avaliação!');
+    }
+
+    /**
+     * Export tickets history as CSV (PRO only).
+     */
+    public function exportTickets(): StreamedResponse
+    {
+        if (!Auth::user()->isPro()) {
+            abort(403, 'Recurso exclusivo para Vertex PRO.');
+        }
+
+        $tickets = Ticket::where('user_id', Auth::id())
+            ->with('messages')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'historico-chamados-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($tickets) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['ID', 'Assunto', 'Prioridade', 'Status', 'Data Abertura', 'Mensagens', 'Fechado Em'], ';');
+            foreach ($tickets as $ticket) {
+                fputcsv($handle, [
+                    $ticket->id,
+                    $ticket->subject,
+                    $ticket->priority,
+                    $ticket->status,
+                    $ticket->created_at->format('d/m/Y H:i'),
+                    $ticket->messages->count(),
+                    $ticket->closed_at ? $ticket->closed_at->format('d/m/Y H:i') : '-',
+                ], ';');
+            }
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
     }
 }

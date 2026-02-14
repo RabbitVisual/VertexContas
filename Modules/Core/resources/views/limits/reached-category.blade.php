@@ -1,13 +1,11 @@
-@section('title', 'Recurso Pro')
-
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Recurso Pro'">
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
             <div class="p-8 sm:p-10 text-center">
 
                 <!-- Icon -->
                 <div class="mx-auto h-24 w-24 bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-full flex items-center justify-center mb-6 ring-8 ring-indigo-50 dark:ring-indigo-900/10">
-                    <x-icon name="tag" class="h-10 w-10 text-indigo-600 dark:text-indigo-500" />
+                    <x-icon name="tags" style="duotone" class="h-10 w-10 text-indigo-600 dark:text-indigo-500" />
                 </div>
 
                 <!-- Headline -->
@@ -26,10 +24,10 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Categorias Padrão</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Sem personalização
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Sem personalização
                             </li>
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Cores fixas
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Cores fixas
                             </li>
                         </ul>
                     </div>
@@ -41,13 +39,13 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Total Liberdade</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> <strong>Crie infinitas categorias</strong>
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> <strong>Crie infinitas categorias</strong>
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Ícones exclusivos
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Ícones exclusivos
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Paleta de cores premium
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Paleta de cores premium
                             </li>
                         </ul>
                     </div>
@@ -56,7 +54,7 @@
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="{{ route('user.subscription.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3.5 border border-transparent text-base font-semibold rounded-lg text-white bg-gradient-to-r from-primary to-blue-600 hover:from-primary-dark hover:to-blue-700 shadow-lg shadow-primary/20 transition-all transform hover:scale-105">
-                        <x-icon name="rocket" class="w-5 h-5 mr-2" />
+                        <x-icon name="rocket" style="solid" class="w-5 h-5 mr-2" />
                         Desbloquear Categorias
                     </a>
 

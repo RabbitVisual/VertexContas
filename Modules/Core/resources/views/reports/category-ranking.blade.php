@@ -1,9 +1,9 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Ranking de Categorias'">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h2 class="font-black text-3xl text-slate-800 dark:text-white flex items-center">
                 <div class="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-xl mr-3">
-                    <x-icon name="chart-pie" class="text-purple-600 dark:text-purple-400" />
+                    <x-icon name="chart-pie" style="duotone" class="text-purple-600 dark:text-purple-400" />
                 </div>
                 Ranking de Categorias
             </h2>
@@ -13,11 +13,11 @@
         <div class="flex gap-2">
             @if(auth()->user()->hasRole('pro_user') || auth()->user()->hasRole('admin'))
                 <a href="{{ route('core.reports.export.categories.csv') }}" class="flex items-center px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-bold text-sm">
-                    <x-icon name="file-csv" class="mr-2" /> CSV
+                    <x-icon name="file-csv" style="solid" class="mr-2" /> CSV
                 </a>
             @else
                 <button onclick="alert('Recurso exclusivo para assinantes PRO!')" class="flex items-center px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg cursor-not-allowed font-bold text-sm" title="Disponível no plano PRO">
-                    <x-icon name="lock" class="mr-2" /> CSV
+                    <x-icon name="lock" style="solid" class="mr-2" /> CSV
                 </button>
             @endif
         </div>
@@ -62,7 +62,7 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                                 <td class="px-6 py-4 flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background-color: {{ $item['color'] }}">
-                                        <i class="fa-solid fa-{{ $item['icon'] }}"></i>
+                                        <x-icon :name="$item['icon'] ?? 'circle-dollar'" style="solid" class="text-xs text-white" />
                                     </div>
                                     <span class="font-bold text-slate-800 dark:text-white">{{ $item['category'] }}</span>
                                 </td>

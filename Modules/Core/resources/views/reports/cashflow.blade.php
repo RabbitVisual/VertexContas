@@ -1,9 +1,9 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Fluxo de Caixa'">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h2 class="font-black text-3xl text-slate-800 dark:text-white flex items-center">
                 <div class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-xl mr-3">
-                    <x-icon name="money-bill-trend-up" class="text-blue-600 dark:text-blue-400" />
+                    <x-icon name="money-bill-trend-up" style="duotone" class="text-blue-600 dark:text-blue-400" />
                 </div>
                 Fluxo de Caixa
             </h2>
@@ -13,17 +13,17 @@
         <div class="flex gap-2">
             @if(auth()->user()->hasRole('pro_user') || auth()->user()->hasRole('admin'))
                 <a href="{{ route('core.reports.export.cashflow.pdf', ['months' => $months]) }}" class="flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-bold text-sm">
-                    <x-icon name="file-pdf" class="mr-2" /> PDF
+                    <x-icon name="file-pdf" style="solid" class="mr-2" /> PDF
                 </a>
                 <a href="{{ route('core.reports.export.cashflow.csv', ['months' => $months]) }}" class="flex items-center px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-bold text-sm">
-                    <x-icon name="file-csv" class="mr-2" /> CSV
+                    <x-icon name="file-csv" style="solid" class="mr-2" /> CSV
                 </a>
             @else
                 <button onclick="alert('Recurso exclusivo para assinantes PRO!')" class="flex items-center px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg cursor-not-allowed font-bold text-sm" title="Disponível no plano PRO">
-                    <x-icon name="lock" class="mr-2" /> PDF
+                    <x-icon name="lock" style="solid" class="mr-2" /> PDF
                 </button>
                 <button onclick="alert('Recurso exclusivo para assinantes PRO!')" class="flex items-center px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg cursor-not-allowed font-bold text-sm" title="Disponível no plano PRO">
-                    <x-icon name="lock" class="mr-2" /> CSV
+                    <x-icon name="lock" style="solid" class="mr-2" /> CSV
                 </button>
             @endif
         </div>

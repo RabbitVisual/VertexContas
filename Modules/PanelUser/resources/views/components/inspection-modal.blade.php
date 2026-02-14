@@ -118,13 +118,13 @@
                        </div>
                    </template>
                    <template x-if="loading">
-                       <x-icon name="spinner" class="animate-spin" />
+                       <x-icon name="circle-notch" style="solid" class="fa-spin w-5 h-5" />
                    </template>
                 </button>
             </div>
 
             <p class="mt-8 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <x-icon name="lock" class="mr-1" /> Criptografia de Ponta a Ponta Ativa
+                <x-icon name="lock" style="solid" class="mr-1" /> Criptografia de Ponta a Ponta Ativa
             </p>
         </div>
     </div>

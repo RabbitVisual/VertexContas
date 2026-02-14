@@ -169,6 +169,29 @@ public function isPro(): bool
 
 ---
 
+## 10.1 Página de Segurança e Atividade
+
+**Arquivo:** `Modules/PanelUser/resources/views/security/index.blade.php`  
+**Rota:** `user.security.index` (`/user/seguranca`)
+
+Design alinhado ao padrão de perfil (breadcrumb, header, cards em grid, ícones locais FontAwesome Pro).
+
+| Recurso | Quem vê | Descrição |
+|---------|---------|-----------|
+| Acesso do Suporte (24h) | Todos | Autorizar/revogar acesso temporário para admin/suporte alterar e-mail/CPF |
+| Alterar Senha | Todos | Formulário para troca de senha |
+| Histórico de Atividade | Todos | Timeline de acessos recentes (paginação) |
+| **Exportar histórico CSV** | **Apenas PRO** | Botão "Exportar CSV" baixa arquivo com todos os acessos (data, hora, IP, navegador, localização) |
+| CTA Upgrade | Apenas FREE | Card "Exporte seu histórico de acessos" com link para assinatura PRO |
+
+**Export (PRO):**
+- **Rota:** `user.security.export-logs` (`GET /user/seguranca/exportar-log`)
+- **Controller:** `SecurityController::exportLogs()`
+- **Formato:** CSV com separador `;`, colunas: Data, Hora, IP, Navegador/Dispositivo, Localização
+- **Proteção:** `auth()->user()->isPro()` — FREE recebe 403.
+
+---
+
 ## 11. Assinatura e Upgrade
 
 ### 11.1 Página de Planos
@@ -264,12 +287,27 @@ public function isPro(): bool
 
 ## 14. Painel Admin e Suporte
 
-- **Admin:** Vê contagem de usuários PRO e badges PRO/FREE na listagem.
-- **Suporte:** Vê badge "PRO" em tickets de usuários PRO; badge "Membro PRO" no perfil do usuário.
+- **Admin:** Vê contagem de usuários PRO e badges PRO/FREE na listagem. Na Central de Suporte (tickets), exibe badge "Cliente PRO" na lista e na visualização do chamado; card "Cliente Vertex PRO" com instrução de atendimento prioritário.
+- **Suporte:** Vê badge "PRO" em tickets de usuários PRO na lista e no detalhe; card "Atendimento Prioritário" para clientes PRO; badge "Membro PRO" no perfil do usuário.
 
 ---
 
-## 15. Resumo de Arquivos PRO-Relevantes
+## 15. Central de Ajuda (Tickets) – Recursos PRO
+
+**Arquivos:** `Modules/PanelUser/resources/views/tickets/` (index, create, show)
+
+| Recurso | Quem vê | Descrição |
+|---------|---------|-----------|
+| Badge "Suporte VIP" | Apenas PRO | Exibido no header das páginas index, create e show |
+| Exportar CSV | Apenas PRO | Botão "Exportar CSV" na index – baixa histórico de chamados (ID, assunto, prioridade, status, data, mensagens, fechamento) |
+| CTA Upgrade | Apenas FREE | Card "Suporte Prioritário com Vertex PRO" na index; card compacto em create e show |
+| Subtítulo PRO | Apenas PRO | "Seus chamados têm prioridade no atendimento. Exporte o histórico quando quiser." |
+
+**Rota Export (PRO):** `user.tickets.export` (`GET /user/tickets/exportar`) – `SupportTicketController::exportTickets()` – proteção `isPro()`.
+
+---
+
+## 16. Resumo de Arquivos PRO-Relevantes
 
 | Arquivo | Uso |
 |---------|-----|
@@ -288,6 +326,8 @@ public function isPro(): bool
 | `database/seeders/DatabaseSeeder.php` | Conta demo PRO |
 | `Modules/HomePage/resources/views/auth/login.blade.php` | Auto login PRO |
 | `database/seeders/RolesAndPermissionsSeeder.php` | Role e permissões `pro_user` |
+| `Modules/PanelUser/resources/views/security/index.blade.php` | Segurança: export CSV (PRO) |
+| `Modules/PanelUser/app/Http/Controllers/SecurityController.php` | exportLogs() PRO-only |
 
 ---
 

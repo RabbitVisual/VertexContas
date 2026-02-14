@@ -1,9 +1,9 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Extrato'">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4" x-data="{ filterOpen: false }">
         <div>
             <h2 class="font-black text-3xl text-slate-800 dark:text-white flex items-center">
                 <div class="bg-primary/10 dark:bg-primary/20 p-2 rounded-xl mr-3">
-                    <x-icon name="money-bill-transfer" class="text-primary" />
+                    <x-icon name="money-bill-transfer" style="duotone" class="text-primary" />
                 </div>
                 Extrato
             </h2>
@@ -11,12 +11,12 @@
         </div>
         <div class="flex flex-wrap gap-2">
             <button @click="filterOpen = true" class="flex items-center px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
-                <x-icon name="filter" class="mr-2" /> Filtros
+                <x-icon name="filter" style="solid" class="mr-2" /> Filtros
             </button>
             @can('create', \Modules\Core\Models\Transaction::class)
                 <a href="{{ route('core.transactions.create') }}"
                    class="flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold shadow-lg shadow-primary/25 transition-all">
-                    <x-icon name="plus" class="mr-2" /> Nova
+                    <x-icon name="plus" style="solid" class="mr-2" /> Nova
                 </a>
             @endcan
         </div>
@@ -36,7 +36,7 @@
                                         <div class="ml-3 flex h-7 items-center">
                                             <button type="button" @click="filterOpen = false" class="rounded-md bg-transparent text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                                 <span class="sr-only">Close panel</span>
-                                                <x-icon name="xmark" class="text-xl" />
+                                                <x-icon name="xmark" style="solid" class="text-xl" />
                                             </button>
                                         </div>
                                     </div>
@@ -69,7 +69,7 @@
                                         <div class="flex rounded-md shadow-sm">
                                             <div class="relative flex-grow focus-within:z-10">
                                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                    <x-icon name="circle-half-stroke" class="text-slate-400" />
+                                                    <x-icon name="circle-half-stroke" style="solid" class="text-slate-400" />
                                                 </div>
                                                 <select name="type" class="block w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-800 pl-10 focus:border-primary focus:ring-primary sm:text-sm">
                                                     <option value="">Todos</option>
@@ -96,8 +96,8 @@
 
     @if(session('success'))
         <div x-data="{ show: true }" x-show="show" x-transition class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl mb-6 flex items-center justify-between shadow-sm">
-            <div class="flex items-center"><x-icon name="circle-check" class="mr-2" /> {{ session('success') }}</div>
-            <button @click="show = false" class="text-emerald-500 hover:text-emerald-700"><x-icon name="xmark" /></button>
+            <div class="flex items-center"><x-icon name="circle-check" style="solid" class="mr-2" /> {{ session('success') }}</div>
+            <button @click="show = false" class="text-emerald-500 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg p-1"><x-icon name="xmark" style="solid" /></button>
         </div>
     @endif
 
@@ -126,7 +126,7 @@
                             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all flex items-center justify-between group-hover:border-primary/30">
                                 <div class="flex items-center gap-4">
                                      <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 text-xl {{ $transaction->type === 'income' ? 'text-emerald-500' : 'text-rose-500' }}">
-                                        <x-icon name="{{ $transaction->category->icon ?? 'circle-dollar' }}" />
+                                        <x-icon name="{{ $transaction->category->icon ?? 'circle-dollar' }}" style="solid" />
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-slate-800 dark:text-white">{{ $transaction->description }}</h4>
@@ -146,13 +146,13 @@
 
                                      <div class="flex justify-end gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <a href="{{ route('core.transactions.edit', $transaction) }}" class="text-slate-400 hover:text-primary transition-colors" title="Editar">
-                                            <x-icon name="pen" class="text-sm" />
+                                            <x-icon name="pen" style="solid" class="text-sm" />
                                         </a>
                                         <form action="{{ route('core.transactions.destroy', $transaction) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" onclick="return confirm('Excluir transação?')" class="text-slate-400 hover:text-red-500 transition-colors" title="Excluir">
-                                                <x-icon name="trash" class="text-sm" />
+                                                <x-icon name="trash" style="solid" class="text-sm" />
                                             </button>
                                         </form>
                                     </div>
@@ -165,7 +165,7 @@
         @empty
             <div class="text-center py-20">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-                    <x-icon name="list-ul" class="text-4xl text-slate-300 dark:text-slate-600" />
+                    <x-icon name="list-ul" style="solid" class="text-4xl text-slate-300 dark:text-slate-600" />
                 </div>
                 <h3 class="text-xl font-bold text-slate-700 dark:text-slate-300">Nenhuma transação encontrada</h3>
                 <p class="text-slate-500 dark:text-slate-500 mt-2">Tente ajustar os filtros ou crie uma nova transação.</p>

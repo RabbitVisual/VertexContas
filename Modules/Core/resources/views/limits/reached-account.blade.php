@@ -1,13 +1,11 @@
-@section('title', 'Limite Atingido')
-
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Limite Atingido'">
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
             <div class="p-8 sm:p-10 text-center">
 
                 <!-- Icon -->
                 <div class="mx-auto h-24 w-24 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full flex items-center justify-center mb-6 ring-8 ring-amber-50 dark:ring-amber-900/10">
-                    <x-icon name="lock" class="h-10 w-10 text-amber-600 dark:text-amber-500" />
+                    <x-icon name="lock" style="solid" class="h-10 w-10 text-amber-600 dark:text-amber-500" />
                 </div>
 
                 <!-- Headline -->
@@ -26,10 +24,10 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">1 Conta</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Sem sincronização bancária
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Sem sincronização bancária
                             </li>
                             <li class="flex items-center text-red-500">
-                                <x-icon name="x" class="w-4 h-4 mr-2" /> Relatórios limitados
+                                <x-icon name="xmark" style="solid" class="w-4 h-4 mr-2" /> Relatórios limitados
                             </li>
                         </ul>
                     </div>
@@ -41,13 +39,13 @@
                         <div class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Contas Ilimitadas</div>
                         <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-2 mt-4 text-left">
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> <strong>Tudo Ilimitado</strong>
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> <strong>Tudo Ilimitado</strong>
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Gestão de Cartões
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Gestão de Cartões
                             </li>
                             <li class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                <x-icon name="check" class="w-4 h-4 mr-2" /> Suporte Prioritário
+                                <x-icon name="check" style="solid" class="w-4 h-4 mr-2" /> Suporte Prioritário
                             </li>
                         </ul>
                     </div>
@@ -56,7 +54,7 @@
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="{{ route('user.subscription.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3.5 border border-transparent text-base font-semibold rounded-lg text-white bg-gradient-to-r from-primary to-blue-600 hover:from-primary-dark hover:to-blue-700 shadow-lg shadow-primary/20 transition-all transform hover:scale-105">
-                        <x-icon name="rocket" class="w-5 h-5 mr-2" />
+                        <x-icon name="rocket" style="solid" class="w-5 h-5 mr-2" />
                         Desbloquear Agora
                     </a>
 

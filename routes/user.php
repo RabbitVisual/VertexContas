@@ -39,9 +39,11 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::put('/seguranca/senha', [SecurityController::class, 'updatePassword'])->name('user.security.password');
     Route::post('/seguranca/suporte/conceder', [SecurityController::class, 'grantSupportAccess'])->name('user.security.support-access.grant');
     Route::post('/seguranca/suporte/revogar', [SecurityController::class, 'revokeSupportAccess'])->name('user.security.support-access.revoke');
+    Route::get('/seguranca/exportar-log', [SecurityController::class, 'exportLogs'])->name('user.security.export-logs');
 
     // Support Tickets
     Route::get('/tickets', [SupportTicketController::class, 'index'])->name('user.tickets.index');
+    Route::get('/tickets/exportar', [SupportTicketController::class, 'exportTickets'])->name('user.tickets.export');
     Route::get('/tickets/novo', [SupportTicketController::class, 'create'])->name('user.tickets.create');
     Route::post('/tickets', [SupportTicketController::class, 'store'])->name('user.tickets.store');
     Route::get('/tickets/{ticket}', [SupportTicketController::class, 'show'])->name('user.tickets.show');

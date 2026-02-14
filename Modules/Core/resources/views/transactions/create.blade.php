@@ -1,4 +1,4 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Nova Transação'">
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <h2 class="font-black text-3xl text-slate-800 dark:text-white">

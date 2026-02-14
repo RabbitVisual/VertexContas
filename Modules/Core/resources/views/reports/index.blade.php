@@ -1,4 +1,4 @@
-<x-paneluser::layouts.master>
+<x-paneluser::layouts.master :title="'Relatórios'">
     <div class="mb-8">
         <h2 class="font-black text-3xl text-slate-800 dark:text-white flex items-center">
             <x-icon name="chart-simple" style="solid" class="text-primary mr-3" /> Relatórios
@@ -8,13 +8,13 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-['Poppins']">
         <!-- CashFlow Report -->
-        <a href="{{ route('core.reports.cashflow') }}" class="group block bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all">
+        <a href="{{ route('core.reports.cashflow') }}" class="group block bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all">
             <div class="flex items-center justify-between mb-6">
                 <div class="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                    <x-icon name="money-bill-trend-up" class="text-3xl" />
+                    <x-icon name="money-bill-trend-up" style="duotone" class="text-3xl" />
                 </div>
                 <div class="bg-slate-100 dark:bg-slate-700 rounded-full p-2 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <x-icon name="arrow-right" class="w-5 h-5" />
+                    <x-icon name="arrow-right" style="solid" class="w-5 h-5" />
                 </div>
             </div>
             <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 group-hover:text-primary transition-colors">Fluxo de Caixa</h3>
@@ -22,13 +22,13 @@
         </a>
 
         <!-- Category Ranking Report -->
-        <a href="{{ route('core.reports.categories') }}" class="group block bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all">
+        <a href="{{ route('core.reports.categories') }}" class="group block bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all">
             <div class="flex items-center justify-between mb-6">
                 <div class="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-                    <x-icon name="chart-pie" class="text-3xl" />
+                    <x-icon name="chart-pie" style="duotone" class="text-3xl" />
                 </div>
                 <div class="bg-slate-100 dark:bg-slate-700 rounded-full p-2 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <x-icon name="arrow-right" class="w-5 h-5" />
+                    <x-icon name="arrow-right" style="solid" class="w-5 h-5" />
                 </div>
             </div>
             <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 group-hover:text-primary transition-colors">Ranking de Categorias</h3>
@@ -51,7 +51,7 @@
                     </p>
                 </div>
                 <a href="{{ route('user.subscription.index') }}" class="whitespace-nowrap inline-flex items-center px-8 py-4 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-50 transition-all transform hover:scale-105 shadow-lg">
-                    <x-icon name="crown" class="text-purple-600 mr-2" />
+                    <x-icon name="crown" style="solid" class="text-purple-600 mr-2" />
                     Fazer Upgrade
                 </a>
             </div>

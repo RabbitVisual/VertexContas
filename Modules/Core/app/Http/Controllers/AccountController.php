@@ -85,7 +85,14 @@ class AccountController extends Controller
             $query->orderBy('date', 'desc')->limit(10);
         }]);
 
-        return view('core::accounts.show', compact('account'));
+        $incomeTotal = null;
+        $expenseTotal = null;
+        if (auth()->user()?->isPro()) {
+            $incomeTotal = $account->transactions()->where('type', 'income')->sum('amount');
+            $expenseTotal = $account->transactions()->where('type', 'expense')->sum('amount');
+        }
+
+        return view('core::accounts.show', compact('account', 'incomeTotal', 'expenseTotal'));
     }
 
     /**
