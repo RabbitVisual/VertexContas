@@ -10,6 +10,7 @@ namespace Modules\PanelUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Core\Services\FinancialHealthService;
 
 class PanelUserController extends Controller
 {
@@ -100,6 +101,11 @@ class PanelUserController extends Controller
             ->take(5)
             ->get();
 
+        // 7. Monthly capacity from recurring income (baseline) + income breakdown for Pro
+        $financialHealthService = app(FinancialHealthService::class);
+        $monthlyCapacity = $financialHealthService->calculateMonthlyCapacity($user);
+        $incomeBreakdown = $financialHealthService->getIncomeBreakdown($user);
+
         return view('paneluser::index', compact(
             'totalBalance',
             'monthlyIncome',
@@ -110,7 +116,9 @@ class PanelUserController extends Controller
             'incomeData',
             'expenseData',
             'spendingByCategory',
-            'recentTransactions'
+            'recentTransactions',
+            'monthlyCapacity',
+            'incomeBreakdown'
         ));
     }
 
