@@ -24,7 +24,9 @@
         "apexcharts": "^5.3.6",
         "chart.js": "^4.5.1",
         "flatpickr": "^4.6.13",
+        "flowbite": "^4.0.1",
         "imask": "^7.6.1",
-        "jsvectormap": "^1.7.0"
+        "jsvectormap": "^1.7.0",
+        "save": "^2.9.0"
     }
 }
