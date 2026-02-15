@@ -1,8 +1,7 @@
 @extends('core::documents._layout')
 
 @section('documentTitle', 'Extrato Vertex')
-@section('documentType', 'Extrato Vertex')
-@section('periodLabel', $periodLabel ?? '')
+@section('documentRightValue', $periodLabel ?? '')
 
 @section('content')
 <table>
@@ -34,7 +33,7 @@
             <td colspan="4">TOTAL</td>
             <td class="text-right">{{ format_currency($totals['total_credit'] ?? 0) }}</td>
             <td class="text-right">{{ format_currency($totals['total_debit'] ?? 0) }}</td>
-            <td class="text-right" style="{{ ($totals['final_balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency($totals['final_balance'] ?? 0) }}</td>
+            <td class="text-right">{{ format_currency($totals['final_balance'] ?? 0) }}</td>
         </tr>
         @endif
     </tbody>

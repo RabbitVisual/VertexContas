@@ -1,8 +1,7 @@
 @extends('core::documents._layout')
 
 @section('documentTitle', 'Ranking de Categorias')
-@section('documentType', 'Ranking de Categorias')
-@section('periodLabel', $periodLabel ?? '')
+@section('documentRightValue', $periodLabel ?? '')
 
 @section('content')
 @php
@@ -16,9 +15,9 @@
 {{-- Resumo visual --}}
 @if(!empty($summary))
 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 120px; padding: 12px 16px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px;">
-        <div style="font-size: 10px; font-weight: 700; color: #0d9488; text-transform: uppercase; letter-spacing: 0.05em;">Receitas</div>
-        <div style="font-size: 18px; font-weight: 800; color: #0f766e;">{{ format_currency($summary['income'] ?? 0) }}</div>
+    <div style="flex: 1; min-width: 120px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Receitas</div>
+        <div style="font-size: 16px; font-weight: 700; color: #1e293b;">{{ format_currency($summary['income'] ?? 0) }}</div>
     </div>
     <div style="flex: 1; min-width: 120px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;">
         <div style="font-size: 10px; font-weight: 700; color: #dc2626; text-transform: uppercase; letter-spacing: 0.05em;">Despesas</div>
@@ -33,7 +32,7 @@
 
 {{-- Gráfico de barras (CSS) - imprime perfeitamente --}}
 @if($rankingWithPercent->isNotEmpty())
-<h3 style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 12px; text-transform: uppercase;">Distribuição de Despesas por Categoria</h3>
+<h3 class="section-title">Distribuição de Despesas por Categoria</h3>
 <div style="margin-bottom: 24px;">
     @foreach($rankingWithPercent as $item)
     <div style="margin-bottom: 10px;">
@@ -42,7 +41,7 @@
             <span style="color: #64748b;">{{ $item['percent'] }}% · {{ format_currency($item['total']) }}</span>
         </div>
         <div style="height: 10px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-            <div style="height: 100%; width: {{ min($item['percent'], 100) }}%; background: {{ $item['color'] ?? '#0d9488' }}; border-radius: 4px;"></div>
+            <div style="height: 100%; width: {{ min($item['percent'], 100) }}%; background: {{ $item['color'] ?? '#475569' }}; border-radius: 4px;"></div>
         </div>
     </div>
     @endforeach
@@ -50,7 +49,7 @@
 @endif
 
 {{-- Tabela detalhada --}}
-<h3 style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 12px; text-transform: uppercase;">Ranking Detalhado</h3>
+<h3 class="section-title">Ranking Detalhado</h3>
 <table>
     <thead>
         <tr class="heading-row">

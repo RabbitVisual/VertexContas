@@ -1,4 +1,5 @@
 <x-paneluser::layouts.master :title="'Relatórios'">
+@php $isPro = auth()->user()?->isPro() ?? false; @endphp
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
     {{-- Hero --}}
     <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
@@ -8,12 +9,13 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
                 <nav class="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-4" aria-label="Navegação">
-                    <a href="{{ ($isPro = auth()->user()->hasRole('pro_user') || auth()->user()->hasRole('admin')) && Route::has('core.dashboard') ? route('core.dashboard') : route('paneluser.index') }}" class="hover:underline">Dashboard</a>
+                    <a href="{{ ($isPro && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index') }}" class="hover:underline">Dashboard</a>
                     <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800" aria-hidden="true"></span>
                     <span class="text-gray-400 dark:text-gray-500">Relatórios</span>
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Seus <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Relatórios</span></h1>
-                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Analise suas finanças com relatórios detalhados e exporte quando precisar.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">{{ $isPro ? 'Analise suas finanças com relatórios detalhados e exporte quando precisar.' : 'Visualize um resumo básico da sua conta. Faça upgrade para relatórios completos, filtros e exportação.' }}</p>
+                @if($isPro)
                 <div class="mt-4 flex flex-wrap gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
                         <x-icon name="chart-line" style="solid" class="w-3.5 h-3.5" /> Comparativos
@@ -25,6 +27,7 @@
                         <x-icon name="file-export" style="solid" class="w-3.5 h-3.5" /> Exportação
                     </span>
                 </div>
+                @endif
             </div>
 
             <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0" role="region" aria-label="Resumo">
@@ -137,7 +140,8 @@
         @endif
     </div>
 
-    {{-- Guia rápido: o que cada relatório faz --}}
+    {{-- Guia rápido: o que cada relatório faz (apenas PRO) --}}
+    @if($isPro)
     <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 sm:p-8 shadow-sm">
         <h2 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <x-icon name="circle-question" style="duotone" class="w-5 h-5 text-emerald-600" />
@@ -158,6 +162,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     @if(!$isPro)
     <div class="relative overflow-hidden bg-slate-900 rounded-3xl p-8 shadow-2xl">

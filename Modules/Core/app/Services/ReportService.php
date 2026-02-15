@@ -35,14 +35,14 @@ class ReportService
     }
 
     /**
-     * Get cash flow data for the last N months.
+     * Get cash flow data for the current month + (N-1) months back (e.g. 6 = atual + 5 atrás).
      * Excludes transfers (internal movements) to show real income/expense.
      *
      * @param  int|null  $accountId  Optional account filter (PRO)
      */
     public function getCashFlow(User $user, int $months = 6, ?int $accountId = null): Collection
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
 
         $transactions = $this->cashFlowBaseQuery($user, $startDate, $accountId)->select(
                 DB::raw('DATE_FORMAT(date, "%Y-%m") as month'),
@@ -85,7 +85,7 @@ class ReportService
      */
     public function getCashFlowByAccount(User $user, int $months = 6, ?int $accountId = null): Collection
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
 
         $rows = $this->cashFlowBaseQuery($user, $startDate, $accountId)
             ->join('accounts', 'transactions.account_id', '=', 'accounts.id')
@@ -120,7 +120,7 @@ class ReportService
      */
     public function getCashFlowByCategory(User $user, int $months = 6, ?int $accountId = null, int $limit = 5): Collection
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
 
         $rows = $this->cashFlowBaseQuery($user, $startDate, $accountId)
             ->where('transactions.type', 'expense')
@@ -162,7 +162,7 @@ class ReportService
      */
     public function getTopCategoriesForPeriod(User $user, int $months = 6, ?int $accountId = null, int $limit = 5): Collection
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
 
         return $this->cashFlowBaseQuery($user, $startDate, $accountId)
             ->where('type', 'expense')
@@ -187,7 +187,7 @@ class ReportService
      */
     public function getCashFlowDetail(User $user, int $months = 6, ?int $accountId = null): Collection
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
         $endDate = now()->endOfMonth();
 
         return $this->cashFlowBaseQuery($user, $startDate, $accountId)
@@ -203,7 +203,7 @@ class ReportService
      */
     public function getCashFlowSummary(User $user, int $months = 6, ?int $accountId = null): array
     {
-        $startDate = now()->subMonths($months)->startOfMonth();
+        $startDate = now()->subMonths($months - 1)->startOfMonth();
         $endDate = now()->endOfMonth();
 
         $income = $this->cashFlowBaseQuery($user, $startDate, $accountId)

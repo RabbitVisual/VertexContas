@@ -1,8 +1,7 @@
 @extends('core::documents._layout')
 
 @section('documentTitle', 'Fluxo de Caixa')
-@section('documentType', 'Fluxo de Caixa')
-@section('periodLabel', $periodLabel ?? 'Últimos ' . ($months ?? 6) . ' meses')
+@section('documentRightValue', $periodLabel ?? 'Últimos ' . ($months ?? 6) . ' meses')
 
 @section('content')
 <table>
@@ -28,14 +27,14 @@
             <td>TOTAL</td>
             <td class="text-right">{{ format_currency(collect($cashFlow)->sum('income')) }}</td>
             <td class="text-right">{{ format_currency(collect($cashFlow)->sum('expense')) }}</td>
-            <td class="text-right" style="{{ collect($cashFlow)->sum('balance') >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency(collect($cashFlow)->sum('balance')) }}</td>
+            <td class="text-right">{{ format_currency(collect($cashFlow)->sum('balance')) }}</td>
         </tr>
         @endif
     </tbody>
 </table>
 
 @if(($cashFlowByAccount ?? collect())->isNotEmpty())
-<h3 style="font-size: 12px; font-weight: 700; color: #334155; margin-top: 24px; margin-bottom: 12px;">Por Conta (Fonte)</h3>
+<h3 class="section-title">Por Conta (Fonte)</h3>
 <table>
     <thead>
         <tr class="heading-row">
@@ -61,7 +60,7 @@
 @endif
 
 @if(($topCategories ?? collect())->isNotEmpty())
-<h3 style="font-size: 12px; font-weight: 700; color: #334155; margin-top: 24px; margin-bottom: 12px;">Top Categorias de Despesa</h3>
+<h3 class="section-title">Top Categorias de Despesa</h3>
 <table>
     <thead>
         <tr class="heading-row">

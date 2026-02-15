@@ -50,7 +50,7 @@
                     @auth
                         <div class="mt-8 flex items-center gap-4 border-t border-slate-200 dark:border-slate-700 pt-6">
                             @include('paneluser::blog.components.like-button', ['post' => $post])
-                            <x-paneluser::blog.components.save-button :post="$post" />
+                            @include('paneluser::blog.components.save-button', ['post' => $post])
                         </div>
                     @endauth
                 </div>

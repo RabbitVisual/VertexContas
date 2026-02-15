@@ -58,7 +58,7 @@
                         </div>
                     @endif
                 </div>
-                <x-icon name="chevron-down" style="duotone" class="w-3.5 h-3.5 text-slate-400 transition-transform shrink-0" :class="open ? 'rotate-180' : ''" />
+                <x-icon name="chevron-down" style="duotone" class="w-3.5 h-3.5 text-slate-400 transition-transform shrink-0" x-bind:class="open ? 'rotate-180' : ''" />
             </button>
 
             {{-- Dropdown Menu --}}

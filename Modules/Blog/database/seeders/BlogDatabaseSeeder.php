@@ -20,6 +20,7 @@ class BlogDatabaseSeeder extends Seeder
         $this->call([
             BlogCategorySeeder::class,
             BlogPostSeeder::class,
+            BlogPostPremiumSeeder::class,
         ]);
     }
 }

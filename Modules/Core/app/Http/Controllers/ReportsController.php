@@ -98,7 +98,7 @@ class ReportsController extends Controller
         $user = auth()->user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
-            : now()->startOfMonth();
+            : now()->subMonths(5)->startOfMonth();
         $endDate = $request->filled('end_date')
             ? Carbon::parse($request->input('end_date'))->endOfDay()
             : now()->endOfMonth();
@@ -207,7 +207,7 @@ class ReportsController extends Controller
         $user = auth()->user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
-            : now()->startOfMonth();
+            : now()->subMonths(5)->startOfMonth();
         $endDate = $request->filled('end_date')
             ? Carbon::parse($request->input('end_date'))->endOfDay()
             : now()->endOfMonth();
@@ -239,7 +239,7 @@ class ReportsController extends Controller
         $user = auth()->user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
-            : now()->startOfMonth();
+            : now()->subMonths(5)->startOfMonth();
         $endDate = $request->filled('end_date')
             ? Carbon::parse($request->input('end_date'))->endOfDay()
             : now()->endOfMonth();
@@ -344,7 +344,7 @@ class ReportsController extends Controller
         $user = auth()->user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
-            : now()->startOfMonth();
+            : now()->subMonths(5)->startOfMonth();
         $endDate = $request->filled('end_date')
             ? Carbon::parse($request->input('end_date'))->endOfDay()
             : now()->endOfMonth();

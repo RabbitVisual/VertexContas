@@ -19,20 +19,20 @@
             overflow-x: hidden;
         }
 
-        /* Fundo animado - tecnologia e segurança */
+        /* Fundo - marca Vertex */
         .bg {
             position: fixed;
             inset: 0;
             z-index: 0;
-            background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 50%, #f8fafc 100%);
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 50%, #f8fafc 100%);
         }
         .bg::before {
             content: '';
             position: absolute;
             inset: 0;
             background-image:
-                linear-gradient(rgba(13, 148, 136, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(13, 148, 136, 0.04) 1px, transparent 1px);
+                linear-gradient(rgba(17, 199, 111, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(17, 199, 111, 0.04) 1px, transparent 1px);
             background-size: 40px 40px;
             animation: gridMove 20s linear infinite;
         }
@@ -40,8 +40,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse 80% 50% at 20% 40%, rgba(13, 148, 136, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(14, 165, 233, 0.06) 0%, transparent 50%);
+            background: radial-gradient(ellipse 80% 50% at 20% 40%, rgba(17, 199, 111, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(17, 199, 111, 0.05) 0%, transparent 50%);
             animation: pulse 8s ease-in-out infinite alternate;
         }
         .orb {
@@ -51,9 +51,9 @@
             opacity: 0.5;
             animation: float 12s ease-in-out infinite;
         }
-        .orb-1 { width: 300px; height: 300px; background: rgba(13, 148, 136, 0.15); top: -10%; left: -5%; animation-delay: 0s; }
-        .orb-2 { width: 250px; height: 250px; background: rgba(14, 165, 233, 0.12); bottom: -5%; right: -5%; animation-delay: -4s; }
-        .orb-3 { width: 180px; height: 180px; background: rgba(16, 185, 129, 0.1); top: 50%; left: 50%; animation-delay: -6s; }
+        .orb-1 { width: 300px; height: 300px; background: rgba(17, 199, 111, 0.12); top: -10%; left: -5%; animation-delay: 0s; }
+        .orb-2 { width: 250px; height: 250px; background: rgba(13, 143, 81, 0.1); bottom: -5%; right: -5%; animation-delay: -4s; }
+        .orb-3 { width: 180px; height: 180px; background: rgba(17, 199, 111, 0.08); top: 50%; left: 50%; animation-delay: -6s; }
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
             100% { transform: translate(40px, 40px); }
@@ -87,12 +87,12 @@
             display: inline-flex;
             align-items: center;
             padding: 6px 14px;
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-            border: 1px solid rgba(13, 148, 136, 0.3);
+            background: #ecfdf5;
+            border: 1px solid rgba(17, 199, 111, 0.3);
             border-radius: 100px;
             font-size: 0.6875rem;
             font-weight: 700;
-            color: #0f766e;
+            color: #11c76f;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             margin-bottom: 1.5rem;
@@ -126,23 +126,36 @@
             color: #64748b;
             line-height: 1.7;
             padding: 1rem 1.25rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: #f8fafc;
             border-radius: 14px;
             margin-bottom: 1.25rem;
-            border-left: 4px solid #0d9488;
+            border-left: 4px solid #11c76f;
         }
         .reason strong { color: #334155; }
         .reset {
             font-size: clamp(0.8125rem, 2.2vw, 0.875rem);
-            color: #0d9488;
+            color: #11c76f;
             font-weight: 600;
         }
         .reset::before {
             content: '✓';
             display: inline-block;
             margin-right: 0.5rem;
-            color: #059669;
+            color: #0d8f51;
         }
+        .btn-back {
+            display: inline-block;
+            margin-top: 1.25rem;
+            padding: 10px 20px;
+            background: #11c76f;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background: #0d8f51; }
         .pro-note {
             font-size: clamp(0.6875rem, 1.8vw, 0.75rem);
             color: #94a3b8;
@@ -180,6 +193,8 @@
         <p class="pro-note">
             Você continua com acesso completo ao Vertex Pro. Esse limite é apenas para impressão/visualização de documentos. Os dados seguem disponíveis na tela principal.
         </p>
+
+        <a href="{{ url()->previous() }}" class="btn-back">Voltar</a>
     </div>
 </body>
 </html>

@@ -1,4 +1,5 @@
 <x-paneluser::layouts.master :title="'Ranking de Categorias'">
+@php $isPro = auth()->user()?->isPro() ?? false; @endphp
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     {{-- Hero --}}
     <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
@@ -13,11 +14,9 @@
                     <span class="text-gray-400 dark:text-gray-500">Ranking de Categorias</span>
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Ranking de <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-600 dark:from-purple-400 dark:to-violet-400">Categorias</span></h1>
-                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Descubra para onde seu dinheiro está indo e priorize onde ajustar.</p>
-                <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">Foque nas 3 categorias com maior gasto para obter o maior impacto.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Descubra para onde seu dinheiro está indo. @if($isPro) Priorize onde ajustar e foque nas 3 categorias com maior gasto. @else Faça upgrade para filtros, dicas e exportação. @endif</p>
             </div>
 
-            @php $isPro = auth()->user()->hasRole('pro_user') || auth()->user()->hasRole('admin'); @endphp
             <div class="flex flex-wrap gap-2">
                 @if($isPro)
                     <a href="{{ route('core.reports.categories.view', request()->only(['start_date','end_date','account_id'])) }}" target="_blank" rel="noopener noreferrer" class="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-bold text-sm" title="Abre em nova aba. Use Ctrl+P para imprimir ou salvar como PDF.">
@@ -79,7 +78,8 @@
         $topCatPct = ($firstCat && ($summary['expense'] ?? 0) > 0) ? (($firstCat['total'] / $summary['expense']) * 100) : null;
     @endphp
 
-    {{-- Dicas + O que fazer --}}
+    {{-- Dicas + O que fazer (apenas PRO) --}}
+    @if($isPro)
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <x-core::report-tips variant="categories" />
         <x-core::report-actions
@@ -88,9 +88,10 @@
             :top-category-percent="$topCatPct"
         />
     </div>
+    @endif
 
-    {{-- Referência 50-30-20 (quando houver despesas) --}}
-    @if(($summary['expense'] ?? 0) > 0)
+    {{-- Referência 50-30-20 (apenas PRO, quando houver despesas) --}}
+    @if($isPro && ($summary['expense'] ?? 0) > 0)
     <div class="rounded-2xl border border-purple-200 dark:border-purple-800/50 bg-purple-50/30 dark:bg-purple-900/10 p-6">
         <h4 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
             <x-icon name="scale-balanced" style="duotone" class="w-5 h-5 text-purple-600" />
@@ -132,10 +133,13 @@
                     <span class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Despesas</span>
                     <p class="sensitive-value text-2xl font-black text-red-700 dark:text-red-300"><x-core::financial-value :value="$summary['expense']" /></p>
                 </div>
+                @if($isPro)
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                     <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Taxa de Poupança</span>
                     <p class="text-2xl font-black text-blue-700 dark:text-blue-300">{{ format_percent($summary['savings_rate'], 1) }}</p>
+                    <p class="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">Meta sugerida: 20%</p>
                 </div>
+                @endif
             </div>
 
             <!-- List -->

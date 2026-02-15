@@ -1,6 +1,6 @@
 <x-paneluser::layouts.master :title="'Fluxo de Caixa'">
 @php
-    $isPro = auth()->user()->hasRole('pro_user') || auth()->user()->hasRole('admin');
+    $isPro = auth()->user()?->isPro() ?? false;
     $summary = $cashFlowSummary ?? ['income' => 0, 'expense' => 0, 'balance' => 0, 'savings_rate' => 0];
     $accumulatedBalance = $cashFlow->map(function ($item, $i) use ($cashFlow) {
         return $cashFlow->take($i + 1)->sum('balance');
@@ -25,8 +25,7 @@
                     <span class="text-gray-400 dark:text-gray-500">Fluxo de Caixa</span>
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Fluxo de <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Caixa</span></h1>
-                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Acompanhe suas receitas e despesas ao longo do tempo. Dados reais, sem transferências internas.</p>
-                <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">Use os gráficos para comparar meses, identificar tendências e tomar decisões informadas.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Acompanhe suas receitas e despesas ao longo do tempo. Dados reais, sem transferências internas. @if($isPro) Use os gráficos para comparar meses, identificar tendências e tomar decisões informadas. @else Faça upgrade para filtros, exportação e análises avançadas. @endif</p>
             </div>
 
             <div class="flex flex-wrap gap-2">
@@ -66,14 +65,17 @@
             <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Saldo Líquido</span>
             <p class="sensitive-value text-2xl font-black mt-1 {{ $summary['balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}"><x-core::financial-value :value="$summary['balance']" /></p>
         </div>
+        @if($isPro)
         <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800">
             <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Taxa de Poupança</span>
             <p class="text-2xl font-black text-blue-700 dark:text-blue-300 mt-1">{{ format_percent($summary['savings_rate'], 1) }}</p>
             <p class="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">Meta sugerida: 20%</p>
         </div>
+        @endif
     </div>
 
-    {{-- Dicas + O que fazer --}}
+    {{-- Dicas + O que fazer (apenas PRO) --}}
+    @if($isPro)
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <x-core::report-tips variant="cashflow" />
         <x-core::report-actions
@@ -82,6 +84,7 @@
             :top-category-percent="$topCategoryPct"
         />
     </div>
+    @endif
 
     {{-- Filtros PRO --}}
     @if($isPro)
@@ -115,8 +118,8 @@
     </div>
     @endif
 
-    {{-- Insights do período --}}
-    @if($cashFlow->isNotEmpty() && $bestMonth && $worstMonth)
+    {{-- Insights do período (apenas PRO) --}}
+    @if($isPro && $cashFlow->isNotEmpty() && $bestMonth && $worstMonth)
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-900/10 p-4 flex items-center gap-4">
             <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-600 shrink-0">
@@ -139,7 +142,8 @@
     </div>
     @endif
 
-    {{-- Charts (Vue 3) --}}
+    {{-- Charts (Vue 3) - apenas PRO --}}
+    @if($isPro)
     <script>
         window.__CASHFLOW_DATA__ = {
             months: @json($cashFlow->pluck('month')->values()),
@@ -152,6 +156,7 @@
         };
     </script>
     <div id="cashflow-dashboard"></div>
+    @endif
 
     {{-- Table: Detalhamento Mensal --}}
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden">
@@ -182,8 +187,8 @@
         </div>
     </div>
 
-    {{-- Table: Por Conta (when multiple accounts) --}}
-    @if(($cashFlowByAccount ?? collect())->isNotEmpty())
+    {{-- Table: Por Conta (when multiple accounts) - apenas PRO --}}
+    @if($isPro && ($cashFlowByAccount ?? collect())->isNotEmpty())
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div class="p-6 border-b border-slate-100 dark:border-slate-700">
             <h3 class="font-bold text-lg text-slate-800 dark:text-white">Por Conta (Fonte)</h3>
@@ -216,8 +221,8 @@
     </div>
     @endif
 
-    {{-- Table: Top Categorias --}}
-    @if(($topCategories ?? collect())->isNotEmpty())
+    {{-- Table: Top Categorias (apenas PRO) --}}
+    @if($isPro && ($topCategories ?? collect())->isNotEmpty())
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div class="p-6 border-b border-slate-100 dark:border-slate-700">
             <h3 class="font-bold text-lg text-slate-800 dark:text-white">Top 5 Categorias de Despesa</h3>
