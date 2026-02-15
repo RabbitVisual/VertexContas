@@ -1,3 +1,4 @@
+@php $isPro = auth()->user()?->isPro() ?? false; @endphp
 <x-paneluser::layouts.master :title="'Transferência entre Contas'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500" x-data="{
     amount: '',
@@ -8,6 +9,27 @@
         this.amount = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
     }
 }">
+    @if($isPro)
+    {{-- Vertex Pro ativo (igual ao extrato) --}}
+    <div class="rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-gradient-to-r from-amber-500/10 to-amber-600/10 dark:from-amber-500/5 dark:to-amber-600/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <x-icon name="crown" style="solid" class="w-6 h-6" />
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-900 dark:text-white">Vertex Pro ativo</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Exporte relatórios e faça transferências entre contas.</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
+                <x-icon name="receipt" style="solid" class="w-4 h-4" />
+                Ir ao extrato
+            </a>
+        </div>
+    </div>
+    @endif
+
     {{-- Hero --}}
     <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
@@ -41,18 +63,16 @@
                     <div class="md:col-span-5 space-y-3">
                         <label for="from_account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Conta de origem (de onde sai)</label>
                         <div class="relative">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                                 <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="from_account_id" id="from_account_id" class="w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-rose-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="from_account_id" id="from_account_id" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-rose-500 font-medium text-gray-800 dark:text-gray-200 appearance-none bg-[image:none] [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione</option>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('from_account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
                                 @endforeach
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <x-icon name="chevron-down" style="solid" class="w-4 h-4" />
-                            </div>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
                         </div>
                         @error('from_account_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
                     </div>
@@ -66,18 +86,16 @@
                     <div class="md:col-span-5 space-y-3">
                         <label for="to_account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Conta de destino (para onde vai)</label>
                         <div class="relative">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                                 <x-icon name="wallet" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="to_account_id" id="to_account_id" class="w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="to_account_id" id="to_account_id" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none bg-[image:none] [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione</option>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('to_account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
                                 @endforeach
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <x-icon name="chevron-down" style="solid" class="w-4 h-4" />
-                            </div>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
                         </div>
                         @error('to_account_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
                     </div>
