@@ -6,6 +6,7 @@ use Modules\PanelUser\Http\Controllers\ProfileController;
 use Modules\PanelUser\Http\Controllers\SecurityController;
 use Modules\PanelUser\Http\Controllers\SubscriptionController;
 use Modules\PanelUser\Http\Controllers\SupportTicketController;
+use Modules\PanelUser\Http\Controllers\BlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,14 +49,25 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     // Support Tickets
     Route::get('/tickets', [SupportTicketController::class, 'index'])->name('user.tickets.index');
     Route::get('/tickets/exportar', [SupportTicketController::class, 'exportTickets'])->name('user.tickets.export');
+    Route::get('/tickets/{ticket}/exportar', [SupportTicketController::class, 'exportTicket'])->name('user.tickets.export-single');
     Route::get('/tickets/novo', [SupportTicketController::class, 'create'])->name('user.tickets.create');
     Route::post('/tickets', [SupportTicketController::class, 'store'])->name('user.tickets.store');
     Route::get('/tickets/{ticket}', [SupportTicketController::class, 'show'])->name('user.tickets.show');
     Route::post('/tickets/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('user.tickets.reply');
     Route::post('/tickets/{ticket}/rate', [SupportTicketController::class, 'rate'])->name('user.tickets.rate');
 
-    // Remote Inspection (Consent)
+    // Blog (reading experience under panel)
+    Route::prefix('blog')->name('paneluser.blog.')->group(function () {
+        Route::get('/', [BlogController::class, 'index'])->name('index');
+        Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
+        Route::post('/comment/{post}', [BlogController::class, 'storeComment'])->name('comment.store');
+        Route::post('/like/{post}', [BlogController::class, 'toggleLike'])->name('like.toggle');
+        Route::post('/save/{post}', [BlogController::class, 'toggleSave'])->name('save.toggle');
+    });
+
+    // Remote Inspection (Consent & Sync)
     Route::post('/inspection/{inspection}/accept', [\Modules\PanelUser\Http\Controllers\InspectionController::class, 'accept'])->name('user.inspection.accept');
     Route::post('/inspection/{inspection}/reject', [\Modules\PanelUser\Http\Controllers\InspectionController::class, 'reject'])->name('user.inspection.reject');
+    Route::get('/inspection/sync-url', [\Modules\PanelUser\Http\Controllers\InspectionController::class, 'syncUrl'])->name('user.inspection.sync');
 
 });

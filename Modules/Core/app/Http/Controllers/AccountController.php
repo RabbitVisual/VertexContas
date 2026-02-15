@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Modules\Core\Http\Requests\StoreAccountRequest;
 use Modules\Core\Http\Requests\UpdateAccountRequest;
 use Modules\Core\Models\Account;
-
+use Modules\Core\Services\InspectionGuard;
 use Modules\Core\Services\SubscriptionLimitService;
 
 class AccountController extends Controller
@@ -112,10 +112,14 @@ class AccountController extends Controller
     {
         $this->authorize('update', $account);
 
+        $balance = InspectionGuard::shouldHideFinancialData()
+            ? $account->balance
+            : $request->balance;
+
         $account->update([
             'name' => $request->name,
             'type' => $request->type,
-            'balance' => $request->balance,
+            'balance' => $balance,
         ]);
 
         return redirect()->route('core.accounts.index')

@@ -62,6 +62,31 @@
     <x-loading-overlay />
     @stack('scripts')
 
+    @if($inspectionSyncActive ?? false)
+    {{-- Real-time sync: segue a mesma tela que o agente está visualizando --}}
+    <script>
+    (function() {
+        var syncUrl = '{{ route("user.inspection.sync") }}';
+        var currentPath = window.location.pathname + (window.location.search || '');
+        var interval = 2500;
+
+        setInterval(function() {
+            fetch(syncUrl, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.active && data.url) {
+                        var targetPath = data.url.replace(window.location.origin, '').split('#')[0];
+                        if (targetPath && targetPath !== currentPath) {
+                            window.location.href = data.url;
+                        }
+                    }
+                })
+                .catch(function() {});
+        }, interval);
+    })();
+    </script>
+    @endif
+
     {{-- Corrige aviso aria-hidden: usa inert em vez de aria-hidden e move foco ao fechar (WAI-ARIA) --}}
     <script>
     (function() {

@@ -5,7 +5,8 @@
 ])
 
 @php
-    $displayNumber = '•••• •••• •••• ' . str_pad((string) ($account->id % 10000), 4, '0', STR_PAD_LEFT);
+    $shouldHide = \Modules\Core\Services\InspectionGuard::shouldHideFinancialData();
+    $displayNumber = $shouldHide ? '•••• •••• •••• ••••' : '•••• •••• •••• ' . str_pad((string) ($account->id % 10000), 4, '0', STR_PAD_LEFT);
     $user = auth()->user();
     $profileName = $user && trim($user->full_name) !== '' ? $user->full_name : '';
 @endphp
@@ -39,7 +40,7 @@
 
             {{-- Número + titular + saldo --}}
             <div>
-                <p class="sensitive-value text-base font-mono font-semibold tracking-[0.22em] tabular-nums mb-4">{{ $displayNumber }}</p>
+                <p class="sensitive-value text-base font-mono font-semibold tracking-[0.22em] tabular-nums mb-4 {{ \Modules\Core\Services\InspectionGuard::maskClasses() }}">{{ $displayNumber }}</p>
                 <div class="flex items-end justify-between gap-4">
                     <div class="min-w-0 flex-1">
                         <p class="font-semibold text-sm uppercase truncate tracking-wide">{{ Str::upper($account->name) }}</p>
@@ -49,7 +50,7 @@
                     </div>
                     <div class="text-right shrink-0">
                         <p class="text-[9px] text-white/80 uppercase tracking-wider">Saldo</p>
-                        <p class="sensitive-value text-sm font-mono font-black tabular-nums leading-tight">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-sm font-mono font-black tabular-nums leading-tight"><x-core::financial-value :value="$account->balance" /></p>
                     </div>
                 </div>
             </div>
@@ -61,16 +62,18 @@
             <a href="{{ route('core.accounts.show', $account) }}" class="pointer-events-auto p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Ver">
                 <x-icon name="eye" style="solid" class="w-5 h-5" />
             </a>
-            <a href="{{ route('core.accounts.edit', $account) }}" class="pointer-events-auto p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Editar">
-                <x-icon name="pencil" style="solid" class="w-5 h-5" />
-            </a>
-            <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="pointer-events-auto inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors inline-flex" title="Excluir">
-                    <x-icon name="trash-can" style="solid" class="w-5 h-5" />
-                </button>
-            </form>
+            @if(!($inspectionReadOnly ?? false))
+                <a href="{{ route('core.accounts.edit', $account) }}" class="pointer-events-auto p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Editar">
+                    <x-icon name="pencil" style="solid" class="w-5 h-5" />
+                </a>
+                <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="pointer-events-auto inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors inline-flex" title="Excluir">
+                        <x-icon name="trash-can" style="solid" class="w-5 h-5" />
+                    </button>
+                </form>
+            @endif
         </div>
     @endif
 </div>

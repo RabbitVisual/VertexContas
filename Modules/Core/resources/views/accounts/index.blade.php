@@ -21,10 +21,12 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
                     @can('create', \Modules\Core\Models\Account::class)
-                        <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
-                            <x-icon name="plus" style="solid" class="w-5 h-5" />
-                            Nova conta
-                        </a>
+                        @if(!($inspectionReadOnly ?? false))
+                            <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                                Nova conta
+                            </a>
+                        @endif
                     @endcan
                     <a href="{{ $dashboardRoute }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
@@ -41,7 +43,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Saldo consolidado</p>
-                        <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($totalBalance, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white tabular-nums"><x-core::financial-value :value="$totalBalance" /></p>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
@@ -117,7 +119,7 @@
                         @if($items->count() > 0)
                             <div class="p-6">
                                 <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ $label }}</p>
-                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white mt-1 font-mono tabular-nums">R$ {{ number_format($sum, 2, ',', '.') }}</p>
+                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white mt-1 font-mono tabular-nums"><x-core::financial-value :value="$sum" /></p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $items->count() }} conta(s)</p>
                             </div>
                         @endif
@@ -164,7 +166,7 @@
 
                             <div class="relative z-10">
                                 <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                                <p class="sensitive-value text-2xl font-mono font-black tracking-tight tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                                <p class="sensitive-value text-2xl font-mono font-black tracking-tight tabular-nums"><x-core::financial-value :value="$account->balance" /></p>
                             </div>
 
                             <div class="relative z-10 flex justify-between items-end">
@@ -179,16 +181,18 @@
                                 <a href="{{ route('core.accounts.show', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Ver">
                                     <x-icon name="eye" style="solid" class="w-5 h-5" />
                                 </a>
-                                <a href="{{ route('core.accounts.edit', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Editar">
-                                    <x-icon name="pencil" style="solid" class="w-5 h-5" />
-                                </a>
-                                <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors" title="Excluir">
-                                        <x-icon name="trash-can" style="solid" class="w-5 h-5" />
-                                    </button>
-                                </form>
+                                @if(!($inspectionReadOnly ?? false))
+                                    <a href="{{ route('core.accounts.edit', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Editar">
+                                        <x-icon name="pencil" style="solid" class="w-5 h-5" />
+                                    </a>
+                                    <form action="{{ route('core.accounts.destroy', $account) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta conta? Ela não pode ter transações.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-3 bg-red-500/40 hover:bg-red-500/60 rounded-xl text-white transition-colors" title="Excluir">
+                                            <x-icon name="trash-can" style="solid" class="w-5 h-5" />
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -201,15 +205,17 @@
                     <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2 leading-tight">Nenhuma conta cadastrada</h3>
                     <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Adicione contas (corrente, poupança ou dinheiro) para começar a controlar saldos e lançar transações no Extrato.</p>
                     @can('create', \Modules\Core\Models\Account::class)
-                        <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
-                            <x-icon name="plus" style="solid" class="w-5 h-5" />
-                            Adicionar primeira conta
-                        </a>
+                        @if(!($inspectionReadOnly ?? false))
+                            <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                                Adicionar primeira conta
+                            </a>
+                        @endif
                     @endcan
                 </div>
             @endforelse
 
-            @if($accounts->count() > 0 && $accounts->count() < 20)
+            @if($accounts->count() > 0 && $accounts->count() < 20 && !($inspectionReadOnly ?? false))
                 @can('create', \Modules\Core\Models\Account::class)
                     <a href="{{ route('core.accounts.create') }}" class="flex flex-col items-center justify-center min-h-[240px] border-2 border-dashed border-gray-300 dark:border-white/10 rounded-3xl hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-all group">
                         <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-4 transition-colors">

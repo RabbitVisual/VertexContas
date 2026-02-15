@@ -3,6 +3,7 @@
 namespace Modules\Core\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -39,6 +40,22 @@ class CoreServiceProvider extends ServiceProvider
 
         // Override configs from database
         $this->overrideConfigsFromDatabase();
+
+        // Share inspection read-only flag (hide edit/delete/create during inspection)
+        View::composer(['paneluser::*', 'core::*'], function ($view) {
+            $view->with('inspectionReadOnly', \Modules\Core\Services\InspectionGuard::isActive());
+        });
+
+        // Share inspection sync flag: real user has active inspection (not agent) → enable real-time URL sync
+        View::composer(['paneluser::components.layouts.master', 'paneluser::layouts.master'], function ($view) {
+            $syncActive = false;
+            if (auth()->check() && !session('original_agent_id')) {
+                $syncActive = \Modules\Core\Models\Inspection::where('user_id', auth()->id())
+                    ->where('status', 'active')
+                    ->exists();
+            }
+            $view->with('inspectionSyncActive', $syncActive);
+        });
     }
 
     /**

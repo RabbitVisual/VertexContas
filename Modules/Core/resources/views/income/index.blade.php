@@ -83,6 +83,19 @@
             </div>
         </div>
 
+        @if($inspectionReadOnly ?? false)
+            <div class="rounded-3xl border-2 border-dashed border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                        <x-icon name="eye" style="duotone" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Modo inspeção ativo</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Esta página não pode ser alterada durante a sessão de suporte. Apenas visualização.</p>
+                    </div>
+                </div>
+            </div>
+        @else
         <form action="{{ route('core.income.store') }}" method="POST" class="space-y-8">
             @csrf
 
@@ -240,6 +253,7 @@
                 </button>
             </div>
         </form>
+        @endif
     </div>
 
     {{-- Modal: Upgrade Vertex Pro --}}

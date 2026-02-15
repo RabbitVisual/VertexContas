@@ -4,34 +4,61 @@ namespace Modules\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Modules\Core\Services\InspectionGuard;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Bloqueia alterações de dados durante inspeção remota.
+ * Modo inspeção = SOMENTE LEITURA. O agente pode visualizar, mas não criar, editar ou excluir.
+ */
 class BlockSensitiveInspectionActions
 {
     /**
-     * Handle an incoming request.
+     * Rotas que PODEM receber POST/PUT/PATCH durante inspeção (exceções necessárias).
      */
+    private const INSPECTION_ALLOWED_MUTATIONS = [
+        'user.inspection.accept',
+        'user.inspection.reject',
+        'support.inspection.stop',
+    ];
+
+    /**
+     * Rotas de exportação: bloqueadas quando usuário negou exibir dados financeiros.
+     */
+    private const FINANCIAL_EXPORT_ROUTES = [
+        'core.reports.export.cashflow.pdf',
+        'core.reports.export.cashflow.csv',
+        'core.reports.export.categories.csv',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
-        if (session()->has('impersonate_inspection_id')) {
-            // Define sensitive route names or patterns
-            $sensitiveRoutes = [
-                'user.security.password',
-                'user.profile.update', // Optional: maybe agent can help fix profile? But password is critical.
-                'user.profile.delete', // If it exists
-                'admin.users.delete',
-                'admin.settings.update',
-            ];
+        if (! session()->has('impersonate_inspection_id')) {
+            return $next($request);
+        }
 
-            if ($request->routeIs($sensitiveRoutes) || $request->isMethod('DELETE')) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'message' => 'Ação bloqueada: Agentes em modo de inspeção não podem realizar esta alteração sensível.',
-                    ], 403);
-                }
+        // Bloquear TODAS as mutações (POST, PUT, PATCH, DELETE) exceto as permitidas
+        $isMutation = in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true);
 
-                return back()->with('error', 'Ação bloqueada durante o modo de inspeção por motivos de segurança.');
+        if ($isMutation && ! $request->routeIs(self::INSPECTION_ALLOWED_MUTATIONS)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Modo inspeção: somente leitura. Não é possível criar, editar ou excluir dados.',
+                ], 403);
             }
+
+            return back()->with('error', 'Modo inspeção ativo: somente visualização. Alterações não são permitidas.');
+        }
+
+        // Exportações: bloquear se usuário negou dados financeiros
+        if (InspectionGuard::shouldHideFinancialData() && $request->routeIs(self::FINANCIAL_EXPORT_ROUTES)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Exportação bloqueada: dados financeiros não autorizados para esta sessão.',
+                ], 403);
+            }
+
+            return back()->with('error', 'Exportação bloqueada durante a inspeção por privacidade.');
         }
 
         return $next($request);

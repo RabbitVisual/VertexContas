@@ -70,9 +70,19 @@
                     <label for="balance" class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Saldo atual *</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">R$</span>
-                        <input type="number" name="balance" id="balance" value="{{ old('balance', $account->balance) }}" step="0.01"
-                               class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white pl-12 pr-4 py-3 font-mono tabular-nums focus:border-emerald-500 outline-none transition-colors @error('balance') border-red-500 @enderror"
-                               required>
+                        @if(\Modules\Core\Services\InspectionGuard::shouldHideFinancialData())
+                            <input type="hidden" name="balance" value="0">
+                            <input type="text" id="balance" value="••••••••" placeholder="Oculto"
+                                   class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 pl-12 pr-4 py-3 font-mono tabular-nums cursor-not-allowed"
+                                   readonly disabled>
+                            <p class="mt-1 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                <x-icon name="lock" style="solid" class="w-3.5 h-3.5" /> Oculto por privacidade durante a inspeção
+                            </p>
+                        @else
+                            <input type="number" name="balance" id="balance" value="{{ old('balance', $account->balance) }}" step="0.01"
+                                   class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white pl-12 pr-4 py-3 font-mono tabular-nums focus:border-emerald-500 outline-none transition-colors @error('balance') border-red-500 @enderror"
+                                   required>
+                        @endif
                     </div>
                     @error('balance')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"><x-icon name="circle-exclamation" style="solid" class="w-4 h-4" /> {{ $message }}</p>

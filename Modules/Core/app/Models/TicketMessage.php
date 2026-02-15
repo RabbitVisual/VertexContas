@@ -15,6 +15,11 @@ class TicketMessage extends Model
         'user_id',
         'message',
         'is_admin_reply',
+        'is_system',
+    ];
+
+    protected $casts = [
+        'is_system' => 'boolean',
     ];
 
     public function ticket()

@@ -35,11 +35,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800">
                     <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Receitas</span>
-                    <p class="sensitive-value text-2xl font-black text-emerald-700 dark:text-emerald-300">R$ {{ number_format($summary['income'], 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-2xl font-black text-emerald-700 dark:text-emerald-300"><x-core::financial-value :value="$summary['income']" /></p>
                 </div>
                 <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800">
                     <span class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Despesas</span>
-                    <p class="sensitive-value text-2xl font-black text-red-700 dark:text-red-300">R$ {{ number_format($summary['expense'], 2, ',', '.') }}</p>
+                    <p class="sensitive-value text-2xl font-black text-red-700 dark:text-red-300"><x-core::financial-value :value="$summary['expense']" /></p>
                 </div>
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                     <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Taxa de Poupança</span>
@@ -68,7 +68,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-center font-medium">{{ $item['count'] }}</td>
                                 <td class="px-6 py-4 text-right font-bold text-slate-700 dark:text-slate-200">
-                                    <span class="sensitive-value">R$ {{ number_format($item['total'], 2, ',', '.') }}</span>
+                                    <span class="sensitive-value"><x-core::financial-value :value="$item['total']" /></span>
                                 </td>
                             </tr>
                         @endforeach

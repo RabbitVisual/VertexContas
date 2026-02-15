@@ -40,8 +40,8 @@
         <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-slate-800/50">
+                    <thead class="sticky top-0 z-10 bg-gray-50/95 dark:bg-slate-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
+                        <tr>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Postagem</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
@@ -49,9 +49,9 @@
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
                         @forelse($posts as $post)
-                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
+                            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/20">
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-4">
                                         @if($post->featured_image)
@@ -73,6 +73,9 @@
                                     <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black rounded-lg uppercase tracking-wider">
                                         {{ $post->category->name }}
                                     </span>
+                                    @if($post->is_premium)
+                                        <span class="ml-1 px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[9px] font-black uppercase">PRO</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-5 text-center">
                                     @php
@@ -96,7 +99,7 @@
                                 </td>
                                 <td class="px-6 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <a href="{{ route('blog.show', $post->slug) }}" target="_blank" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
+                                        <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
                                             <x-icon name="eye" class="text-xs" />
                                         </a>
                                         <a href="{{ route('admin.blog.edit', $post) }}" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">

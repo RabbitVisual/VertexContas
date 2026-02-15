@@ -53,10 +53,10 @@
                     @foreach($cashFlow->reverse() as $item)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-6 py-4 font-bold text-slate-800 dark:text-white">{{ $item['month'] }}</td>
-                            <td class="px-6 py-4 text-emerald-600 font-medium"><span class="sensitive-value">R$ {{ number_format($item['income'], 2, ',', '.') }}</span></td>
-                            <td class="px-6 py-4 text-red-600 font-medium"><span class="sensitive-value">R$ {{ number_format($item['expense'], 2, ',', '.') }}</span></td>
+                            <td class="px-6 py-4 text-emerald-600 font-medium"><span class="sensitive-value"><x-core::financial-value :value="$item['income']" /></span></td>
+                            <td class="px-6 py-4 text-red-600 font-medium"><span class="sensitive-value"><x-core::financial-value :value="$item['expense']" /></span></td>
                             <td class="px-6 py-4 font-bold {{ $item['balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
-                                <span class="sensitive-value">R$ {{ number_format($item['balance'], 2, ',', '.') }}</span>
+                                <span class="sensitive-value"><x-core::financial-value :value="$item['balance']" /></span>
                             </td>
                         </tr>
                     @endforeach

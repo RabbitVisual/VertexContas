@@ -4,11 +4,14 @@ namespace Modules\PanelUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Modules\Core\Models\Inspection;
 use Illuminate\Support\Facades\Auth;
 
 class InspectionController extends Controller
 {
+    private const CACHE_PREFIX = 'inspection_view_';
+
     /**
      * Accept an inspection request.
      */
@@ -47,5 +50,27 @@ class InspectionController extends Controller
         $inspection->update(['status' => 'rejected']);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Poll endpoint for real-time sync: returns the URL the agent is currently viewing.
+     * Used so the client can follow the same screen without manual refresh.
+     */
+    public function syncUrl(Request $request)
+    {
+        $inspection = Inspection::where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->first();
+
+        if (! $inspection) {
+            return response()->json(['url' => null, 'active' => false]);
+        }
+
+        $url = Cache::get(self::CACHE_PREFIX . $inspection->id);
+
+        return response()->json([
+            'url' => $url,
+            'active' => true,
+        ]);
     }
 }

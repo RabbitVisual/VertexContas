@@ -36,10 +36,12 @@
                     Filtros
                 </button>
                 @can('create', \Modules\Core\Models\Transaction::class)
-                    <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
-                        Nova transação
-                    </a>
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                            <x-icon name="plus" style="solid" class="w-5 h-5" />
+                            Nova transação
+                        </a>
+                    @endif
                 @endcan
             </div>
         </div>
@@ -55,7 +57,7 @@
                     <div class="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: {{ $incomeProgress }}%"></div>
                     </div>
-                    <p class="text-[10px] text-gray-500">Meta: R$ {{ number_format($plannedIncome, 2, ',', '.') }}</p>
+                    <p class="text-[10px] text-gray-500">Meta: <x-core::financial-value :value="$plannedIncome" /></p>
                 </div>
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -65,18 +67,20 @@
                     <div class="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: {{ $expenseProgress }}%"></div>
                     </div>
-                    <p class="text-[10px] text-gray-500">Limite: R$ {{ number_format($plannedExpense, 2, ',', '.') }}</p>
+                    <p class="text-[10px] text-gray-500">Limite: <x-core::financial-value :value="$plannedExpense" /></p>
                 </div>
                 <div class="hidden lg:flex flex-col justify-center">
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Referência</span>
                     <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $currentMonth ? Str::ucfirst(now()->month($currentMonth)->translatedFormat('F')) . ' ' . $currentYear : 'Todos os meses ' . $currentYear }}</span>
                 </div>
-                <div class="flex items-center justify-end">
-                    <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-500 hover:underline uppercase tracking-wider">
-                        Ajustar planejamento
-                        <x-icon name="arrow-right" style="solid" class="w-3 h-3" />
-                    </a>
-                </div>
+                @if(!($inspectionReadOnly ?? false))
+                    <div class="flex items-center justify-end">
+                        <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-500 hover:underline uppercase tracking-wider">
+                            Ajustar planejamento
+                            <x-icon name="arrow-right" style="solid" class="w-3 h-3" />
+                        </a>
+                    </div>
+                @endif
             </div>
         @endif
     </div>
@@ -105,7 +109,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total receitas</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums sensitive-value">R$ {{ number_format($incomeTotal, 2, ',', '.') }}</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums sensitive-value"><x-core::financial-value :value="$incomeTotal" /></p>
                     <p class="text-xs text-gray-500 mt-0.5">No período filtrado</p>
                 </div>
             </div>
@@ -118,7 +122,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total despesas</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums sensitive-value">R$ {{ number_format($expenseTotal, 2, ',', '.') }}</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums sensitive-value"><x-core::financial-value :value="$expenseTotal" /></p>
                     <p class="text-xs text-gray-500 mt-0.5">No período filtrado</p>
                 </div>
             </div>
@@ -130,7 +134,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Saldo do período</p>
-                    <p class="text-2xl font-black tabular-nums sensitive-value {{ $balance >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">R$ {{ number_format($balance, 2, ',', '.') }}</p>
+                    <p class="text-2xl font-black tabular-nums sensitive-value {{ $balance >= 0 ? 'text-emerald-400' : 'text-rose-400' }}"><x-core::financial-value :value="$balance" /></p>
                     <p class="text-xs text-gray-500 mt-0.5">Resultado líquido</p>
                 </div>
             </div>
@@ -155,10 +159,12 @@
                 <button type="button" title="Exportar Excel" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-emerald-500 flex items-center justify-center transition-colors">
                     <x-icon name="file-excel" style="solid" class="w-5 h-5" />
                 </button>
-                <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
-                    <x-icon name="right-left" style="solid" class="w-4 h-4" />
-                    Transferência
-                </a>
+                @if(!($inspectionReadOnly ?? false))
+                    <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
+                        <x-icon name="right-left" style="solid" class="w-4 h-4" />
+                        Transferência
+                    </a>
+                @endif
             </div>
         </div>
     @endif
@@ -222,20 +228,22 @@
                                 </div>
                                 <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                                     <p class="sensitive-value text-xl font-black tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                                        {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
+                                        {{ $transaction->type === 'income' ? '+' : '-' }} <x-core::financial-value :value="$transaction->amount" />
                                     </p>
-                                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <a href="{{ route('core.transactions.edit', $transaction) }}" class="w-9 h-9 rounded-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-500 hover:bg-emerald-500 hover:text-white transition-colors" title="Editar">
-                                            <x-icon name="pen" style="solid" class="w-4 h-4" />
-                                        </a>
-                                        <form action="{{ route('core.transactions.destroy', $transaction) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta transação?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="w-9 h-9 rounded-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-500 hover:bg-rose-500 hover:text-white transition-colors" title="Excluir">
-                                                <x-icon name="trash-can" style="solid" class="w-4 h-4" />
-                                            </button>
-                                        </form>
-                                    </div>
+                                    @if(!($inspectionReadOnly ?? false))
+                                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <a href="{{ route('core.transactions.edit', $transaction) }}" class="w-9 h-9 rounded-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-500 hover:bg-emerald-500 hover:text-white transition-colors" title="Editar">
+                                                <x-icon name="pen" style="solid" class="w-4 h-4" />
+                                            </a>
+                                            <form action="{{ route('core.transactions.destroy', $transaction) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta transação?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="w-9 h-9 rounded-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-500 hover:bg-rose-500 hover:text-white transition-colors" title="Excluir">
+                                                    <x-icon name="trash-can" style="solid" class="w-4 h-4" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -248,10 +256,12 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nenhuma movimentação</h3>
                     <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-8">Não há transações no período ou filtros selecionados. Registre uma receita ou despesa para começar.</p>
-                    <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
-                        Nova transação
-                    </a>
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20">
+                            <x-icon name="plus" style="solid" class="w-5 h-5" />
+                            Nova transação
+                        </a>
+                    @endif
                 </div>
             @endforelse
         </div>

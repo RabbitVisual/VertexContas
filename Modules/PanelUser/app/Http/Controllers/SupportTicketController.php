@@ -21,10 +21,18 @@ class SupportTicketController extends Controller
 
     public function index()
     {
-        $tickets = Ticket::where('user_id', Auth::id())->with('messages.user')->latest()->paginate(10);
+        $tickets = Ticket::where('user_id', Auth::id())->with(['messages.user', 'assignedAgent'])->latest()->paginate(10);
         $isPro = Auth::user()->isPro();
 
-        return view('paneluser::tickets.index', compact('tickets', 'isPro'));
+        $allTickets = Ticket::where('user_id', Auth::id())->get();
+        $stats = [
+            'total' => $allTickets->count(),
+            'abertos' => $allTickets->where('status', 'open')->count(),
+            'pendentes' => $allTickets->where('status', 'pending')->count(),
+            'resolvidos' => $allTickets->whereIn('status', ['resolved', 'closed'])->count(),
+        ];
+
+        return view('paneluser::tickets.index', compact('tickets', 'isPro', 'stats'));
     }
 
     public function create()
@@ -73,10 +81,28 @@ class SupportTicketController extends Controller
             abort(403);
         }
 
-        $ticket->load('messages.user');
+        $ticket->load(['messages.user', 'assignedAgent', 'closedBy']);
         $isPro = Auth::user()->isPro();
 
-        return view('paneluser::tickets.show', compact('ticket', 'isPro'));
+        $firstResponseAt = null;
+        $firstResponseHours = null;
+        if ($isPro) {
+            $firstReply = $ticket->messages->where('is_admin_reply', true)->first();
+            if ($firstReply) {
+                $firstResponseAt = $firstReply->created_at;
+                $firstResponseHours = round($ticket->created_at->diffInMinutes($firstResponseAt) / 60, 1);
+            }
+        }
+
+        $inspectionActive = \Modules\Core\Models\Inspection::where('ticket_id', $ticket->id)
+            ->where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->exists();
+
+        return view('paneluser::tickets.show', compact(
+            'ticket', 'isPro', 'inspectionActive',
+            'firstResponseAt', 'firstResponseHours'
+        ));
     }
 
     public function reply(Request $request, Ticket $ticket)
@@ -176,6 +202,38 @@ class SupportTicketController extends Controller
                     $ticket->created_at->format('d/m/Y H:i'),
                     $ticket->messages->count(),
                     $ticket->closed_at ? $ticket->closed_at->format('d/m/Y H:i') : '-',
+                ], ';');
+            }
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+    /**
+     * Export single ticket as CSV (PRO only).
+     */
+    public function exportTicket(Ticket $ticket): StreamedResponse
+    {
+        if ($ticket->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if (! Auth::user()->isPro()) {
+            abort(403, 'Recurso exclusivo para Vertex PRO.');
+        }
+
+        $filename = 'chamado-' . $ticket->id . '-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($ticket) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Data', 'Remetente', 'Mensagem'], ';');
+            foreach ($ticket->messages as $msg) {
+                $sender = $msg->is_system ? 'Vertex Inspection' : ($msg->is_admin_reply ? ($msg->user->name ?? 'Suporte') : 'Você');
+                fputcsv($handle, [
+                    $msg->created_at->format('d/m/Y H:i:s'),
+                    $sender,
+                    $msg->message,
                 ], ';');
             }
             fclose($handle);

@@ -72,12 +72,14 @@ class InspectionController extends Controller
         // Login as the client
         Auth::loginUsingId($inspection->user_id);
 
-        // Auto-post to ticket history
+        // System audit message: inspection started
+        $agentName = $inspection->agent->name ?? 'Agente';
         TicketMessage::create([
             'ticket_id' => $inspection->ticket_id,
             'user_id' => $inspection->agent_id,
-            'message' => '🛡️ **AUDITORIA:** O agente iniciou o modo de inspeção remota para auxiliar na resolução do chamado.',
+            'message' => "🛡️ Vertex Inspection — Inspeção remota iniciada pelo agente {$agentName}. Acompanhe em tempo real no seu painel. Aguarde a resposta do suporte após a análise.",
             'is_admin_reply' => true,
+            'is_system' => true,
         ]);
 
         return redirect()->route('paneluser.index')
@@ -114,12 +116,21 @@ class InspectionController extends Controller
         Auth::logout();
         Auth::loginUsingId($originalAgentId);
 
-        // Auto-post to ticket history
+        // System audit message: inspection ended (with count, PRO-aware)
+        $inspectionCount = Inspection::where('ticket_id', $inspection->ticket_id)->where('status', 'completed')->count();
+        $isPro = $inspection->client->isPro();
+        $countText = $inspectionCount === 1
+            ? '1ª inspeção deste chamado'
+            : "{$inspectionCount}ª inspeção deste chamado";
+        $message = $isPro
+            ? "✅ Vertex Inspection — Inspeção finalizada com sucesso pelo agente. {$countText}. Análise concluída. Aguarde o retorno do suporte com o diagnóstico e próximos passos."
+            : "✅ Vertex Inspection — Inspeção finalizada pelo agente. {$countText}. Aguarde a resposta do suporte.";
         TicketMessage::create([
             'ticket_id' => $inspection->ticket_id,
             'user_id' => $originalAgentId,
-            'message' => '✅ **AUDITORIA:** A inspeção remota foi finalizada com sucesso e a sessão foi encerrada.',
+            'message' => $message,
             'is_admin_reply' => true,
+            'is_system' => true,
         ]);
 
         // Notify user
@@ -139,9 +150,14 @@ class InspectionController extends Controller
 
     /**
      * Check if the current user has an active inspection session.
+     * Usado via AJAX pelo banner. Se acessado diretamente no navegador, redireciona.
      */
     public function checkSession()
     {
+        if (! request()->ajax() && ! request()->wantsJson()) {
+            return redirect()->route('paneluser.index');
+        }
+
         return response()->json([
             'active' => session()->has('impersonate_inspection_id')
         ]);

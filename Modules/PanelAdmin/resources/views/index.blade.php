@@ -233,7 +233,7 @@
     </div>
 
     <!-- Blog Analytics -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Most Read Posts -->
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700">
@@ -244,14 +244,12 @@
             </div>
             <div class="divide-y divide-slate-50 dark:divide-slate-700">
                 @foreach($mostReadPosts as $post)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <div class="text-sm font-bold text-slate-800 dark:text-white truncate max-w-[200px]">{{ $post->title }}</div>
+                    <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="block p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="text-sm font-bold text-slate-800 dark:text-white truncate">{{ $post->title }}</div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-bold text-slate-500">{{ $post->views }} views</span>
-                        </div>
-                    </div>
+                        <span class="text-xs font-bold text-slate-500 shrink-0 ml-2">{{ $post->views }} views</span>
+                    </a>
                 @endforeach
             </div>
         </div>
@@ -275,6 +273,27 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+
+        <!-- Recent Comments -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-icon name="comments" class="text-amber-500" />
+                    Comentários Recentes
+                </h2>
+            </div>
+            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+                @forelse($recentComments as $comment)
+                    <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <p class="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{{ $comment->content }}</p>
+                        <p class="text-xs text-slate-500 mt-1">{{ $comment->user->name ?? '—' }} · {{ $comment->created_at->diffForHumans() }}</p>
+                        <a href="{{ route('paneluser.blog.show', $comment->post->slug) }}" target="_blank" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 inline-block">{{ $comment->post->title }}</a>
+                    </div>
+                @empty
+                    <div class="p-4 text-sm text-slate-500 dark:text-slate-400">Nenhum comentário recente.</div>
+                @endforelse
             </div>
         </div>
     </div>

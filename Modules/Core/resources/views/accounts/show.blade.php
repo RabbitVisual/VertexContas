@@ -31,10 +31,12 @@
                         <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
                         Voltar
                     </a>
-                    <a href="{{ route('core.accounts.edit', $account) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
-                        <x-icon name="pencil" style="solid" class="w-4 h-4" />
-                        Editar
-                    </a>
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.accounts.edit', $account) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                            <x-icon name="pencil" style="solid" class="w-4 h-4" />
+                            Editar
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -54,7 +56,7 @@
                         </div>
                         <div class="relative z-10">
                             <p class="text-xs text-white/70 uppercase tracking-widest mb-1">Saldo</p>
-                            <p class="sensitive-value text-3xl font-mono font-black tabular-nums">R$ {{ number_format($account->balance, 2, ',', '.') }}</p>
+                            <p class="sensitive-value text-3xl font-mono font-black tabular-nums"><x-core::financial-value :value="$account->balance" /></p>
                         </div>
                         <div class="relative z-10">
                             <p class="text-[10px] text-white/60 uppercase tracking-[0.2em] mb-0.5">Nome no cartão</p>
@@ -76,10 +78,12 @@
                             </div>
                             Últimas transações
                         </h3>
-                        <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
-                            <x-icon name="plus" style="solid" class="w-4 h-4" />
-                            Nova transação
-                        </a>
+                        @if(!($inspectionReadOnly ?? false))
+                            <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                                <x-icon name="plus" style="solid" class="w-4 h-4" />
+                                Nova transação
+                            </a>
+                        @endif
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
@@ -107,7 +111,7 @@
                                         <td class="px-6 py-4 text-gray-600 dark:text-gray-400 font-mono text-xs">{{ $transaction->date->format('d/m/Y') }}</td>
                                         <td class="px-6 py-4 text-right">
                                             <span class="sensitive-value font-mono font-semibold tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                                                {{ $transaction->type === 'income' ? '+' : '-' }} R$ {{ number_format($transaction->amount, 2, ',', '.') }}
+                                                {{ $transaction->type === 'income' ? '+' : '-' }} <x-core::financial-value :value="$transaction->amount" />
                                             </span>
                                         </td>
                                     </tr>
@@ -119,10 +123,12 @@
                                                     <x-icon name="receipt" style="duotone" class="w-8 h-8 opacity-50" />
                                                 </div>
                                                 <p class="font-medium">Nenhuma transação nesta conta</p>
-                                                <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
-                                                    <x-icon name="plus" style="solid" class="w-4 h-4" />
-                                                    Adicionar transação
-                                                </a>
+                                                @if(!($inspectionReadOnly ?? false))
+                                                    <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                                                        <x-icon name="plus" style="solid" class="w-4 h-4" />
+                                                        Adicionar transação
+                                                    </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -140,7 +146,7 @@
                                 <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Entradas</span>
                                 <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
                             </div>
-                            <p class="sensitive-value p-6 text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">R$ {{ number_format($incomeTotal ?? 0, 2, ',', '.') }}</p>
+                            <p class="sensitive-value p-6 text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums"><x-core::financial-value :value="$incomeTotal ?? 0" /></p>
                         </div>
                         <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 overflow-hidden">
                             <div class="px-6 py-4 border-b border-rose-200 dark:border-rose-800/30 bg-rose-50/50 dark:bg-rose-900/10 flex items-center gap-2">
@@ -148,7 +154,7 @@
                                 <span class="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">Saídas</span>
                                 <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
                             </div>
-                            <p class="sensitive-value p-6 text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">R$ {{ number_format($expenseTotal ?? 0, 2, ',', '.') }}</p>
+                            <p class="sensitive-value p-6 text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums"><x-core::financial-value :value="$expenseTotal ?? 0" /></p>
                         </div>
                     </div>
                 @endif
