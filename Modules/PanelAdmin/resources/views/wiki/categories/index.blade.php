@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Categorias Wiki</x-slot>
+
     <div class="space-y-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -7,7 +9,7 @@
             </div>
             <button onclick="document.getElementById('modal-add-category').classList.remove('hidden')"
                 class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                <x-icon name="plus" /> Nova Categoria
+                <x-icon name="plus" style="duotone" /> Nova Categoria
             </button>
         </div>
 
@@ -16,16 +18,16 @@
                 <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all group">
                     <div class="flex items-start justify-between mb-4">
                         <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                            <x-icon name="{{ $category->icon ?? 'book' }}" class="text-xl" />
+                            <x-icon name="{{ $category->icon ?? 'book' }}" style="duotone" class="text-xl" />
                         </div>
                         <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onclick="editCategory({{ json_encode($category) }})" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                <x-icon name="pen" class="text-xs" />
+                                <x-icon name="pen" style="duotone" class="text-xs" />
                             </button>
                             <form action="{{ route('admin.wiki.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Tem certeza? Isso apagará todos os artigos desta categoria.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-colors">
-                                    <x-icon name="trash" class="text-xs" />
+                                    <x-icon name="trash" style="duotone" class="text-xs" />
                                 </button>
                             </form>
                         </div>

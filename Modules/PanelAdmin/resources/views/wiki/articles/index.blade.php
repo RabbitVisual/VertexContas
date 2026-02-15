@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Artigos Wiki</x-slot>
+
     <div class="space-y-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -7,7 +9,7 @@
             </div>
             <a href="{{ route('admin.wiki.articles.create') }}"
                 class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                <x-icon name="plus" /> Novo Artigo
+                <x-icon name="plus" style="duotone" /> Novo Artigo
             </a>
         </div>
         <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
@@ -55,12 +57,12 @@
                                 <td class="px-6 py-5">
                                     <div class="flex justify-end gap-2">
                                         <a href="{{ route('admin.wiki.articles.edit', $article) }}" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                            <x-icon name="pen" class="text-xs" />
+                                            <x-icon name="pen" style="duotone" class="text-xs" />
                                         </a>
                                         <form action="{{ route('admin.wiki.articles.destroy', $article) }}" method="POST" onsubmit="return confirm('Tem certeza?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-colors">
-                                                <x-icon name="trash" class="text-xs" />
+                                                <x-icon name="trash" style="duotone" class="text-xs" />
                                             </button>
                                         </form>
                                     </div>

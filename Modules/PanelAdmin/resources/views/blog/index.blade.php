@@ -1,5 +1,7 @@
 <x-paneladmin::layouts.master>
-    <div class="space-y-8 animate-in fade-in duration-500">
+    <x-slot name="navbarTitle">Gestão do Blog</x-slot>
+
+    <div class="space-y-8">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -11,7 +13,7 @@
                     Categorias
                 </a>
                 <a href="{{ route('admin.blog.create') }}" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                    <x-icon name="plus" /> Novo Post
+                    <x-icon name="plus" style="duotone" /> Novo Post
                 </a>
             </div>
         </div>
@@ -60,7 +62,7 @@
                                             </div>
                                         @else
                                             <div class="w-16 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 shrink-0">
-                                                <x-icon name="image" class="text-xs" />
+                                                <x-icon name="image" style="duotone" class="text-xs" />
                                             </div>
                                         @endif
                                         <div class="flex flex-col">
@@ -100,15 +102,15 @@
                                 <td class="px-6 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                            <x-icon name="eye" class="text-xs" />
+                                            <x-icon name="eye" style="duotone" class="text-xs" />
                                         </a>
                                         <a href="{{ route('admin.blog.edit', $post) }}" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                            <x-icon name="pen" class="text-xs" />
+                                            <x-icon name="pen" style="duotone" class="text-xs" />
                                         </a>
                                         <form action="{{ route('admin.blog.destroy', $post) }}" method="POST" onsubmit="return confirm('Apagar este post permanentemente?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-colors">
-                                                <x-icon name="trash" class="text-xs" />
+                                                <x-icon name="trash" style="duotone" class="text-xs" />
                                             </button>
                                         </form>
                                     </div>
@@ -118,7 +120,7 @@
                             <tr>
                                 <td colspan="5" class="px-6 py-20 text-center">
                                     <div class="flex flex-col items-center">
-                                        <x-icon name="file-circle-plus" class="text-6xl text-slate-200 mb-6" />
+                                        <x-icon name="file-circle-plus" style="duotone" class="text-6xl text-slate-300 dark:text-slate-600 mb-6" />
                                         <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Ainda não há posts cadastrados.</p>
                                         <a href="{{ route('admin.blog.create') }}" class="mt-6 text-primary font-black text-sm hover:underline">Criar meu primeiro post</a>
                                     </div>

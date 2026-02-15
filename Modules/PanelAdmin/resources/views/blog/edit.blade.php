@@ -1,9 +1,11 @@
 <x-paneladmin::layouts.master>
-    <div class="max-w-5xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+    <x-slot name="navbarTitle">Editar Post</x-slot>
+
+    <div class="max-w-5xl mx-auto space-y-8">
         <!-- Header -->
         <div class="flex items-center gap-4">
             <a href="{{ route('admin.blog.index') }}" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 flex items-center justify-center text-slate-400 hover:text-primary transition-all">
-                <x-icon name="arrow-left" />
+                <x-icon name="arrow-left" style="duotone" />
             </a>
             <div>
                 <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Editar Post</h1>
@@ -32,7 +34,7 @@
                 <!-- SEO Section -->
                 <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
                     <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                        <x-icon name="magnifying-glass" class="text-primary text-sm" /> Configurações de SEO
+                        <x-icon name="magnifying-glass" style="duotone" class="text-primary text-sm" /> Configurações de SEO
                     </h3>
 
                     <div class="space-y-2">
@@ -94,7 +96,7 @@
                             @if($post->featured_image)
                                 <img id="preview" src="{{ asset($post->featured_image) }}" class="absolute inset-0 w-full h-full object-cover">
                             @else
-                                <x-icon name="cloud-arrow-up" class="text-3xl mb-2 group-hover:scale-110 transition-transform" />
+                                <x-icon name="cloud-arrow-up" style="duotone" class="text-3xl mb-2 group-hover:scale-110 transition-transform" />
                                 <span class="text-[10px] font-black uppercase tracking-widest">Alterar Imagem</span>
                                 <img id="preview" class="hidden absolute inset-0 w-full h-full object-cover">
                             @endif

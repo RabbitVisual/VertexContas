@@ -13,51 +13,62 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\Transaction;
+use Modules\HomePage\Services\HomePageProDataService;
 
 class HomePageController extends Controller
 {
     /**
-     * Display the public homepage.
+     * Display the public homepage. PRO users see personalized vitrine.
      */
-    public function home()
+    public function home(HomePageProDataService $proDataService)
     {
         $financialSnapshot = null;
+        $proHomeData = null;
+        $isPro = false;
+
         if (Auth::check()) {
             $user = Auth::user();
-            $totalBalance = Account::where('user_id', $user->id)->sum('balance');
-            $currentMonth = now()->month;
-            $currentYear = now()->year;
-            $monthlyIncome = Transaction::where('user_id', $user->id)
-                ->where('type', 'income')
-                ->whereMonth('date', $currentMonth)
-                ->whereYear('date', $currentYear)
-                ->sum('amount');
-            $monthlyExpense = Transaction::where('user_id', $user->id)
-                ->where('type', 'expense')
-                ->whereMonth('date', $currentMonth)
-                ->whereYear('date', $currentYear)
-                ->sum('amount');
-            $savingsRate = $monthlyIncome > 0
-                ? round((($monthlyIncome - $monthlyExpense) / $monthlyIncome) * 100, 1)
-                : 0;
-            $recentTransactions = Transaction::where('user_id', $user->id)
-                ->whereIn('type', ['income', 'expense'])
-                ->with('category')
-                ->latest('date')
-                ->latest('id')
-                ->take(3)
-                ->get();
+            $isPro = $user->isPro();
 
-            $financialSnapshot = [
-                'total_balance' => $totalBalance,
-                'monthly_income' => $monthlyIncome,
-                'monthly_expense' => $monthlyExpense,
-                'savings_rate' => $savingsRate,
-                'recent_transactions' => $recentTransactions,
-            ];
+            if ($isPro) {
+                $proHomeData = $proDataService->getProHomeData($user);
+                $financialSnapshot = $proHomeData['financialSnapshot'];
+            } else {
+                $totalBalance = Account::where('user_id', $user->id)->sum('balance');
+                $currentMonth = now()->month;
+                $currentYear = now()->year;
+                $monthlyIncome = Transaction::where('user_id', $user->id)
+                    ->where('type', 'income')
+                    ->whereMonth('date', $currentMonth)
+                    ->whereYear('date', $currentYear)
+                    ->sum('amount');
+                $monthlyExpense = Transaction::where('user_id', $user->id)
+                    ->where('type', 'expense')
+                    ->whereMonth('date', $currentMonth)
+                    ->whereYear('date', $currentYear)
+                    ->sum('amount');
+                $savingsRate = $monthlyIncome > 0
+                    ? round((($monthlyIncome - $monthlyExpense) / $monthlyIncome) * 100, 1)
+                    : 0;
+                $recentTransactions = Transaction::where('user_id', $user->id)
+                    ->whereIn('type', ['income', 'expense'])
+                    ->with('category')
+                    ->latest('date')
+                    ->latest('id')
+                    ->take(3)
+                    ->get();
+
+                $financialSnapshot = [
+                    'total_balance' => $totalBalance,
+                    'monthly_income' => $monthlyIncome,
+                    'monthly_expense' => $monthlyExpense,
+                    'savings_rate' => $savingsRate,
+                    'recent_transactions' => $recentTransactions,
+                ];
+            }
         }
 
-        return view('homepage::homepage', compact('financialSnapshot'));
+        return view('homepage::homepage', compact('financialSnapshot', 'proHomeData', 'isPro'));
     }
 
     /**

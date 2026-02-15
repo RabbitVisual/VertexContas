@@ -1,8 +1,10 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Gateways</x-slot>
+
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            <x-icon name="credit-card" style="solid" class="mr-2 text-primary" />
+            <x-icon name="credit-card" style="duotone" class="mr-2 text-[#11C76F]" />
             Gateways de Pagamento
         </h1>
     </div>
@@ -48,7 +50,7 @@
                         </button>
                     </form>
                     <a href="{{ route('admin.gateways.edit', $gateway->id) }}" class="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors">
-                        <x-icon name="gears" style="solid" class="mr-2" /> Configurar
+                        <x-icon name="gears" style="duotone" class="mr-2" /> Configurar
                     </a>
                 </div>
             </div>

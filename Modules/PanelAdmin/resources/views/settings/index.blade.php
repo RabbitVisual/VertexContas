@@ -1,8 +1,10 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Configurações</x-slot>
+
 <div class="container mx-auto px-4 py-6" x-data="{ activeTab: 'general' }">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            <x-icon name="gears" style="solid" class="mr-2 text-primary" />
+            <x-icon name="gears" style="duotone" class="mr-2 text-[#11C76F]" />
             Configurações do Sistema
         </h1>
     </div>

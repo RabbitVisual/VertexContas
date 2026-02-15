@@ -1,8 +1,10 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Novo Artigo Wiki</x-slot>
+
     <div class="max-w-4xl mx-auto space-y-6">
         <div class="flex items-center gap-4">
             <a href="{{ route('admin.wiki.articles') }}" class="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 text-slate-500 hover:text-primary transition-colors">
-                <x-icon name="arrow-left" />
+                <x-icon name="arrow-left" style="duotone" />
             </a>
             <div>
                 <h1 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Novo Artigo Wiki</h1>

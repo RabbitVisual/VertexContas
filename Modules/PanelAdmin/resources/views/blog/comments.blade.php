@@ -1,10 +1,12 @@
 <x-paneladmin::layouts.master>
-    <div class="space-y-8 animate-in fade-in duration-500">
+    <x-slot name="navbarTitle">Comentários</x-slot>
+
+    <div class="space-y-8">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <a href="{{ route('admin.blog.index') }}" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 flex items-center justify-center text-slate-400 hover:text-primary transition-all">
-                    <x-icon name="arrow-left" />
+                    <x-icon name="arrow-left" style="duotone" />
                 </a>
                 <div>
                     <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Moderação de Comentários</h1>
@@ -64,14 +66,14 @@
                                             <form action="{{ route('admin.blog.comments.approve', $comment) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-sm" title="Aprovar Comentário">
-                                                    <x-icon name="check" class="text-xs" />
+                                                    <x-icon name="check" style="duotone" class="text-xs" />
                                                 </button>
                                             </form>
                                         @endif
                                         <form action="{{ route('admin.blog.comments.reject', $comment) }}" method="POST" onsubmit="return confirm('Excluir este comentário permanentemente?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Rejeitar/Excluir">
-                                                <x-icon name="xmark" class="text-xs" />
+                                                <x-icon name="xmark" style="duotone" class="text-xs" />
                                             </button>
                                         </form>
                                     </div>
@@ -81,7 +83,7 @@
                             <tr>
                                 <td colspan="4" class="px-6 py-20 text-center">
                                     <div class="flex flex-col items-center">
-                                        <x-icon name="comments" class="text-6xl text-slate-200 mb-6" />
+                                        <x-icon name="comments" style="duotone" class="text-6xl text-slate-300 dark:text-slate-600 mb-6" />
                                         <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Nenhum comentário para moderar.</p>
                                     </div>
                                 </td>

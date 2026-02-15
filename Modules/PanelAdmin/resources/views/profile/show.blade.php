@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Meu Perfil</x-slot>
+
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
         <!-- Profile Header Card -->
@@ -19,11 +21,11 @@
                     @endif
 
                     <div class="absolute inset-0 bg-black/40 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
-                        <x-icon name="camera" class="text-white text-3xl" />
+                        <x-icon name="camera" style="duotone" class="text-white text-3xl" />
                     </div>
 
                     <div class="absolute -bottom-2 -right-2 bg-white dark:bg-[#111111] p-3 rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 group-hover:rotate-12 transition-transform">
-                        <x-icon name="pen" class="text-[#11C76F] text-lg" />
+                        <x-icon name="pen" style="duotone" class="text-[#11C76F] text-lg" />
                     </div>
                 </div>
 

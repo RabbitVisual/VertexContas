@@ -59,5 +59,11 @@ class DatabaseSeeder extends Seeder
             );
             $user->syncRoles([$demo['role']]);
         }
+
+        $this->call([
+            \Modules\Blog\Database\Seeders\BlogDatabaseSeeder::class,
+            WikiCategorySeeder::class,
+            WikiArticleSeeder::class,
+        ]);
     }
 }

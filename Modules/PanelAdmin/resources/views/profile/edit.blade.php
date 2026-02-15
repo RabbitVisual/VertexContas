@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Editar Perfil</x-slot>
+
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
         <div class="mb-10 flex items-center justify-between">
@@ -9,7 +11,7 @@
                 <p class="text-sm text-slate-500 font-medium">Atualize suas informações e senha de acesso.</p>
             </div>
             <a href="{{ route('admin.profile.show') }}" class="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-[#11C76F] transition-all shadow-sm">
-                <x-icon name="arrow-left" class="text-xl" />
+                <x-icon name="arrow-left" style="duotone" class="text-xl" />
             </a>
         </div>
 

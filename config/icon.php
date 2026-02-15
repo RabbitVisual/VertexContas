@@ -49,5 +49,9 @@ return [
         'contact' => 'envelope',
         'gauge' => 'gauge-high',
         'arrow-right-left' => 'right-left',
+        'vertex-logo' => 'image',
+        'user-robot-xmarks' => 'robot',
+        'image-user' => 'image-portrait',
+        'user-vneck' => 'user',
     ],
 ];

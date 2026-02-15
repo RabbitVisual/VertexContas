@@ -1,10 +1,12 @@
 <x-paneladmin::layouts.master>
-    <div class="h-[calc(100vh-8rem)] flex flex-col animate-in slide-in-from-bottom-6 duration-700">
+    <x-slot name="navbarTitle">Ticket #{{ $ticket->id }}</x-slot>
+
+    <div class="h-[calc(100vh-8rem)] flex flex-col">
         <!-- Header -->
         <div class="bg-white dark:bg-[#111111] rounded-[2.5rem] p-6 mb-6 border border-gray-100 dark:border-white/5 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
                 <a href="{{ route('admin.support.index') }}" class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-[#11C76F]/10 hover:text-[#11C76F] transition-all hover:scale-105 active:scale-95 shadow-sm group">
-                    <x-icon name="arrow-left" class="group-hover:-translate-x-1 transition-transform" />
+                    <x-icon name="arrow-left" style="duotone" class="group-hover:-translate-x-1 transition-transform" />
                 </a>
                 <div>
                     <div class="flex items-center gap-3">
@@ -50,7 +52,7 @@
                         <form action="{{ route('admin.support.takeover', $ticket) }}" method="POST">
                             @csrf
                             <button type="submit" class="h-12 px-6 rounded-2xl bg-[#11C76F] text-white font-black text-xs uppercase tracking-widest hover:bg-[#0EA85A] hover:-translate-y-1 transition-all shadow-xl shadow-[#11C76F]/25 flex items-center gap-3">
-                                <x-icon name="handshake" /> Assumir
+                                <x-icon name="handshake" style="duotone" /> Assumir
                             </button>
                         </form>
                     @endif
@@ -64,7 +66,7 @@
             <div class="flex-1 flex flex-col bg-white dark:bg-[#111111] rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden relative">
                 <!-- Watermark -->
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] dark:opacity-[0.01]">
-                    <x-icon name="vertex-logo" class="w-96" />
+                    <x-icon name="vertex-logo" style="duotone" class="w-96" />
                 </div>
 
                 <div
@@ -94,7 +96,7 @@
                 <!-- Customer Profile -->
                 <div class="bg-white dark:bg-[#111111] rounded-[3rem] p-8 border border-gray-100 dark:border-white/5 shadow-xl">
                     <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
-                        <x-icon name="user-vneck" class="text-xs" /> Perfil do Cliente
+                        <x-icon name="user-vneck" style="duotone" class="text-xs" /> Perfil do Cliente
                     </h4>
 
                     <div class="flex flex-col items-center text-center">
@@ -107,7 +109,7 @@
                                 </div>
                             @endif
                             <div class="absolute inset-0 bg-black/40 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <x-icon name="camera" class="text-white text-xl" />
+                                <x-icon name="camera" style="duotone" class="text-white text-xl" />
                             </div>
                             <div class="absolute -bottom-2 -right-2 bg-white dark:bg-[#111111] p-1.5 rounded-xl shadow-lg border border-gray-100 dark:border-white/10">
                                 <div class="w-4 h-4 rounded-full bg-emerald-500"></div>
@@ -189,7 +191,7 @@
                         </div>
                     @else
                         <div class="text-center py-10 border-2 border-dashed border-white/10 rounded-[2rem] mb-8 relative z-10">
-                            <x-icon name="user-robot-xmarks" class="text-3xl text-white/10 mb-2" />
+                            <x-icon name="user-robot-xmarks" style="duotone" class="text-3xl text-white/10 mb-2" />
                             <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Nenhum Agente Designado</p>
                         </div>
                     @endif
@@ -241,7 +243,7 @@
                             </div>
 
                             <div class="w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center" :class="selectedAgent == '{{ $agent->id }}' ? 'border-[#11C76F] bg-[#11C76F]' : 'border-slate-300 dark:border-white/10'">
-                                <x-icon name="check" class="text-[10px] text-white" x-show="selectedAgent == '{{ $agent->id }}'" />
+                                <x-icon name="check" style="duotone" class="text-[10px] text-white" x-show="selectedAgent == '{{ $agent->id }}'" />
                             </div>
                         </label>
                     @endforeach
@@ -277,7 +279,7 @@
                     <input type="file" name="photo" id="photo_input" class="hidden" accept="image/*" onchange="previewImage(this)">
                     <label for="photo_input" class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[2rem] cursor-pointer hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6" id="preview_placeholder">
-                            <x-icon name="cloud-arrow-up" class="text-4xl text-slate-300 group-hover:text-[#11C76F] mb-4 transition-colors" />
+                            <x-icon name="cloud-arrow-up" style="duotone" class="text-4xl text-slate-300 group-hover:text-[#11C76F] mb-4 transition-colors" />
                             <p class="mb-2 text-xs font-black text-slate-500 uppercase tracking-widest">Clique para selecionar</p>
                             <p class="text-[10px] text-slate-400 font-bold uppercase">PNG, JPG ou WEBP (Max 2MB)</p>
                         </div>

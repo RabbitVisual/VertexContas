@@ -1,10 +1,12 @@
 <x-paneladmin::layouts.master>
-    <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <x-slot name="navbarTitle">Categorias do Blog</x-slot>
+
+    <div class="max-w-4xl mx-auto space-y-8">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <a href="{{ route('admin.blog.index') }}" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 flex items-center justify-center text-slate-400 hover:text-primary transition-all">
-                    <x-icon name="arrow-left" />
+                    <x-icon name="arrow-left" style="duotone" />
                 </a>
                 <div>
                     <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Categorias do Blog</h1>
@@ -12,7 +14,7 @@
                 </div>
             </div>
             <button @click="$dispatch('open-modal', 'create-category-modal')" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
-                <x-icon name="plus" /> Nova Categoria
+                <x-icon name="plus" style="duotone" /> Nova Categoria
             </button>
         </div>
 
@@ -38,7 +40,7 @@
                         <form action="{{ route('admin.blog.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Apagar esta categoria?')" class="flex-none">
                             @csrf @method('DELETE')
                             <button type="submit" class="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-xl hover:bg-red-100 transition-colors">
-                                <x-icon name="trash" class="text-xs" />
+                                <x-icon name="trash" style="duotone" class="text-xs" />
                             </button>
                         </form>
                     </div>
@@ -67,7 +69,7 @@
                 </x-core::modal>
             @empty
                 <div class="col-span-full py-20 bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-gray-800 text-center">
-                    <x-icon name="tags" class="text-6xl text-slate-200 mb-6" />
+                    <x-icon name="tags" style="duotone" class="text-6xl text-slate-300 dark:text-slate-600 mb-6" />
                     <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Nenhuma categoria encontrada.</p>
                 </div>
             @endforelse

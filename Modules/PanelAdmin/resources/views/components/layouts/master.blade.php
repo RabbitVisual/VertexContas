@@ -36,10 +36,14 @@
         <!-- Sidebar -->
         <x-paneladmin::sidebar />
 
-        <!-- Content Area -->
-        <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+        <!-- Content Area (min-w-0 for flex shrink, sidebar colapsável) -->
+        <div class="relative flex flex-col flex-1 min-w-0 overflow-hidden">
             <!-- Navbar -->
-            <x-paneladmin::navbar />
+            <x-paneladmin::navbar>
+                @isset($navbarTitle)
+                    <x-slot name="title">{{ $navbarTitle }}</x-slot>
+                @endisset
+            </x-paneladmin::navbar>
 
             <!-- Main Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-background p-6">

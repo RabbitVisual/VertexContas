@@ -1,6 +1,5 @@
-@section('title', 'Gerenciamento de Permissões')
-
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Permissões</x-slot>
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
 
         <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
@@ -9,7 +8,7 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">Defina o que cada papel pode fazer no sistema.</p>
             </div>
             <div class="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-3 py-1 rounded-lg">
-                <x-icon name="shield-check" class="w-4 h-4 inline mr-1" />
+                <x-icon name="shield-check" style="duotone" class="w-4 h-4 inline mr-1" />
                 Admin tem acesso total (Oculto)
             </div>
         </div>
@@ -54,7 +53,7 @@
 
             <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800 flex justify-end">
                 <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium flex items-center">
-                    <x-icon name="save" class="w-4 h-4 mr-2" />
+                    <x-icon name="save" style="duotone" class="w-4 h-4 mr-2" />
                     Salvar Permissões
                 </button>
             </div>

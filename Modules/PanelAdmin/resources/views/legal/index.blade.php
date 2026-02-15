@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Central Legal</x-slot>
+
     <div class="space-y-6">
         <div>
             <h1 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Central Legal</h1>
@@ -38,7 +40,7 @@
                             </div>
                         </div>
                         <a href="{{ route('admin.legal.edit', $document) }}" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors flex-shrink-0">
-                            <x-icon name="pen" class="text-sm" />
+                            <x-icon name="pen" style="duotone" class="text-sm" />
                         </a>
                     </div>
                 </div>

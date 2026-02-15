@@ -43,6 +43,7 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
                         $dashboardRoute = 'paneluser.index';
                         if(Auth::user()->hasRole('admin')) $dashboardRoute = 'admin.index';
                         elseif(Auth::user()->hasRole('support')) $dashboardRoute = 'support.index';
+                        elseif(Auth::user()->isPro()) $dashboardRoute = 'core.dashboard';
                     @endphp
                     <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 p-2 pr-5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group decoration-transparent">
                         <div class="relative flex-shrink-0">
@@ -109,6 +110,7 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
                     $dashboardRoute = 'paneluser.index';
                     if(Auth::user()->hasRole('admin')) $dashboardRoute = 'admin.index';
                     elseif(Auth::user()->hasRole('support')) $dashboardRoute = 'support.index';
+                    elseif(Auth::user()->isPro()) $dashboardRoute = 'core.dashboard';
                 @endphp
                 <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                     <div class="flex items-center gap-3 mb-4">

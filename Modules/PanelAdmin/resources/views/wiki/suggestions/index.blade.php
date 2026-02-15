@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Sugestões Wiki</x-slot>
+
     <div x-data="{
         statusModal: false,
         selectedSuggestion: null,
@@ -24,8 +26,8 @@
         <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-slate-800/50">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-gray-50 dark:bg-slate-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-white/5">
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Colaborador</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Sugestão</th>
                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
@@ -35,7 +37,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                         @foreach($suggestions as $suggestion)
-                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
+                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all even:bg-slate-50/50 dark:even:bg-slate-800/30">
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
@@ -73,12 +75,12 @@
                                 <td class="px-6 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button @click="openStatusModal({{ json_encode($suggestion) }})" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                            <x-icon name="pen-to-square" class="text-xs" />
+                                            <x-icon name="pen-to-square" style="duotone" class="text-xs" />
                                         </button>
                                         <form action="{{ route('admin.wiki.suggestions.destroy', $suggestion) }}" method="POST" onsubmit="return confirm('Apagar sugestão permanentemente?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-colors">
-                                                <x-icon name="trash" class="text-xs" />
+                                                <x-icon name="trash" style="duotone" class="text-xs" />
                                             </button>
                                         </form>
                                     </div>
@@ -103,7 +105,7 @@
                     <div class="flex items-center justify-between">
                         <h3 class="text-xl font-black text-slate-800 dark:text-white">Atualizar Sugestão</h3>
                         <button @click="statusModal = false" class="text-slate-400 hover:text-red-500 transition-colors">
-                            <x-icon name="xmark" class="text-xl" />
+                            <x-icon name="xmark" style="duotone" class="text-xl" />
                         </button>
                     </div>
 

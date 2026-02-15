@@ -1,5 +1,7 @@
 <x-paneladmin::layouts.master>
-    <div class="space-y-8 animate-in fade-in duration-500">
+    <x-slot name="navbarTitle">Central de Suporte</x-slot>
+
+    <div class="space-y-8">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -27,7 +29,7 @@
                             <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Fechado</option>
                         </select>
                         <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-[#11C76F] transition-colors">
-                            <x-icon name="chevron-down" class="text-[10px]" />
+                            <x-icon name="chevron-down" style="duotone" class="text-[10px]" />
                         </div>
                     </div>
                 </div>
@@ -42,7 +44,7 @@
                             <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Alta</option>
                         </select>
                         <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-[#11C76F] transition-colors">
-                            <x-icon name="chevron-down" class="text-[10px]" />
+                            <x-icon name="chevron-down" style="duotone" class="text-[10px]" />
                         </div>
                     </div>
                 </div>
@@ -58,14 +60,14 @@
                             @endforeach
                         </select>
                         <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-[#11C76F] transition-colors">
-                            <x-icon name="chevron-down" class="text-[10px]" />
+                            <x-icon name="chevron-down" style="duotone" class="text-[10px]" />
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-end">
                     <button type="submit" class="w-full py-4 bg-[#11C76F] text-white font-black rounded-[1.5rem] shadow-xl shadow-[#11C76F]/25 hover:bg-[#0EA85A] hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
-                        <x-icon name="magnifying-glass" class="text-sm" /> Aplicar Filtros
+                        <x-icon name="magnifying-glass" style="duotone" class="text-sm" /> Aplicar Filtros
                     </button>
                 </div>
             </form>
@@ -75,8 +77,8 @@
         <div class="bg-white dark:bg-[#111111] rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-white/[0.02]">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-gray-50 dark:bg-slate-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Informações do Chamado</th>
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Prioridade</th>
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
@@ -86,7 +88,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-white/[0.05]">
                         @forelse($tickets as $ticket)
-                            <tr class="group hover:bg-[#11C76F]/[0.02] dark:hover:bg-[#11C76F]/[0.05] transition-all">
+                            <tr class="group hover:bg-[#11C76F]/[0.02] dark:hover:bg-[#11C76F]/[0.05] transition-all even:bg-slate-50/50 dark:even:bg-slate-800/30">
                                 <td class="px-8 py-6">
                                     <div class="flex items-center gap-4">
                                         <div class="relative shrink-0">
@@ -172,13 +174,13 @@
                                 <td class="px-8 py-6 text-right">
                                     <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                                         <a href="{{ route('admin.support.show', $ticket) }}" class="w-10 h-10 rounded-[1rem] bg-gray-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-[#11C76F] hover:text-white transition-all flex items-center justify-center shadow-sm">
-                                            <x-icon name="comment-dots" class="text-xs" />
+                                            <x-icon name="comment-dots" style="duotone" class="text-xs" />
                                         </a>
                                         @if($ticket->assigned_agent_id !== Auth::id())
                                             <form action="{{ route('admin.support.takeover', $ticket) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="w-10 h-10 rounded-[1rem] bg-[#11C76F]/10 text-[#11C76F] hover:bg-[#11C76F] hover:text-white transition-all flex items-center justify-center shadow-sm" title="Assumir este ticket">
-                                                    <x-icon name="handshake" class="text-xs" />
+                                                    <x-icon name="handshake" style="duotone" class="text-xs" />
                                                 </button>
                                             </form>
                                         @endif
@@ -190,7 +192,7 @@
                                 <td colspan="5" class="px-8 py-24 text-center">
                                     <div class="flex flex-col items-center max-w-xs mx-auto">
                                         <div class="w-24 h-24 rounded-[2rem] bg-gray-50 dark:bg-white/[0.02] flex items-center justify-center mb-6">
-                                            <x-icon name="mailbox-empty" class="text-5xl text-slate-200 dark:text-white/10" />
+                                            <x-icon name="mailbox-empty" style="duotone" class="text-5xl text-slate-200 dark:text-white/10" />
                                         </div>
                                         <h3 class="text-lg font-black text-slate-900 dark:text-white">Nenhum chamado pendente</h3>
                                         <p class="text-slate-500 dark:text-slate-400 text-sm mt-2 font-medium leading-relaxed">Não encontramos nenhum chamado que corresponda aos filtros selecionados no momento.</p>

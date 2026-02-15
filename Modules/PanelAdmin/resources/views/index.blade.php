@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Dashboard</x-slot>
+
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Painel Administrativo</h1>
@@ -20,13 +22,13 @@
         <!-- Revenue Card -->
         <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="money-bill-trend-up" class="w-24 h-24 text-white" />
+                <x-icon name="money-bill-trend-up" style="duotone" class="w-24 h-24 text-white" />
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
                     <p class="text-blue-100/80 font-semibold text-sm uppercase tracking-wider">Receita Total</p>
                     <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="vault" class="w-5 h-5 text-white" />
+                        <x-icon name="vault" style="duotone" class="w-5 h-5 text-white" />
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ format_currency($totalRevenue) }}</h3>
@@ -35,7 +37,7 @@
                         $revenueDiff = $monthlyRevenue - $revenueLastMonth;
                         $revPercent = $revenueLastMonth > 0 ? ($revenueDiff / $revenueLastMonth) * 100 : 100;
                     @endphp
-                    <x-icon name="{{ $revenueDiff >= 0 ? 'arrow-trend-up' : 'arrow-trend-down' }}" class="w-3 h-3 mr-1" />
+                    <x-icon name="{{ $revenueDiff >= 0 ? 'arrow-trend-up' : 'arrow-trend-down' }}" style="duotone" class="w-3 h-3 mr-1" />
                     <span>{{ format_percent(abs($revPercent), 1) }} em relação ao mês anterior</span>
                 </div>
             </div>
@@ -44,18 +46,18 @@
         <!-- Users Card -->
         <div class="bg-gradient-to-br from-purple-600 to-pink-700 rounded-2xl p-6 text-white shadow-xl shadow-purple-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="users" class="w-24 h-24 text-white" />
+                <x-icon name="users" style="duotone" class="w-24 h-24 text-white" />
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
                     <p class="text-purple-100/80 font-semibold text-sm uppercase tracking-wider">Total de Usuários</p>
                     <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="users-gear" class="w-5 h-5 text-white" />
+                        <x-icon name="users-gear" style="duotone" class="w-5 h-5 text-white" />
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ format_number($totalUsers, 0) }}</h3>
                 <div class="flex items-center text-xs text-purple-100/90 font-medium">
-                    <x-icon name="user-plus" class="w-3 h-3 mr-1" />
+                    <x-icon name="user-plus" style="duotone" class="w-3 h-3 mr-1" />
                     <span>+{{ $newUsersThisMonth }} novos este mês</span>
                 </div>
             </div>
@@ -64,19 +66,19 @@
         <!-- Pro Users Card -->
         <a href="{{ route('admin.subscriptions.index') }}" class="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="crown" class="w-24 h-24 text-white" />
+                <x-icon name="crown" style="duotone" class="w-24 h-24 text-white" />
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
                     <p class="text-amber-100/80 font-semibold text-sm uppercase tracking-wider">Assinantes PRO</p>
                     <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="star" class="w-5 h-5 text-white" />
+                        <x-icon name="star" style="duotone" class="w-5 h-5 text-white" />
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ format_number($proUsersCount, 0) }}</h3>
                 <div class="flex flex-col gap-1 text-xs text-amber-100/90 font-medium">
-                    <span><x-icon name="chart-pie" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? format_percent(($proUsersCount/$totalUsers)*100, 1) : '0%' }} da base total</span>
-                    <span><x-icon name="arrows-rotate" class="w-3 h-3 mr-1 inline" />{{ $activeSubscriptionsCount ?? 0 }} assinaturas recorrentes ativas</span>
+                    <span><x-icon name="chart-pie" style="duotone" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? format_percent(($proUsersCount/$totalUsers)*100, 1) : '0%' }} da base total</span>
+                    <span><x-icon name="arrows-rotate" style="duotone" class="w-3 h-3 mr-1 inline" />{{ $activeSubscriptionsCount ?? 0 }} assinaturas recorrentes ativas</span>
                 </div>
             </div>
         </a>
@@ -84,18 +86,18 @@
         <!-- Support Card -->
         <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="headset" class="w-24 h-24 text-white" />
+                <x-icon name="headset" style="duotone" class="w-24 h-24 text-white" />
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
                     <p class="text-emerald-100/80 font-semibold text-sm uppercase tracking-wider">Tickets Abertos</p>
                     <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="ticket" class="w-5 h-5 text-white" />
+                        <x-icon name="ticket" style="duotone" class="w-5 h-5 text-white" />
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ $openTicketsCount }}</h3>
                 <div class="flex items-center text-xs text-emerald-100/90 font-medium">
-                    <x-icon name="clock" class="w-3 h-3 mr-1" />
+                    <x-icon name="clock" style="duotone" class="w-3 h-3 mr-1" />
                     <span>Aguardando resposta</span>
                 </div>
             </div>
@@ -103,18 +105,18 @@
         <!-- Blog Conversion Rate -->
         <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="chart-simple" class="w-24 h-24 text-white" />
+                <x-icon name="chart-simple" style="duotone" class="w-24 h-24 text-white" />
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
                     <p class="text-indigo-100/80 font-semibold text-sm uppercase tracking-wider">Conversão Blog</p>
                     <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="arrow-right-arrow-left" class="w-5 h-5 text-white" />
+                        <x-icon name="arrow-right-arrow-left" style="duotone" class="w-5 h-5 text-white" />
                     </div>
                 </div>
                 <h3 class="text-3xl font-black mb-1">{{ format_percent($blogConversionRate, 1) }}</h3>
                 <div class="flex items-center text-xs text-indigo-100/90 font-medium">
-                    <x-icon name="users" class="w-3 h-3 mr-1" />
+                    <x-icon name="users" style="duotone" class="w-3 h-3 mr-1" />
                     <span>Visitantes > Assinantes</span>
                 </div>
             </div>
@@ -127,7 +129,7 @@
         <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="chart-line" class="text-indigo-500" />
+                    <x-icon name="chart-line" style="duotone" class="text-indigo-500" />
                     Evolução da Receita
                 </h2>
                 <span class="text-xs font-semibold text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 px-2 py-1 rounded">Últimos 6 Meses</span>
@@ -140,7 +142,7 @@
         <!-- User Distribution Chart -->
         <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <x-icon name="chart-pie" class="text-purple-500" />
+                <x-icon name="chart-pie" style="duotone" class="text-purple-500" />
                 Distribuição de Usuários
             </h2>
             <div class="h-48 flex items-center justify-center">
@@ -170,14 +172,14 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="user-plus" class="text-blue-500" />
+                    <x-icon name="user-plus" style="duotone" class="text-blue-500" />
                     Últimos Cadastros
                 </h2>
                 <a href="{{ route('admin.users.index') }}" class="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Ver Todos</a>
             </div>
-            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 @foreach($recentUsers as $user)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
                                 {{ substr($user->first_name, 0, 1) }}
@@ -202,17 +204,17 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="credit-card" class="text-emerald-500" />
+                    <x-icon name="credit-card" style="duotone" class="text-emerald-500" />
                     Pagamentos Recentes
                 </h2>
                 <a href="{{ route('admin.payments.index') }}" class="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Ver Logs</a>
             </div>
-            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 @foreach($recentPayments as $payment)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center">
-                                <x-icon name="receipt" class="w-5 h-5" />
+                                <x-icon name="receipt" style="duotone" class="w-5 h-5" />
                             </div>
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800 dark:text-white">{{ $payment->user->full_name ?? 'Usuário Desconhecido' }}</h4>
@@ -238,13 +240,13 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="newspaper" class="text-indigo-500" />
+                    <x-icon name="newspaper" style="duotone" class="text-indigo-500" />
                     Artigos Mais Lidos
                 </h2>
             </div>
-            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 @foreach($mostReadPosts as $post)
-                    <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="block p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="block p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="text-sm font-bold text-slate-800 dark:text-white truncate">{{ $post->title }}</div>
                         </div>
@@ -258,13 +260,13 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="feather-pointed" class="text-amber-500" />
+                    <x-icon name="feather-pointed" style="duotone" class="text-amber-500" />
                     Top Autores
                 </h2>
             </div>
-            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 @foreach($topAuthors as $stat)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                         <div class="flex items-center gap-3">
                             <div class="text-sm font-bold text-slate-800 dark:text-white">{{ $stat->author->name ?? "Unknown" }}</div>
                         </div>
@@ -280,13 +282,13 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-slate-50 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="comments" class="text-amber-500" />
+                    <x-icon name="comments" style="duotone" class="text-amber-500" />
                     Comentários Recentes
                 </h2>
             </div>
-            <div class="divide-y divide-slate-50 dark:divide-slate-700">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 @forelse($recentComments as $comment)
-                    <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                         <p class="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{{ $comment->content }}</p>
                         <p class="text-xs text-slate-500 mt-1">{{ $comment->user->name ?? '—' }} · {{ $comment->created_at->diffForHumans() }}</p>
                         <a href="{{ route('paneluser.blog.show', $comment->post->slug) }}" target="_blank" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 inline-block">{{ $comment->post->title }}</a>
@@ -301,32 +303,32 @@
     <!-- Quick Actions Grid -->
     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
         <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-            <x-icon name="bolt" class="text-amber-500" />
+            <x-icon name="bolt" style="duotone" class="text-amber-500" />
             Atalhos do Administrador
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <a href="{{ route('admin.users.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="users" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
+                <x-icon name="users" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Usuários</span>
             </a>
             <a href="{{ route('admin.settings.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="gears" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
+                <x-icon name="gears" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Configurações</span>
             </a>
             <a href="{{ route('admin.gateways.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="credit-card" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
+                <x-icon name="credit-card" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Gateways</span>
             </a>
             <a href="{{ route('admin.plans.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="crown" class="text-2xl text-slate-400 group-hover:text-amber-500 mb-2" />
+                <x-icon name="crown" style="duotone" class="text-2xl text-slate-400 group-hover:text-amber-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Planos</span>
             </a>
             <a href="{{ route('admin.roles.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="shield-halved" class="text-2xl text-slate-400 group-hover:text-emerald-500 mb-2" />
+                <x-icon name="shield-halved" style="duotone" class="text-2xl text-slate-400 group-hover:text-emerald-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Permissões</span>
             </a>
             <a href="{{ route('admin.notifications.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="bell" class="text-2xl text-slate-400 group-hover:text-pink-500 mb-2" />
+                <x-icon name="bell" style="duotone" class="text-2xl text-slate-400 group-hover:text-pink-500 mb-2" />
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Notificações</span>
             </a>
         </div>

@@ -1,4 +1,6 @@
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Detalhes do Disparo</x-slot>
+
     <div class="max-w-5xl mx-auto px-4 py-10">
 
         <!-- Header Section -->
@@ -6,7 +8,7 @@
             <div class="space-y-1">
                 <div class="flex items-center gap-3 mb-2">
                     <a href="{{ route('admin.notifications.index') }}" class="text-[10px] font-black text-[#11C76F] uppercase tracking-[0.3em] hover:opacity-70 transition-opacity flex items-center gap-2">
-                        <x-icon name="arrow-left" />
+                        <x-icon name="arrow-left" style="duotone" />
                         Voltar ao Histórico
                     </a>
                 </div>
@@ -18,14 +20,14 @@
 
             <div class="flex gap-4">
                 <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 text-slate-600 dark:text-slate-300 font-black rounded-xl hover:border-[#11C76F] hover:text-[#11C76F] transition-all text-[10px] uppercase tracking-widest">
-                    <x-icon name="copy" />
+                    <x-icon name="copy" style="duotone" />
                     Usar como Template
                 </a>
                 <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja remover este histórico?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                        <x-icon name="trash" />
+                        <x-icon name="trash" style="duotone" />
                     </button>
                 </form>
             </div>
@@ -44,7 +46,7 @@
                                     'danger' => 'bg-red-500/10 text-red-500',
                                     default => 'bg-blue-500/10 text-blue-500'
                                 } }}">
-                                <x-icon :name="$data->icon ?? 'bell'" class="text-3xl" />
+                                <x-icon :name="$data->icon ?? 'bell'" style="duotone" class="text-3xl" />
                             </div>
                             <div>
                                 <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight italic">{{ $data->title }}</h2>
@@ -76,8 +78,8 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50/30 dark:bg-transparent text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+                            <thead class="sticky top-0 z-10">
+                                <tr class="bg-gray-50 dark:bg-slate-900/95 dark:bg-slate-900 backdrop-blur-sm border-b border-gray-100 dark:border-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
                                     <th class="px-10 py-6">ID Usuário</th>
                                     <th class="px-10 py-6">Status Interno</th>
                                     <th class="px-10 py-6 text-right">Data de Recebimento</th>
@@ -85,7 +87,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-white/5">
                                 @foreach($blast as $notif)
-                                    <tr>
+                                    <tr class="even:bg-slate-50/50 dark:even:bg-slate-800/30 hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
                                         <td class="px-10 py-6">
                                             <span class="text-sm font-black text-slate-700 dark:text-slate-300">#{{ $notif->notifiable_id }}</span>
                                         </td>
@@ -113,7 +115,7 @@
             <!-- Stats Sidebar -->
             <div class="space-y-8">
                 <div class="bg-[#11C76F] p-8 rounded-[2.5rem] shadow-2xl shadow-[#11C76F]/20 text-white relative overflow-hidden">
-                    <x-icon name="bolt" class="absolute -right-4 -bottom-4 text-9xl text-white/10" />
+                    <x-icon name="bolt" style="duotone" class="absolute -right-4 -bottom-4 text-9xl text-white/10" />
                     <div class="relative z-10">
                         <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">Desempenho</span>
                         <div class="mt-4 mb-8">

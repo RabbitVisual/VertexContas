@@ -1,6 +1,5 @@
-@section('title', 'Planos & Limites')
-
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Planos e Limites</x-slot>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Plans Setup -->
         <div class="col-span-2 space-y-6">
@@ -11,7 +10,7 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">Defina os recursos disponíveis para usuários gratuitos.</p>
                     </div>
                     <div class="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
-                        <x-icon name="sliders" class="w-5 h-5" />
+                        <x-icon name="sliders" style="duotone" class="w-5 h-5" />
                     </div>
                 </div>
 
@@ -24,7 +23,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Limite de Receitas</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                    <x-icon name="arrow-up" class="w-4 h-4" />
+                                    <x-icon name="arrow-up" style="duotone" class="w-4 h-4" />
                                 </span>
                                 <input type="number" name="limit_free_income" value="{{ $limits['income'] }}" class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary transition-colors">
                             </div>
@@ -34,7 +33,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Limite de Despesas</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                    <x-icon name="arrow-down" class="w-4 h-4" />
+                                    <x-icon name="arrow-down" style="duotone" class="w-4 h-4" />
                                 </span>
                                 <input type="number" name="limit_free_expense" value="{{ $limits['expense'] }}" class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary transition-colors">
                             </div>
@@ -45,7 +44,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Limite de Contas</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                    <x-icon name="wallet" class="w-4 h-4" />
+                                    <x-icon name="wallet" style="duotone" class="w-4 h-4" />
                                 </span>
                                 <input type="number" name="limit_free_account" value="{{ $limits['account'] }}" class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary transition-colors">
                             </div>
@@ -55,7 +54,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Limite de Metas</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                    <x-icon name="bullseye" class="w-4 h-4" />
+                                    <x-icon name="bullseye" style="duotone" class="w-4 h-4" />
                                 </span>
                                 <input type="number" name="limit_free_goal" value="{{ $limits['goal'] }}" class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary transition-colors">
                             </div>
@@ -65,7 +64,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Limite de Orçamentos</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                                    <x-icon name="chart-pie" class="w-4 h-4" />
+                                    <x-icon name="chart-pie" style="duotone" class="w-4 h-4" />
                                 </span>
                                 <input type="number" name="limit_free_budget" value="{{ $limits['budget'] }}" class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white focus:ring-primary focus:border-primary transition-colors">
                             </div>
@@ -74,7 +73,7 @@
 
                     <div class="flex justify-end">
                         <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium flex items-center">
-                            <x-icon name="save" class="w-4 h-4 mr-2" />
+                            <x-icon name="save" style="duotone" class="w-4 h-4 mr-2" />
                             Salvar Alterações
                         </button>
                     </div>
@@ -98,15 +97,15 @@
 
                 <div class="space-y-3">
                     <div class="flex items-center text-sm">
-                        <x-icon name="check-circle" class="w-4 h-4 mr-2 text-emerald-400" />
+                        <x-icon name="check-circle" style="solid" class="w-4 h-4 mr-2 text-emerald-400" />
                         <span>Contas Ilimitadas</span>
                     </div>
                     <div class="flex items-center text-sm">
-                        <x-icon name="check-circle" class="w-4 h-4 mr-2 text-emerald-400" />
+                        <x-icon name="check-circle" style="solid" class="w-4 h-4 mr-2 text-emerald-400" />
                         <span>Transações Ilimitadas</span>
                     </div>
                     <div class="flex items-center text-sm">
-                        <x-icon name="check-circle" class="w-4 h-4 mr-2 text-emerald-400" />
+                        <x-icon name="check-circle" style="solid" class="w-4 h-4 mr-2 text-emerald-400" />
                         <span>Metas & Orçamentos Ilimitados</span>
                     </div>
                 </div>

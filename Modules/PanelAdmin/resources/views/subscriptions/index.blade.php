@@ -1,6 +1,5 @@
-@section('title', 'Assinaturas')
-
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Assinaturas</x-slot>
     <!-- Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
@@ -55,13 +54,13 @@
                     <option value="canceled" {{ request('status') == 'canceled' ? 'selected' : '' }}>Cancelada</option>
                 </select>
                 <button type="submit" class="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600">
-                    <x-icon name="filter" class="w-4 h-4" />
+                    <x-icon name="filter" style="duotone" class="w-4 h-4" />
                 </button>
             </form>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
-                <thead class="bg-gray-50 dark:bg-slate-700/50 uppercase text-xs font-semibold text-gray-500 dark:text-gray-300">
+                <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-slate-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-white/5 uppercase text-xs font-semibold text-gray-500 dark:text-gray-300">
                     <tr>
                         <th class="px-6 py-4">Usuário</th>
                         <th class="px-6 py-4">Gateway</th>
@@ -73,7 +72,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($subscriptions as $sub)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                             <td class="px-6 py-4">
                                 @if($sub->user)
                                     <div class="font-medium text-gray-900 dark:text-white">{{ $sub->user->name ?? $sub->user->email }}</div>

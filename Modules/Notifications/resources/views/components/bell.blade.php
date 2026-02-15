@@ -28,7 +28,7 @@
                 <h3 class="font-bold text-sm text-gray-900 dark:text-white">Notificações</h3>
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('super-admin'))
                     <a href="{{ route('admin.notifications.create') }}" class="w-6 h-6 rounded-lg bg-[#11C76F]/10 text-[#11C76F] flex items-center justify-center hover:bg-[#11C76F] hover:text-white transition-all shadow-sm" title="Nova Notificação">
-                        <x-icon name="plus" class="text-xs" />
+                        <x-icon name="plus" style="duotone" class="text-xs" />
                     </a>
                 @endif
             </div>
@@ -41,14 +41,14 @@
         <div class="max-h-96 overflow-y-auto">
             <template x-if="loading && notifications.length === 0">
                 <div class="p-4 text-center text-gray-400 text-sm">
-                    <x-icon name="spinner" class="w-5 h-5 animate-spin mx-auto mb-2" />
+                    <x-icon name="spinner" style="duotone" class="w-5 h-5 animate-spin mx-auto mb-2" />
                     Carregando...
                 </div>
             </template>
 
             <template x-if="!loading && notifications.length === 0">
                 <div class="p-8 text-center text-gray-400">
-                    <x-icon name="bell-slash" class="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <x-icon name="bell-slash" style="duotone" class="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p class="text-sm">Nenhuma nuva notificação.</p>
                 </div>
             </template>
@@ -56,8 +56,13 @@
             <template x-for="notification in notifications" :key="notification.id">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors group relative">
                     <div class="flex gap-3">
-                        <div class="flex-shrink-0 mt-1">
-                            <i class="fa-duotone w-5 h-5" :class="['fa-' + notification.icon, notification.color]" aria-hidden="true"></i>
+                        <div class="flex-shrink-0 mt-1 w-5 h-5 flex items-center justify-center" :class="notification.color || 'text-slate-500'">
+                            <span x-show="(notification.icon || 'bell') === 'bell'"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
+                            <span x-show="(notification.icon || 'bell') === 'circle-info'"><x-icon name="circle-info" style="duotone" class="w-5 h-5" /></span>
+                            <span x-show="(notification.icon || 'bell') === 'circle-check'"><x-icon name="circle-check" style="duotone" class="w-5 h-5" /></span>
+                            <span x-show="(notification.icon || 'bell') === 'triangle-exclamation'"><x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5" /></span>
+                            <span x-show="(notification.icon || 'bell') === 'circle-xmark'"><x-icon name="circle-xmark" style="duotone" class="w-5 h-5" /></span>
+                            <span x-show="!['bell','circle-info','circle-check','triangle-exclamation','circle-xmark'].includes(notification.icon || 'bell')"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-gray-900 dark:text-white" x-text="notification.title"></p>
@@ -73,7 +78,7 @@
 
                         <!-- Mark as Read Button (Show on Hover) -->
                         <button @click.stop="markAsRead(notification.id)" class="absolute top-2 right-2 text-gray-300 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" title="Marcar como lida">
-                            <x-icon name="check" class="w-4 h-4" />
+                            <x-icon name="check" style="duotone" class="w-4 h-4" />
                         </button>
                     </div>
                 </div>

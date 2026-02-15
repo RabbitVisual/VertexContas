@@ -1,6 +1,5 @@
-@section('title', 'Detalhes do Usuário')
-
 <x-paneladmin::layouts.master>
+    <x-slot name="navbarTitle">Detalhes do Usuário</x-slot>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- User Profile Card -->
@@ -86,7 +85,7 @@
             <!-- Financial Health Card (Glassmorphism) -->
             <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-lg p-6">
                 <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <x-icon name="chart-line" class="text-primary" />
+                    <x-icon name="chart-line" style="duotone" class="text-[#11C76F]" />
                     Saúde Financeira
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -110,7 +109,7 @@
             @if(isset($supportStats))
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                     <h3 class="font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                        <x-icon name="headset" class="text-primary" />
+                        <x-icon name="headset" style="duotone" class="text-[#11C76F]" />
                         Performance Técnico de Suporte
                     </h3>
 
@@ -168,7 +167,7 @@
             <!-- Future: Activity Log Table or Detailed List could go here -->
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
                 <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 dark:bg-slate-700 rounded-full mb-3">
-                    <x-icon name="chart-line" class="w-6 h-6 text-gray-400" />
+                    <x-icon name="chart-line" style="duotone" class="w-6 h-6 text-slate-400" />
                 </div>
                 <h3 class="text-gray-900 dark:text-white font-medium mb-1">Histórico de Atividades</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">
