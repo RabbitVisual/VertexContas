@@ -23,6 +23,7 @@
         "@tailwindcss/typography": "^0.5.19",
         "apexcharts": "^5.3.6",
         "chart.js": "^4.5.1",
+        "emoji-picker-element": "^1.29.0",
         "flatpickr": "^4.6.13",
         "flowbite": "^4.0.1",
         "imask": "^7.6.1",

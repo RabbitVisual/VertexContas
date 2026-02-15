@@ -67,83 +67,26 @@
                     <x-icon name="vertex-logo" class="w-96" />
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar relative z-10" id="chat-messages">
-                    @forelse($ticket->messages as $msg)
-                        <div class="flex {{ $msg->user_id === $ticket->user_id ? 'justify-start' : 'justify-end' }} group animate-in slide-in-from-bottom-2 duration-300">
-                            <div class="max-w-[75%] flex flex-col {{ $msg->user_id === $ticket->user_id ? 'items-start' : 'items-end' }}">
-                                <div class="flex items-center gap-3 mb-2 px-3">
-                                    @if($msg->user_id === $ticket->user_id)
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $msg->user->name }}</span>
-                                    @else
-                                        <span class="text-[10px] font-black text-[#11C76F] uppercase tracking-widest">Suporte: {{ $msg->user->name }}</span>
-                                    @endif
-                                    <span class="text-[9px] font-bold text-slate-300">{{ $msg->created_at->format('H:i') }}</span>
-                                </div>
-                                <div class="px-8 py-5 rounded-[2.5rem] text-sm font-medium leading-relaxed transition-all group-hover:shadow-lg
-                                    {{ $msg->user_id === $ticket->user_id
-                                        ? 'bg-gray-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 rounded-tl-none border border-transparent dark:border-white/[0.03]'
-                                        : ($msg->is_admin_reply
-                                            ? 'bg-[#111111] dark:bg-white text-white dark:text-[#111111] shadow-2xl shadow-black/10 rounded-tr-none'
-                                            : 'bg-[#11C76F] text-white shadow-xl shadow-[#11C76F]/20 rounded-tr-none') }}">
-                                    {!! nl2br(e($msg->message)) !!}
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="h-full flex flex-col items-center justify-center text-slate-300 px-12 text-center">
-                             <div class="w-20 h-20 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6">
-                                <x-icon name="comment-slash" style="duotone" class="text-4xl opacity-20" />
-                             </div>
-                             <p class="font-black uppercase tracking-widest text-xs">Matenha o foco. Inicie o atendimento.</p>
-                             <p class="text-[10px] font-medium text-slate-400 mt-2 max-w-[200px]">Aguardando sua primeira resposta administrativa.</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- Input Hub -->
-                @if($ticket->status !== 'closed')
-                    <div class="p-8 bg-gray-50/50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-white/5 relative z-10">
-                        <form action="{{ route('admin.support.reply', $ticket) }}" method="POST" class="space-y-6">
-                            @csrf
-                            <div class="relative group">
-                                <textarea name="message" rows="4" required class="w-full px-8 py-6 bg-white dark:bg-[#111111] border-2 border-transparent rounded-[2.5rem] focus:border-[#11C76F]/30 focus:ring-4 focus:ring-[#11C76F]/10 text-slate-800 dark:text-white font-bold text-sm resize-none shadow-sm transition-all placeholder:text-slate-300" placeholder="Digite sua resposta oficial..."></textarea>
-                                <div class="absolute right-6 bottom-6 flex items-center gap-3 opacity-40 group-focus-within:opacity-100 transition-opacity">
-                                     <x-icon name="markdown" class="text-lg" />
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                                <div class="flex items-center gap-6 p-2 bg-white dark:bg-[#111111] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm px-6">
-                                    <div class="relative flex items-center gap-3 group">
-                                        <x-icon name="flag-checkered" class="text-slate-400 text-xs" />
-                                        <select name="status" class="bg-transparent border-none text-[10px] font-black uppercase tracking-[0.1em] text-slate-500 focus:ring-0 cursor-pointer py-3 pr-10 appearance-none">
-                                            <option value="answered" {{ $ticket->status === 'open' ? 'selected' : '' }}>Marcar como Respondido</option>
-                                            <option value="pending" {{ $ticket->status === 'pending' ? 'selected' : '' }}>Manter Pendente</option>
-                                            <option value="closed">Encerrar Chamado</option>
-                                        </select>
-                                        <div class="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-[#11C76F] transition-colors">
-                                            <x-icon name="chevron-down" class="text-[8px]" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="w-full md:w-auto px-12 py-5 bg-[#11C76F] text-white font-black rounded-3xl shadow-2xl shadow-[#11C76F]/30 hover:bg-[#0EA85A] hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group">
-                                    Enviar Resposta <x-icon name="paper-plane-top" style="duotone" class="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                @else
-                    <div class="p-12 bg-gray-50 dark:bg-black/20 text-center relative z-10 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-50 to-transparent dark:from-black/20 dark:to-transparent"></div>
-                        <div class="relative">
-                            <div class="inline-flex items-center gap-3 px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl">
-                                <x-icon name="lock-keyhole" /> Atendimento Finalizado
-                            </div>
-                            <p class="text-[10px] font-black text-slate-400 mt-4 tracking-widest uppercase">Este histórico foi arquivado para fins de auditoria.</p>
-                        </div>
-                    </div>
-                @endif
+                <div
+                    id="ticket-chat-admin"
+                    class="flex-1 relative z-10"
+                    data-ticket-id="{{ $ticket->id }}"
+                    data-post-url="{{ route('admin.support.reply', $ticket) }}"
+                    data-messages-url="{{ route('admin.support.messages', $ticket) }}"
+                    data-initial-messages="{{ json_encode($initialMessagesForVue ?? []) }}"
+                    data-current-user-id="{{ auth()->id() }}"
+                    data-is-closed="{{ $ticket->status === 'closed' ? '1' : '0' }}"
+                    data-can-reply="{{ $ticket->status !== 'closed' ? '1' : '0' }}"
+                    data-context="admin"
+                    data-placeholder="Digite sua resposta oficial..."
+                    data-is-pro="{{ $ticket->user->isPro() ? '1' : '0' }}"
+                    data-status-options="{{ json_encode([
+                        ['value' => 'answered', 'label' => 'Marcar como Respondido'],
+                        ['value' => 'pending', 'label' => 'Manter Pendente'],
+                        ['value' => 'closed', 'label' => 'Encerrar Chamado'],
+                    ]) }}"
+                    data-csrf="{{ csrf_token() }}"
+                ></div>
             </div>
 
             <!-- Sidebar Intel -->
@@ -355,14 +298,8 @@
     </x-core::modal>
 
     @push('scripts')
+    @vite('resources/js/ticket-chat.js')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatMessages = document.getElementById('chat-messages');
-            if (chatMessages) {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        });
-
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();

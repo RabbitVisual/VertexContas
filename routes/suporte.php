@@ -22,6 +22,7 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:admin|support'])
 
     // Tickets
     Route::get('/tickets', [SupportAgentController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{ticket}/messages', [SupportAgentController::class, 'messages'])->name('tickets.messages');
     Route::get('/tickets/{ticket}', [SupportAgentController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [SupportAgentController::class, 'reply'])->name('tickets.reply');
     Route::post('/tickets/{ticket}/close', [SupportAgentController::class, 'close'])->name('tickets.close');

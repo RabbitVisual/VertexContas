@@ -52,6 +52,7 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::get('/tickets/{ticket}/exportar', [SupportTicketController::class, 'exportTicket'])->name('user.tickets.export-single');
     Route::get('/tickets/novo', [SupportTicketController::class, 'create'])->name('user.tickets.create');
     Route::post('/tickets', [SupportTicketController::class, 'store'])->name('user.tickets.store');
+    Route::get('/tickets/{ticket}/messages', [SupportTicketController::class, 'messages'])->name('user.tickets.messages');
     Route::get('/tickets/{ticket}', [SupportTicketController::class, 'show'])->name('user.tickets.show');
     Route::post('/tickets/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('user.tickets.reply');
     Route::post('/tickets/{ticket}/rate', [SupportTicketController::class, 'rate'])->name('user.tickets.rate');

@@ -2,6 +2,7 @@
 
 namespace Modules\PanelUser\Http\Controllers;
 
+use App\Helpers\TicketHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,15 +65,57 @@ class SupportTicketController extends Controller
         ]);
 
         // Notify Admins (System Wide or specific Role)
-        // Ideally we notify the 'support' role. For now, system wide info.
+        $preview = TicketHelper::safeMessagePreview($request->message);
+        $body = 'O usuário '.Auth::user()->name.' abriu um novo chamado: '.$ticket->subject;
+        if ($preview !== '') {
+            $body .= "\n\nPreview: ".$preview;
+        }
         $this->notificationService->sendToRole(
             'admin',
             'Novo Chamado de Suporte',
-            'O usuário '.Auth::user()->name.' abriu um novo chamado: '.$ticket->subject,
-            'info'
+            $body,
+            'info',
+            route('admin.support.show', $ticket)
         );
 
         return redirect()->route('user.tickets.show', $ticket)->with('success', 'Chamado aberto com sucesso!');
+    }
+
+    public function messages(Ticket $ticket)
+    {
+        if ($ticket->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $ticket->load('messages.user');
+        $messages = $ticket->messages->map(fn ($m) => $this->formatMessageForJson($m));
+
+        return response()->json([
+            'messages' => $messages->values()->all(),
+            'ticket' => [
+                'id' => $ticket->id,
+                'status' => $ticket->status,
+                'closed_at' => $ticket->closed_at?->toIso8601String(),
+            ],
+        ]);
+    }
+
+    protected function formatMessageForJson(TicketMessage $msg, ?int $ticketUserId = null): array
+    {
+        $senderName = $msg->is_system ? 'Vertex Inspection' : ($msg->is_admin_reply ? ($msg->user->name ?? 'Suporte') : ($msg->user->name ?? 'Cliente'));
+        $isOwn = !$msg->is_system && $msg->user_id === Auth::id();
+
+        return [
+            'id' => $msg->id,
+            'user_id' => $msg->user_id,
+            'message' => $msg->message,
+            'is_admin_reply' => (bool) $msg->is_admin_reply,
+            'is_system' => (bool) $msg->is_system,
+            'created_at' => $msg->created_at->toIso8601String(),
+            'sender_name' => $senderName,
+            'is_own' => $isOwn,
+            'user_photo' => $msg->user?->photo ? asset('storage/' . $msg->user->photo) : null,
+        ];
     }
 
     public function show(Ticket $ticket)
@@ -99,9 +142,11 @@ class SupportTicketController extends Controller
             ->where('status', 'active')
             ->exists();
 
+        $initialMessagesForVue = $ticket->messages->map(fn ($m) => $this->formatMessageForJson($m))->values()->all();
+
         return view('paneluser::tickets.show', compact(
             'ticket', 'isPro', 'inspectionActive',
-            'firstResponseAt', 'firstResponseHours'
+            'firstResponseAt', 'firstResponseHours', 'initialMessagesForVue'
         ));
     }
 
@@ -116,24 +161,38 @@ class SupportTicketController extends Controller
         }
 
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required|string|max:10000',
         ]);
 
-        TicketMessage::create([
+        $message = TicketMessage::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
             'message' => $request->message,
         ]);
+        $message->load('user');
 
         $ticket->update(['last_reply_at' => now(), 'status' => 'open']); // Re-open if user replies
 
-        // Notify Agents
+        // Notify Agents (com preview da mensagem)
+        $preview = TicketHelper::safeMessagePreview($request->message);
+        $body = 'O usuário enviou uma nova mensagem no chamado #'.$ticket->id.': '.$ticket->subject;
+        if ($preview !== '') {
+            $body .= "\n\nPreview: ".$preview;
+        }
         $this->notificationService->sendToRole(
             'admin',
             'Resposta do Usuário no Chamado #'.$ticket->id,
-            'O usuário enviou uma nova mensagem.',
-            'info'
+            $body,
+            'info',
+            route('admin.support.show', $ticket)
         );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => $this->formatMessageForJson($message, $ticket->user_id),
+                'ticket' => ['status' => $ticket->fresh()->status],
+            ], 201);
+        }
 
         return back()->with('success', 'Mensagem enviada!');
     }

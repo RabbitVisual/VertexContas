@@ -2,6 +2,7 @@
 
 namespace Modules\PanelAdmin\Http\Controllers;
 
+use App\Helpers\TicketHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -50,14 +51,51 @@ class AdminSupportController extends Controller
     }
 
     /**
+     * Get messages as JSON (for polling).
+     */
+    public function messages(Ticket $ticket)
+    {
+        $ticket->load(['messages.user', 'user']);
+        $messages = $ticket->messages->map(fn ($m) => $this->formatMessageForJson($m, $ticket));
+
+        return response()->json([
+            'messages' => $messages->values()->all(),
+            'ticket' => [
+                'id' => $ticket->id,
+                'status' => $ticket->status,
+                'closed_at' => $ticket->closed_at?->toIso8601String(),
+            ],
+        ]);
+    }
+
+    protected function formatMessageForJson(TicketMessage $msg, ?Ticket $ticket = null): array
+    {
+        $senderName = $msg->is_system ? 'Vertex Inspection' : ($msg->is_admin_reply ? ($msg->user->name ?? 'Suporte') : ($ticket?->user->name ?? 'Cliente'));
+        $isOwn = !$msg->is_system && $msg->user_id === Auth::id();
+
+        return [
+            'id' => $msg->id,
+            'user_id' => $msg->user_id,
+            'message' => $msg->message,
+            'is_admin_reply' => (bool) $msg->is_admin_reply,
+            'is_system' => (bool) $msg->is_system,
+            'created_at' => $msg->created_at->toIso8601String(),
+            'sender_name' => $senderName,
+            'is_own' => $isOwn,
+            'user_photo' => $msg->user?->photo ? asset('storage/' . $msg->user->photo) : null,
+        ];
+    }
+
+    /**
      * Show the specified ticket.
      */
     public function show(Ticket $ticket)
     {
         $ticket->load(['user', 'assignedAgent', 'messages.user']);
         $agents = User::role(['support', 'admin'])->get();
+        $initialMessagesForVue = $ticket->messages->map(fn ($m) => $this->formatMessageForJson($m, $ticket))->values()->all();
 
-        return view('paneladmin::support.show', compact('ticket', 'agents'));
+        return view('paneladmin::support.show', compact('ticket', 'agents', 'initialMessagesForVue'));
     }
 
     /**
@@ -106,32 +144,45 @@ class AdminSupportController extends Controller
     public function reply(Request $request, Ticket $ticket)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required|string|max:10000',
             'status' => 'required|in:open,pending,answered,closed',
         ]);
 
-        TicketMessage::create([
+        $message = TicketMessage::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
             'message' => $request->message,
             'is_admin_reply' => true,
         ]);
 
+        $message->load('user');
+
         $ticket->update([
             'status' => $request->status,
             'last_reply_at' => now(),
-            // Auto-assign to self if unassigned and replying
             'assigned_agent_id' => $ticket->assigned_agent_id ?? Auth::id(),
         ]);
 
-        // Notify User
+        // Notify User (com preview da mensagem)
+        $preview = TicketHelper::safeMessagePreview($request->message);
+        $body = 'O administrador respondeu ao seu ticket: ' . $ticket->subject;
+        if ($preview !== '') {
+            $body .= "\n\nPreview: " . $preview;
+        }
         $this->notificationService->sendToUser(
             $ticket->user,
             'Nova resposta no chamado #' . $ticket->id,
-            'O administrador respondeu ao seu ticket: ' . $ticket->subject,
+            $body,
             'info',
             route('user.tickets.show', $ticket)
         );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => $this->formatMessageForJson($message, $ticket),
+                'ticket' => ['status' => $ticket->fresh()->status],
+            ], 201);
+        }
 
         return back()->with('success', 'Resposta enviada com sucesso!');
     }

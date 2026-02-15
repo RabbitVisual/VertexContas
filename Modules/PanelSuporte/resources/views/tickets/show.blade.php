@@ -64,84 +64,29 @@
     <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
         <!-- Main Conversation Area -->
         <div class="xl:col-span-3 space-y-8">
-            <!-- Messages Container -->
-            <div class="flex flex-col space-y-8 bg-white/50 dark:bg-slate-900/50 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm backdrop-blur-sm">
-
-                @forelse($ticket->messages as $message)
-                    @php
-                        $isSystem = $message->is_system ?? false;
-                        $senderLabel = $isSystem ? 'Vertex Inspection' : ($message->is_admin_reply ? 'Equipe de Suporte' : ($message->user->name ?? 'Cliente'));
-                    @endphp
-                    <div class="flex gap-4 {{ $isSystem ? 'justify-center' : ($message->is_admin_reply ? 'flex-row-reverse' : '') }} group">
-                        @if(!$isSystem)
-                        <!-- Avatar -->
-                        <div class="flex-shrink-0 mt-1">
-                            @if($message->is_admin_reply)
-                                <div class="relative">
-                                    @if($message->user && $message->user->photo)
-                                        <img src="{{ asset('storage/' . $message->user->photo) }}" class="w-12 h-12 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-900 shadow-sm" title="{{ $message->user->name }} (Suporte)" />
-                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary border-2 border-white dark:border-slate-900 flex items-center justify-center shadow-sm">
-                                            <x-icon name="headset" style="solid" class="text-[10px] text-white" />
-                                        </div>
-                                    @else
-                                        <div class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 ring-4 ring-white dark:ring-slate-900">
-                                            <x-icon name="headset" style="duotone" class="text-xl" />
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                <div class="relative">
-                                    @if($message->user && $message->user->photo)
-                                        <img src="{{ asset('storage/' . $message->user->photo) }}" class="w-12 h-12 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-900 shadow-sm" />
-                                    @else
-                                        <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 flex items-center justify-center font-black text-sm ring-4 ring-white dark:ring-slate-900 shadow-sm">
-                                            {{ substr($message->user->name ?? 'U', 0, 1) }}
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
-                        @endif
-
-                        <!-- Message Content -->
-                        <div class="flex flex-col {{ $isSystem ? 'items-center w-full' : ($message->is_admin_reply ? 'items-end' : 'items-start') }} max-w-[85%] {{ $isSystem ? 'max-w-2xl mx-auto' : '' }}">
-                            <div class="flex items-center gap-3 mb-1.5 px-1 {{ $isSystem ? 'justify-center' : '' }}">
-                                @if($isSystem)
-                                    <div class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-500/20">
-                                        <x-icon name="magnifying-glass-chart" style="solid" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                                        <span class="text-[11px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">{{ $senderLabel }}</span>
-                                    </div>
-                                @else
-                                    <span class="text-[11px] font-black text-slate-800 dark:text-gray-200 uppercase tracking-widest">{{ $senderLabel }}</span>
-                                @endif
-                                <span class="text-[10px] text-gray-400 font-bold tracking-tighter">{{ $message->created_at->format('H:i') }}</span>
-                            </div>
-
-                            <div class="relative p-5 rounded-[2rem] shadow-sm italic-none leading-relaxed transition-all group-hover:shadow-md
-                                {{ $isSystem
-                                    ? 'bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-900 dark:text-amber-100'
-                                    : ($message->is_admin_reply
-                                        ? 'bg-primary text-white rounded-tr-none'
-                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-gray-300 rounded-tl-none border border-gray-100 dark:border-gray-700')
-                                }}">
-                                <p class="text-[14px] font-medium whitespace-pre-wrap">{{ $message->message }}</p>
-                            </div>
-
-                            <div class="mt-2 px-1">
-                                <span class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">{{ $message->created_at->format('d \d\e M, Y') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="py-20 text-center opacity-30 italic-none">
-                        <x-icon name="message-slash" style="duotone" class="text-6xl mb-4" />
-                        <p class="font-black text-sm uppercase tracking-widest">Nenhuma mensagem registrada</p>
-                    </div>
-                @endforelse
-
+            <div class="bg-white/50 dark:bg-slate-900/50 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm backdrop-blur-sm overflow-hidden">
+                <div
+                    id="ticket-chat-support"
+                    class="flex-1"
+                    data-ticket-id="{{ $ticket->id }}"
+                    data-post-url="{{ route('support.tickets.reply', $ticket) }}"
+                    data-messages-url="{{ route('support.tickets.messages', $ticket) }}"
+                    data-initial-messages="{{ json_encode($initialMessagesForVue ?? []) }}"
+                    data-current-user-id="{{ auth()->id() }}"
+                    data-is-closed="{{ $ticket->status === 'closed' ? '1' : '0' }}"
+                    data-can-reply="{{ $ticket->status !== 'closed' ? '1' : '0' }}"
+                    data-context="support"
+                    data-placeholder="Escreva aqui sua resposta técnica..."
+                    data-is-pro="{{ $ticket->user->isPro() ? '1' : '0' }}"
+                    data-status-options="{{ json_encode([
+                        ['value' => 'answered', 'label' => 'Resolvido / Respondido'],
+                        ['value' => 'pending', 'label' => 'Aguardar Cliente'],
+                        ['value' => 'open', 'label' => 'Reabrir / Manter Aberto'],
+                    ]) }}"
+                    data-csrf="{{ csrf_token() }}"
+                ></div>
             </div>
 
-            <!-- Reply Interaction Area -->
             @if($ticket->status === 'closed')
                 <div class="bg-gray-50 dark:bg-slate-900 rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 shadow-inner text-center">
                     <div class="w-16 h-16 bg-gray-200 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
@@ -167,61 +112,6 @@
                             Aguardando avaliação do cliente
                         </div>
                     @endif
-                </div>
-            @else
-                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 shadow-xl transition-all focus-within:ring-4 focus-within:ring-primary/5">
-                    <form action="{{ route('support.tickets.reply', $ticket) }}" method="POST" class="space-y-6">
-                        @csrf
-                        <div class="relative group">
-                            <div class="absolute top-4 left-4 text-primary opacity-20 group-focus-within:opacity-100 transition-opacity">
-                                <x-icon name="pen-nib" style="duotone" class="text-xl" />
-                            </div>
-                            <textarea name="message" rows="5" class="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[2rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-all resize-none" placeholder="Escreva aqui sua resposta técnica..." required></textarea>
-                        </div>
-
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
-                             <div class="flex items-center gap-4 w-full md:w-auto">
-                                 <div class="relative w-full md:w-64" x-data="{
-                                    open: false,
-                                    status: '{{ $ticket->status }}',
-                                    options: [
-                                        { value: 'answered', label: 'Resolvido / Respondido', icon: 'check-circle', color: 'text-emerald-500' },
-                                        { value: 'pending', label: 'Aguardar Cliente', icon: 'clock', color: 'text-amber-500' },
-                                        { value: 'open', label: 'Reabrir / Manter Aberto', icon: 'circle-dot', color: 'text-primary' }
-                                    ],
-                                    get activeOption() {
-                                        return this.options.find(o => o.value === this.status) || this.options[0];
-                                    }
-                                 }">
-                                    <input type="hidden" name="status" :value="status">
-
-                                    <button type="button" @click="open = !open" class="w-full flex items-center justify-between pl-4 pr-10 py-3 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-xs font-black text-slate-700 dark:text-gray-300 focus:ring-2 focus:ring-primary/20 transition-all hover:bg-gray-100 dark:hover:bg-slate-700 relative">
-                                        <div class="flex items-center gap-2">
-                                            <x-icon ::name="activeOption.icon" ::class="activeOption.color" />
-                                            <span x-text="activeOption.label"></span>
-                                        </div>
-                                        <x-icon name="chevron-down" class="text-gray-400 pointer-events-none text-[10px] transition-transform duration-200" ::class="open ? 'rotate-180' : ''" />
-                                    </button>
-
-                                    <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="absolute bottom-full mb-3 left-0 w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-3xl shadow-2xl p-2 z-50 overflow-hidden" x-cloak>
-                                        <template x-for="option in options" :key="option.value">
-                                            <button type="button" @click="status = option.value; open = false" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left group">
-                                                <div class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 group-hover:bg-white dark:group-hover:bg-slate-700 transition-colors">
-                                                    <x-icon ::name="option.icon" ::class="option.color" />
-                                                </div>
-                                                <span class="text-[11px] font-black text-slate-700 dark:text-gray-300 uppercase tracking-widest" x-text="option.label"></span>
-                                            </button>
-                                        </template>
-                                    </div>
-                                 </div>
-                             </div>
-
-                             <button type="submit" class="w-full md:w-auto px-10 py-3.5 bg-primary hover:bg-primary-dark text-white font-black text-sm rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
-                                 <x-icon name="paper-plane" style="solid" class="text-sm" />
-                                 Publicar Resposta
-                             </button>
-                        </div>
-                    </form>
                 </div>
             @endif
         </div>
@@ -355,4 +245,8 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+@vite('resources/js/ticket-chat.js')
+@endpush
 </x-panelsuporte::layouts.master>
