@@ -16,6 +16,8 @@ class TemplateDocumentService
 
     public const TYPE_CATEGORY_RANKING = 'category_ranking';
 
+    public const TYPE_EXTRATO = 'extrato';
+
     public function __construct(
         protected SettingService $settingService
     ) {}
@@ -87,7 +89,7 @@ class TemplateDocumentService
             'company_email' => $settings->get('company_email') ?? '',
             'document_footer_text' => $settings->get('document_footer_text') ?? 'Vertex Contas - Sistema de Gestão Financeira',
             'app_url' => $general->get('app_url') ?? config('app.url'),
-            'logo_path' => $branding->get('app_logo') ? asset('storage/' . ltrim(str_replace('storage/', '', $branding->get('app_logo')), '/')) : asset('storage/logos/logo.svg'),
+            'logo_path' => $branding->get('app_logo') ? asset($branding->get('app_logo')) : asset('storage/logos/logo.svg'),
         ];
     }
 
@@ -95,7 +97,7 @@ class TemplateDocumentService
     {
         return match ($documentType) {
             self::TYPE_INVOICE => (int) $this->settingService->get('limit_download_invoice_per_day', 10),
-            self::TYPE_CASHFLOW, self::TYPE_CATEGORY_RANKING => (int) $this->settingService->get('limit_download_report_per_day', 5),
+            self::TYPE_CASHFLOW, self::TYPE_CATEGORY_RANKING, self::TYPE_EXTRATO => (int) $this->settingService->get('limit_download_report_per_day', 5),
             default => 5,
         };
     }

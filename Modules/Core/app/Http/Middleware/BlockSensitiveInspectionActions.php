@@ -26,9 +26,15 @@ class BlockSensitiveInspectionActions
      * Rotas de exportação: bloqueadas quando usuário negou exibir dados financeiros.
      */
     private const FINANCIAL_EXPORT_ROUTES = [
-        'core.reports.export.cashflow.pdf',
+        'core.reports.cashflow.view',
         'core.reports.export.cashflow.csv',
         'core.reports.export.categories.csv',
+        'core.reports.categories.view',
+        'core.reports.extrato.view',
+        'core.reports.export.extrato.csv',
+        'core.reports.export.extrato.xlsx',
+        'core.reports.export.cashflow.csv',
+        'core.reports.export.cashflow.xlsx',
     ];
 
     public function handle(Request $request, Closure $next): Response

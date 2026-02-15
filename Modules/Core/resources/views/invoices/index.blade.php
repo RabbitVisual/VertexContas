@@ -63,6 +63,7 @@
                         <th scope="col" class="px-6 py-4">Valor</th>
                         <th scope="col" class="px-6 py-4">Status</th>
                         <th scope="col" class="px-6 py-4">Referência</th>
+                        <th scope="col" class="px-6 py-4">Ação</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/5">
@@ -90,10 +91,16 @@
                             <td class="px-6 py-4 font-mono text-xs text-gray-400 dark:text-gray-500">
                                 {{ Str::limit($invoice->external_id ?? '-', 14) }}
                             </td>
+                            <td class="px-6 py-4">
+                                <a href="{{ route('core.invoices.view', $invoice) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
+                                    <x-icon name="print" style="solid" class="w-4 h-4" />
+                                    Ver / Imprimir
+                                </a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-0">
+                            <td colspan="6" class="p-0">
                                 <div class="flex flex-col items-center justify-center py-24 text-center bg-gray-50 dark:bg-gray-950/50" role="status">
                                     <div class="w-24 h-24 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center text-gray-300 dark:text-gray-700 mb-6 shadow-sm border border-gray-100 dark:border-white/5" aria-hidden="true">
                                         <x-icon name="file-invoice" style="duotone" class="w-12 h-12 opacity-40 dark:opacity-20" />

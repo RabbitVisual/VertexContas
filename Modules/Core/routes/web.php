@@ -10,6 +10,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/invoices', [\Modules\Core\Http\Controllers\InvoiceController::class, 'index'])
         ->middleware('pro')
         ->name('core.invoices.index');
+    Route::get('/invoices/{invoice}/view', [\Modules\Core\Http\Controllers\InvoiceController::class, 'show'])
+        ->middleware('pro')
+        ->name('core.invoices.view');
 
     // Accounts CRUD
     Route::resource('accounts', \Modules\Core\Http\Controllers\AccountController::class)->names('core.accounts');
@@ -37,9 +40,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [\Modules\Core\Http\Controllers\ReportsController::class, 'index'])->name('index');
         Route::get('/cashflow', [\Modules\Core\Http\Controllers\ReportsController::class, 'cashFlow'])->name('cashflow');
         Route::get('/categories', [\Modules\Core\Http\Controllers\ReportsController::class, 'categoryRanking'])->name('categories');
+        Route::get('/extrato', [\Modules\Core\Http\Controllers\ReportsController::class, 'extrato'])->middleware('pro')->name('extrato');
         Route::get('/export/cashflow/csv', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportCashFlowCsv'])->name('export.cashflow.csv');
+        Route::get('/export/cashflow/xlsx', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportCashFlowXlsx'])->name('export.cashflow.xlsx');
         Route::get('/export/categories/csv', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportCategoryRankingCsv'])->name('export.categories.csv');
-        Route::get('/export/cashflow/pdf', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportCashFlowPdf'])->name('export.cashflow.pdf');
+        Route::get('/export/extrato/csv', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportExtratoCsv'])->name('export.extrato.csv');
+        Route::get('/export/extrato/xlsx', [\Modules\Core\Http\Controllers\ReportsController::class, 'exportExtratoXlsx'])->name('export.extrato.xlsx');
+        Route::get('/cashflow/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewCashFlow'])->name('cashflow.view');
+        Route::get('/categories/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewCategoryRanking'])->name('categories.view');
+        Route::get('/extrato/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewExtrato'])->name('extrato.view');
     });
 
     Route::resource('cores', CoreController::class)->names('core');
