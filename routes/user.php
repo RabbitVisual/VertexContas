@@ -28,6 +28,7 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
 
     // Subscription
     Route::get('/subscription', [SubscriptionController::class, 'index'])->name('user.subscription.index');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('user.subscription.cancel');
 
     // Profile
     Route::get('/perfil', [ProfileController::class, 'show'])->name('user.profile.show');

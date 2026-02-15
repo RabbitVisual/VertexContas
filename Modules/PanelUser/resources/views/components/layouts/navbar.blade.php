@@ -143,7 +143,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('user.profile.show') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <a href="{{ url('/user/perfil') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <x-icon name="user" style="solid" class="w-4 h-4 text-gray-400" />
                                     Perfil
                                 </a>

@@ -43,6 +43,7 @@ class WebhookController extends Controller
 
         match ($type) {
             'checkout.session.completed' => $this->handleStripeCheckoutCompleted($payload),
+            'customer.subscription.deleted' => $this->handleStripeSubscriptionDeleted($payload),
             'invoice.paid' => $this->handleStripeInvoicePaid($payload),
             'invoice.payment_failed' => $this->handleStripeInvoiceFailed($payload),
             default => null,
@@ -143,6 +144,39 @@ class WebhookController extends Controller
             );
 
             $this->upgradeUserToPro($userId, $metadata);
+        });
+    }
+
+    protected function handleStripeSubscriptionDeleted(array $payload): void
+    {
+        $object = $payload['data']['object'] ?? [];
+        $subscriptionId = $object['id'] ?? null;
+        if (! $subscriptionId) {
+            return;
+        }
+        $sub = Subscription::where('external_subscription_id', $subscriptionId)->first();
+        if (! $sub) {
+            return;
+        }
+        DB::transaction(function () use ($sub) {
+            $sub->update(['status' => 'canceled', 'canceled_at' => now()]);
+            $user = User::find($sub->user_id);
+            if ($user && $user->hasRole('pro_user')) {
+                $user->removeRole('pro_user');
+                $user->assignRole('free_user');
+                Log::info("User {$user->id} downgraded to free after Stripe subscription deleted.");
+                try {
+                    app(\Modules\Notifications\Services\NotificationService::class)->sendToUser(
+                        $user,
+                        'Assinatura Vertex PRO encerrada',
+                        'Sua assinatura foi encerrada. Você continua com acesso ao plano gratuito. Para voltar ao PRO, assine novamente em Planos.',
+                        'info',
+                        route('user.subscription.index')
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to send subscription ended notification: ' . $e->getMessage());
+                }
+            }
         });
     }
 
