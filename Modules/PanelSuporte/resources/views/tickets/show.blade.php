@@ -68,7 +68,12 @@
             <div class="flex flex-col space-y-8 bg-white/50 dark:bg-slate-900/50 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm backdrop-blur-sm">
 
                 @forelse($ticket->messages as $message)
-                    <div class="flex gap-4 {{ $message->is_admin_reply ? 'flex-row-reverse' : '' }} group">
+                    @php
+                        $isSystem = $message->is_system ?? false;
+                        $senderLabel = $isSystem ? 'Vertex Inspection' : ($message->is_admin_reply ? 'Equipe de Suporte' : ($message->user->name ?? 'Cliente'));
+                    @endphp
+                    <div class="flex gap-4 {{ $isSystem ? 'justify-center' : ($message->is_admin_reply ? 'flex-row-reverse' : '') }} group">
+                        @if(!$isSystem)
                         <!-- Avatar -->
                         <div class="flex-shrink-0 mt-1">
                             @if($message->is_admin_reply)
@@ -86,28 +91,38 @@
                                 </div>
                             @else
                                 <div class="relative">
-                                    @if($message->user->photo)
+                                    @if($message->user && $message->user->photo)
                                         <img src="{{ asset('storage/' . $message->user->photo) }}" class="w-12 h-12 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-900 shadow-sm" />
                                     @else
                                         <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 flex items-center justify-center font-black text-sm ring-4 ring-white dark:ring-slate-900 shadow-sm">
-                                            {{ substr($message->user->name, 0, 1) }}
+                                            {{ substr($message->user->name ?? 'U', 0, 1) }}
                                         </div>
                                     @endif
                                 </div>
                             @endif
                         </div>
+                        @endif
 
                         <!-- Message Content -->
-                        <div class="flex flex-col {{ $message->is_admin_reply ? 'items-end' : 'items-start' }} max-w-[85%]">
-                            <div class="flex items-center gap-3 mb-1.5 px-1">
-                                <span class="text-[11px] font-black text-slate-800 dark:text-gray-200 uppercase tracking-widest">{{ $message->is_admin_reply ? 'Equipe de Suporte' : $message->user->name }}</span>
+                        <div class="flex flex-col {{ $isSystem ? 'items-center w-full' : ($message->is_admin_reply ? 'items-end' : 'items-start') }} max-w-[85%] {{ $isSystem ? 'max-w-2xl mx-auto' : '' }}">
+                            <div class="flex items-center gap-3 mb-1.5 px-1 {{ $isSystem ? 'justify-center' : '' }}">
+                                @if($isSystem)
+                                    <div class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-500/20">
+                                        <x-icon name="magnifying-glass-chart" style="solid" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                                        <span class="text-[11px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">{{ $senderLabel }}</span>
+                                    </div>
+                                @else
+                                    <span class="text-[11px] font-black text-slate-800 dark:text-gray-200 uppercase tracking-widest">{{ $senderLabel }}</span>
+                                @endif
                                 <span class="text-[10px] text-gray-400 font-bold tracking-tighter">{{ $message->created_at->format('H:i') }}</span>
                             </div>
 
                             <div class="relative p-5 rounded-[2rem] shadow-sm italic-none leading-relaxed transition-all group-hover:shadow-md
-                                {{ $message->is_admin_reply
-                                    ? 'bg-primary text-white rounded-tr-none'
-                                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-gray-300 rounded-tl-none border border-gray-100 dark:border-gray-700'
+                                {{ $isSystem
+                                    ? 'bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-900 dark:text-amber-100'
+                                    : ($message->is_admin_reply
+                                        ? 'bg-primary text-white rounded-tr-none'
+                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-gray-300 rounded-tl-none border border-gray-100 dark:border-gray-700')
                                 }}">
                                 <p class="text-[14px] font-medium whitespace-pre-wrap">{{ $message->message }}</p>
                             </div>

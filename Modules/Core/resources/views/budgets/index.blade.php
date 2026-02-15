@@ -28,10 +28,12 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina limites por categoria e acompanhe o consumo. Edite quando quiser sem avisos de limite.</p>
             </div>
             @can('create', \Modules\Core\Models\Budget::class)
-                <a href="{{ route('core.budgets.create') }}" class="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
-                    <x-icon name="plus" style="solid" class="w-5 h-5" />
-                    Novo orçamento
-                </a>
+                @if(!($inspectionReadOnly ?? false))
+                    <a href="{{ route('core.budgets.create') }}" class="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                        <x-icon name="plus" style="solid" class="w-5 h-5" />
+                        Novo orçamento
+                    </a>
+                @endif
             @endcan
         </div>
 
@@ -44,7 +46,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total orçado</p>
-                        <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($totalBudgeted, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums"><x-core::financial-value :value="$totalBudgeted" /></p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -53,7 +55,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total utilizado</p>
-                        <p class="sensitive-value text-xl font-black text-rose-600 dark:text-rose-400 tabular-nums">R$ {{ number_format($totalSpent, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-xl font-black text-rose-600 dark:text-rose-400 tabular-nums"><x-core::financial-value :value="$totalSpent" /></p>
                     </div>
                 </div>
                 <div class="col-span-2 md:col-span-1 flex items-center gap-4">
@@ -178,29 +180,31 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                            <a href="{{ route('core.budgets.edit', $budget) }}" class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" title="Editar">
-                                <x-icon name="pen" style="solid" class="w-4 h-4" />
-                            </a>
-                            <form action="{{ route('core.budgets.destroy', $budget) }}" method="POST" onsubmit="return confirm('Excluir este orçamento?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 rounded-xl text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-colors" title="Excluir">
-                                    <x-icon name="trash" style="solid" class="w-4 h-4" />
-                                </button>
-                            </form>
-                        </div>
+                        @if(!($inspectionReadOnly ?? false))
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('core.budgets.edit', $budget) }}" class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" title="Editar">
+                                    <x-icon name="pen" style="solid" class="w-4 h-4" />
+                                </a>
+                                <form action="{{ route('core.budgets.destroy', $budget) }}" method="POST" onsubmit="return confirm('Excluir este orçamento?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 rounded-xl text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-colors" title="Excluir">
+                                        <x-icon name="trash" style="solid" class="w-4 h-4" />
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="space-y-3">
                         <div class="flex justify-between items-end">
                             <div>
                                 <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gasto atual</p>
-                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($budget->spent_amount, 2, ',', '.') }}</p>
+                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums"><x-core::financial-value :value="$budget->spent_amount" /></p>
                             </div>
                             <div class="text-right">
                                 <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Limite</p>
-                                <p class="text-sm font-bold text-gray-600 dark:text-gray-300 tabular-nums">R$ {{ number_format($budget->limit_amount, 2, ',', '.') }}</p>
+                                <p class="text-sm font-bold text-gray-600 dark:text-gray-300 tabular-nums"><x-core::financial-value :value="$budget->limit_amount" /></p>
                             </div>
                         </div>
                         <div class="h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -209,9 +213,9 @@
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                             <span class="{{ $textClass }}">{{ number_format($budget->usage_percentage, 1) }}% utilizado</span>
                             @if(!$isExceeded)
-                                <span class="text-gray-500 dark:text-gray-400">R$ {{ number_format($remaining, 2, ',', '.') }} disponíveis</span>
+                                <span class="text-gray-500 dark:text-gray-400"><x-core::financial-value :value="$remaining" /> disponíveis</span>
                             @else
-                                <span class="text-rose-600 dark:text-rose-400">R$ {{ number_format(abs($remaining), 2, ',', '.') }} acima</span>
+                                <span class="text-rose-600 dark:text-rose-400"><x-core::financial-value :value="abs($remaining)" /> acima</span>
                             @endif
                         </div>
                     </div>
@@ -225,15 +229,17 @@
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem orçamentos</h3>
                 <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Defina limites por categoria para controlar seus gastos.</p>
                 @can('create', \Modules\Core\Models\Budget::class)
-                    <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
-                        Criar meu primeiro orçamento
-                    </a>
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                            <x-icon name="plus" style="solid" class="w-5 h-5" />
+                            Criar meu primeiro orçamento
+                        </a>
+                    @endif
                 @endcan
             </div>
         @endforelse
 
-        @if($budgets->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Budget::class))
+        @if($budgets->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Budget::class) && !($inspectionReadOnly ?? false))
             <a href="{{ route('core.budgets.create') }}" class="group flex flex-col items-center justify-center min-h-[280px] rounded-3xl border-2 border-dashed border-gray-200 dark:border-white/10 hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                 <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-3 transition-colors">
                     <x-icon name="plus" style="solid" class="w-7 h-7 text-gray-400 dark:text-gray-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />

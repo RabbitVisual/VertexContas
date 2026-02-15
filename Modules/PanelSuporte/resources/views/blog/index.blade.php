@@ -7,9 +7,10 @@
         </a>
     </div>
 
-    <div class="bg-white dark:bg-slate-800 shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-            <thead class="bg-gray-50 dark:bg-slate-700/50">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+        <table class="min-w-full text-left border-collapse">
+            <thead class="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-800/95 backdrop-blur border-b border-slate-200 dark:border-slate-700">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Título</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Autor</th>
@@ -19,9 +20,9 @@
                     <th scope="col" class="relative px-6 py-3"><span class="sr-only">Ações</span></th>
                 </tr>
             </thead>
-            <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
                 @foreach($posts as $post)
-                <tr>
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/20">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             @if($post->featured_image)
@@ -61,8 +62,11 @@
                 @endforeach
             </tbody>
         </table>
-        <div class="px-6 py-4">
+        </div>
+        @if($posts->hasPages())
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700">
             {{ $posts->links() }}
         </div>
+        @endif
     </div>
 </x-panelsuporte::layouts.master>

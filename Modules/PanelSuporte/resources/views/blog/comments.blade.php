@@ -25,19 +25,19 @@
                                 <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ $comment->user->name ?? 'Usuário Desconhecido' }}</h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $comment->created_at->diffForHumans() }}</p>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Em: <a href="{{ route('blog.show', $comment->post->slug) }}" class="text-indigo-600 hover:text-indigo-900" target="_blank">{{ $comment->post->title }}</a></p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Em: <a href="{{ route('paneluser.blog.show', $comment->post->slug) }}" class="text-indigo-600 hover:text-indigo-900" target="_blank">{{ $comment->post->title }}</a></p>
                             <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">{{ $comment->content }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-end space-x-3">
-                        <form action="{{ route('blog.comments.reject', $comment->id) }}" method="POST" onsubmit="return confirm('Rejeitar e excluir este comentário?');">
+                        <form action="{{ route('suporte.blog.comments.reject', $comment) }}" method="POST" onsubmit="return confirm('Rejeitar e excluir este comentário?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                 Rejeitar
                             </button>
                         </form>
-                        <form action="{{ route('blog.comments.approve', $comment->id) }}" method="POST">
+                        <form action="{{ route('suporte.blog.comments.approve', $comment) }}" method="POST">
                             @csrf
                             <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                 Aprovar

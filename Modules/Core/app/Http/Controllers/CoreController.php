@@ -16,6 +16,7 @@ use Modules\Core\Models\Budget;
 use Modules\Core\Models\Goal;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\FinancialHealthService;
+use Modules\Core\Services\InspectionGuard;
 use Modules\Core\Services\SubscriptionLimitService;
 
 class CoreController extends Controller
@@ -115,6 +116,10 @@ class CoreController extends Controller
 
         // Prepare category spending data for chart
         $categoryData = $this->prepareCategoryData($user);
+
+        // Mask chart data when inspection active without financial permission
+        $cashFlowData = InspectionGuard::maskChartData($cashFlowData);
+        $categoryData = InspectionGuard::maskChartData($categoryData);
 
         // Recent transactions for Pro dashboard table
         $recentTransactions = Transaction::where('user_id', $user->id)

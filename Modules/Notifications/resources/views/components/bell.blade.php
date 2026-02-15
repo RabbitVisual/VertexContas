@@ -125,7 +125,9 @@
             fetchNotifications(silent = false) {
                 if (!silent) this.loading = true;
 
-                fetch('/notifications/unread')
+                fetch('/notifications/unread', {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
                     .then(response => response.json())
                     .then(data => {
                         // Check for new notifications

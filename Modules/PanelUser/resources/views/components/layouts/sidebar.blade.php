@@ -72,7 +72,7 @@
                     </a>
                     @endif
                     @can('create', \Modules\Core\Models\Transaction::class)
-                    @if(Route::has('core.transactions.create'))
+                    @if(Route::has('core.transactions.create') && !($inspectionReadOnly ?? false))
                     <a href="{{ route('core.transactions.create') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('core.transactions.create') ? $proNavActive : $proNavInactive }}">
                         <x-icon name="plus" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('core.transactions.create') ? $proIconActive : $proIconInactive }}" />
@@ -80,7 +80,7 @@
                     </a>
                     @endif
                     @endcan
-                    @if(Route::has('core.transactions.transfer'))
+                    @if(Route::has('core.transactions.transfer') && !($inspectionReadOnly ?? false))
                     <a href="{{ route('core.transactions.transfer') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('core.transactions.transfer') ? $proNavActive : $proNavInactive }}">
                         <x-icon name="right-left" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('core.transactions.transfer') ? $proIconActive : $proIconInactive }}" />
@@ -101,7 +101,7 @@
                         Orçamentos
                     </a>
                     @endif
-                    @if(Route::has('core.income.index'))
+                    @if(Route::has('core.income.index') && !($inspectionReadOnly ?? false))
                     <a href="{{ route('core.income.index') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('core.income.*') ? $proNavActive : $proNavInactive }}">
                         <x-icon name="money-bill-trend-up" style="duotone" class="w-5 shrink-0 mr-3 {{ request()->routeIs('core.income.*') ? $proIconActive : $proIconInactive }}" />
@@ -154,13 +154,13 @@
                     </a>
 
                     {{-- Conteúdo --}}
-                    @if(Route::has('blog.index'))
+                    @if(Route::has('paneluser.blog.index'))
                     <div class="pt-4 pb-2">
                         <p class="{{ $proSectionLabel }}">Conteúdo</p>
                     </div>
-                    <a href="{{ route('blog.index') }}"
-                        class="{{ $proNavBase }} {{ request()->routeIs('blog.*') ? $proNavActive : $proNavInactive }}">
-                        <x-icon name="newspaper" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('blog.*') ? $proIconActive : $proIconInactive }}" />
+                    <a href="{{ route('paneluser.blog.index') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('paneluser.blog.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="newspaper" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('paneluser.blog.*') ? $proIconActive : $proIconInactive }}" />
                         Blog
                     </a>
                     @endif
@@ -208,7 +208,7 @@
                     </li>
                     @endif
                     @can('create', \Modules\Core\Models\Transaction::class)
-                    @if(Route::has('core.transactions.create'))
+                    @if(Route::has('core.transactions.create') && !($inspectionReadOnly ?? false))
                     <li>
                         <a href="{{ route('core.transactions.create') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.transactions.create') ? $navItemActiveClass : '' }}">
                             <x-icon name="plus" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.transactions.create') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
@@ -217,7 +217,7 @@
                     </li>
                     @endif
                     @endcan
-                    @if(Route::has('core.transactions.transfer'))
+                    @if(Route::has('core.transactions.transfer') && !($inspectionReadOnly ?? false))
                     <li>
                         <a href="{{ route('core.transactions.transfer') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.transactions.transfer') ? $navItemActiveClass : '' }}">
                             <x-icon name="right-left" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.transactions.transfer') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
@@ -243,7 +243,7 @@
                         </a>
                     </li>
                     @endif
-                    @if(Route::has('core.income.index'))
+                    @if(Route::has('core.income.index') && !($inspectionReadOnly ?? false))
                     <li>
                         <a href="{{ route('core.income.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.income.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="money-bill-trend-up" style="duotone" class="w-5 shrink-0 transition duration-75 {{ request()->routeIs('core.income.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
@@ -283,11 +283,11 @@
                             <span class="ms-3 flex-1">Planos</span>
                         </a>
                     </li>
-                    @if(Route::has('blog.index'))
+                    @if(Route::has('paneluser.blog.index'))
                     <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700"><span class="{{ $sectionLabelClass }}">Conteúdo</span></li>
                     <li>
-                        <a href="{{ route('blog.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('blog.*') ? $navItemActiveClass : '' }}">
-                            <x-icon name="newspaper" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('blog.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                        <a href="{{ route('paneluser.blog.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('paneluser.blog.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="newspaper" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('paneluser.blog.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3">Blog</span>
                         </a>
                     </li>

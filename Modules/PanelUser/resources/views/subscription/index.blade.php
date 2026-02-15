@@ -265,7 +265,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white font-mono text-xs">{{ $payment->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-6 py-4">{{ $methodLabels[strtolower($payment->gateway_slug ?? '')] ?? ucfirst($payment->gateway_slug) }}</td>
-                            <td class="px-6 py-4 font-mono font-semibold tabular-nums"><span class="sensitive-value">{{ $payment->currency }} {{ number_format((float) $payment->amount, 2, ',', '.') }}</span></td>
+                            <td class="px-6 py-4 font-mono font-semibold tabular-nums"><span class="sensitive-value"><x-core::financial-value :value="$payment->amount" :prefix="$payment->currency ?? 'R$'" /></span></td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $payment->status === 'succeeded' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' }}">
                                     {{ $payment->status === 'succeeded' ? 'Pago' : $payment->status }}

@@ -20,7 +20,7 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Classifique receitas e despesas no Extrato, nos orçamentos e nos relatórios. O sistema já traz categorias padrão; assinantes Pro podem criar personalizadas.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
-                    @if($isPro)
+                    @if($isPro && !($inspectionReadOnly ?? false))
                         <a href="{{ route('core.categories.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-500/20">
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
                             Nova categoria
@@ -102,14 +102,18 @@
                                 </div>
                                 <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $category->name }}</p>
                                 @if(!is_null($category->user_id))
-                                    <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
-                                            <x-icon name="trash-can" style="solid" class="w-3 h-3" />
-                                            Excluir
-                                        </button>
-                                    </form>
+                                    @if(!($inspectionReadOnly ?? false))
+                                        <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
+                                                <x-icon name="trash-can" style="solid" class="w-3 h-3" />
+                                                Excluir
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="mt-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Personalizada</span>
+                                    @endif
                                 @else
                                     <span class="mt-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Padrão</span>
                                 @endif
@@ -146,14 +150,18 @@
                                 </div>
                                 <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $category->name }}</p>
                                 @if(!is_null($category->user_id))
-                                    <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
-                                            <x-icon name="trash-can" style="solid" class="w-3 h-3" />
-                                            Excluir
-                                        </button>
-                                    </form>
+                                    @if(!($inspectionReadOnly ?? false))
+                                        <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
+                                                <x-icon name="trash-can" style="solid" class="w-3 h-3" />
+                                                Excluir
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="mt-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Personalizada</span>
+                                    @endif
                                 @else
                                     <span class="mt-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Padrão</span>
                                 @endif

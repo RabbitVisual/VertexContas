@@ -7,11 +7,15 @@ use Illuminate\Http\Request;
 use Modules\Blog\Models\Post;
 use Modules\Blog\Models\BlogCategory;
 use Modules\Blog\Models\Comment;
-use Illuminate\Support\Str;
+use Modules\Blog\Services\BlogService;
 use Modules\Notifications\Services\NotificationService;
 
 class BlogManagerController extends Controller
 {
+    public function __construct(
+        protected NotificationService $notificationService,
+        protected BlogService $blogService
+    ) {}
     /**
      * Display a listing of the resource.
      */
@@ -44,47 +48,32 @@ class BlogManagerController extends Controller
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'meta_description' => 'nullable|string|max:160',
             'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'notify_users' => 'boolean', // Custom field for notification
+            'notify_users' => 'boolean',
         ]);
 
-        $slug = Str::slug($validated['title']);
-        $count = Post::where('slug', 'LIKE', "{$slug}%")->count();
-        if ($count > 0) {
-            $slug .= '-' . ($count + 1);
-        }
-
-        $imagePath = null;
-        if ($request->hasFile('featured_image')) {
-            $imagePath = $request->file('featured_image')->store('blog', 'public');
-            $imagePath = 'storage/' . $imagePath;
-        }
-
-        $ogImagePath = null;
-        if ($request->hasFile('og_image')) {
-            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
-            $ogImagePath = 'storage/' . $ogImagePath;
-        }
-
-        $post = Post::create([
-            'author_id' => auth()->id(),
-            'category_id' => $validated['category_id'],
+        $data = [
             'title' => $validated['title'],
-            'slug' => $slug,
+            'category_id' => $validated['category_id'],
             'content' => $validated['content'],
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
-            'featured_image' => $imagePath,
             'meta_description' => $validated['meta_description'] ?? null,
-            'og_image' => $ogImagePath,
-        ]);
+        ];
+        if ($request->hasFile('featured_image')) {
+            $data['featured_image'] = $request->file('featured_image');
+        }
+        if ($request->hasFile('og_image')) {
+            $data['og_image'] = $request->file('og_image');
+        }
 
-        // Send notification if requested and published
+        $post = $this->blogService->createPost($data, (int) auth()->id());
+
         if ($post->status === 'published' && $request->boolean('notify_users')) {
-            app(NotificationService::class)->sendSystemWide(
+            $this->notificationService->sendSystemWide(
                 'Novo Artigo: ' . $post->title,
                 'Confira nosso novo artigo financeiro!',
                 'info',
-                route('blog.show', $post->slug)
+                route('paneluser.blog.show', $post->slug)
             );
         }
 
@@ -119,33 +108,22 @@ class BlogManagerController extends Controller
             'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->title !== $post->title) {
-            $slug = Str::slug($validated['title']);
-            $count = Post::where('slug', 'LIKE', "{$slug}%")->where('id', '!=', $id)->count();
-            if ($count > 0) {
-                $slug .= '-' . ($count + 1);
-            }
-            $post->slug = $slug;
-        }
-
-        if ($request->hasFile('featured_image')) {
-            $imagePath = $request->file('featured_image')->store('blog', 'public');
-            $post->featured_image = 'storage/' . $imagePath;
-        }
-
-        if ($request->hasFile('og_image')) {
-            $ogImagePath = $request->file('og_image')->store('blog/seo', 'public');
-            $post->og_image = 'storage/' . $ogImagePath;
-        }
-
-        $post->update([
+        $data = [
             'title' => $validated['title'],
             'category_id' => $validated['category_id'],
             'content' => $validated['content'],
             'status' => $validated['status'],
             'is_premium' => $request->boolean('is_premium'),
             'meta_description' => $validated['meta_description'] ?? null,
-        ]);
+        ];
+        if ($request->hasFile('featured_image')) {
+            $data['featured_image'] = $request->file('featured_image');
+        }
+        if ($request->hasFile('og_image')) {
+            $data['og_image'] = $request->file('og_image');
+        }
+
+        $this->blogService->updatePost($post, $data);
 
         return redirect()->route('suporte.blog.index')->with('success', 'Post atualizado com sucesso!');
     }
@@ -177,13 +155,12 @@ class BlogManagerController extends Controller
         $comment = Comment::findOrFail($id);
         $comment->update(['is_approved' => true]);
 
-        // Notify user
-        app(NotificationService::class)->sendToUser(
+        $this->notificationService->sendToUser(
             $comment->user,
             'Comentário Aprovado',
             'Seu comentário no post "' . $comment->post->title . '" foi aprovado!',
             'success',
-            route('blog.show', $comment->post->slug)
+            route('paneluser.blog.show', $comment->post->slug)
         );
 
         return back()->with('success', 'Comentário aprovado!');

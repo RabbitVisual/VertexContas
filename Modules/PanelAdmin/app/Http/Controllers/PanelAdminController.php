@@ -57,6 +57,7 @@ class PanelAdminController extends Controller
         $mostReadPosts = \Modules\Blog\Models\Post::where('status', 'published')->orderBy('views', 'desc')->take(5)->get();
         $totalBlogViews = \Modules\Blog\Models\Post::sum('views');
         $blogConversionRate = $totalBlogViews > 0 ? (($proUsersCount / $totalBlogViews) * 100) : 0;
+        $recentComments = \Modules\Blog\Models\Comment::with('post', 'user')->latest()->take(5)->get();
 
         // Top Authors (Safe approach without assuming User model has posts relationship)
         $topAuthors = \Modules\Blog\Models\Post::select('author_id', DB::raw('count(*) as total'))
@@ -95,7 +96,9 @@ class PanelAdminController extends Controller
             'monthLabels',
             'mostReadPosts',
             'topAuthors',
-            'blogConversionRate'
+            'blogConversionRate',
+            'totalBlogViews',
+            'recentComments'
         ));
     }
 

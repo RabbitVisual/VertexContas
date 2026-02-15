@@ -23,10 +23,12 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Transforme seus sonhos em objetivos alcançáveis. Acompanhe o progresso de cada meta.</p>
             </div>
             @can('create', \Modules\Core\Models\Goal::class)
-                <a href="{{ route('core.goals.create') }}" class="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
-                    <x-icon name="plus" style="solid" class="w-5 h-5" />
-                    Nova Meta
-                </a>
+                @if(!($inspectionReadOnly ?? false))
+                    <a href="{{ route('core.goals.create') }}" class="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                        <x-icon name="plus" style="solid" class="w-5 h-5" />
+                        Nova Meta
+                    </a>
+                @endif
             @endcan
         </div>
 
@@ -39,7 +41,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total objetivado</p>
-                        <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($totalTarget, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums"><x-core::financial-value :value="$totalTarget" /></p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -48,7 +50,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total acumulado</p>
-                        <p class="sensitive-value text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">R$ {{ number_format($totalCurrent, 2, ',', '.') }}</p>
+                        <p class="sensitive-value text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums"><x-core::financial-value :value="$totalCurrent" /></p>
                     </div>
                 </div>
                 <div class="col-span-2 md:col-span-1 flex items-center gap-4">
@@ -126,7 +128,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">Para atingir todas as metas com prazo, reserve mensalmente aproximadamente:</p>
                     <div class="flex items-baseline gap-2">
                         <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">R$</span>
-                        <span class="sensitive-value text-3xl sm:text-4xl font-black text-gray-900 dark:text-white font-mono tracking-tight">{{ number_format($totalMonthlyNeeded, 2, ',', '.') }}</span>
+                        <span class="sensitive-value text-3xl sm:text-4xl font-black text-gray-900 dark:text-white font-mono tracking-tight"><x-core::financial-value :value="$totalMonthlyNeeded" prefix="" /></span>
                         <span class="text-sm font-bold text-gray-500 uppercase tracking-wider">/ mês</span>
                     </div>
                 </div>
@@ -191,11 +193,11 @@
                         <div class="flex justify-between items-end">
                             <div>
                                 <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acumulado</p>
-                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($goal->current_amount, 2, ',', '.') }}</p>
+                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white tabular-nums"><x-core::financial-value :value="$goal->current_amount" /></p>
                             </div>
                             <div class="text-right">
                                 <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Meta</p>
-                                <p class="text-sm font-bold text-gray-600 dark:text-gray-300 tabular-nums">R$ {{ number_format($goal->target_amount, 2, ',', '.') }}</p>
+                                <p class="text-sm font-bold text-gray-600 dark:text-gray-300 tabular-nums"><x-core::financial-value :value="$goal->target_amount" /></p>
                             </div>
                         </div>
                         <div class="h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -204,7 +206,7 @@
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                             <span class="{{ $textClass }}">{{ number_format($percentage, 0) }}%</span>
                             @if($remaining > 0)
-                                <span class="text-gray-500 dark:text-gray-400">Restam R$ {{ number_format($remaining, 2, ',', '.') }}</span>
+                                <span class="text-gray-500 dark:text-gray-400">Restam <x-core::financial-value :value="$remaining" /></span>
                             @else
                                 <span class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                                     <x-icon name="circle-check" style="solid" class="w-3.5 h-3.5" /> Concluída
@@ -213,19 +215,21 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-4 mt-4 border-t border-gray-100 dark:border-white/5">
-                        <a href="{{ route('core.goals.edit', $goal) }}" class="flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center justify-center gap-2">
-                            <x-icon name="pen" style="solid" class="w-4 h-4" /> Editar
-                        </a>
-                        <div class="w-px h-4 bg-gray-200 dark:bg-white/10"></div>
-                        <form action="{{ route('core.goals.destroy', $goal) }}" method="POST" class="flex-1">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" onclick="return confirm('Deseja realmente remover esta meta?')" class="w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-colors flex items-center justify-center gap-2">
-                                <x-icon name="trash" style="solid" class="w-4 h-4" /> Excluir
-                            </button>
-                        </form>
-                    </div>
+                    @if(!($inspectionReadOnly ?? false))
+                        <div class="flex items-center gap-2 pt-4 mt-4 border-t border-gray-100 dark:border-white/5">
+                            <a href="{{ route('core.goals.edit', $goal) }}" class="flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center justify-center gap-2">
+                                <x-icon name="pen" style="solid" class="w-4 h-4" /> Editar
+                            </a>
+                            <div class="w-px h-4 bg-gray-200 dark:bg-white/10"></div>
+                            <form action="{{ route('core.goals.destroy', $goal) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" onclick="return confirm('Deseja realmente remover esta meta?')" class="w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-colors flex items-center justify-center gap-2">
+                                    <x-icon name="trash" style="solid" class="w-4 h-4" /> Excluir
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             </div>
         @empty
@@ -236,15 +240,17 @@
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem metas ativas</h3>
                 <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Planeje seu futuro. Adicione sua primeira meta financeira para começar a poupar.</p>
                 @can('create', \Modules\Core\Models\Goal::class)
-                    <a href="{{ route('core.goals.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
-                        Criar minha primeira meta
-                    </a>
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.goals.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                            <x-icon name="plus" style="solid" class="w-5 h-5" />
+                            Criar minha primeira meta
+                        </a>
+                    @endif
                 @endcan
             </div>
         @endforelse
 
-        @if($goals->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Goal::class))
+        @if($goals->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Goal::class) && !($inspectionReadOnly ?? false))
             <a href="{{ route('core.goals.create') }}" class="group flex flex-col items-center justify-center min-h-[280px] rounded-3xl border-2 border-dashed border-gray-200 dark:border-white/10 hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                 <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-3 transition-colors">
                     <x-icon name="plus" style="solid" class="w-7 h-7 text-gray-400 dark:text-gray-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />

@@ -7,11 +7,16 @@ declare(strict_types=1);
  * Permite esconder/exibir valores financeiros e dados sensíveis no painel do usuário.
  * Uso: ao clicar no ícone de olho na navbar, todos os elementos com classe 'sensitive-value' são mascarados.
  *
+ * Durante inspeção remota: quando o usuário não autoriza "Exibir Dados Financeiros",
+ * o InspectionGuard força o mascaramento no servidor (dados jamais são enviados ao agente).
+ *
  * @author Vertex Solutions LTDA
  * @see https://github.com/vertex-solutions
  */
 
 namespace App\Helpers;
+
+use Modules\Core\Services\InspectionGuard;
 
 final class SensitiveHelper
 {
@@ -48,5 +53,23 @@ final class SensitiveHelper
     public static function storageKey(): string
     {
         return self::STORAGE_KEY;
+    }
+
+    /**
+     * Retorna o valor formatado para exibição, mascarado quando inspeção ativa sem permissão financeira.
+     *
+     * @param  float|int|string  $value
+     */
+    public static function formatForInspection($value, string $prefix = 'R$'): string
+    {
+        return InspectionGuard::maskValue($value, $prefix);
+    }
+
+    /**
+     * Se deve ocultar dados financeiros (inspeção ativa + usuário negou).
+     */
+    public static function inspectionHidesFinancial(): bool
+    {
+        return InspectionGuard::shouldHideFinancialData();
     }
 }

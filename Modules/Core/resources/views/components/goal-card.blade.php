@@ -17,7 +17,7 @@
                 {{ $goal->name }}
             </h4>
             <p class="text-xs text-slate-500 dark:text-slate-400">
-                Meta: <span class="sensitive-value">R$ {{ number_format($goal->target_amount, 2, ',', '.') }}</span>
+                Meta: <x-core::financial-value :value="$goal->target_amount" />
             </p>
         </div>
 
@@ -35,7 +35,7 @@
     <div class="px-6 pb-6 space-y-2">
         <div class="flex justify-between text-sm">
             <span class="font-semibold text-slate-600 dark:text-slate-300">
-                <span class="sensitive-value">R$ {{ number_format($goal->current_amount, 2, ',', '.') }}</span>
+                <x-core::financial-value :value="$goal->current_amount" />
             </span>
             <span class="font-bold text-primary-600 dark:text-primary-400">
                 {{ number_format($progress, 1) }}%
@@ -50,7 +50,7 @@
 
         @if(!$isCompleted)
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Faltam <span class="sensitive-value">R$ {{ number_format($goal->remaining_amount, 2, ',', '.') }}</span>
+                Faltam <x-core::financial-value :value="$goal->remaining_amount" />
                 @if($goal->deadline)
                     · Prazo: {{ $goal->deadline->format('d/m/Y') }}
                 @endif

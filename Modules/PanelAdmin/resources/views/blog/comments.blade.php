@@ -35,7 +35,7 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <span class="font-bold text-slate-800 dark:text-white text-sm">{{ $comment->user->name }}</span>
-                                            <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank" class="text-[9px] text-primary font-black uppercase tracking-tight hover:underline">
+                                            <a href="{{ route('paneluser.blog.show', $comment->post->slug) }}" target="_blank" class="text-[9px] text-primary font-black uppercase tracking-tight hover:underline">
                                                 No post: {{ $comment->post->title }}
                                             </a>
                                         </div>

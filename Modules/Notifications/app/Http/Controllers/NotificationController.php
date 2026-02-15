@@ -10,12 +10,23 @@ class NotificationController extends Controller
 {
     /**
      * Fetch unread notifications for the current user.
-     * Use polling (AJAX) to call this.
+     * Use polling (AJAX) to call this. Se acessado diretamente no navegador, redireciona.
      */
     public function fetchUnread()
     {
+        if (! request()->ajax() && ! request()->wantsJson()) {
+            $user = Auth::user();
+            if ($user?->hasRole('admin')) {
+                return redirect()->route('admin.notifications.index');
+            }
+            if ($user?->hasRole('support')) {
+                return redirect()->route('support.notifications.index');
+            }
+            return redirect()->route('user.notifications.index');
+        }
+
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['count' => 0, 'notifications' => []]);
         }
 

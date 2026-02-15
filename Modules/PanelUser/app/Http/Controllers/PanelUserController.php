@@ -45,13 +45,18 @@ class PanelUserController extends Controller
             ->whereYear('date', $currentYear)
             ->sum('amount');
 
-        // 3. Top 2 Goals
+        // 3. Accounts (for dashboard list)
+        $accounts = \Modules\Core\Models\Account::where('user_id', $user->id)
+            ->orderBy('name')
+            ->get();
+
+        // 4. Goals (top 2 for FREE)
         $goals = \Modules\Core\Models\Goal::where('user_id', $user->id)
             ->orderBy('deadline', 'asc')
             ->take(2)
             ->get();
 
-        // 4. Cash Flow Chart Data (Last 6 Months)
+        // 5. Cash Flow Chart Data (Last 6 Months)
         $months = collect();
         for ($i = 5; $i >= 0; $i--) {
             $months->push(now()->subMonths($i));
@@ -110,6 +115,7 @@ class PanelUserController extends Controller
             'stockBalance' => $totalBalance,
             'monthlyIncome' => $monthlyIncome,
             'monthlyExpense' => $monthlyExpense,
+            'accounts' => $accounts,
             'goals' => $goals,
             'user' => $user,
             'chartLabels' => $chartLabels,
