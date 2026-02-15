@@ -37,6 +37,9 @@
         <button @click="activeTab = 'blog'" :class="{ 'border-primary text-primary': activeTab === 'blog', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'blog' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="newspaper" style="solid" class="mr-2" /> Blog
         </button>
+        <button @click="activeTab = 'documents'" :class="{ 'border-primary text-primary': activeTab === 'documents', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'documents' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+            <x-icon name="file-lines" style="solid" class="mr-2" /> Documentos
+        </button>
     </div>
 
     <!-- General Settings -->
@@ -217,6 +220,55 @@
         </form>
     </div>
 
+
+    <!-- Document Templates Settings -->
+    <div x-show="activeTab === 'documents'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
+        <form action="{{ route('admin.settings.documents') }}" method="POST">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Empresa</label>
+                    <input type="text" name="company_name" value="{{ old('company_name', $documents->get('company_name') ?? $general->get('app_name')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <p class="text-xs text-gray-500 mt-1">Exibido em faturas e relatórios</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Endereço</label>
+                    <input type="text" name="company_address" value="{{ old('company_address', $documents->get('company_address')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CNPJ</label>
+                    <input type="text" name="company_cnpj" value="{{ old('company_cnpj', $documents->get('company_cnpj')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone</label>
+                    <input type="text" name="company_phone" value="{{ old('company_phone', $documents->get('company_phone')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
+                    <input type="email" name="company_email" value="{{ old('company_email', $documents->get('company_email')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texto do Rodapé</label>
+                    <input type="text" name="document_footer_text" value="{{ old('document_footer_text', $documents->get('document_footer_text')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite de Faturas/Dia</label>
+                    <input type="number" name="limit_download_invoice_per_day" value="{{ old('limit_download_invoice_per_day', $documents->get('limit_download_invoice_per_day') ?? 10) }}" min="0" max="999" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <p class="text-xs text-gray-500 mt-1">Máximo de visualizações de faturas por usuário por dia</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite de Relatórios/Dia</label>
+                    <input type="number" name="limit_download_report_per_day" value="{{ old('limit_download_report_per_day', $documents->get('limit_download_report_per_day') ?? 5) }}" min="0" max="999" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <p class="text-xs text-gray-500 mt-1">Máximo de visualizações de relatórios por usuário por dia</p>
+                </div>
+                <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
+                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                        <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <!-- Blog Settings -->
     <div x-show="activeTab === 'blog'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>

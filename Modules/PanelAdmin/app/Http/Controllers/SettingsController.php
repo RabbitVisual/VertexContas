@@ -24,8 +24,9 @@ class SettingsController extends Controller
         $branding = $this->settingService->getByGroup('branding');
         $mail = $this->settingService->getByGroup('mail');
         $blog = $this->settingService->getByGroup('blog');
+        $documents = $this->settingService->getByGroup('document_templates');
 
-        return view('paneladmin::settings.index', compact('general', 'branding', 'mail', 'blog'));
+        return view('paneladmin::settings.index', compact('general', 'branding', 'mail', 'blog', 'documents'));
     }
 
     /**
@@ -159,6 +160,30 @@ class SettingsController extends Controller
         }
 
         return back()->with('success', 'Notificação enviada com sucesso!');
+    }
+
+    /**
+     * Update document templates settings (company info, limits).
+     */
+    public function updateDocumentTemplates(Request $request)
+    {
+        $data = $request->validate([
+            'company_name' => 'required|string|max:255',
+            'company_address' => 'nullable|string|max:500',
+            'company_cnpj' => 'nullable|string|max:20',
+            'company_phone' => 'nullable|string|max:30',
+            'company_email' => 'nullable|email|max:255',
+            'document_footer_text' => 'nullable|string|max:500',
+            'limit_download_invoice_per_day' => 'required|integer|min:0|max:999',
+            'limit_download_report_per_day' => 'required|integer|min:0|max:999',
+        ]);
+
+        foreach ($data as $key => $value) {
+            $type = in_array($key, ['limit_download_invoice_per_day', 'limit_download_report_per_day']) ? 'integer' : 'string';
+            $this->settingService->set($key, $value, 'document_templates', $type);
+        }
+
+        return back()->with('success', 'Configurações de documentos atualizadas com sucesso!');
     }
 
     /**

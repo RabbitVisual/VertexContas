@@ -5,14 +5,42 @@ declare(strict_types=1);
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Modules\Core\Services\TemplateDocumentService;
 use Modules\Gateways\Models\PaymentLog;
 use Modules\Gateways\Models\Subscription;
 
 class InvoiceController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        protected TemplateDocumentService $templateService
+    ) {
         $this->middleware('pro');
+    }
+
+    /**
+     * Exibe fatura em HTML (nova aba). Usuário imprime ou salva como PDF pelo navegador.
+     */
+    public function show(Request $request, PaymentLog $invoice)
+    {
+        $user = auth()->user();
+        if ($invoice->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if (!$this->templateService->canDownload(TemplateDocumentService::TYPE_INVOICE, $user)) {
+            $limit = (int) app(\Modules\Core\Services\SettingService::class)->get('limit_download_invoice_per_day', 10);
+
+            return response()->view('core::documents.limit-exceeded', [
+                'message' => "Você abriu {$limit} faturas para impressão hoje. Esse limite é renovado diariamente.",
+            ], 429);
+        }
+
+        $this->templateService->logDownload($user, TemplateDocumentService::TYPE_INVOICE, (string) $invoice->id, $request);
+
+        $templateData = $this->templateService->getTemplateData();
+
+        return view('core::documents.invoice', compact('invoice', 'templateData'));
     }
 
     /**

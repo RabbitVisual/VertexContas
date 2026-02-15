@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/ticket-chat.js',
+                'resources/js/cashflow-dashboard.js',
             ],
             refresh: [
                 'resources/views/**',
