@@ -164,3 +164,23 @@ if (! function_exists('parse_brl_date')) {
         return $value;
     }
 }
+
+if (! function_exists('plan_pro_name')) {
+    /** Nome do plano PRO (configurável em Admin > Planos). */
+    function plan_pro_name(string $default = 'Vertex PRO'): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+
+        return (string) $settings->get('plan_pro_name', $default);
+    }
+}
+
+if (! function_exists('plan_free_name')) {
+    /** Nome do plano gratuito (configurável em Admin > Planos). */
+    function plan_free_name(string $default = 'Plano Gratuito'): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+
+        return (string) $settings->get('plan_free_name', $default);
+    }
+}

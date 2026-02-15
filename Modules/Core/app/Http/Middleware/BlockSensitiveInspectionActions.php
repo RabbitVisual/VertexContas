@@ -27,6 +27,7 @@ class BlockSensitiveInspectionActions
      */
     private const FINANCIAL_EXPORT_ROUTES = [
         'core.reports.cashflow.view',
+        'core.reports.consultoria.view',
         'core.reports.export.cashflow.csv',
         'core.reports.export.categories.csv',
         'core.reports.categories.view',

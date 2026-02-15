@@ -48,9 +48,11 @@ class ProfileController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'birth_date' => ['nullable', 'date'],
+            'show_assistant' => ['boolean'],
         ];
 
         $validated = $request->validate($rules);
+        $validated['show_assistant'] = $request->boolean('show_assistant');
 
         // 2. Security: Email and CPF are never updated by user - only admin/support when support_access is granted
         $user->fill($validated);

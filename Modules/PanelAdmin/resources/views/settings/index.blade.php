@@ -1,14 +1,8 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Configurações</x-slot>
 
-<div class="container mx-auto px-4 py-6" x-data="{ activeTab: 'general' }">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            <x-icon name="gears" style="duotone" class="mr-2 text-[#11C76F]" />
-            Configurações do Sistema
-        </h1>
-    </div>
-
+    <x-paneladmin::page title="Configurações do Sistema" subtitle="Ajuste geral, marca, e-mail, blog e documentos.">
+    <div x-data="{ activeTab: 'general' }" class="space-y-8">
     @if(session('success'))
         <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">{{ session('success') }}</span>
@@ -26,42 +20,42 @@
     @endif
 
     <!-- Tabs -->
-    <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-        <button @click="activeTab = 'general'" :class="{ 'border-primary text-primary': activeTab === 'general', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'general' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+    <div class="flex border-b border-slate-200 dark:border-slate-700">
+        <button @click="activeTab = 'general'" :class="{ 'border-[#11C76F] text-[#11C76F]': activeTab === 'general', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'general' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="sliders" style="solid" class="mr-2" /> Geral
         </button>
-        <button @click="activeTab = 'branding'" :class="{ 'border-primary text-primary': activeTab === 'branding', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'branding' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+        <button @click="activeTab = 'branding'" :class="{ 'border-[#11C76F] text-[#11C76F]': activeTab === 'branding', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'branding' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="palette" style="solid" class="mr-2" /> Marca
         </button>
-        <button @click="activeTab = 'mail'" :class="{ 'border-primary text-primary': activeTab === 'mail', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'mail' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+        <button @click="activeTab = 'mail'" :class="{ 'border-[#11C76F] text-[#11C76F]': activeTab === 'mail', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'mail' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="envelope" style="solid" class="mr-2" /> E-mail (SMTP)
         </button>
-        <button @click="activeTab = 'blog'" :class="{ 'border-primary text-primary': activeTab === 'blog', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'blog' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+        <button @click="activeTab = 'blog'" :class="{ 'border-[#11C76F] text-[#11C76F]': activeTab === 'blog', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'blog' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="newspaper" style="solid" class="mr-2" /> Blog
         </button>
-        <button @click="activeTab = 'documents'" :class="{ 'border-primary text-primary': activeTab === 'documents', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'documents' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+        <button @click="activeTab = 'documents'" :class="{ 'border-[#11C76F] text-[#11C76F]': activeTab === 'documents', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'documents' }" class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition-colors">
             <x-icon name="file-lines" style="solid" class="mr-2" /> Documentos
         </button>
     </div>
 
     <!-- General Settings -->
-    <div x-show="activeTab === 'general'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6">
+    <div x-show="activeTab === 'general'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
         <form action="{{ route('admin.settings.general') }}" method="POST">
             @csrf
             <div class="grid grid-cols-1 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Aplicação</label>
-                    <input type="text" name="app_name" value="{{ old('app_name', $general->get('app_name')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome da Aplicação</label>
+                    <input type="text" name="app_name" value="{{ old('app_name', $general->get('app_name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
-                    <textarea name="app_description" rows="3" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">{{ old('app_description', $general->get('app_description')) }}</textarea>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Descrição</label>
+                    <textarea name="app_description" rows="3" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('app_description', $general->get('app_description')) }}</textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL da Aplicação</label>
-                    <input type="url" name="app_url" value="{{ old('app_url', $general->get('app_url')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">URL da Aplicação</label>
+                    <input type="url" name="app_url" value="{{ old('app_url', $general->get('app_url')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -71,14 +65,14 @@
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="maintenance_mode" value="1" class="sr-only peer" {{ $general->get('maintenance_mode') ? 'checked' : '' }}>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/80 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
                     </label>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fuso Horário (GMT)</label>
-                        <select name="app_timezone" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Fuso Horário (GMT)</label>
+                        <select name="app_timezone" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <optgroup label="Brasil">
                                 <option value="America/Sao_Paulo" {{ $general->get('app_timezone') == 'America/Sao_Paulo' ? 'selected' : '' }}>Brasília (GMT-3)</option>
                                 <option value="America/Bahia" {{ $general->get('app_timezone') == 'America/Bahia' ? 'selected' : '' }}>Bahia (GMT-3)</option>
@@ -101,8 +95,8 @@
                         <p class="text-xs text-gray-500 mt-1">Usado globalmente em todo o sistema para datas e horários.</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Idioma Padrão</label>
-                        <select name="app_locale" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Idioma Padrão</label>
+                        <select name="app_locale" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="pt_BR" {{ $general->get('app_locale') == 'pt_BR' ? 'selected' : '' }}>Português (Brasil)</option>
                             <option value="en" {{ $general->get('app_locale') == 'en' ? 'selected' : '' }}>English</option>
                         </select>
@@ -110,7 +104,7 @@
                 </div>
 
                 <div class="flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Alterações
                     </button>
                 </div>
@@ -119,7 +113,7 @@
     </div>
 
     <!-- Branding Settings -->
-    <div x-show="activeTab === 'branding'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
+    <div x-show="activeTab === 'branding'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <form action="{{ route('admin.settings.branding') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -150,7 +144,7 @@
                 </div>
 
                 <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
                         <x-icon name="cloud-arrow-up" style="solid" class="mr-2" /> Upload & Salvar
                     </button>
                 </div>
@@ -159,13 +153,13 @@
     </div>
 
     <!-- Mail Settings -->
-    <div x-show="activeTab === 'mail'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
+    <div x-show="activeTab === 'mail'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <form action="{{ route('admin.settings.mail') }}" method="POST">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Driver de E-mail</label>
-                    <select name="mail_mailer" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Driver de E-mail</label>
+                    <select name="mail_mailer" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                         <option value="smtp" {{ $mail->get('mail_mailer') == 'smtp' ? 'selected' : '' }}>SMTP</option>
                         <option value="log" {{ $mail->get('mail_mailer') == 'log' ? 'selected' : '' }}>Log (Dev)</option>
                         <option value="mailgun" {{ $mail->get('mail_mailer') == 'mailgun' ? 'selected' : '' }}>Mailgun</option>
@@ -173,18 +167,18 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Host SMTP</label>
-                    <input type="text" name="mail_host" value="{{ old('mail_host', $mail->get('mail_host')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Host SMTP</label>
+                    <input type="text" name="mail_host" value="{{ old('mail_host', $mail->get('mail_host')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Porta</label>
-                        <input type="number" name="mail_port" value="{{ old('mail_port', $mail->get('mail_port')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Porta</label>
+                        <input type="number" name="mail_port" value="{{ old('mail_port', $mail->get('mail_port')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Criptografia</label>
-                         <select name="mail_encryption" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Criptografia</label>
+                         <select name="mail_encryption" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="tls" {{ $mail->get('mail_encryption') == 'tls' ? 'selected' : '' }}>TLS</option>
                             <option value="ssl" {{ $mail->get('mail_encryption') == 'ssl' ? 'selected' : '' }}>SSL</option>
                             <option value="null" {{ $mail->get('mail_encryption') == 'null' ? 'selected' : '' }}>Nenhuma</option>
@@ -193,28 +187,28 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Usuário SMTP</label>
-                    <input type="text" name="mail_username" value="{{ old('mail_username', $mail->get('mail_username')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Usuário SMTP</label>
+                    <input type="text" name="mail_username" value="{{ old('mail_username', $mail->get('mail_username')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha SMTP</label>
-                    <input type="password" name="mail_password" placeholder="••••••••" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Senha SMTP</label>
+                    <input type="password" name="mail_password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     <p class="text-xs text-gray-500 mt-1">Deixe em branco para manter a senha atual.</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail Remetente</label>
-                    <input type="email" name="mail_from_address" value="{{ old('mail_from_address', $mail->get('mail_from_address')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">E-mail Remetente</label>
+                    <input type="email" name="mail_from_address" value="{{ old('mail_from_address', $mail->get('mail_from_address')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome Remetente</label>
-                    <input type="text" name="mail_from_name" value="{{ old('mail_from_name', $mail->get('mail_from_name')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome Remetente</label>
+                    <input type="text" name="mail_from_name" value="{{ old('mail_from_name', $mail->get('mail_from_name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações de E-mail
                     </button>
                 </div>
@@ -224,47 +218,47 @@
 
 
     <!-- Document Templates Settings -->
-    <div x-show="activeTab === 'documents'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
+    <div x-show="activeTab === 'documents'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <form action="{{ route('admin.settings.documents') }}" method="POST">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Empresa</label>
-                    <input type="text" name="company_name" value="{{ old('company_name', $documents->get('company_name') ?? $general->get('app_name')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome da Empresa</label>
+                    <input type="text" name="company_name" value="{{ old('company_name', $documents->get('company_name') ?? $general->get('app_name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
                     <p class="text-xs text-gray-500 mt-1">Exibido em faturas e relatórios</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Endereço</label>
-                    <input type="text" name="company_address" value="{{ old('company_address', $documents->get('company_address')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Endereço</label>
+                    <input type="text" name="company_address" value="{{ old('company_address', $documents->get('company_address')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CNPJ</label>
-                    <input type="text" name="company_cnpj" value="{{ old('company_cnpj', $documents->get('company_cnpj')) }}" x-mask="'cnpj'" placeholder="00.000.000/0000-00" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">CNPJ</label>
+                    <input type="text" name="company_cnpj" value="{{ old('company_cnpj', $documents->get('company_cnpj')) }}" x-mask="'cnpj'" placeholder="00.000.000/0000-00" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone</label>
-                    <input type="text" name="company_phone" value="{{ old('company_phone', $documents->get('company_phone')) }}" x-mask="'phone'" placeholder="(00) 00000-0000" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Telefone</label>
+                    <input type="text" name="company_phone" value="{{ old('company_phone', $documents->get('company_phone')) }}" x-mask="'phone'" placeholder="(00) 00000-0000" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
-                    <input type="email" name="company_email" value="{{ old('company_email', $documents->get('company_email')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">E-mail</label>
+                    <input type="email" name="company_email" value="{{ old('company_email', $documents->get('company_email')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texto do Rodapé</label>
-                    <input type="text" name="document_footer_text" value="{{ old('document_footer_text', $documents->get('document_footer_text')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Texto do Rodapé</label>
+                    <input type="text" name="document_footer_text" value="{{ old('document_footer_text', $documents->get('document_footer_text')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite de Faturas/Dia</label>
-                    <input type="number" name="limit_download_invoice_per_day" value="{{ old('limit_download_invoice_per_day', $documents->get('limit_download_invoice_per_day') ?? 10) }}" min="0" max="999" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Limite de Faturas/Dia</label>
+                    <input type="number" name="limit_download_invoice_per_day" value="{{ old('limit_download_invoice_per_day', $documents->get('limit_download_invoice_per_day') ?? 10) }}" min="0" max="999" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
                     <p class="text-xs text-gray-500 mt-1">Máximo de visualizações de faturas por usuário por dia</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite de Relatórios/Dia</label>
-                    <input type="number" name="limit_download_report_per_day" value="{{ old('limit_download_report_per_day', $documents->get('limit_download_report_per_day') ?? 5) }}" min="0" max="999" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Limite de Relatórios/Dia</label>
+                    <input type="number" name="limit_download_report_per_day" value="{{ old('limit_download_report_per_day', $documents->get('limit_download_report_per_day') ?? 5) }}" min="0" max="999" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
                     <p class="text-xs text-gray-500 mt-1">Máximo de visualizações de relatórios por usuário por dia</p>
                 </div>
                 <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações
                     </button>
                 </div>
@@ -273,7 +267,7 @@
     </div>
 
     <!-- Blog Settings -->
-    <div x-show="activeTab === 'blog'" class="bg-white dark:bg-slate-800 shadow rounded-lg p-6" x-cloak>
+    <div x-show="activeTab === 'blog'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <form action="{{ route('admin.settings.blog') }}" method="POST">
             @csrf
             <div class="space-y-6">
@@ -300,12 +294,13 @@
                 </div>
 
                 <div class="flex justify-end mt-4">
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors flex items-center">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações do Blog
                     </button>
                 </div>
             </div>
         </form>
     </div>
-</div>
+    </div>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

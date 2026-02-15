@@ -6,5 +6,6 @@
     "Blog": true,
     "Core": true,
     "Gateways": true,
-    "Notifications": true
+    "Notifications": true,
+    "Gamification": true
 }

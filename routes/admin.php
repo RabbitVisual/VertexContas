@@ -11,6 +11,7 @@ use Modules\PanelAdmin\Http\Controllers\PaymentController;
 use Modules\PanelAdmin\Http\Controllers\SubscriptionController;
 use Modules\PanelAdmin\Http\Controllers\PlanController;
 use Modules\PanelAdmin\Http\Controllers\RoleController;
+use Modules\PanelAdmin\Http\Controllers\InsightAdminController;
 use Modules\PanelAdmin\Http\Controllers\LegalManagerController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
 
@@ -126,6 +127,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::put('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'updateArticle'])->name('articles.update');
         Route::delete('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'destroyArticle'])->name('articles.destroy');
     });
+    // Central de Insights (Vertex Bot)
+    Route::prefix('insights')->name('insights.')->group(function () {
+        Route::get('/', [InsightAdminController::class, 'index'])->name('index');
+        Route::get('/create', [InsightAdminController::class, 'create'])->name('create');
+        Route::post('/', [InsightAdminController::class, 'store'])->name('store');
+        Route::get('/{insight}/edit', [InsightAdminController::class, 'edit'])->name('edit');
+        Route::put('/{insight}', [InsightAdminController::class, 'update'])->name('update');
+        Route::delete('/{insight}', [InsightAdminController::class, 'destroy'])->name('destroy');
+    });
+
     // Central Legal
     Route::prefix('legal')->name('legal.')->group(function () {
         Route::get('/', [LegalManagerController::class, 'index'])->name('index');

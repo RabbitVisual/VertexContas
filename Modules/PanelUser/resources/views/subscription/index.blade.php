@@ -14,14 +14,14 @@
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">
                     @if($isPro)
-                        Seu plano <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-400">Vertex PRO</span>
+                        Seu plano <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-400">{{ plan_pro_name() }}</span>
                     @else
                         Planos e <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Assinatura</span>
                     @endif
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">
                     @if($isPro)
-                        Obrigado por fazer parte do Vertex PRO. Aproveite todos os benefícios configurados pelo painel.
+                        Obrigado por fazer parte do {{ plan_pro_name() }}. Aproveite todos os benefícios configurados pelo painel.
                     @else
                         Evolua seu controle financeiro. 7 dias grátis, depois R$ 29,90/mês. Cancele quando quiser.
                     @endif
@@ -51,26 +51,65 @@
     </div>
 
     @if($isPro)
-        {{-- PRO: Benefícios (limites = Ilimitado, alinhado ao PanelAdmin) --}}
+        @php
+            $proDescAccount = ($proHasLimits && $limitsPro['account'] >= 0) ? 'Até ' . $limitsPro['account'] . ' contas' : 'Ilimitado';
+            $proDescTransactions = ($proHasLimits && $limitsPro['income'] >= 0 && $limitsPro['expense'] >= 0)
+                ? 'Até ' . ($limitsPro['income'] + $limitsPro['expense']) . ' transações'
+                : (($proHasLimits && ($limitsPro['income'] >= 0 || $limitsPro['expense'] >= 0))
+                    ? 'Até ' . max($limitsPro['income'], $limitsPro['expense']) . ' por tipo'
+                    : 'Ilimitado');
+            $proDescGoalsBudgets = ($proHasLimits && $limitsPro['goal'] >= 0 && $limitsPro['budget'] >= 0)
+                ? 'Até ' . $limitsPro['goal'] . ' metas, ' . $limitsPro['budget'] . ' orçamentos'
+                : (($proHasLimits && ($limitsPro['goal'] >= 0 || $limitsPro['budget'] >= 0))
+                    ? 'Metas: ' . ($limitsPro['goal'] >= 0 ? $limitsPro['goal'] : 'ilimitado') . ', Orçamentos: ' . ($limitsPro['budget'] >= 0 ? $limitsPro['budget'] : 'ilimitado')
+                    : 'Ilimitado');
+        @endphp
+        {{-- PRO: Benefícios dinâmicos (limites do painel) --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @foreach([
-                ['icon' => 'building-columns', 'title' => 'Contas', 'desc' => 'Ilimitado', 'style' => 'duotone'],
-                ['icon' => 'chart-simple', 'title' => 'Relatórios', 'desc' => 'PDF e Excel', 'style' => 'duotone'],
-                ['icon' => 'bullseye', 'title' => 'Metas e orçamentos', 'desc' => 'Ilimitado', 'style' => 'duotone'],
-                ['icon' => 'headset', 'title' => 'Suporte VIP', 'desc' => 'Prioritário', 'style' => 'duotone'],
-            ] as $benefit)
-                <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-sm hover:shadow-xl transition-all duration-300">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                            <x-icon name="{{ $benefit['icon'] }}" style="{{ $benefit['style'] ?? 'duotone' }}" class="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white">{{ $benefit['title'] }}</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ $benefit['desc'] }}</p>
-                        </div>
+            <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                        <x-icon name="building-columns" style="duotone" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Contas</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ $proDescAccount }}</p>
                     </div>
                 </div>
-            @endforeach
+            </div>
+            <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                        <x-icon name="chart-simple" style="duotone" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Relatórios</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">PDF e Excel</p>
+                    </div>
+                </div>
+            </div>
+            <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                        <x-icon name="bullseye" style="duotone" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Metas e orçamentos</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ $proDescGoalsBudgets }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                        <x-icon name="headset" style="duotone" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Suporte VIP</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Prioritário</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="flex flex-wrap items-center justify-center gap-4">
@@ -166,7 +205,7 @@
                     <div class="mt-6">
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <x-icon name="crown" style="solid" class="text-amber-400 w-6 h-6" />
-                            Vertex PRO
+                            {{ plan_pro_name() }}
                         </h2>
                         <p class="mt-4 flex items-baseline">
                             <span class="text-4xl font-black text-white">R$ 29,90</span>
@@ -175,15 +214,45 @@
                         <p class="mt-2 text-sm text-gray-400">Após 7 dias grátis. Cancele quando quiser. Reembolso automático se cancelar no trial.</p>
                     </div>
 
+                    @php
+                        $proBenefitAccounts = ($proHasLimits && $limitsPro['account'] >= 0) ? 'Cadastre até ' . $limitsPro['account'] . ' contas' : 'Contas ilimitadas';
+                        $proBenefitTransactions = ($proHasLimits && ($limitsPro['income'] >= 0 || $limitsPro['expense'] >= 0))
+                            ? 'Até ' . (($limitsPro['income'] >= 0 && $limitsPro['expense'] >= 0) ? ($limitsPro['income'] + $limitsPro['expense']) . ' transações' : max($limitsPro['income'], $limitsPro['expense']) . ' por tipo (rec/desp)')
+                            : 'Transações ilimitadas';
+                        $proBenefitGoals = ($proHasLimits && $limitsPro['goal'] >= 0) ? 'Até ' . $limitsPro['goal'] . ' metas' : 'Metas ilimitadas';
+                        $proBenefitBudgets = ($proHasLimits && $limitsPro['budget'] >= 0) ? 'Até ' . $limitsPro['budget'] . ' orçamentos' : 'Orçamentos ilimitados';
+                    @endphp
                     <ul class="mt-8 space-y-4 flex-1">
-                        @foreach(['Contas ilimitadas', 'Transações ilimitadas', 'Relatórios PDF/CSV', 'Metas e orçamentos ilimitados', 'Suporte prioritário VIP'] as $item)
-                            <li class="flex items-start gap-3">
-                                <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
-                                    <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
-                                </div>
-                                <span class="text-gray-300 text-sm font-medium">{{ $item }}</span>
-                            </li>
-                        @endforeach
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
+                                <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
+                            </div>
+                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitAccounts }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
+                                <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
+                            </div>
+                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitTransactions }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
+                                <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
+                            </div>
+                            <span class="text-gray-300 text-sm font-medium">Relatórios PDF/CSV</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
+                                <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
+                            </div>
+                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitGoals }}, {{ $proBenefitBudgets }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
+                                <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
+                            </div>
+                            <span class="text-gray-300 text-sm font-medium">Suporte prioritário VIP</span>
+                        </li>
                     </ul>
 
                     <div x-data="{ open: false }" class="mt-8">

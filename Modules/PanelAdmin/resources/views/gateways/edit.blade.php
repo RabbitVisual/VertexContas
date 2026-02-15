@@ -1,31 +1,24 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Configurar Gateway</x-slot>
 
-<div class="container mx-auto px-4 py-6">
-    <div class="flex items-center mb-8">
-        <a href="{{ route('admin.gateways.index') }}" class="text-gray-500 hover:text-gray-700 mr-4">
-            <x-icon name="arrow-left" style="duotone" class="text-xl" />
-        </a>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center">
-            Configurar {{ $gateway->name }}
-            @if($gateway->slug === 'stripe')
-                <x-icon name="stripe" style="brands" class="ml-3 text-primary" />
-            @else
-                <x-icon name="{{ $gateway->icon }}" style="solid" class="ml-3 text-primary" />
-            @endif
-        </h1>
-    </div>
+    <x-paneladmin::page title="Configurar {{ $gateway->name }}" subtitle="Chaves de API e ambiente.">
+        <x-slot name="header">
+            <a href="{{ route('admin.gateways.index') }}" class="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white font-medium">
+                <x-icon name="arrow-left" style="duotone" class="w-4 h-4" /> Voltar
+            </a>
+        </x-slot>
 
     @if(session('success'))
-        <div class="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400" role="alert">
-            <div class="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <x-icon name="check" style="duotone" class="text-xl" />
+        <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400 mb-6" role="alert">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
+                <x-icon name="check" style="duotone" class="w-5 h-5" />
             </div>
-            <p class="font-black uppercase tracking-widest text-xs">{{ session('success') }}</p>
+            <p class="font-bold text-sm">{{ session('success') }}</p>
         </div>
     @endif
 
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-white/5 shadow-2xl p-8 max-w-4xl mx-auto">
+    <x-paneladmin::card class="max-w-4xl">
+        <div class="p-6">
         <form action="{{ route('admin.gateways.update', $gateway->id) }}" method="POST">
             @csrf
             @method('PUT')
@@ -83,12 +76,13 @@
                 </div>
 
                 <div class="flex justify-end pt-2">
-                    <button type="submit" class="px-8 py-4 bg-[#11C76F] text-white font-black rounded-xl shadow-xl shadow-[#11C76F]/20 hover:bg-[#0EA85A] transition-all flex items-center gap-2 text-sm uppercase tracking-widest">
-                        <x-icon name="save" style="duotone" /> Salvar Configurações
+                    <button type="submit" class="px-6 py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors flex items-center gap-2">
+                        <x-icon name="save" style="duotone" class="w-4 h-4" /> Salvar Configurações
                     </button>
                 </div>
             </div>
         </form>
-    </div>
-</div>
+        </div>
+    </x-paneladmin::card>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

@@ -3,6 +3,10 @@
     $user = auth()->user();
     $userName = $user->full_name ?? $user->first_name ?? 'Membro PRO';
     $firstName = explode(' ', $userName)[0] ?? $userName;
+    $financialScore = $vertexBot['financial_score'] ?? 0;
+    $scoreLabel = $financialScore <= 40 ? 'Risco' : ($financialScore <= 70 ? 'Atenção' : 'Saúde Vertex');
+    $scoreTextClass = $financialScore <= 40 ? 'text-red-600 dark:text-red-400' : ($financialScore <= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400');
+    $scoreBorderClass = $financialScore <= 40 ? 'hover:border-red-500/30' : ($financialScore <= 70 ? 'hover:border-amber-500/30' : 'hover:border-emerald-500/30');
     $greeting = match (true) {
         now()->hour < 12 => 'Bom dia',
         now()->hour < 18 => 'Boa tarde',
@@ -67,7 +71,35 @@
         </div>
 
         {{-- Stats Grid - CBAV style (rounded-3xl, border, ícones duotone) --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {{-- Score Financeiro (Gauge) --}}
+            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 {{ $scoreBorderClass }} shadow-sm hover:shadow-xl">
+                <div class="relative p-6 flex items-center gap-4">
+                    <div class="relative w-20 h-20 shrink-0">
+                        @php
+                            $pct = min(100, max(0, $financialScore)) / 100;
+                            $angle = 180 * (1 - $pct);
+                            $rad = deg2rad($angle);
+                            $cx = 100; $cy = 90; $r = 80;
+                            $x2 = $cx + $r * cos($rad);
+                            $y2 = $cy + $r * sin($rad);
+                            $strokeHex = $financialScore <= 40 ? '#ef4444' : ($financialScore <= 70 ? '#f59e0b' : '#22c55e');
+                        @endphp
+                        <svg viewBox="0 0 200 100" class="w-full h-full -scale-y-100">
+                            <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#e5e7eb" stroke-width="10" stroke-linecap="round" />
+                            <path d="M 20 90 A 80 80 0 0 1 {{ $x2 }} {{ $y2 }}" fill="none" stroke="{{ $strokeHex }}" stroke-width="10" stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center pt-2">
+                            <span class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ $financialScore }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Score Financeiro</p>
+                        <p class="text-sm font-bold {{ $scoreTextClass }} mt-0.5">{{ $scoreLabel }}</p>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">0-100: poupança, reserva e consistência</p>
+                    </div>
+                </div>
+            </div>
             <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6">
                 <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="wallet" style="duotone" class="w-6 h-6" />

@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust proxies em produção (hospedagem compartilhada/CDN/Cloudflare)
+        if ((string) (env('APP_ENV') ?? 'production') === 'production') {
+            $middleware->trustProxies(at: '*');
+        }
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
         ]);

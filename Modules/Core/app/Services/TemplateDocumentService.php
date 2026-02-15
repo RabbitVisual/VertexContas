@@ -18,6 +18,8 @@ class TemplateDocumentService
 
     public const TYPE_EXTRATO = 'extrato';
 
+    public const TYPE_CONSULTING = 'consulting';
+
     public function __construct(
         protected SettingService $settingService
     ) {}
@@ -97,7 +99,7 @@ class TemplateDocumentService
     {
         return match ($documentType) {
             self::TYPE_INVOICE => (int) $this->settingService->get('limit_download_invoice_per_day', 10),
-            self::TYPE_CASHFLOW, self::TYPE_CATEGORY_RANKING, self::TYPE_EXTRATO => (int) $this->settingService->get('limit_download_report_per_day', 5),
+            self::TYPE_CASHFLOW, self::TYPE_CATEGORY_RANKING, self::TYPE_EXTRATO, self::TYPE_CONSULTING => (int) $this->settingService->get('limit_download_report_per_day', 5),
             default => 5,
         };
     }

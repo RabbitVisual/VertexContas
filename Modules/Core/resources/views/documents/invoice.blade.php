@@ -24,7 +24,7 @@
     </thead>
     <tbody>
         <tr class="item-row">
-            <td>Assinatura Vertex PRO Mensal</td>
+            <td>Assinatura {{ plan_pro_name() }} Mensal</td>
             <td class="text-right">{{ $amountFormatted }}</td>
         </tr>
         <tr class="item-row">

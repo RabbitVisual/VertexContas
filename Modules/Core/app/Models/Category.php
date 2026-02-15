@@ -19,6 +19,8 @@ class Category extends Model
         'type',
         'icon',
         'color',
+        'pillar',
+        'type_group',
     ];
 
     protected $casts = [
@@ -64,6 +66,14 @@ class Category extends Model
             // we should HIDE them if not Pro.
             // Existing transactions will still render fine via relations.
         });
+    }
+
+    /**
+     * Scope by type_group (essential, lifestyle, financial).
+     */
+    public function scopeByTypeGroup($query, string $group)
+    {
+        return $query->where('type_group', $group);
     }
 
     /**

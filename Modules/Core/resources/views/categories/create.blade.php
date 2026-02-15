@@ -1,5 +1,5 @@
 <x-paneluser::layouts.master :title="'Nova Categoria'">
-    <div class="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{ type: 'expense', selectedIcon: 'circle-dollar', selectedColor: '#64748b' }">
+    <div class="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{ type: 'expense', selectedIcon: 'circle-dollar', selectedColor: '#64748b', selectedTypeGroup: 'lifestyle' }">
         {{-- Hero CBAV --}}
         <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-[100px]"></div>
@@ -62,6 +62,31 @@
                         </button>
                     </div>
                     <input type="hidden" name="type" :value="type">
+                </div>
+
+                <div x-show="type === 'expense'" x-transition>
+                    <label class="block text-sm font-bold text-gray-900 dark:text-white mb-3">Grupo 50/30/20 (Despesas)</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="button" @click="selectedTypeGroup = 'essential'"
+                                :class="selectedTypeGroup === 'essential' ? 'bg-amber-50 dark:bg-amber-500/20 border-amber-500 text-amber-700 dark:text-amber-400' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'"
+                                class="px-4 py-3 rounded-xl border-2 font-medium transition-all flex flex-col items-center gap-1">
+                            <x-icon name="house" style="duotone" class="w-5 h-5" />
+                            <span>Essencial (50%)</span>
+                        </button>
+                        <button type="button" @click="selectedTypeGroup = 'lifestyle'"
+                                :class="selectedTypeGroup === 'lifestyle' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-500 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'"
+                                class="px-4 py-3 rounded-xl border-2 font-medium transition-all flex flex-col items-center gap-1">
+                            <x-icon name="heart" style="duotone" class="w-5 h-5" />
+                            <span>Estilo de Vida (30%)</span>
+                        </button>
+                        <button type="button" @click="selectedTypeGroup = 'financial'"
+                                :class="selectedTypeGroup === 'financial' ? 'bg-emerald-50 dark:bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-400' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'"
+                                class="px-4 py-3 rounded-xl border-2 font-medium transition-all flex flex-col items-center gap-1">
+                            <x-icon name="chart-line" style="duotone" class="w-5 h-5" />
+                            <span>Financeiro (20%)</span>
+                        </button>
+                    </div>
+                    <input type="hidden" name="type_group" :value="type === 'expense' ? selectedTypeGroup : ''">
                 </div>
 
                 <div>

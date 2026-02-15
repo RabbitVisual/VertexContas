@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'last_login_at',
         'last_login_ip',
+        'show_assistant',
         'support_access_expires_at',
     ];
 
@@ -57,6 +58,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'birth_date' => 'date',
             'last_login_at' => 'datetime',
+            'show_assistant' => 'boolean',
             'support_access_expires_at' => 'datetime',
         ];
     }

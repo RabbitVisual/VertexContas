@@ -33,7 +33,7 @@ Follow these rules strictly for every request.
     * *Rule:* NEVER use Emogi in code.
     * *Usage:* Use the `<i>` tag: `<i class="fa-pro fa-solid fa-house"></i>`.
     * *Location:* Assets are in `resources/fw-pro`.
-* **JS Framework:** **Alpine.js (v3)** + Blade Components.
+* **JS Framework:** **Alpine.js (v3), Vue 3 e Vanilia JS.** + Blade Components.
     * *Prohibited:* Do NOT suggest React, Vue, or Livewire unless explicitly asked.
 
 ## 3. BACKEND PATTERNS

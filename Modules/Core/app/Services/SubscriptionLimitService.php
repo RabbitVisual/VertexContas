@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Core\Services;
 
 use App\Models\User;
@@ -23,14 +25,22 @@ class SubscriptionLimitService
     ];
 
     /**
+     * Default limits for PRO when pro_has_limits=1 but limit_pro_* is missing or invalid.
+     */
+    private const PRO_LIMITS_DEFAULT = [
+        'account' => 50,
+        'income' => 5000,
+        'expense' => 5000,
+        'goal' => 15,
+        'budget' => 20,
+        'category' => 50,
+    ];
+
+    /**
      * Check if user can create a new entity.
      */
     public function canCreate(User $user, string $entity): bool
     {
-        if ($user->isPro()) {
-            return true;
-        }
-
         $limit = $this->getLimit($user, $entity);
         if ($limit === 'unlimited') {
             return true;
@@ -64,15 +74,25 @@ class SubscriptionLimitService
     /**
      * Get the limit for an entity based on user role.
      *
-     * @return int|string Returns 'unlimited' for pro users, int for free users
+     * @return int|string Returns 'unlimited' for pro when pro_has_limits=0 or limit < 0, int otherwise
      */
     public function getLimit(User $user, string $entity): int|string
     {
-        if ($user->isPro()) {
-            return 'unlimited';
-        }
-
         $settings = app(SettingService::class);
+
+        if ($user->isPro()) {
+            $proHasLimits = (bool) $settings->get('pro_has_limits', 0);
+            if (! $proHasLimits) {
+                return 'unlimited';
+            }
+
+            $proLimit = (int) $settings->get("limit_pro_{$entity}", -1);
+            if ($proLimit < 0) {
+                return (int) (self::PRO_LIMITS_DEFAULT[$entity] ?? 0);
+            }
+
+            return $proLimit;
+        }
 
         return (int) $settings->get("limit_free_{$entity}", self::FREE_LIMITS[$entity] ?? 0);
     }
@@ -104,11 +124,13 @@ class SubscriptionLimitService
             'goal' => 'metas',
             'budget' => 'orçamentos',
             'account' => 'contas',
+            'category' => 'categorias personalizadas',
         ];
 
         $entityName = $entityNames[$entity] ?? $entity;
+        $planProName = (string) app(SettingService::class)->get('plan_pro_name', 'Vertex PRO');
 
-        return "Limite de {$entityName} atingido! Migre para o plano PRO para cadastros ilimitados.";
+        return "Limite de {$entityName} atingido! Migre para o plano {$planProName} para cadastros ilimitados.";
     }
 
     /**
@@ -135,6 +157,7 @@ class SubscriptionLimitService
         return [
             'current' => $current,
             'limit' => $limit,
+            'limit_display' => (string) $limit,
             'percentage' => min(100, $percentage),
         ];
     }
@@ -153,14 +176,16 @@ class SubscriptionLimitService
         }
 
         $notificationService = app(\Modules\Notifications\Services\NotificationService::class);
+        $settings = app(SettingService::class);
         $cacheKey = "limit_notify_{$user->id}_{$entity}";
+        $planProName = (string) $settings->get('plan_pro_name', 'Vertex PRO');
 
         if ($percentage >= 100) {
             if (! \Illuminate\Support\Facades\Cache::has("{$cacheKey}_100")) {
                 $notificationService->sendToUser(
                     $user,
                     "Limite de {$entity} Atingido!",
-                    "Você atingiu 100% do seu limite de {$entity}. Faça upgrade para PRO para remover os limites.",
+                    "Você atingiu 100% do seu limite de {$entity}. Faça upgrade para {$planProName} para remover os limites.",
                     'danger',
                     route('user.subscription.index')
                 );
@@ -171,7 +196,7 @@ class SubscriptionLimitService
                 $notificationService->sendToUser(
                     $user,
                     "Limite de {$entity} Próximo",
-                    "Você já usou {$percentage}% do seu limite de {$entity}. Considere fazer upgrade.",
+                    "Você já usou {$percentage}% do seu limite de {$entity}. Considere fazer upgrade para {$planProName}.",
                     'warning',
                     route('user.subscription.index')
                 );

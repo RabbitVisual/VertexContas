@@ -1,6 +1,6 @@
 <x-paneluser::layouts.master :title="'Relatórios'">
 @php $isPro = auth()->user()?->isPro() ?? false; @endphp
-<div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ showConsultingModal: false }">
     {{-- Hero --}}
     <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]" aria-hidden="true"></div>
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">
-                            {{ $isPro ? 'Vertex PRO' : 'Visualização básica' }}
+                            {{ $isPro ? plan_pro_name() : 'Visualização básica' }}
                         </p>
                         <p class="text-2xl font-black text-gray-900 dark:text-white leading-tight">
                             {{ $isPro ? ($transactionCount ?? 0) . ' transações' : 'Apenas visualização' }}
@@ -50,6 +50,51 @@
 
     {{-- Report Cards --}}
     <div class="grid grid-cols-1 gap-6">
+        {{-- Consultoria Mensal (PRO) - Destaque --}}
+        @if($isPro)
+        <div class="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-600 rounded-3xl border border-blue-500/20 dark:border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-500">
+            <div class="flex flex-col lg:flex-row items-stretch">
+                <div class="lg:w-48 p-8 flex flex-row lg:flex-col items-center justify-center gap-4 lg:gap-1 text-center border-b lg:border-b-0 lg:border-r border-white/20">
+                    <span class="text-xs font-black text-blue-100 uppercase tracking-[0.2em]">{{ plan_pro_name() }}</span>
+                    <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white shrink-0">
+                        <x-icon name="crown" style="solid" class="w-7 h-7" />
+                    </div>
+                </div>
+                <div class="flex-1 p-8">
+                    <h3 class="text-2xl font-black text-white group-hover:text-blue-100 transition-colors mb-2">Consultoria Mensal</h3>
+                    <p class="text-blue-100 text-sm leading-relaxed">Análise 50/30/20, score financeiro, recomendações personalizadas e medalhas conquistadas. Imprima ou salve como PDF.</p>
+                </div>
+                <div class="lg:w-64 p-8 flex items-center justify-center bg-white/10 border-t lg:border-t-0 lg:border-l border-white/10">
+                    <a href="{{ route('core.reports.consultoria.view') }}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+                        Gerar Consultoria
+                        <x-icon name="arrow-right" style="solid" class="w-4 h-4" />
+                    </a>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="group relative overflow-hidden bg-gradient-to-r from-blue-600/90 to-purple-600/90 dark:from-blue-600/80 dark:to-purple-600/80 rounded-3xl border border-blue-500/20 dark:border-purple-500/20 shadow-lg">
+            <div class="flex flex-col lg:flex-row items-stretch">
+                <div class="lg:w-48 p-8 flex flex-row lg:flex-col items-center justify-center gap-4 lg:gap-1 text-center border-b lg:border-b-0 lg:border-r border-white/20">
+                    <span class="text-xs font-black text-blue-100 uppercase tracking-[0.2em]">{{ plan_pro_name() }}</span>
+                    <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-white shrink-0">
+                        <x-icon name="crown" style="solid" class="w-7 h-7" />
+                    </div>
+                </div>
+                <div class="flex-1 p-8">
+                    <h3 class="text-2xl font-black text-white mb-2">Consultoria Mensal</h3>
+                    <p class="text-blue-100 text-sm leading-relaxed">Análise 50/30/20, score financeiro, recomendações personalizadas e medalhas conquistadas.</p>
+                </div>
+                <div class="lg:w-64 p-8 flex items-center justify-center bg-white/10 border-t lg:border-t-0 lg:border-l border-white/10">
+                    <button type="button" @click="showConsultingModal = true" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+                        Ver Consultoria
+                        <x-icon name="crown" style="solid" class="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Fluxo de Caixa --}}
         <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl">
             <div class="flex flex-col lg:flex-row items-stretch">
@@ -99,7 +144,7 @@
         <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-teal-500/30 shadow-sm hover:shadow-xl">
             <div class="flex flex-col lg:flex-row items-stretch">
                 <div class="lg:w-48 bg-gray-50 dark:bg-gray-900 p-8 flex flex-row lg:flex-col items-center justify-center gap-4 lg:gap-1 text-center border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/5">
-                    <span class="text-xs font-black text-teal-600 dark:text-teal-500 uppercase tracking-[0.2em]">Vertex PRO</span>
+                    <span class="text-xs font-black text-teal-600 dark:text-teal-500 uppercase tracking-[0.2em]">{{ plan_pro_name() }}</span>
                     <div class="w-14 h-14 rounded-2xl bg-teal-600/10 dark:bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
                         <x-icon name="building-columns" style="duotone" class="w-7 h-7" />
                     </div>
@@ -120,14 +165,14 @@
         <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm opacity-90">
             <div class="flex flex-col lg:flex-row items-stretch">
                 <div class="lg:w-48 bg-gray-50 dark:bg-gray-900 p-8 flex flex-row lg:flex-col items-center justify-center gap-4 lg:gap-1 text-center border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/5">
-                    <span class="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.2em]">Vertex PRO</span>
+                    <span class="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.2em]">{{ plan_pro_name() }}</span>
                     <div class="w-14 h-14 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                         <x-icon name="building-columns" style="duotone" class="w-7 h-7" />
                     </div>
                 </div>
                 <div class="flex-1 p-8">
                     <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">Extrato Vertex</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Relatório exclusivo para Vertex PRO. Assine para acessar extrato completo com filtros e exportação.</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Relatório exclusivo para {{ plan_pro_name() }}. Assine para acessar extrato completo com filtros e exportação.</p>
                 </div>
                 <div class="lg:w-64 p-8 flex items-center justify-center bg-gray-50 dark:bg-gray-900/30 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5">
                     <a href="{{ route('user.subscription.index') }}" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
@@ -147,7 +192,11 @@
             <x-icon name="circle-question" style="duotone" class="w-5 h-5 text-emerald-600" />
             Guia rápido dos relatórios
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+            <div class="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border border-blue-100 dark:border-blue-800/30">
+                <span class="font-bold text-blue-700 dark:text-blue-400 block mb-2">Consultoria Mensal</span>
+                <p class="text-slate-600 dark:text-slate-400">Score financeiro, análise 50/30/20 (Essencial/Estilo de Vida/Financeiro), recomendações personalizadas e medalhas do mês. Imprima ou salve como PDF.</p>
+            </div>
             <div class="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30">
                 <span class="font-bold text-emerald-700 dark:text-emerald-400 block mb-2">Fluxo de Caixa</span>
                 <p class="text-slate-600 dark:text-slate-400">Mostra receitas e despesas ao longo do tempo. Use para ver tendências, taxa de poupança e identificar meses atípicos.</p>
@@ -163,6 +212,26 @@
         </div>
     </div>
     @endif
+
+    {{-- Modal: Consultoria exclusiva PRO (Free users) --}}
+    <div x-show="showConsultingModal" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="showConsultingModal = false" role="dialog" aria-modal="true" aria-labelledby="consulting-modal-title">
+        <div x-show="showConsultingModal" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="relative w-full max-w-md rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-2xl p-8" @click.stop>
+            <button type="button" @click="showConsultingModal = false" class="absolute top-4 right-4 p-2 rounded-xl text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors" aria-label="Fechar">
+                <x-icon name="xmark" style="solid" class="w-5 h-5" />
+            </button>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white mb-6">
+                    <x-icon name="crown" style="solid" class="w-8 h-8" />
+                </div>
+                <h2 id="consulting-modal-title" class="text-xl font-black text-gray-900 dark:text-white mb-3">Consultoria Exclusiva {{ plan_pro_name() }}</h2>
+                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6">A análise 50/30/20 e o relatório de consultoria financeira são exclusivos do plano Vertex PRO. Faça upgrade para receber recomendações personalizadas, score financeiro e medalhas.</p>
+                <a href="{{ route('user.subscription.index') }}" class="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+                    <x-icon name="crown" style="solid" class="w-5 h-5" />
+                    Fazer Upgrade
+                </a>
+            </div>
+        </div>
+    </div>
 
     @if(!$isPro)
     <div class="relative overflow-hidden bg-slate-900 rounded-3xl p-8 shadow-2xl">

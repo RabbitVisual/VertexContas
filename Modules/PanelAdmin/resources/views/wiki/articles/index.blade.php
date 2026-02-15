@@ -1,32 +1,26 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Artigos Wiki</x-slot>
 
-    <div class="space-y-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Artigos da Wiki</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Gerencie o conteúdo técnico da base de conhecimento.</p>
-            </div>
-            <a href="{{ route('admin.wiki.articles.create') }}"
-                class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                <x-icon name="plus" style="duotone" /> Novo Artigo
+    <x-paneladmin::page title="Artigos da Wiki" subtitle="Gerencie o conteúdo técnico da base de conhecimento.">
+        <x-slot name="header">
+            <a href="{{ route('admin.wiki.articles.create') }}" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2">
+                <x-icon name="plus" style="duotone" class="w-4 h-4" /> Novo Artigo
             </a>
-        </div>
-        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-slate-800/50">
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Artigo</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Acessos</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800/50">
+        </x-slot>
+
+        <x-paneladmin::card>
+            <x-paneladmin::table-wrapper>
+                <x-slot name="thead">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Artigo</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Categoria</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Status</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Acessos</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Ações</th>
+                    </tr>
+                </x-slot>
                         @foreach($articles as $article)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                                 <td class="px-6 py-5">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-slate-800 dark:text-white">{{ $article->title }}</span>
@@ -34,7 +28,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-5">
-                                    <span class="px-3 py-1 bg-primary/5 text-primary text-[10px] font-black rounded-lg uppercase">
+                                    <span class="px-3 py-1 bg-[#11C76F]/10 text-[#11C76F] text-xs font-bold rounded-lg uppercase">
                                         {{ $article->category->name }}
                                     </span>
                                 </td>
@@ -56,7 +50,7 @@
                                 </td>
                                 <td class="px-6 py-5">
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('admin.wiki.articles.edit', $article) }}" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
+                                        <a href="{{ route('admin.wiki.articles.edit', $article) }}" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-[#11C76F] transition-colors">
                                             <x-icon name="pen" style="duotone" class="text-xs" />
                                         </a>
                                         <form action="{{ route('admin.wiki.articles.destroy', $article) }}" method="POST" onsubmit="return confirm('Tem certeza?')">
@@ -69,14 +63,12 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-paneladmin::table-wrapper>
             @if($articles->hasPages())
-                <div class="px-6 py-4 bg-gray-50 dark:bg-slate-800/30 border-t border-gray-50 dark:border-gray-800">
+                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700">
                     {{ $articles->links() }}
                 </div>
             @endif
-        </div>
-    </div>
+        </x-paneladmin::card>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

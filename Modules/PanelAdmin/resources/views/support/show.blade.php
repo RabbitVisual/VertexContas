@@ -3,7 +3,7 @@
 
     <div class="h-[calc(100vh-8rem)] flex flex-col">
         <!-- Header -->
-        <div class="bg-white dark:bg-[#111111] rounded-[2.5rem] p-6 mb-6 border border-gray-100 dark:border-white/5 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 mb-6 border border-slate-100 dark:border-slate-700 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
                 <a href="{{ route('admin.support.index') }}" class="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:bg-[#11C76F]/10 hover:text-[#11C76F] transition-all hover:scale-105 active:scale-95 shadow-sm group">
                     <x-icon name="arrow-left" style="duotone" class="group-hover:-translate-x-1 transition-transform" />
@@ -63,7 +63,7 @@
         <!-- Main Layout -->
         <div class="flex-1 flex flex-col md:flex-row gap-8 overflow-hidden">
             <!-- Chat Side -->
-            <div class="flex-1 flex flex-col bg-white dark:bg-[#111111] rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden relative">
+            <div class="flex-1 flex flex-col bg-white dark:bg-[#111111] rounded-xl border border-slate-100 dark:border-slate-700 shadow-2xl overflow-hidden relative">
                 <!-- Watermark -->
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] dark:opacity-[0.01]">
                     <x-icon name="vertex-logo" style="duotone" class="w-96" />
@@ -94,7 +94,7 @@
             <!-- Sidebar Intel -->
             <div class="w-full md:w-96 space-y-8 overflow-y-auto custom-scrollbar">
                 <!-- Customer Profile -->
-                <div class="bg-white dark:bg-[#111111] rounded-[3rem] p-8 border border-gray-100 dark:border-white/5 shadow-xl">
+                <div class="bg-white dark:bg-[#111111] rounded-xl p-8 border border-slate-100 dark:border-slate-700 shadow-xl">
                     <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
                         <x-icon name="user-vneck" style="duotone" class="text-xs" /> Perfil do Cliente
                     </h4>
@@ -158,7 +158,7 @@
                     </div>
                     @endif
 
-                    <div class="mt-10 pt-8 border-t border-gray-100 dark:border-white/5">
+                    <div class="mt-10 pt-8 border-t border-slate-100 dark:border-slate-700">
                         <a href="{{ route('admin.users.show', $ticket->user) }}" class="w-full flex items-center justify-center py-4 rounded-2xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-[10px] font-black uppercase tracking-[0.1em] hover:scale-105 active:scale-95 transition-all shadow-xl">
                             Visualizar Dossier Completo
                         </a>
@@ -166,7 +166,7 @@
                 </div>
 
                 <!-- Active Agent Card -->
-                <div class="bg-gradient-to-br from-[#111111] to-[#222222] rounded-[3rem] p-8 text-white shadow-2xl relative overflow-hidden group">
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 text-white shadow-2xl relative overflow-hidden group">
                     <!-- Background Accent -->
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-[#11C76F]/10 rounded-full blur-3xl group-hover:bg-[#11C76F]/20 transition-all duration-700"></div>
 

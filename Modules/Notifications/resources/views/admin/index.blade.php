@@ -1,176 +1,148 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Central de Avisos</x-slot>
 
-    <div class="max-w-5xl mx-auto px-4 py-10">
-
-        <!-- Header Section -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-            <div class="space-y-1">
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic uppercase">
-                    Central de Avisos
-                </h1>
-                <p class="text-sm text-slate-500 font-medium italic">Gerencie e envie notificações inteligentes para toda a plataforma.</p>
-            </div>
-
-            <a href="{{ route('admin.notifications.create') }}" class="inline-flex items-center gap-3 px-6 py-4 bg-[#11C76F] text-white font-black rounded-2xl shadow-lg shadow-[#11C76F]/20 hover:bg-[#0EA85A] hover:-translate-y-1 active:scale-95 transition-all text-[10px] uppercase tracking-[0.2em]">
-                <x-icon name="plus" style="duotone" class="text-lg" />
+    <x-paneladmin::page title="Central de Avisos" subtitle="Gerencie e envie notificações para toda a plataforma.">
+        <x-slot name="header">
+            <a href="{{ route('admin.notifications.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors">
+                <x-icon name="plus" style="duotone" class="w-4 h-4" />
                 Nova Notificação
             </a>
-        </div>
+        </x-slot>
 
         @if(session('success'))
-            <div class="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] flex items-center gap-4 text-emerald-600 dark:text-emerald-400">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <x-icon name="check" style="duotone" class="text-xl" />
+            <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
+                    <x-icon name="check" style="duotone" class="w-5 h-5" />
                 </div>
-                <p class="font-black uppercase tracking-widest text-xs">{{ session('success') }}</p>
+                <p class="font-bold text-sm">{{ session('success') }}</p>
             </div>
         @endif
 
-        <!-- Stats Grid (Aesthetic) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
-                <div class="relative z-10 flex flex-col">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Total de Disparos</span>
-                    <div class="flex items-end gap-3">
-                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">{{ $recentNotifications->sum('count') }}</span>
-                        <x-icon name="paper-plane" style="duotone" class="text-xl text-blue-500 mb-1" />
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Total de Disparos</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ $recentNotifications->sum('count') }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                        <x-icon name="paper-plane" style="duotone" class="w-6 h-6 text-blue-500" />
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
-                <div class="relative z-10 flex flex-col">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Alcance Médio</span>
-                    <div class="flex items-end gap-3">
-                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">98%</span>
-                        <x-icon name="users" style="duotone" class="text-xl text-emerald-500 mb-1" />
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Alcance Médio</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">98%</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                        <x-icon name="users" style="duotone" class="w-6 h-6 text-emerald-500" />
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
-                <div class="relative z-10 flex flex-col">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Taxa de Leitura</span>
-                    <div class="flex items-end gap-3">
-                        <span class="text-4xl font-black text-slate-900 dark:text-white leading-none tracking-tight italic">74%</span>
-                        <x-icon name="eye" style="duotone" class="text-xl text-amber-500 mb-1" />
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Taxa de Leitura</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">74%</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                        <x-icon name="eye" style="duotone" class="w-6 h-6 text-amber-500" />
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- History Section -->
-        <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
-            <div class="p-10 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01]">
-                <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight italic">Histórico de Disparos</h3>
-                <p class="text-xs text-slate-400 font-black uppercase tracking-widest mt-1">Últimas 10 notificações enviadas</p>
-            </div>
+        <!-- Histórico -->
+        <x-paneladmin::card title="Histórico de Disparos" subtitle="Últimas notificações enviadas.">
+            <x-paneladmin::table-wrapper>
+                <x-slot name="thead">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Notificação</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tipo</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Alcance</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Data</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Ações</th>
+                    </tr>
+                </x-slot>
+                @forelse($recentNotifications as $notification)
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                        <td class="px-6 py-4">
+                            <div>
+                                <p class="font-bold text-slate-900 dark:text-white text-sm">{{ $notification->data->title ?? '—' }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 max-w-md">{{ $notification->data->message ?? '' }}</p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl flex items-center justify-center
+                                    {{ match($notification->data->type ?? 'info') {
+                                        'success' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+                                        'warning' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                                        'danger' => 'bg-red-500/10 text-red-600 dark:text-red-400',
+                                        default => 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                    } }}">
+                                    <x-icon :name="$notification->data->icon ?? 'bell'" style="duotone" class="w-4 h-4" />
+                                </div>
+                                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                    {{ match($notification->data->type ?? 'info') {
+                                        'success' => 'Sucesso',
+                                        'warning' => 'Atenção',
+                                        'danger' => 'Crítico',
+                                        default => 'Informativo'
+                                    } }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                {{ $notification->count }} usuários
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
+                            {{ \Carbon\Carbon::parse($notification->created_at)->format('d/m/Y H:i') }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.notifications.show', $notification->id) }}" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-[#11C76F] hover:bg-[#11C76F]/10 flex items-center justify-center transition-colors" title="Ver Detalhes">
+                                    <x-icon name="eye" style="duotone" class="w-4 h-4" />
+                                </a>
+                                <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-500 hover:bg-blue-500/10 flex items-center justify-center transition-colors" title="Usar como Template">
+                                    <x-icon name="copy" style="duotone" class="w-4 h-4" />
+                                </a>
+                                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Apagar este histórico?')" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors" title="Excluir">
+                                        <x-icon name="trash" style="duotone" class="w-4 h-4" />
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center gap-4">
+                                <div class="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                    <x-icon name="bullhorn" style="duotone" class="w-8 h-8 text-slate-400" />
+                                </div>
+                                <p class="font-medium text-slate-900 dark:text-white">Nenhuma notificação enviada</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Crie sua primeira notificação para os usuários.</p>
+                                <a href="{{ route('admin.notifications.create') }}" class="text-sm font-bold text-[#11C76F] hover:underline">Nova Notificação</a>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </x-paneladmin::table-wrapper>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="sticky top-0 z-10">
-                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-gray-50 dark:bg-slate-900/95 dark:bg-slate-900 backdrop-blur-sm border-b border-gray-100 dark:border-white/5">
-                            <th class="px-10 py-6">Notificação</th>
-                            <th class="px-10 py-6">Tipo / Ícone</th>
-                            <th class="px-10 py-6">Alcance</th>
-                            <th class="px-10 py-6">Data de Envio</th>
-                            <th class="px-10 py-6 text-right">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                        @forelse($recentNotifications as $notification)
-                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                                <td class="px-10 py-8">
-                                    <div class="space-y-1">
-                                        <p class="text-sm font-black text-slate-900 dark:text-white tracking-tight">{{ $notification->data->title }}</p>
-                                        <p class="text-xs text-slate-500 line-clamp-1 max-w-md italic">{{ $notification->data->message }}</p>
-                                    </div>
-                                </td>
-                                <td class="px-10 py-8">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center
-                                            {{ match($notification->data->type ?? 'info') {
-                                                'success' => 'bg-emerald-500/10 text-emerald-500',
-                                                'warning' => 'bg-amber-500/10 text-amber-500',
-                                                'danger' => 'bg-red-500/10 text-red-500',
-                                                default => 'bg-blue-500/10 text-blue-500'
-                                            } }}">
-                                            <x-icon :name="$notification->data->icon ?? 'bell'" style="duotone" class="text-lg" />
-                                        </div>
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                            {{ match($notification->data->type ?? 'info') {
-                                                'success' => 'Sucesso',
-                                                'warning' => 'Atenção',
-                                                'danger' => 'Crítico',
-                                                default => 'Informativo'
-                                            } }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-10 py-8">
-                                    <div class="flex items-center gap-2">
-                                        <div class="px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest border border-gray-100 dark:border-white/5">
-                                            {{ $notification->count }} Usuários
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-10 py-8">
-                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic leading-none">
-                                        {{ \Carbon\Carbon::parse($notification->created_at)->format('d/m/Y - H:i') }}
-                                    </span>
-                                </td>
-                                <td class="px-10 py-8 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('admin.notifications.show', $notification->id) }}" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-[#11C76F] hover:bg-[#11C76F]/10 transition-all active:scale-90" title="Ver Detalhes">
-                                            <x-icon name="eye" style="duotone" class="text-lg" />
-                                        </a>
-                                        <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-blue-500 hover:bg-blue-500/10 transition-all active:scale-90" title="Usar como Template">
-                                            <x-icon name="copy" style="duotone" class="text-lg" />
-                                        </a>
-                                        <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Apagar este histórico?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-90" title="Excluir">
-                                                <x-icon name="trash" style="duotone" class="text-lg" />
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-10 py-20 text-center">
-                                    <div class="flex flex-col items-center gap-4">
-                                        <div class="w-20 h-20 rounded-[2rem] bg-gray-50 dark:bg-white/5 flex items-center justify-center text-slate-300">
-                                            <x-icon name="bullhorn" style="duotone" class="text-4xl text-slate-300 dark:text-slate-600" />
-                                        </div>
-                                        <div>
-                                            <p class="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">Nenhuma notificação enviada</p>
-                                            <p class="text-xs text-slate-400 font-medium italic mt-1">Comece criando sua primeira mensagem para os usuários.</p>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="p-10 bg-gray-50/50 dark:bg-white/[0.01] border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Mostrando últimos registros</span>
-                <div class="flex gap-2">
-                    <button class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all shadow-sm">
-                        <x-icon name="chevron-left" style="duotone" class="text-xs" />
-                    </button>
-                    <button class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all shadow-sm">
-                        <x-icon name="chevron-right" style="duotone" class="text-xs" />
-                    </button>
+            @if($recentNotifications->isNotEmpty())
+                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400">
+                    Mostrando últimos {{ $recentNotifications->count() }} registros
                 </div>
-            </div>
-        </div>
-    </div>
+            @endif
+        </x-paneladmin::card>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

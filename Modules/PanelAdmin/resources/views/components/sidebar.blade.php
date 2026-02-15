@@ -66,6 +66,15 @@
                         </span>
                     </a>
 
+                    {{-- Central de Insights --}}
+                    <a href="{{ route('admin.insights.index') }}"
+                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.insights.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
+                        <x-icon name="robot" style="duotone" class="size-5 shrink-0" />
+                        <span class="invisible absolute start-full top-1/2 z-50 ms-4 -translate-y-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:visible">
+                            Insights
+                        </span>
+                    </a>
+
                     {{-- Blog --}}
                     <a href="{{ route('admin.blog.index') }}"
                         class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.blog.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
@@ -157,6 +166,17 @@
                         <a href="{{ route('admin.wiki.categories') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.wiki.categories*') ? $linkActive : $linkInactive }}"><x-icon name="folder" style="duotone" class="size-4 shrink-0" />Categorias Wiki</a>
                         <a href="{{ route('admin.wiki.articles') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.wiki.articles*') ? $linkActive : $linkInactive }}"><x-icon name="file-pen" style="duotone" class="size-4 shrink-0" />Artigos Wiki</a>
                         <a href="{{ route('admin.wiki.suggestions') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.wiki.suggestions*') ? $linkActive : $linkInactive }}"><x-icon name="book" style="duotone" class="size-4 shrink-0" />Gestão Wiki</a>
+                    </div>
+                </div>
+
+                {{-- Categoria: Gamificação --}}
+                <div class="mt-5">
+                    <div class="flex items-center gap-2 px-3 py-2">
+                        <x-icon name="robot" style="duotone" class="size-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Gamificação</span>
+                    </div>
+                    <div class="mt-0.5 space-y-0.5">
+                        <a href="{{ route('admin.insights.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.insights.*') ? $linkActive : $linkInactive }}"><x-icon name="lightbulb" style="duotone" class="size-4 shrink-0" />Central de Insights</a>
                     </div>
                 </div>
 

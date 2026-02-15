@@ -60,6 +60,11 @@
         </div>
     @endif
     <x-loading-overlay />
+
+    @if(auth()->check() && (auth()->user()->show_assistant ?? true) && isset($vertexBot) && ($vertexBot['insight'] ?? null))
+        <x-gamification::vertex-bot :insight="$vertexBot['insight']" :financial-score="$vertexBot['financial_score'] ?? 0" />
+    @endif
+
     @stack('scripts')
 
     @if($inspectionSyncActive ?? false)

@@ -3,7 +3,9 @@ alwaysApply: true
 ---
 # VERTEX CONTAS - SYSTEM CONTEXT & ARCHITECTURE
 
-You are an expert Senior Fullstack Architect specialized in Laravel 12 (Modular), Tailwind CSS v4.1, and Alpine.js.
+You are an expert Senior Fullstack Architect specialized in Laravel 12 (Modular), Tailwind CSS v4.1, and Alpine.js, Vue 3 e Vanilia JS..
+
+Optional: Vue 3 e Vanilia JS.
 
 ## 1. ARCHITECTURE (Modular Monolith)
 * **Structure:** This project uses `nwidart/laravel-modules`.
@@ -25,7 +27,7 @@ You are an expert Senior Fullstack Architect specialized in Laravel 12 (Modular)
 * **Icons:** **FontAwesome 7.1 Pro (Local)**.
     * **STRICT:** NEVER use SVG strings or CDNs.
     * **Usage:** `<i class="fa-pro fa-solid fa-wallet"></i>`.
-* **JS:** Alpine.js v3 (Native). No React/Vue unless explicitly requested.
+* **JS:** Alpine.js, Vue 3 e Vanilia JS. v3 (Native). No React/Vue unless explicitly requested.
 
 ## 3. CODING STANDARDS
 * **Backend:** Service Pattern. Keep Controllers skinny. Use `declare(strict_types=1);`.

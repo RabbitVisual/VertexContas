@@ -46,8 +46,10 @@
             </x-paneladmin::navbar>
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-background p-6">
-                {{ $slot ?? '' }}
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-background p-6 min-h-0">
+                <div class="max-w-[1600px] w-full mx-auto">
+                    {{ $slot ?? '' }}
+                </div>
             </main>
 
             <x-notifications::toast />

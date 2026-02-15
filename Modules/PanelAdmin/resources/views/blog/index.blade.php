@@ -1,59 +1,52 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Gestão do Blog</x-slot>
 
-    <div class="space-y-8">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Gestão do Blog</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Publique, edite e gerencie todo o conteúdo do seu blog.</p>
-            </div>
+    <x-paneladmin::page title="Gestão do Blog" subtitle="Publique, edite e gerencie todo o conteúdo do seu blog.">
+        <x-slot name="header">
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.blog.categories') }}" class="px-6 py-3 rounded-2xl bg-gray-100 dark:bg-slate-800 text-slate-600 dark:text-gray-400 font-black text-sm hover:bg-gray-200 transition-all">
+                <a href="{{ route('admin.blog.categories') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
                     Categorias
                 </a>
-                <a href="{{ route('admin.blog.create') }}" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                    <x-icon name="plus" style="duotone" /> Novo Post
+                <a href="{{ route('admin.blog.create') }}" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2">
+                    <x-icon name="plus" style="duotone" class="w-4 h-4" /> Novo Post
                 </a>
             </div>
-        </div>
+        </x-slot>
 
-        <!-- Stats Grid (Optional but nice) -->
+        <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total de Posts</span>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Total de Posts</span>
                 <span class="text-3xl font-black text-slate-800 dark:text-white">{{ $posts->total() }}</span>
             </div>
-            <div class="bg-indigo-600 p-6 rounded-[2rem] text-white shadow-xl shadow-indigo-500/20">
+            <div class="bg-indigo-600 p-6 rounded-xl text-white shadow-sm">
                 <span class="text-[10px] font-black text-indigo-200 uppercase tracking-widest block mb-1">Publicados</span>
                 <span class="text-3xl font-black text-white">{{ \Modules\Blog\Models\Post::where('status', 'published')->count() }}</span>
             </div>
-             <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Comentários Pendentes</span>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Comentários Pendentes</span>
                 <span class="text-3xl font-black text-slate-800 dark:text-white">{{ \Modules\Blog\Models\Comment::where('is_approved', false)->count() }}</span>
             </div>
-             <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total de Acessos</span>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Total de Acessos</span>
                 <span class="text-3xl font-black text-slate-800 dark:text-white">{{ format_number(\Modules\Blog\Models\Post::sum('views'), 0) }}</span>
             </div>
         </div>
 
         <!-- Posts Table -->
-        <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="sticky top-0 z-10 bg-gray-50/95 dark:bg-slate-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
-                        <tr>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Postagem</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Acessos</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+        <x-paneladmin::card>
+            <x-paneladmin::table-wrapper>
+                <x-slot name="thead">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Postagem</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Categoria</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Status</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Acessos</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Ações</th>
+                    </tr>
+                </x-slot>
                         @forelse($posts as $post)
-                            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/30 dark:even:bg-slate-800/20">
+                            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-4">
                                         @if($post->featured_image)
@@ -127,15 +120,13 @@
                                 </td>
                             </tr>
                         @endforelse
-                    </tbody>
-                </table>
-            </div>
+            </x-paneladmin::table-wrapper>
 
             @if($posts->hasPages())
-                <div class="p-6 border-t border-gray-50 dark:border-gray-800">
+                <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700">
                     {{ $posts->links() }}
                 </div>
             @endif
-        </div>
-    </div>
+        </x-paneladmin::card>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

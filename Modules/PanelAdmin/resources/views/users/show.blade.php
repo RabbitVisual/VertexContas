@@ -1,28 +1,30 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Detalhes do Usuário</x-slot>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+    <x-paneladmin::page title="Detalhes do Usuário" subtitle="{{ $user->name }} — {{ $user->email }}">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- User Profile Card -->
         <div class="col-span-1">
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 text-center">
-                <div class="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-bold text-primary mx-auto mb-4">
+            <x-paneladmin::card>
+            <div class="p-6 text-center">
+                <div class="h-24 w-24 bg-[#11C76F]/10 rounded-xl flex items-center justify-center text-3xl font-bold text-[#11C76F] mx-auto mb-4">
                     {{ substr($user->name, 0, 1) }}
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h2>
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">{{ $user->email }}</p>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">{{ $user->name }}</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">{{ $user->email }}</p>
 
                 <div class="flex justify-center gap-2 mb-6">
                     @foreach($user->roles as $role)
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-300">
+                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">
                             {{ ucfirst(str_replace('_', ' ', $role->name)) }}
                         </span>
                     @endforeach
                 </div>
 
-                <div class="border-t border-gray-100 dark:border-gray-700 pt-6 text-left space-y-3">
+                <div class="border-t border-slate-100 dark:border-slate-700 pt-6 text-left space-y-3">
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">ID:</span>
-                        <span class="font-medium dark:text-white">{{ $user->id }}</span>
+                        <span class="text-slate-500 dark:text-slate-400">ID:</span>
+                        <span class="font-medium text-slate-900 dark:text-white">{{ $user->id }}</span>
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500">Cadastro:</span>
@@ -42,26 +44,28 @@
                     @endif
                 </div>
             </div>
+            </x-paneladmin::card>
 
             <!-- Manage Role -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mt-6">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4">Gerenciar Papel/Plano</h3>
+            <x-paneladmin::card title="Gerenciar Papel/Plano">
+            <div class="p-6">
                 <form action="{{ route('admin.users.update', $user) }}" method="POST">
                     @csrf
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role do Usuário</label>
-                        <select name="role" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-white">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Role do Usuário</label>
+                        <select name="role" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="free_user" {{ $user->hasRole('free_user') ? 'selected' : '' }}>Free User</option>
                             <option value="pro_user" {{ $user->hasRole('pro_user') ? 'selected' : '' }}>Pro User</option>
                             <option value="admin" {{ $user->hasRole('admin') ? 'selected' : '' }}>Admin</option>
                             <option value="support" {{ $user->hasRole('support') ? 'selected' : '' }}>Support</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
+                    <button type="submit" class="w-full py-2.5 bg-[#11C76F] text-white rounded-xl hover:bg-[#0EA85A] transition-colors text-sm font-bold">
                         Atualizar Role
                     </button>
                 </form>
             </div>
+            </x-paneladmin::card>
         </div>
 
         <!-- Stats & Activity -->
@@ -176,4 +180,5 @@
             </div>
         </div>
     </div>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

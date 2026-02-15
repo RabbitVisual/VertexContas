@@ -123,6 +123,13 @@
                         Relatórios
                     </a>
                     @endif
+                    @if(Route::has('user.achievements.index'))
+                    <a href="{{ route('user.achievements.index') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('user.achievements.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="medal" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('user.achievements.*') ? $proIconActive : $proIconInactive }}" />
+                        Conquistas
+                    </a>
+                    @endif
 
                     {{-- Suporte --}}
                     <div class="pt-4 pb-2">
@@ -273,6 +280,14 @@
                             <x-icon name="chart-simple" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.reports.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Relatórios</span>
                             <span class="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded" title="Exportar PDF/CSV é exclusivo PRO">PRO</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Route::has('user.achievements.index'))
+                    <li>
+                        <a href="{{ route('user.achievements.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('user.achievements.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="medal" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('user.achievements.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Conquistas</span>
                         </a>
                     </li>
                     @endif

@@ -62,7 +62,7 @@
         <div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex flex-col md:flex-row items-center gap-4">
                 <p class="text-slate-400 dark:text-slate-500 text-xs text-center md:text-left">
-                    &copy; {{ date('Y') }} VertexContas. Todos os direitos reservados.
+                    &copy; {{ date('Y') }} <strong class="text-slate-600 dark:text-slate-400">Vertex Solutions LTDA</strong>. Todos os direitos reservados.
                 </p>
                 @auth
                     <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800">
@@ -72,7 +72,7 @@
                 @endauth
             </div>
             <p class="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1">
-                Desenvolvido com <x-icon name="heart" style="duotone" class="text-red-500 animate-pulse" /> por Vertex Solutions
+                Desenvolvido com <x-icon name="heart" style="duotone" class="text-red-500 animate-pulse" /> por Vertex Solutions LTDA
             </p>
         </div>
     </div>

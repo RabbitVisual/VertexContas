@@ -32,8 +32,8 @@
                                     <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                                         <x-icon name="crown" style="solid" class="w-8 h-8 text-white" />
                                     </div>
-                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Conteúdo Exclusivo para Assinantes Vertex PRO</h2>
-                                    <p class="text-slate-600 dark:text-slate-400 mb-6">Este artigo contém estratégias avançadas reservadas para assinantes Vertex PRO.</p>
+                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Conteúdo Exclusivo para Assinantes {{ plan_pro_name() }}</h2>
+                                    <p class="text-slate-600 dark:text-slate-400 mb-6">Este artigo contém estratégias avançadas reservadas para assinantes {{ plan_pro_name() }}.</p>
                                     <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center gap-2 w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg hover:shadow-xl">
                                         <x-icon name="crown" style="solid" class="w-5 h-5" />
                                         Desbloquear Acesso Agora

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Modules\Core\Services;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\RecurringTransaction;
 use Modules\Core\Models\Transaction;
@@ -95,6 +97,220 @@ class FinancialHealthService
         });
 
         return (float) ($income - $expenses);
+    }
+
+    /**
+     * Renda Base: soma das receitas recorrentes (baseline) cadastradas no Onboarding.
+     * Usado como denominador no 50/30/20.
+     */
+    public function getBaselineIncome(User $user): float
+    {
+        $recurring = RecurringTransaction::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'income')
+            ->where('is_baseline', true)
+            ->active()
+            ->get();
+
+        return (float) $recurring->sum(fn (RecurringTransaction $rt) => $this->getNormalizedMonthlyAmount($rt));
+    }
+
+    /**
+     * Budget health analysis: 50/30/20 deviations per pillar.
+     * Uses Baseline Income as denominator. Returns actual %, target %, deviation, status (over/under/ok).
+     *
+     * @return array{baseline_income: float, total_expenses: float, pillars: array, savings_pct: float}
+     */
+    public function getBudgetHealthAnalysis(User $user): array
+    {
+        $start = now()->startOfMonth();
+        $end = now()->endOfMonth();
+
+        $baselineIncome = $this->getBaselineIncome($user);
+        if ($baselineIncome <= 0) {
+            $baselineIncome = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'income')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+        }
+
+        if ($baselineIncome <= 0) {
+            return [
+                'baseline_income' => 0.0,
+                'total_expenses' => 0.0,
+                'pillars' => [
+                    'essential' => ['actual_pct' => 0.0, 'target_pct' => 50, 'deviation' => 0.0, 'status' => 'ok', 'label' => 'Essential: 0% (Ok)'],
+                    'lifestyle' => ['actual_pct' => 0.0, 'target_pct' => 30, 'deviation' => 0.0, 'status' => 'ok', 'label' => 'Lifestyle: 0% (Ok)'],
+                    'financial' => ['actual_pct' => 0.0, 'target_pct' => 20, 'deviation' => 0.0, 'status' => 'ok', 'label' => 'Financial: 0% (Ok)'],
+                ],
+                'savings_pct' => 0.0,
+            ];
+        }
+
+        $expensesByTypeGroup = Transaction::query()
+            ->where('transactions.user_id', $user->id)
+            ->where('transactions.type', 'expense')
+            ->where('transactions.status', 'completed')
+            ->whereBetween('transactions.date', [$start, $end])
+            ->whereNull('transactions.destination_account_id')
+            ->whereNull('transactions.parent_id')
+            ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
+            ->select(DB::raw('COALESCE(NULLIF(categories.type_group, ""), "lifestyle") as type_group'), DB::raw('SUM(transactions.amount) as total'))
+            ->groupBy('type_group')
+            ->get()
+            ->keyBy('type_group');
+
+        $essentialTotal = (float) ($expensesByTypeGroup->get('essential')?->total ?? 0);
+        $lifestyleTotal = (float) ($expensesByTypeGroup->get('lifestyle')?->total ?? 0);
+        $financialTotal = (float) ($expensesByTypeGroup->get('financial')?->total ?? 0);
+        $totalExpenses = $essentialTotal + $lifestyleTotal + $financialTotal;
+
+        $essentialPct = ($essentialTotal / $baselineIncome) * 100;
+        $lifestylePct = ($lifestyleTotal / $baselineIncome) * 100;
+        $financialPct = ($financialTotal / $baselineIncome) * 100;
+        $savingsPct = max(0.0, (($baselineIncome - $totalExpenses) / $baselineIncome) * 100);
+
+        $targets = ['essential' => 50, 'lifestyle' => 30, 'financial' => 20];
+        $actuals = ['essential' => $essentialPct, 'lifestyle' => $lifestylePct, 'financial' => $financialPct];
+        $labels = ['essential' => 'Essencial', 'lifestyle' => 'Estilo de Vida', 'financial' => 'Financeiro'];
+
+        $pillars = [];
+        foreach (['essential', 'lifestyle', 'financial'] as $key) {
+            $actual = round($actuals[$key], 2);
+            $target = $targets[$key];
+            $deviation = round($actual - $target, 2);
+            $status = $deviation > 0 ? 'over' : ($deviation < -2 ? 'under' : 'ok');
+            $statusLabel = $status === 'over' ? 'Acima' : ($status === 'under' ? 'Abaixo' : 'Ok');
+            $pillars[$key] = [
+                'actual_pct' => $actual,
+                'target_pct' => $target,
+                'deviation' => $deviation,
+                'status' => $status,
+                'label' => sprintf('%s: %s%s%% (%s)', $labels[$key], $deviation >= 0 ? '+' : '', $deviation, $statusLabel),
+            ];
+        }
+
+        return [
+            'baseline_income' => round($baselineIncome, 2),
+            'total_expenses' => round($totalExpenses, 2),
+            'pillars' => $pillars,
+            'savings_pct' => round($savingsPct, 2),
+        ];
+    }
+
+    /**
+     * 50/30/20 breakdown: percentages of income in each pillar.
+     * Uses type_group (essential, lifestyle, financial). Returns want_pct/savings_pct for RuleEngine compatibility.
+     *
+     * @return array{essential_pct: float, want_pct: float, savings_pct: float, lifestyle_pct: float, financial_pct: float}
+     */
+    public function get503020Breakdown(User $user, Carbon $start, Carbon $end): array
+    {
+        $income = $this->getBaselineIncome($user);
+        if ($income <= 0) {
+            $income = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'income')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+        }
+
+        if ($income <= 0) {
+            return [
+                'essential_pct' => 0.0,
+                'want_pct' => 0.0,
+                'savings_pct' => 0.0,
+                'lifestyle_pct' => 0.0,
+                'financial_pct' => 0.0,
+            ];
+        }
+
+        $expensesByTypeGroup = Transaction::query()
+            ->where('transactions.user_id', $user->id)
+            ->where('transactions.type', 'expense')
+            ->where('transactions.status', 'completed')
+            ->whereBetween('transactions.date', [$start, $end])
+            ->whereNull('transactions.destination_account_id')
+            ->whereNull('transactions.parent_id')
+            ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
+            ->select(DB::raw('COALESCE(NULLIF(categories.type_group, ""), "lifestyle") as type_group'), DB::raw('SUM(transactions.amount) as total'))
+            ->groupBy('type_group')
+            ->get()
+            ->keyBy('type_group');
+
+        $essentialTotal = (float) ($expensesByTypeGroup->get('essential')?->total ?? 0);
+        $lifestyleTotal = (float) ($expensesByTypeGroup->get('lifestyle')?->total ?? 0);
+        $financialTotal = (float) ($expensesByTypeGroup->get('financial')?->total ?? 0);
+        $totalExpense = $essentialTotal + $lifestyleTotal + $financialTotal;
+
+        $savingsPct = $income > 0 ? max(0.0, (($income - $totalExpense) / $income) * 100) : 0.0;
+        $essentialPct = $income > 0 ? ($essentialTotal / $income) * 100 : 0.0;
+        $lifestylePct = $income > 0 ? ($lifestyleTotal / $income) * 100 : 0.0;
+        $financialPct = $income > 0 ? ($financialTotal / $income) * 100 : 0.0;
+        $wantPct = $lifestylePct;
+
+        return [
+            'essential_pct' => round($essentialPct, 2),
+            'want_pct' => round($wantPct, 2),
+            'savings_pct' => round($savingsPct, 2),
+            'lifestyle_pct' => round($lifestylePct, 2),
+            'financial_pct' => round($financialPct, 2),
+        ];
+    }
+
+    /**
+     * Reserve months: account_balance / monthly_expenses (0 if no expenses).
+     */
+    public function getReserveMonths(User $user): float
+    {
+        $snapshot = $this->getUserFinancialSnapshot($user);
+        $balance = (float) $snapshot['account_balance'];
+        $monthlyExpenses = (float) $snapshot['monthly_expenses'];
+
+        if ($monthlyExpenses <= 0) {
+            return $balance > 0 ? 999.0 : 0.0;
+        }
+
+        return round($balance / $monthlyExpenses, 2);
+    }
+
+    /**
+     * Max consecutive days with at least one completed transaction in the last N days.
+     */
+    public function getConsecutiveTransactionDays(User $user, int $lookback = 30): int
+    {
+        $start = now()->subDays($lookback)->startOfDay();
+        $dates = Transaction::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->where('date', '>=', $start)
+            ->selectRaw('DATE(date) as d')
+            ->distinct()
+            ->orderBy('d')
+            ->pluck('d')
+            ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->values()
+            ->toArray();
+
+        if (empty($dates)) {
+            return 0;
+        }
+
+        $maxStreak = 1;
+        $currentStreak = 1;
+
+        for ($i = 1; $i < count($dates); $i++) {
+            $prev = Carbon::parse($dates[$i - 1]);
+            $curr = Carbon::parse($dates[$i]);
+            if ($curr->diffInDays($prev) === 1) {
+                $currentStreak++;
+            } else {
+                $maxStreak = max($maxStreak, $currentStreak);
+                $currentStreak = 1;
+            }
+        }
+
+        return max($maxStreak, $currentStreak);
     }
 
     /**

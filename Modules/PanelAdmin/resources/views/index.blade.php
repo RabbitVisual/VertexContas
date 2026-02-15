@@ -1,26 +1,23 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Dashboard</x-slot>
 
-    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Painel Administrativo</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Bem-vindo de volta! Aqui está o que está acontecendo no sistema hoje.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-xs font-bold flex items-center">
-                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
-                Sistema Online
-            </span>
-            <div class="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                {{ now()->format('d/m/Y H:i') }}
+    <x-paneladmin::page title="Painel Administrativo" subtitle="Bem-vindo de volta! Aqui está o que está acontecendo no sistema hoje.">
+        <x-slot name="header">
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-xs font-bold flex items-center">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
+                    Sistema Online
+                </span>
+                <div class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    {{ now()->format('d/m/Y H:i') }}
+                </div>
             </div>
-        </div>
-    </div>
+        </x-slot>
 
     <!-- Main Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Revenue Card -->
-        <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
+        <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="money-bill-trend-up" style="duotone" class="w-24 h-24 text-white" />
             </div>
@@ -44,7 +41,7 @@
         </div>
 
         <!-- Users Card -->
-        <div class="bg-gradient-to-br from-purple-600 to-pink-700 rounded-2xl p-6 text-white shadow-xl shadow-purple-500/20 relative overflow-hidden group">
+        <div class="bg-gradient-to-br from-purple-600 to-pink-700 rounded-xl p-6 text-white shadow-xl shadow-purple-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="users" style="duotone" class="w-24 h-24 text-white" />
             </div>
@@ -64,7 +61,7 @@
         </div>
 
         <!-- Pro Users Card -->
-        <a href="{{ route('admin.subscriptions.index') }}" class="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
+        <a href="{{ route('admin.subscriptions.index') }}" class="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="crown" style="duotone" class="w-24 h-24 text-white" />
             </div>
@@ -84,7 +81,7 @@
         </a>
 
         <!-- Support Card -->
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="headset" style="duotone" class="w-24 h-24 text-white" />
             </div>
@@ -102,8 +99,28 @@
                 </div>
             </div>
         </div>
+        <!-- Média de Score Financeiro -->
+        <div class="bg-gradient-to-br from-cyan-600 to-teal-700 rounded-xl p-6 text-white shadow-xl shadow-cyan-500/20 relative overflow-hidden group">
+            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <x-icon name="chart-pie" style="duotone" class="w-24 h-24 text-white" />
+            </div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-cyan-100/80 font-semibold text-sm uppercase tracking-wider">Média de Score Financeiro</p>
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
+                        <x-icon name="wallet" style="duotone" class="w-5 h-5 text-white" />
+                    </div>
+                </div>
+                <h3 class="text-3xl font-black mb-1">{{ $avgFinancialScore ?? 0 }}/100</h3>
+                <div class="flex items-center text-xs text-cyan-100/90 font-medium">
+                    <x-icon name="users" style="duotone" class="w-3 h-3 mr-1" />
+                    <span>Baseado em economia, orçamento e consistência</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Blog Conversion Rate -->
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
             <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <x-icon name="chart-simple" style="duotone" class="w-24 h-24 text-white" />
             </div>
@@ -124,9 +141,9 @@
     </div>
 
     <!-- Charts & Lists Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Revenue Chart -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="chart-line" style="duotone" class="text-indigo-500" />
@@ -140,7 +157,7 @@
         </div>
 
         <!-- User Distribution Chart -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                 <x-icon name="chart-pie" style="duotone" class="text-purple-500" />
                 Distribuição de Usuários
@@ -167,10 +184,10 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Recent Users -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="user-plus" style="duotone" class="text-blue-500" />
                     Últimos Cadastros
@@ -201,8 +218,8 @@
         </div>
 
         <!-- Recent Payments -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="credit-card" style="duotone" class="text-emerald-500" />
                     Pagamentos Recentes
@@ -235,10 +252,10 @@
     </div>
 
     <!-- Blog Analytics -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Most Read Posts -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="newspaper" style="duotone" class="text-indigo-500" />
                     Artigos Mais Lidos
@@ -257,8 +274,8 @@
         </div>
 
         <!-- Top Authors -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="feather-pointed" style="duotone" class="text-amber-500" />
                     Top Autores
@@ -279,8 +296,8 @@
         </div>
 
         <!-- Recent Comments -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <x-icon name="comments" style="duotone" class="text-amber-500" />
                     Comentários Recentes
@@ -301,7 +318,7 @@
     </div>
 
     <!-- Quick Actions Grid -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
         <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
             <x-icon name="bolt" style="duotone" class="text-amber-500" />
             Atalhos do Administrador
@@ -333,6 +350,8 @@
             </a>
         </div>
     </div>
+
+    </x-paneladmin::page>
 
     @push('scripts')
     <script>

@@ -19,7 +19,7 @@
             <div class="flex-1 min-w-0 max-w-20 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <div class="{{ $barColor }} h-full rounded-full transition-all duration-300" style="width: {{ $pct }}%"></div>
             </div>
-            <a href="{{ route('user.subscription.index') }}" class="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">Vertex Pro</a>
+            <a href="{{ route('user.subscription.index') }}" class="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">{{ plan_pro_name() }}</a>
         </div>
     @else
         <div class="mb-6 bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">

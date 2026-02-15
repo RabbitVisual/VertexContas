@@ -68,6 +68,18 @@ class PanelAdminController extends Controller
             ->with('author')
             ->get();
 
+        // Average Financial Score (Gamification)
+        $gamificationService = app(\Modules\Core\Services\GamificationService::class);
+        $avgFinancialScore = 0;
+        $usersWithScores = \App\Models\User::all();
+        if ($usersWithScores->isNotEmpty()) {
+            $totalScore = 0;
+            foreach ($usersWithScores as $u) {
+                $totalScore += $gamificationService->calculateFinancialScore($u);
+            }
+            $avgFinancialScore = (int) round($totalScore / $usersWithScores->count());
+        }
+
         // Chart Data (Last 6 Months Revenue)
         $revenueData = [];
         $monthLabels = [];
@@ -81,6 +93,7 @@ class PanelAdminController extends Controller
         }
 
         return view('paneladmin::index', compact(
+            'avgFinancialScore',
             'totalRevenue',
             'monthlyRevenue',
             'revenueLastMonth',

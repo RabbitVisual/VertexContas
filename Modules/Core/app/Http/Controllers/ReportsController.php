@@ -24,6 +24,7 @@ class ReportsController extends Controller
         $this->middleware('pro')->only([
             'extrato',
             'viewExtrato',
+            'viewConsulting',
             'exportExtratoCsv',
             'exportExtratoXlsx',
             'exportCashFlowCsv',
@@ -334,6 +335,38 @@ class ReportsController extends Controller
         $periodLabel = $startDate->format('d/m/Y') . ' a ' . $endDate->format('d/m/Y');
 
         return view('core::documents.category-ranking', compact('ranking', 'summary', 'templateData', 'periodLabel'));
+    }
+
+    /**
+     * View consulting report in HTML (new tab). 50/30/20 analysis, score, recommendations, medals. PRO only.
+     */
+    public function viewConsulting(Request $request)
+    {
+        $user = auth()->user();
+        if (! $user->isPro()) {
+            return redirect()->route('core.reports.index')
+                ->with('error', 'Consultoria é exclusiva PRO.');
+        }
+
+        if (! $this->templateService->canDownload(TemplateDocumentService::TYPE_CONSULTING, $user)) {
+            $limit = (int) $this->settingService->get('limit_download_report_per_day', 5);
+
+            return response()->view('core::documents.limit-exceeded', [
+                'message' => "Você abriu {$limit} relatórios de consultoria hoje. Esse limite é renovado diariamente.",
+            ], 429);
+        }
+
+        $consultingData = $this->reportService->getConsultingData($user);
+        $this->templateService->logDownload(
+            $user,
+            TemplateDocumentService::TYPE_CONSULTING,
+            'consultoria-' . now()->format('Y-m'),
+            $request
+        );
+
+        $templateData = $this->templateService->getTemplateData();
+
+        return view('core::documents.consulting-report', compact('consultingData', 'templateData'));
     }
 
     /**

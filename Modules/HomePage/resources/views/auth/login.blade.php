@@ -103,7 +103,8 @@
                         <x-icon name="arrow-right-to-bracket" />
                     </button>
 
-                    <!-- Auto Login Demo -->
+                    {{-- Auto Login Demo (apenas em ambiente local) --}}
+                    @if(app()->environment('local'))
                     <div class="pt-6 border-t border-slate-200 dark:border-slate-700">
                         <p class="text-xs font-bold text-center text-slate-400 uppercase tracking-widest mb-4">Acesso Rápido (Demo)</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -140,6 +141,7 @@
                             </button>
                         </div>
                     </div>
+                    @endif
                 </form>
 
                 <div class="mt-10 text-center">

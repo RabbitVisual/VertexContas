@@ -5,11 +5,13 @@ namespace Modules\Core\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Modules\Core\Http\Requests\StoreCategoryRequest;
 use Modules\Core\Models\Category;
+use Modules\Core\Services\SubscriptionLimitService;
 
 class CategoryController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        protected SubscriptionLimitService $limitService
+    ) {
         $this->middleware(['auth', 'verified']);
         $this->middleware('permission:core.view')->only(['index']);
         $this->middleware('permission:core.create')->only(['create', 'store']);
@@ -28,9 +30,10 @@ class CategoryController extends Controller
 
     public function create()
     {
-        // Enforce Pro-only for custom categories
-        if (! auth()->user()->isPro()) {
-            return view('core::limits.reached-category');
+        $user = auth()->user();
+        if (! $this->limitService->canCreate($user, 'category')) {
+            return redirect()->route('core.categories.index')
+                ->with('error', $this->limitService->getLimitReachedMessage('category'));
         }
 
         return view('core::categories.create');
@@ -38,10 +41,19 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        // Enforce Pro-only for custom categories
-        if (! auth()->user()->isPro()) {
-            return view('core::limits.reached-category');
+        $user = auth()->user();
+        if (! $this->limitService->canCreate($user, 'category')) {
+            return redirect()->route('core.categories.index')
+                ->with('error', $this->limitService->getLimitReachedMessage('category'));
         }
+
+        $typeGroup = $request->type === 'expense' ? ($request->type_group ?? 'lifestyle') : null;
+        $pillar = match ($typeGroup) {
+            'essential' => 'essential',
+            'lifestyle' => 'want',
+            'financial' => 'savings',
+            default => null,
+        };
 
         Category::create([
             'user_id' => auth()->id(),
@@ -49,6 +61,8 @@ class CategoryController extends Controller
             'type' => $request->type,
             'icon' => $request->icon ?? 'circle-dollar',
             'color' => $request->color ?? '#64748b',
+            'type_group' => $typeGroup,
+            'pillar' => $pillar,
         ]);
 
         return redirect()->route('core.categories.index')

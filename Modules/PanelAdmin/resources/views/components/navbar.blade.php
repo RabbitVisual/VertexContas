@@ -6,12 +6,12 @@
             <x-icon name="bars-staggered" style="solid" class="text-lg" />
         </button>
 
-        <div class="hidden sm:block">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white leading-none">
+        <div class="hidden sm:flex flex-col justify-center gap-0.5 min-h-[2.5rem]">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                 {{ $title ?? 'Vertex Admin' }}
             </h2>
-            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none mt-1 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#11C76F] animate-pulse"></span>
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-tight flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#11C76F] animate-pulse shrink-0"></span>
                 Sistema Operacional
             </span>
         </div>
@@ -41,11 +41,11 @@
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open" @click.away="open = false" type="button"
                 class="flex items-center gap-2 md:gap-3 pl-3 md:pl-4 border-l border-gray-100 dark:border-white/10 group focus:outline-none focus:ring-2 focus:ring-[#11C76F]/20 rounded-r-lg py-1">
-                <div class="hidden md:flex flex-col text-right">
-                    <span class="text-xs font-bold text-slate-900 dark:text-white leading-none group-hover:text-[#11C76F] transition-colors">
+                <div class="hidden md:flex flex-col text-right justify-center gap-0.5 antialiased">
+                    <span class="text-sm font-semibold text-slate-900 dark:text-white leading-tight group-hover:text-[#11C76F] transition-colors">
                         {{ Auth::user()->first_name ?? Auth::user()->name }}
                     </span>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mt-0.5">
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider leading-tight">
                         {{ Auth::user()->roles->first()?->name ?? 'Admin' }}
                     </span>
                 </div>

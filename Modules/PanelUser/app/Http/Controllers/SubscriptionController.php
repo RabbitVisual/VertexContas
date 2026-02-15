@@ -35,6 +35,17 @@ class SubscriptionController extends Controller
             'expense' => (int) $settingService->get('limit_free_expense', 5),
             'goal' => (int) $settingService->get('limit_free_goal', 1),
             'budget' => (int) $settingService->get('limit_free_budget', 1),
+            'category' => (int) $settingService->get('limit_free_category', 0),
+        ];
+
+        $proHasLimits = (bool) $settingService->get('pro_has_limits', 0);
+        $limitsPro = [
+            'account' => (int) $settingService->get('limit_pro_account', -1),
+            'income' => (int) $settingService->get('limit_pro_income', -1),
+            'expense' => (int) $settingService->get('limit_pro_expense', -1),
+            'goal' => (int) $settingService->get('limit_pro_goal', -1),
+            'budget' => (int) $settingService->get('limit_pro_budget', -1),
+            'category' => (int) $settingService->get('limit_pro_category', -1),
         ];
 
         return view('paneluser::subscription.index', compact(
@@ -42,7 +53,9 @@ class SubscriptionController extends Controller
             'payments',
             'isPro',
             'activeSubscription',
-            'limits'
+            'limits',
+            'limitsPro',
+            'proHasLimits'
         ));
     }
 

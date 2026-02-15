@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Models\Transaction;
+use Modules\Gamification\Models\UserMedal;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -748,5 +749,87 @@ class ReportService
             'balance' => $income - $expense,
             'savings_rate' => $income > 0 ? (($income - $expense) / $income) * 100 : 0,
         ];
+    }
+
+    /**
+     * Get consulting data for Premium Financial Report (PRO only).
+     * Aggregates budget analysis, financial score, recommendations, and medals.
+     *
+     * @return array{budget_analysis: array, financial_score: int, recommendations: array, medals: \Illuminate\Support\Collection, period_label: string}
+     */
+    public function getConsultingData(User $user): array
+    {
+        $financialHealth = app(FinancialHealthService::class);
+        $gamification = app(GamificationService::class);
+
+        $budgetAnalysis = $financialHealth->getBudgetHealthAnalysis($user);
+        $gamificationData = $gamification->analyzeUser($user);
+
+        $recommendations = $this->buildRecommendations($budgetAnalysis);
+
+        $medals = UserMedal::where('user_id', $user->id)
+            ->whereBetween('unlocked_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->with('medal')
+            ->get()
+            ->map(fn ($um) => [
+                'title' => $um->medal?->title ?? '—',
+                'description' => $um->medal?->description ?? '',
+                'icon' => $um->medal?->icon_name ?? 'star',
+                'color' => $um->medal?->color ?? '#64748b',
+                'unlocked_at' => $um->unlocked_at,
+            ]);
+
+        return [
+            'budget_analysis' => $budgetAnalysis,
+            'financial_score' => $gamificationData['financial_score'],
+            'recommendations' => $recommendations,
+            'medals' => $medals,
+            'period_label' => now()->locale('pt_BR')->translatedFormat('F Y'),
+        ];
+    }
+
+    /**
+     * Build dynamic recommendations based on 50/30/20 deviations.
+     *
+     * @return array<int, string>
+     */
+    protected function buildRecommendations(array $budgetAnalysis): array
+    {
+        $recommendations = [];
+        $pillars = $budgetAnalysis['pillars'] ?? [];
+        $savingsPct = $budgetAnalysis['savings_pct'] ?? 0;
+
+        if (($pillars['essential']['status'] ?? '') === 'over') {
+            $recommendations[] = 'Sugerimos revisar contratos de serviços fixos ou buscar economia em supermercado e combustível.';
+        }
+
+        if ($savingsPct < 20) {
+            $recommendations[] = 'Sua taxa de investimento está abaixo do recomendado. Reserve ao menos 20% da renda para sua segurança futura.';
+        }
+
+        if (($pillars['lifestyle']['status'] ?? '') === 'over') {
+            $recommendations[] = 'Gastos com estilo de vida acima do ideal. Avalie assinaturas e lazer para reequilibrar.';
+        }
+
+        if (($pillars['financial']['status'] ?? '') === 'under') {
+            $recommendations[] = 'O pilar financeiro (investimentos e reserva) está abaixo da meta. Priorize aportes mensais.';
+        }
+
+        $allOk = empty($recommendations);
+        foreach (['essential', 'lifestyle', 'financial'] as $key) {
+            if (($pillars[$key]['status'] ?? '') !== 'ok') {
+                $allOk = false;
+                break;
+            }
+        }
+        if ($savingsPct < 20) {
+            $allOk = false;
+        }
+
+        if ($allOk) {
+            $recommendations = ['Parabéns! Seus gastos estão alinhados à regra 50/30/20.'];
+        }
+
+        return $recommendations;
     }
 }

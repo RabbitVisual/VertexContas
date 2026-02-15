@@ -44,6 +44,7 @@
                             $navItems = [
                                 ['id' => 'personal', 'label' => 'Dados Básicos', 'icon' => 'user'],
                                 ['id' => 'contact', 'label' => 'Contato', 'icon' => 'phone'],
+                                ['id' => 'preferences', 'label' => 'Preferências', 'icon' => 'sliders'],
                                 ['id' => 'photos', 'label' => 'Fotos de Perfil', 'icon' => 'images'],
                             ];
                         @endphp
@@ -162,6 +163,23 @@
                             </div>
                         </section>
 
+                        {{-- Section: Preferences --}}
+                        <section id="preferences" class="scroll-mt-28 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all hover:shadow-md">
+                            <div class="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 flex items-center gap-3">
+                                <div class="p-2 bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/10"><x-icon name="robot" style="solid" class="w-5 h-5" /></div>
+                                <h2 class="text-lg font-black text-gray-900 dark:text-white">Preferências</h2>
+                            </div>
+                            <div class="p-8 space-y-6">
+                                <div class="flex items-center gap-4 p-5 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700">
+                                    <input type="checkbox" name="show_assistant" id="show_assistant" value="1" {{ old('show_assistant', $user->show_assistant ?? true) ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20 w-5 h-5">
+                                    <label for="show_assistant" class="flex-1">
+                                        <span class="block font-bold text-gray-900 dark:text-white">Ativar Assistente Virtual Vertex PRO</span>
+                                        <span class="block text-sm text-gray-500 dark:text-slate-400 mt-0.5">O robô Vertex aparece com dicas e insights baseados nas suas finanças.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
                         {{-- Section: Photos --}}
                         <section id="photos" class="scroll-mt-28 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden pb-10 transition-all hover:shadow-md">
                             <div class="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 flex items-center justify-between">
@@ -272,6 +290,7 @@
         const tips = {
             'personal': 'Seus dados básicos são usados para identificação na plataforma. Mantenha nome e sobrenome sempre atualizados.',
             'contact': 'Garantir que seu telefone esteja correto é importante para comunicações. E-mail e CPF são protegidos e só podem ser alterados pelo suporte.',
+            'preferences': 'O assistente Vertex Bot oferece dicas personalizadas sobre suas finanças. Ative ou desative conforme sua preferência.',
             'photos': 'Use fotos nítidas. Você pode ter até 3 fotos e alternar qual será exibida como principal. Clique em uma miniatura para definir como ativa.'
         };
 
@@ -322,7 +341,7 @@
 
         let lastActiveSection = 'personal';
         window.addEventListener('scroll', () => {
-            const sections = ['personal', 'contact', 'photos'];
+            const sections = ['personal', 'contact', 'preferences', 'photos'];
             let current = lastActiveSection;
             const threshold = 150;
 

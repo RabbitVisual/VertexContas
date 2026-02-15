@@ -1,6 +1,30 @@
 https://www.hyperui.dev/
 https://github.com/markmead/hyperui
 -------------------------------------------
+
+## Design Tokens (PanelAdmin)
+
+### Tipografia
+- Page Title: text-2xl font-bold text-slate-900 dark:text-white
+- Page Subtitle: text-sm text-slate-500 dark:text-slate-400 mt-1
+- Section Title: text-lg font-bold
+- Table Header: text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400
+
+### Espaçamento
+- Page gap: space-y-8
+- Card padding: p-6
+- Section gap: gap-6
+- Grid gap: gap-6
+
+### Cards/Containers
+- rounded-xl, shadow-sm, border border-slate-100 dark:border-slate-700
+- bg-white dark:bg-slate-800
+
+### Inputs (HyperUI/Flowbite)
+- rounded-xl, border border-slate-200 dark:border-slate-600
+- focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]
+
+-------------------------------------------
 Application Components:
 https://www.hyperui.dev/components/application/accordions
 https://www.hyperui.dev/components/application/badges

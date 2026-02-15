@@ -1,151 +1,123 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Detalhes do Disparo</x-slot>
 
-    <div class="max-w-5xl mx-auto px-4 py-10">
-
-        <!-- Header Section -->
-        <div class="mb-10 flex items-center justify-between">
-            <div class="space-y-1">
-                <div class="flex items-center gap-3 mb-2">
-                    <a href="{{ route('admin.notifications.index') }}" class="text-[10px] font-black text-[#11C76F] uppercase tracking-[0.3em] hover:opacity-70 transition-opacity flex items-center gap-2">
-                        <x-icon name="arrow-left" style="duotone" />
-                        Voltar ao Histórico
-                    </a>
-                </div>
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic uppercase">
-                    Detalhes do Disparo
-                </h1>
-                <p class="text-sm text-slate-500 font-medium italic">Análise técnica e alcance da notificação enviada.</p>
-            </div>
-
-            <div class="flex gap-4">
-                <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/5 text-slate-600 dark:text-slate-300 font-black rounded-xl hover:border-[#11C76F] hover:text-[#11C76F] transition-all text-[10px] uppercase tracking-widest">
-                    <x-icon name="copy" style="duotone" />
-                    Usar como Template
+    <x-paneladmin::page title="Detalhes do Disparo" subtitle="Análise e alcance da notificação enviada.">
+        <x-slot name="header">
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.notifications.index') }}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                    <x-icon name="arrow-left" style="duotone" class="w-4 h-4" /> Voltar
                 </a>
-                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja remover este histórico?')">
+                <a href="{{ route('admin.notifications.edit', $notification->id) }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#11C76F] hover:text-[#11C76F] font-medium text-sm transition-colors">
+                    <x-icon name="copy" style="duotone" class="w-4 h-4" /> Usar como Template
+                </a>
+                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Remover este histórico?')" class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                        <x-icon name="trash" style="duotone" />
+                    <button type="submit" class="p-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+                        <x-icon name="trash" style="duotone" class="w-4 h-4" />
                     </button>
                 </form>
             </div>
-        </div>
+        </x-slot>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Details Card -->
-            <div class="lg:col-span-2 space-y-8">
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl">
-                    <div class="flex items-center justify-between mb-10">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-[2rem] flex items-center justify-center
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <x-paneladmin::card>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between gap-4 mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-xl flex items-center justify-center
+                                    {{ match($data->type ?? 'info') {
+                                        'success' => 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+                                        'warning' => 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                                        'danger' => 'bg-red-500/10 text-red-600 dark:text-red-400',
+                                        default => 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                    } }}">
+                                    <x-icon :name="$data->icon ?? 'bell'" style="duotone" class="w-7 h-7" />
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">{{ $data->title ?? '—' }}</h2>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Enviado em {{ \Carbon\Carbon::parse($notification->created_at)->format('d/m/Y \à\s H:i') }}</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase
                                 {{ match($data->type ?? 'info') {
-                                    'success' => 'bg-emerald-500/10 text-emerald-500',
-                                    'warning' => 'bg-amber-500/10 text-amber-500',
-                                    'danger' => 'bg-red-500/10 text-red-500',
-                                    default => 'bg-blue-500/10 text-blue-500'
+                                    'success' => 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400',
+                                    'warning' => 'bg-amber-500/20 text-amber-700 dark:text-amber-400',
+                                    'danger' => 'bg-red-500/20 text-red-700 dark:text-red-400',
+                                    default => 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
                                 } }}">
-                                <x-icon :name="$data->icon ?? 'bell'" style="duotone" class="text-3xl" />
+                                {{ $data->type ?? 'Informativo' }}
+                            </span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700">
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ $data->message ?? '—' }}</p>
+                        </div>
+                    </div>
+                </x-paneladmin::card>
+
+                <x-paneladmin::card :title="'Destinatários (' . $blast->count() . ')'">
+                    <x-paneladmin::table-wrapper>
+                        <x-slot name="thead">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">ID Usuário</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Recebimento</th>
+                            </tr>
+                        </x-slot>
+                        @foreach($blast as $notif)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                                <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">#{{ $notif->notifiable_id }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium {{ $notif->read_at ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">
+                                        <span class="w-2 h-2 rounded-full {{ $notif->read_at ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                                        {{ $notif->read_at ? 'Lida' : 'Entregue' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right text-sm text-slate-500 dark:text-slate-400">
+                                    {{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </x-paneladmin::table-wrapper>
+                </x-paneladmin::card>
+            </div>
+
+            <div class="space-y-6">
+                <x-paneladmin::card title="Desempenho">
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-[#11C76F]/10 flex items-center justify-center">
+                                <x-icon name="bolt" style="duotone" class="w-6 h-6 text-[#11C76F]" />
                             </div>
                             <div>
-                                <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight italic">{{ $data->title }}</h2>
-                                <p class="text-xs text-slate-400 font-black uppercase tracking-widest">Enviado em {{ \Carbon\Carbon::parse($notification->created_at)->format('d/m/Y \à\s H:i') }}</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white">100%</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Taxa de entrega</p>
                             </div>
                         </div>
-                        <div class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest
-                            {{ match($data->type ?? 'info') {
-                                'success' => 'bg-emerald-500 text-white',
-                                'warning' => 'bg-amber-500 text-white',
-                                'danger' => 'bg-red-500 text-white',
-                                default => 'bg-blue-500 text-white'
-                            } }}">
-                            {{ $data->type ?? 'Informativo' }}
+                        <div class="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-[#11C76F] rounded-full" style="width: 100%"></div>
                         </div>
                     </div>
+                </x-paneladmin::card>
 
-                    <div class="prose dark:prose-invert max-w-none">
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-lg italic bg-gray-50/50 dark:bg-white/[0.01] p-8 rounded-3xl border border-dashed border-gray-200 dark:border-white/10">
-                            "{{ $data->message }}"
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Recipient List -->
-                <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
-                    <div class="p-10 border-b border-gray-100 dark:border-white/5">
-                        <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight italic">Destinatários ({{ $blast->count() }})</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="sticky top-0 z-10">
-                                <tr class="bg-gray-50 dark:bg-slate-900/95 dark:bg-slate-900 backdrop-blur-sm border-b border-gray-100 dark:border-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-                                    <th class="px-10 py-6">ID Usuário</th>
-                                    <th class="px-10 py-6">Status Interno</th>
-                                    <th class="px-10 py-6 text-right">Data de Recebimento</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                                @foreach($blast as $notif)
-                                    <tr class="even:bg-slate-50/50 dark:even:bg-slate-800/30 hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
-                                        <td class="px-10 py-6">
-                                            <span class="text-sm font-black text-slate-700 dark:text-slate-300">#{{ $notif->notifiable_id }}</span>
-                                        </td>
-                                        <td class="px-10 py-6">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-2 h-2 rounded-full {{ $notif->read_at ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-slate-300' }}"></div>
-                                                <span class="text-xs font-black uppercase tracking-widest {{ $notif->read_at ? 'text-emerald-500' : 'text-slate-400' }}">
-                                                    {{ $notif->read_at ? 'Lida' : 'Entregue' }}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <span class="text-xs font-medium text-slate-500 italic">
-                                                {{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Sidebar -->
-            <div class="space-y-8">
-                <div class="bg-[#11C76F] p-8 rounded-[2.5rem] shadow-2xl shadow-[#11C76F]/20 text-white relative overflow-hidden">
-                    <x-icon name="bolt" style="duotone" class="absolute -right-4 -bottom-4 text-9xl text-white/10" />
-                    <div class="relative z-10">
-                        <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">Desempenho</span>
-                        <div class="mt-4 mb-8">
-                            <span class="text-5xl font-black italic tracking-tighter">100%</span>
-                            <p class="text-xs font-black uppercase tracking-widest mt-1">Taxa de Entrega</p>
+                <x-paneladmin::card title="Metadados">
+                    <div class="p-6 space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                            <span class="text-sm text-slate-500 dark:text-slate-400">Ícone</span>
+                            <span class="text-sm font-medium text-slate-900 dark:text-white">{{ $data->icon ?? 'bell' }}</span>
                         </div>
-                        <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
-                            <div class="bg-white h-full" style="width: 100%"></div>
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+                            <span class="text-sm text-slate-500 dark:text-slate-400">Transmissão</span>
+                            <span class="text-sm font-medium text-slate-900 dark:text-white">Global</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-sm text-slate-500 dark:text-slate-400">ID</span>
+                            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">{{ substr(md5($notification->data), 0, 12) }}</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl space-y-6">
-                    <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">Metadados</h4>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center py-3 border-b border-gray-50 dark:border-white/5">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ícone</span>
-                            <span class="text-xs font-black text-slate-700 dark:text-slate-300">{{ $data->icon ?? 'bell' }}</span>
-                        </div>
-                        <div class="flex justify-between items-center py-3 border-b border-gray-50 dark:border-white/5">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Transmissão Global</span>
-                            <span class="text-xs font-black text-slate-700 dark:text-slate-300">Sim</span>
-                        </div>
-                        <div class="flex justify-between items-center py-3">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID de Identificação</span>
-                            <span class="text-[10px] font-mono text-slate-400">{{ substr(md5($notification->data), 0, 12) }}</span>
-                        </div>
-                    </div>
-                </div>
+                </x-paneladmin::card>
             </div>
         </div>
-    </div>
+    </x-paneladmin::page>
 </x-paneladmin::layouts.master>

@@ -49,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/cashflow/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewCashFlow'])->name('cashflow.view');
         Route::get('/categories/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewCategoryRanking'])->name('categories.view');
         Route::get('/extrato/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewExtrato'])->name('extrato.view');
+        Route::get('/consultoria/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewConsulting'])->middleware('pro')->name('consultoria.view');
     });
 
     Route::resource('cores', CoreController::class)->names('core');

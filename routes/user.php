@@ -8,6 +8,8 @@ use Modules\PanelUser\Http\Controllers\SubscriptionController;
 use Modules\PanelUser\Http\Controllers\SupportTicketController;
 use Modules\PanelUser\Http\Controllers\BlogController;
 use Modules\PanelUser\Http\Controllers\LegalAcceptanceController;
+use Modules\PanelUser\Http\Controllers\VertexBotController;
+use Modules\PanelUser\Http\Controllers\AchievementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +30,8 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::get('/', [PanelUserController::class, 'index'])->name('paneluser.index');
     Route::post('/onboarding/complete', [PanelUserController::class, 'completeOnboarding'])->name('paneluser.onboarding.complete');
     Route::post('/cta-sidebar/dismiss', [PanelUserController::class, 'dismissSidebarCta'])->name('user.cta-sidebar.dismiss');
+    Route::post('/vertex-bot/dismiss', [VertexBotController::class, 'dismissInsight'])->name('user.vertex-bot.dismiss');
+    Route::get('/conquistas', [AchievementController::class, 'index'])->name('user.achievements.index');
 
     // Financial Baseline (legado) → redireciona para Core
     Route::get('/onboarding/setup-income', fn () => redirect('/minha-renda', 301))->name('paneluser.onboarding.setup-income');

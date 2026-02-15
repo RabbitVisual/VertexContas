@@ -17,105 +17,115 @@
     <x-homepage::layouts.navbar />
 
     <main class="font-['Poppins'] overflow-x-hidden">
-        <!-- Hero Section -->
-        <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 bg-white dark:bg-slate-900 transition-colors duration-500">
-            <!-- Background Decorations -->
-            <div class="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 -z-10"></div>
-            <div class="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 -z-10"></div>
+        <!-- Hero Section - Vertex Azul/Roxo Dark -->
+        <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 bg-slate-950 overflow-hidden">
+            <!-- Background Glow Orbs -->
+            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 -z-10" aria-hidden="true"></div>
+            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-violet-600/15 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/3 -z-10" aria-hidden="true"></div>
+            <div class="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 -z-10" aria-hidden="true"></div>
 
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center lg:text-left flex flex-col lg:flex-row items-center gap-16">
                 <div class="w-full lg:w-3/5 space-y-8">
                     @auth
-                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full {{ $isPro ?? false ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-500' }} text-xs font-bold uppercase tracking-wider backdrop-blur-sm animate-fade-in-down">
-                            <x-icon name="circle-user" />
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full {{ $isPro ?? false ? 'bg-amber-500/20 text-amber-400' : 'bg-indigo-500/20 text-indigo-300' }} text-xs font-bold uppercase tracking-wider backdrop-blur-sm animate-fade-in-down border border-amber-500/30 dark:border-indigo-500/30">
+                            <x-icon name="circle-user" style="duotone" />
                             Bem-vindo de volta, {{ Auth::user()->first_name }}!
                         </div>
                     @else
-                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider backdrop-blur-sm animate-fade-in-down">
-                            <x-icon name="shield-check" />
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider backdrop-blur-sm animate-fade-in-down border border-indigo-500/30">
+                            <x-icon name="shield-check" style="duotone" />
                             Gestão 100% Local e Segura
                         </div>
                     @endauth
 
-                    <h1 class="text-5xl lg:text-7xl font-black text-slate-800 dark:text-white leading-[1.1] animate-fade-in-up">
+                    <h1 class="text-5xl lg:text-7xl font-black text-white leading-[1.1] animate-fade-in-up">
                         @if($isPro ?? false)
                             {{ $greeting }}, {{ $firstName }}!<br>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-primary-dark">Suas finanças em um só lugar.</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-violet-400">Suas finanças em um só lugar.</span>
                         @else
-                            Domine cada <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-dark">centavo</span> da sua vida.
+                            Não apenas anote seus gastos.<br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400">Domine sua liberdade financeira.</span>
                         @endif
                     </h1>
 
-                    <p class="text-xl text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-75">
+                    <p class="text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-75">
                         @if($isPro ?? false)
                             Aqui está o que importa para suas finanças este mês.
                         @else
-                            Gerencie receitas, despesas, orçamentos e metas em uma interface profissional, projetada para quem busca liberdade financeira total sem depender de conexões externas.
+                            O único sistema que utiliza a regra 50/30/20 e um mentor virtual para transformar sua relação com o dinheiro.
                         @endif
                     </p>
 
                     <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4 animate-fade-in-up delay-150 flex-wrap">
                         @auth
-                            <a href="{{ route($dashboardRoute) }}" class="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/40 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group decoration-transparent">
+                            <a href="{{ route($dashboardRoute) }}" class="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-xl shadow-indigo-500/25 hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 group decoration-transparent">
                                 Acessar Meu Painel
-                                <x-icon name="grid-2" class="group-hover:scale-110 transition-transform" />
+                                <x-icon name="grid-2" style="duotone" class="group-hover:scale-110 transition-transform" />
                             </a>
                             @if($isPro ?? false)
                                 @if(Route::has('core.transactions.create'))
-                                    <a href="{{ route('core.transactions.create') }}" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-xl shadow-amber-500/20 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group decoration-transparent">
+                                    <a href="{{ route('core.transactions.create') }}" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 px-10 py-4 rounded-2xl text-lg font-bold transition-all flex items-center justify-center gap-3 group decoration-transparent">
                                         <x-icon name="plus" style="solid" class="group-hover:scale-110 transition-transform" />
                                         Nova Transação
                                     </a>
                                 @endif
                                 @if(Route::has('core.reports.index'))
-                                    <a href="{{ route('core.reports.index') }}" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-10 py-4 rounded-2xl text-lg font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-3 group decoration-transparent">
+                                    <a href="{{ route('core.reports.index') }}" class="w-full sm:w-auto bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 border border-slate-600 px-10 py-4 rounded-2xl text-lg font-bold transition-all flex items-center justify-center gap-3 group decoration-transparent">
                                         <x-icon name="chart-simple" style="duotone" class="group-hover:scale-110 transition-transform" />
                                         Relatórios
                                     </a>
                                 @endif
                             @endif
+                            <a href="{{ route('help-center') }}" class="w-full sm:w-auto bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 border border-slate-600 px-10 py-4 rounded-2xl text-lg font-bold transition-all flex items-center justify-center gap-3 decoration-transparent">
+                                Central de Ajuda
+                            </a>
                         @else
-                            <a href="{{ route('register') }}" class="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/40 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group decoration-transparent">
-                                Criar Conta Grátis
-                                <x-icon name="arrow-right" class="group-hover:translate-x-1 transition-transform" />
+                            <a href="{{ route('register') }}" class="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-10 py-4 rounded-2xl text-lg font-bold shadow-xl shadow-indigo-500/25 hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 group decoration-transparent">
+                                Começar Agora Gratuitamente
+                                <x-icon name="arrow-right" style="duotone" class="group-hover:translate-x-1 transition-transform" />
+                            </a>
+                            <a href="#features" class="w-full sm:w-auto bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 border border-slate-600 px-10 py-4 rounded-2xl text-lg font-bold transition-all flex items-center justify-center gap-3 decoration-transparent">
+                                Ver Como Funciona
                             </a>
                         @endauth
-                        <a href="{{ route('help-center') }}" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-10 py-4 rounded-2xl text-lg font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-3 decoration-transparent">
-                            Ver Central de Ajuda
+                        @guest
+                        <a href="{{ route('help-center') }}" class="w-full sm:w-auto bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 border border-slate-600 px-10 py-4 rounded-2xl text-lg font-bold transition-all flex items-center justify-center gap-3 decoration-transparent">
+                            Central de Ajuda
                         </a>
+                        @endguest
                     </div>
 
                     @auth
                     <div class="flex items-center justify-center lg:justify-start gap-6 lg:gap-8 pt-8 flex-wrap {{ $financialSnapshot ? '' : 'opacity-60' }}">
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="sensitive-value text-2xl font-black dark:text-white">+<x-core::financial-value :value="$financialSnapshot['monthly_income'] ?? 0" /></span>
-                            <span class="text-xs font-bold uppercase tracking-widest">Renda Bruta</span>
+                            <span class="sensitive-value text-2xl font-black text-white">+<x-core::financial-value :value="$financialSnapshot['monthly_income'] ?? 0" /></span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Renda Bruta</span>
                         </div>
-                        <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="w-px h-8 bg-slate-600"></div>
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="sensitive-value text-2xl font-black dark:text-white">{{ $financialSnapshot ? $financialSnapshot['savings_rate'] . '%' : '0%' }}</span>
-                            <span class="text-xs font-bold uppercase tracking-widest">Economia</span>
+                            <span class="sensitive-value text-2xl font-black text-white">{{ $financialSnapshot ? $financialSnapshot['savings_rate'] . '%' : '0%' }}</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Economia</span>
                         </div>
                         @if(($isPro ?? false) && isset($financialSnapshot['monthly_balance']))
-                        <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="w-px h-8 bg-slate-600"></div>
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="sensitive-value text-2xl font-black dark:text-white {{ ($financialSnapshot['monthly_balance'] ?? 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                            <span class="sensitive-value text-2xl font-black {{ ($financialSnapshot['monthly_balance'] ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">
                                 <x-core::financial-value :value="$financialSnapshot['monthly_balance'] ?? 0" />
                             </span>
-                            <span class="text-xs font-bold uppercase tracking-widest">Balanço Mensal</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Balanço Mensal</span>
                         </div>
                         @endif
                     </div>
                     @else
                     <div class="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-60">
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="sensitive-value text-2xl font-black dark:text-white">+<x-core::financial-value :value="0" /></span>
-                            <span class="text-xs font-bold uppercase tracking-widest">Renda Bruta</span>
+                            <span class="sensitive-value text-2xl font-black text-white">+<x-core::financial-value :value="0" /></span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Renda Bruta</span>
                         </div>
-                        <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="w-px h-8 bg-slate-600"></div>
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="sensitive-value text-2xl font-black dark:text-white">0%</span>
-                            <span class="text-xs font-bold uppercase tracking-widest">Economia</span>
+                            <span class="sensitive-value text-2xl font-black text-white">0%</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Economia</span>
                         </div>
                     </div>
                     @endauth
@@ -123,7 +133,7 @@
 
                 <!-- Hero Mockup/Illustration -->
                 <div class="w-full lg:w-2/5 relative animate-fade-in-right">
-                    <div class="relative bg-gradient-to-br from-slate-100 to-white dark:from-slate-800 dark:to-slate-900 p-6 rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 transform lg:rotate-2 group hover:rotate-0 transition-transform duration-700">
+                    <div class="relative bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-600/50 transform lg:rotate-2 group hover:rotate-0 transition-transform duration-700">
                         @auth
                             @if($isPro ?? false)
                             {{-- PRO Card: premium design --}}
@@ -211,7 +221,7 @@
                         @endauth
 
                         <!-- Balance Card -->
-                        <div class="bg-primary p-6 rounded-2xl mb-6 text-white overflow-hidden relative">
+                        <div class="bg-gradient-to-br from-indigo-600 to-violet-600 p-6 rounded-2xl mb-6 text-white overflow-hidden relative">
                             <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                             <div class="flex justify-between items-start mb-8">
                                 <span class="text-xs font-bold uppercase opacity-80">Saldo Principal</span>
@@ -226,41 +236,41 @@
                             @auth
                             @if($financialSnapshot && $financialSnapshot['recent_transactions']->isNotEmpty())
                                 @foreach($financialSnapshot['recent_transactions'] as $tx)
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 shadow-sm border border-slate-600/50">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full {{ $tx->type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center">
                                             <x-icon name="{{ $tx->type === 'income' ? 'plus' : 'cart-shopping' }}" style="solid" />
                                         </div>
                                         <div>
-                                            <div class="text-sm font-bold dark:text-white">{{ $tx->description ?: ($tx->category?->name ?? 'Transação') }}</div>
+                                            <div class="text-sm font-bold text-white">{{ $tx->description ?: ($tx->category?->name ?? 'Transação') }}</div>
                                             <div class="text-xs text-slate-400">{{ $tx->date->diffForHumans() }}</div>
                                         </div>
                                     </div>
-                                    <span class="sensitive-value text-sm font-black {{ $tx->type === 'income' ? 'text-green-500' : 'text-red-500' }}">
+                                    <span class="sensitive-value text-sm font-black {{ $tx->type === 'income' ? 'text-emerald-400' : 'text-rose-400' }}">
                                         {{ $tx->type === 'income' ? '+' : '-' }} <x-core::financial-value :value="$tx->amount" />
                                     </span>
                                 </div>
                                 @endforeach
                             @else
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 shadow-sm border border-slate-600/50">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
                                             <x-icon name="plus" style="solid" />
                                         </div>
                                         <div>
-                                            <div class="text-sm font-bold dark:text-white">Renda Mensal</div>
+                                            <div class="text-sm font-bold text-white">Renda Mensal</div>
                                             <div class="text-xs text-slate-400">Hoje, 10:45</div>
                                         </div>
                                     </div>
-                                    <span class="sensitive-value text-sm font-black text-green-500">+ <x-core::financial-value :value="5000" /></span>
+                                    <span class="sensitive-value text-sm font-black text-emerald-400">+ <x-core::financial-value :value="5000" /></span>
                                 </div>
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 shadow-sm border border-slate-600/50">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center">
-                                            <x-icon name="cart-shopping" />
+                                        <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center">
+                                            <x-icon name="cart-shopping" style="duotone" />
                                         </div>
                                         <div>
-                                            <div class="text-sm font-bold dark:text-white">Supermercado</div>
+                                            <div class="text-sm font-bold text-white">Supermercado</div>
                                             <div class="text-xs text-slate-400">Ontem, 20:30</div>
                                         </div>
                                     </div>
@@ -268,29 +278,29 @@
                                 </div>
                             @endif
                             @else
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 shadow-sm border border-slate-600/50">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
                                         <x-icon name="plus" style="solid" />
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold dark:text-white">Renda Mensal</div>
+                                        <div class="text-sm font-bold text-white">Renda Mensal</div>
                                         <div class="text-xs text-slate-400">Hoje, 10:45</div>
                                     </div>
                                 </div>
-                                <span class="sensitive-value text-sm font-black text-green-500">+ <x-core::financial-value :value="5000" /></span>
+                                <span class="sensitive-value text-sm font-black text-emerald-400">+ <x-core::financial-value :value="5000" /></span>
                             </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 shadow-sm border border-slate-600/50">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center">
-                                        <x-icon name="cart-shopping" />
+                                    <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center">
+                                        <x-icon name="cart-shopping" style="duotone" />
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold dark:text-white">Supermercado</div>
+                                        <div class="text-sm font-bold text-white">Supermercado</div>
                                         <div class="text-xs text-slate-400">Ontem, 20:30</div>
                                     </div>
                                 </div>
-                                <span class="sensitive-value text-sm font-black text-red-500">- <x-core::financial-value :value="450.20" /></span>
+                                <span class="sensitive-value text-sm font-black text-rose-400">- <x-core::financial-value :value="450.20" /></span>
                             </div>
                             @endauth
                         </div>
@@ -420,59 +430,102 @@
                     </div>
                 </div>
                 @else
-                {{-- Guest/Free: Features genéricas --}}
+                {{-- Guest/Free: Killer Features Grid (Glassmorphism) --}}
                 <div class="text-center max-w-3xl mx-auto mb-20 space-y-4">
-                    <h2 class="text-4xl font-black text-slate-800 dark:text-white">Tudo o que você precisa</h2>
-                    <p class="text-lg text-slate-500 dark:text-slate-400">Gerencie todas as nuances do seu dinheiro sem sair de casa, com ferramentas que facilitam o planejamento financeiro.</p>
+                    <h2 class="text-4xl font-black text-slate-800 dark:text-white">O que torna o Vertex único</h2>
+                    <p class="text-lg text-slate-500 dark:text-slate-400">Recursos que diferenciam o Vertex Contas de qualquer outro sistema de gestão financeira.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="money-bill-trend-up" class="text-indigo-500 text-2xl" />
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                    {{-- 1. Inteligência 50/30/20 --}}
+                    <div class="group p-6 lg:p-8 backdrop-blur-xl bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-3xl hover:border-indigo-500/30 hover:shadow-xl transition-all duration-300">
+                        <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <x-icon name="chart-pie" style="duotone" class="text-indigo-400 text-2xl" />
                         </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Renda & Despesas</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Categorize suas entradas e saídas de forma inteligente. Saiba exatamente para onde cada real está indo.</p>
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-white">Inteligência 50/30/20</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">O sistema categoriza automaticamente suas transações em <strong>Essencial (50%)</strong>, <strong>Desejo (30%)</strong> e <strong>Investimento (20%)</strong>.</p>
                     </div>
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="bullseye-arrow" class="text-emerald-500 text-2xl" />
+
+                    {{-- 2. Mentor Virtual (Vertex Bot) --}}
+                    <div class="group p-6 lg:p-8 backdrop-blur-xl bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-3xl hover:border-indigo-500/30 hover:shadow-xl transition-all duration-300">
+                        <div class="w-14 h-14 bg-violet-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <x-icon name="robot" style="duotone" class="text-violet-400 text-2xl" />
                         </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Metas Financeiras</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Crie planos para sua reserva de emergência, viagens ou a compra de um carro. Acompanhe o progresso em tempo real.</p>
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-white">Mentor Virtual (Vertex Bot)</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-3">Dicas personalizadas baseadas nos seus dados reais. Um coach financeiro 24h ao seu lado.</p>
+                        <div class="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-700 dark:text-emerald-300 italic">
+                            "Parabéns! Você economizou 15% em relação ao mês passado."
+                        </div>
                     </div>
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="calculator" class="text-amber-500 text-2xl" />
+
+                    {{-- 3. Consultoria PRO em PDF --}}
+                    <div class="group p-6 lg:p-8 backdrop-blur-xl bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-3xl hover:border-indigo-500/30 hover:shadow-xl transition-all duration-300">
+                        <div class="w-14 h-14 bg-amber-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <x-icon name="file-pdf" style="duotone" class="text-amber-400 text-2xl" />
                         </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Orçamentos Conscientes</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Defina limites mensais para cada categoria e receba alertas para evitar gastos impulsivos.</p>
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-white">Consultoria PRO em PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">Relatório mensal automático que funciona como um consultor financeiro pessoal. Score, análise 50/30/20 e recomendações.</p>
+                        @include('homepage::partials.consulting-pdf-preview')
                     </div>
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="chart-pie-simple" class="text-purple-500 text-2xl" />
+
+                    {{-- 4. Segurança de Elite (LGPD) --}}
+                    <div class="group p-6 lg:p-8 backdrop-blur-xl bg-white/5 dark:bg-slate-800/50 border border-white/10 dark:border-slate-700/50 rounded-3xl hover:border-indigo-500/30 hover:shadow-xl transition-all duration-300">
+                        <div class="w-14 h-14 bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <x-icon name="shield-check" style="duotone" class="text-emerald-400 text-2xl" />
                         </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Relatórios Detalhados</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Visualize sua saúde financeira através de gráficos dinâmicos e exporte dados para análises profundas.</p>
-                    </div>
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-rose-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="lock" class="text-rose-500 text-2xl" />
-                        </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Dados 100% Locais</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Seus dados financeiros nunca saem da sua máquina. Privacidade e segurança absoluta para sua tranquilidade.</p>
-                    </div>
-                    <div class="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5">
-                        <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <x-icon name="moon-stars" class="text-blue-500 text-2xl" />
-                        </div>
-                        <h3 class="text-xl font-bold mb-4 dark:text-white">Interface Adaptativa</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Trabalhe confortavelmente em qualquer iluminação com suporte nativo a Dark Mode premium.</p>
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-white">Segurança de Elite (LGPD)</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Dados protegidos com criptografia, máscaras de privacidade e total conformidade com a Lei Geral de Proteção de Dados.</p>
                     </div>
                 </div>
                 @endif
             </div>
         </section>
+
+        {{-- Gamification Showcase - Sua Jornada de Conquistas --}}
+        @if(($medals ?? collect())->isNotEmpty())
+        <section class="py-24 bg-slate-950 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-violet-600/10 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2" aria-hidden="true"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-4xl font-black text-white mb-4">Sua Jornada de Conquistas</h2>
+                    <p class="text-lg text-slate-400">Economizar no Vertex é como subir de nível em um jogo. Desbloqueie medalhas ao atingir metas financeiras.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    @foreach($medals as $medal)
+                        @php
+                            $rarity = $medal->rarity ?? 'silver';
+                            $rarityCardClass = match($rarity) {
+                                'bronze' => 'bg-gradient-to-br from-amber-800/80 to-amber-900/90 border-amber-700/50',
+                                'silver' => 'bg-gradient-to-br from-slate-400 to-slate-600 border-slate-500/50 shadow-inner',
+                                'gold' => 'bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-600 border-amber-500/50 shadow-lg shadow-amber-500/30',
+                                'platinum' => 'bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 border-purple-400/60',
+                                default => 'bg-gradient-to-br from-slate-500 to-slate-700 border-slate-500/50',
+                            };
+                            $rarityIconClass = match($rarity) {
+                                'bronze' => 'bg-amber-900/40 text-amber-200',
+                                'silver' => 'bg-slate-200/50 text-slate-800',
+                                'gold' => 'bg-amber-200/40 text-amber-900',
+                                'platinum' => 'bg-white/30 text-white',
+                                default => 'bg-slate-600/50 text-slate-200',
+                            };
+                        @endphp
+                        <div class="relative rounded-2xl border backdrop-blur-xl p-6 {{ $rarityCardClass }} hover:scale-[1.03] transition-transform duration-300" title="{{ $medal->description }}">
+                            <div class="flex flex-col items-center text-center">
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 {{ $rarityIconClass }}">
+                                    <x-icon name="{{ $medal->icon_name ?? 'medal' }}" style="duotone" class="w-10 h-10" />
+                                </div>
+                                <h3 class="font-bold text-white text-sm leading-tight drop-shadow-sm">{{ $medal->title }}</h3>
+                                @if($medal->description)
+                                    <p class="text-xs text-white/80 mt-2 line-clamp-2">{{ Str::limit($medal->description, 60) }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
 
         {{-- PRO: Gráficos --}}
         @if(($isPro ?? false) && isset($proHomeData) && isset($proHomeData['cashFlowData']))
@@ -499,6 +552,116 @@
             </div>
         </section>
         @endif
+
+        {{-- Pricing Table - FREE vs PRO (para conversão) --}}
+        @php
+            $proHasLimits = $proHasLimits ?? false;
+            $limitsPro = $limitsPro ?? ['account' => -1, 'income' => -1, 'expense' => -1, 'goal' => -1, 'budget' => -1];
+            $freeLimits = $freeLimits ?? ['account' => 1, 'income' => 5, 'expense' => 5, 'goal' => 1, 'budget' => 1];
+            $planProName = $planProName ?? 'Vertex PRO';
+            $planFreeName = $planFreeName ?? 'Plano Gratuito';
+            $proAccountDisplay = $proHasLimits && (($limitsPro['account'] ?? -1) >= 0) ? 'Até ' . $limitsPro['account'] . ' contas' : 'Ilimitado';
+            $proIncomeDisplay = ($proHasLimits ?? false) && (($limitsPro['income'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['income'] ?? 5000) : 'Ilimitado';
+            $proExpenseDisplay = ($proHasLimits ?? false) && (($limitsPro['expense'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['expense'] ?? 5000) : 'Ilimitado';
+            $proGoalDisplay = ($proHasLimits ?? false) && (($limitsPro['goal'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['goal'] ?? 15) : 'Ilimitado';
+            $proBudgetDisplay = ($proHasLimits ?? false) && (($limitsPro['budget'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['budget'] ?? 20) : 'Ilimitado';
+        @endphp
+        <section id="pricing" class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-4">Planos</h2>
+                    <p class="text-lg text-slate-500 dark:text-slate-400">Escolha o plano ideal para sua jornada financeira.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {{-- FREE --}}
+                    <div class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-sm">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $planFreeName ?? 'Plano Gratuito' }}</h3>
+                        <p class="text-3xl font-black text-slate-600 dark:text-slate-300 mb-6">Gratuito</p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="building-columns" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Até {{ $freeLimits['account'] ?? 1 }} conta(s)
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="arrow-up" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Até {{ $freeLimits['income'] ?? 5 }} receitas
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="arrow-down" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Até {{ $freeLimits['expense'] ?? 5 }} despesas
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="bullseye" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Até {{ $freeLimits['goal'] ?? 1 }} meta(s)
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="chart-pie" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Até {{ $freeLimits['budget'] ?? 1 }} orçamento(s)
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500">
+                                <x-icon name="minus" style="solid" class="w-4 h-4" />
+                                Relatórios PDF
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="robot" style="duotone" class="w-4 h-4 text-slate-400" />
+                                Vertex Bot básico
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500">
+                                <x-icon name="minus" style="solid" class="w-4 h-4" />
+                                Suporte prioritário
+                            </li>
+                        </ul>
+                        <a href="{{ route('register') }}" class="block w-full py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            Começar Grátis
+                        </a>
+                    </div>
+                    {{-- PRO --}}
+                    <div class="rounded-3xl border-2 border-indigo-500/50 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 dark:from-indigo-900/20 dark:to-violet-900/20 p-8 shadow-xl relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-indigo-500 text-white text-xs font-black uppercase">Recomendado</div>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $planProName ?? 'Vertex PRO' }}</h3>
+                        <p class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1">R$ 29,90<span class="text-lg font-medium text-slate-500">/mês</span></p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">7 dias grátis · Cancele quando quiser</p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                {{ $proAccountDisplay }}
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Receitas {{ $proIncomeDisplay }}
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Despesas {{ $proExpenseDisplay }}
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Metas {{ $proGoalDisplay }}
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Orçamentos {{ $proBudgetDisplay }}
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Relatórios PDF e Excel
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Vertex Bot + Consultoria PRO
+                            </li>
+                            <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Suporte prioritário
+                            </li>
+                        </ul>
+                        <a href="{{ auth()->check() ? route('user.subscription.index') : route('register') }}" class="block w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-center shadow-lg shadow-indigo-500/25 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] transition-all">
+                            Assinar {{ $planProName ?? 'Vertex PRO' }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- CTA Section (oculto para PRO) -->
         @if(!($isPro ?? false))

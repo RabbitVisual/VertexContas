@@ -13,12 +13,19 @@ class StoreCategoryRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:income,expense'],
             'icon' => ['nullable', 'string', 'max:50'],
             'color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'type_group' => ['nullable', 'in:essential,lifestyle,financial'],
         ];
+
+        if ($this->type === 'expense') {
+            $rules['type_group'] = ['required', 'in:essential,lifestyle,financial'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
