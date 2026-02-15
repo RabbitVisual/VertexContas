@@ -123,6 +123,64 @@ class SettingSeeder extends Seeder
                 'type' => 'string',
                 'is_encrypted' => false,
             ],
+
+            // Document Templates (invoices, reports)
+            [
+                'key' => 'company_name',
+                'value' => env('APP_NAME', 'Vertex Contas'),
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'company_address',
+                'value' => '',
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'company_cnpj',
+                'value' => '',
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'company_phone',
+                'value' => '',
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'company_email',
+                'value' => '',
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'document_footer_text',
+                'value' => 'Vertex Contas - Sistema de Gestão Financeira',
+                'group' => 'document_templates',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'limit_download_invoice_per_day',
+                'value' => 10,
+                'group' => 'document_templates',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'limit_download_report_per_day',
+                'value' => 5,
+                'group' => 'document_templates',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
         ];
 
         foreach ($settings as $setting) {

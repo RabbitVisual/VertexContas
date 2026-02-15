@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     // Admin Support Center (Global Management)
     Route::prefix('support')->name('support.')->group(function () {
         Route::get('/', [AdminSupportController::class, 'index'])->name('index');
+        Route::get('/{ticket}/messages', [AdminSupportController::class, 'messages'])->name('messages');
         Route::get('/{ticket}', [AdminSupportController::class, 'show'])->name('show');
         Route::post('/{ticket}/reply', [AdminSupportController::class, 'reply'])->name('reply');
         Route::post('/{ticket}/assign', [AdminSupportController::class, 'assign'])->name('assign');

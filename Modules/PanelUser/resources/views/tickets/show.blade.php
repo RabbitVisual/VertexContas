@@ -131,139 +131,79 @@
                 </div>
             </div>
 
-            <div class="p-6 md:p-8 space-y-8 bg-gray-50/30 dark:bg-slate-900/30">
-                @forelse($ticket->messages as $message)
-                    @php
-                        $isSystem = $message->is_system ?? false;
-                        $senderLabel = $isSystem ? 'Vertex Inspection' : ($message->is_admin_reply ? 'Equipe de Suporte' : 'Você');
-                    @endphp
-                    <div class="flex gap-4 {{ $isSystem ? 'justify-center' : ($message->user_id === Auth::id() ? 'flex-row-reverse' : '') }}">
-                        @if(!$isSystem)
-                            <div class="shrink-0">
-                                @if($message->user && $message->user->photo)
-                                    <img src="{{ asset('storage/' . $message->user->photo) }}" class="w-10 h-10 rounded-xl object-cover ring-2 ring-white dark:ring-slate-900 shadow-sm" title="{{ $message->user->name }}" alt="" />
-                                @else
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ring-2 ring-white dark:ring-slate-900 shadow-sm
-                                        {{ $message->is_admin_reply ? 'bg-primary/20 text-primary' : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-400' }}">
-                                        {{ substr($message->user->name ?? 'U', 0, 1) }}
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
+            <div
+                id="ticket-chat-user"
+                class="flex-1"
+                data-ticket-id="{{ $ticket->id }}"
+                data-post-url="{{ route('user.tickets.reply', $ticket) }}"
+                data-messages-url="{{ route('user.tickets.messages', $ticket) }}"
+                data-initial-messages="{{ json_encode($initialMessagesForVue ?? []) }}"
+                data-current-user-id="{{ auth()->id() }}"
+                data-is-closed="{{ $ticket->status === 'closed' ? '1' : '0' }}"
+                data-can-reply="{{ $ticket->status !== 'closed' ? '1' : '0' }}"
+                data-context="user"
+                data-placeholder="Digite sua resposta aqui..."
+                data-is-pro="{{ $isPro ? '1' : '0' }}"
+                data-csrf="{{ csrf_token() }}"
+            ></div>
 
-                        <div class="max-w-[80%] lg:max-w-[70%] {{ $isSystem ? 'max-w-2xl mx-auto' : '' }}">
-                            <div class="flex items-center gap-2 mb-1 {{ $isSystem ? 'justify-center' : ($message->user_id === Auth::id() ? 'flex-row-reverse' : '') }}">
-                                @if($isSystem)
-                                    <div class="flex items-center gap-2 px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-500/20">
-                                        <x-icon name="magnifying-glass-chart" style="solid" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                                        <span class="text-xs font-bold text-amber-700 dark:text-amber-400">{{ $senderLabel }}</span>
-                                    </div>
-                                @else
-                                    <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $senderLabel }}</span>
-                                @endif
-                                <span class="text-[10px] text-gray-400">
-                                    @if($isPro)
-                                        {{ $message->created_at->format('d/m/Y H:i') }}
-                                    @else
-                                        {{ $message->created_at->format('H:i') }}
-                                    @endif
-                                </span>
-                            </div>
-
-                            <div class="p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm border
-                                {{ $isSystem
-                                    ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-900 dark:text-amber-100'
-                                    : ($message->user_id === Auth::id()
-                                        ? 'bg-primary/10 dark:bg-primary/20 text-gray-800 dark:text-gray-200 rounded-tr-none border-primary/20 dark:border-primary/30'
-                                        : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-tl-none border-gray-100 dark:border-slate-700')
-                                }}">
-                                {!! nl2br(e($message->message)) !!}
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-12">
-                        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                            <x-icon name="comments" style="duotone" class="w-8 h-8 text-slate-400 dark:text-slate-500 opacity-50" />
-                        </div>
-                        <p class="text-sm font-bold text-gray-500 dark:text-slate-400">Nenhuma mensagem encontrada.</p>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Reply / Actions --}}
-            <div class="border-t border-gray-200 dark:border-white/5 p-6 md:p-8 bg-white dark:bg-slate-900">
-                @if($ticket->status === 'closed')
+            @if($ticket->status === 'closed' && !$ticket->rating)
+                <div class="p-6 md:p-8 border-t border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900">
                     <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-6 text-center border border-gray-200 dark:border-white/5 max-w-xl mx-auto">
-                        <div class="w-12 h-12 bg-gray-200 dark:bg-slate-700 rounded-xl flex items-center justify-center mx-auto mb-3 text-gray-500 dark:text-slate-400">
-                            <x-icon name="lock" style="duotone" class="w-6 h-6" />
-                        </div>
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-1">Chamado Fechado</h3>
                         <p class="text-xs text-gray-500 dark:text-slate-400 mb-6">
                             Fechado em <span class="font-bold">{{ $ticket->closed_at ? $ticket->closed_at->format('d/m/Y H:i') : '' }}</span>
                         </p>
-
-                        @if(!$ticket->rating)
-                            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-white/5">
-                                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Como foi sua experiência?</h4>
-                                <form action="{{ route('user.tickets.rate', $ticket) }}" method="POST" x-data="{ rating: 0, hover: 0 }">
-                                    @csrf
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <template x-for="i in [1,2,3,4,5]" :key="i">
-                                            <button type="button"
-                                                @click="rating = i"
-                                                @mouseenter="hover = i"
-                                                @mouseleave="hover = 0"
-                                                class="transition-transform hover:scale-110 focus:outline-none p-1">
-                                                <x-icon name="star" style="solid" class="w-8 h-8 transition-colors duration-200"
-                                                    :class="(hover >= i || rating >= i) ? 'text-amber-400' : 'text-gray-200 dark:text-gray-600'" />
-                                            </button>
-                                        </template>
-                                    </div>
-                                    <input type="hidden" name="rating" :value="rating" required>
-                                    <textarea name="rating_comment" rows="2"
-                                        class="w-full rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-4 focus:ring-primary/10 focus:border-primary mb-4 p-3"
-                                        placeholder="Deixe um comentário (opcional)..."></textarea>
-                                    <button type="submit" :disabled="rating === 0"
-                                        class="w-full py-3 px-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all shadow-lg shadow-primary-500/20">
-                                        Enviar Avaliação
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="inline-block px-6 py-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-500/20">
-                                <div class="flex items-center gap-2 mb-1 justify-center">
-                                    <span class="text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-widest text-[10px]">Avaliado</span>
-                                    <div class="flex gap-0.5">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            <x-icon name="star" style="solid" class="text-sm {{ $i <= $ticket->rating ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600' }}" />
-                                        @endfor
-                                    </div>
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-white/5">
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4">Como foi sua experiência?</h4>
+                            <form action="{{ route('user.tickets.rate', $ticket) }}" method="POST" x-data="{ rating: 0, hoveredStar: 0 }">
+                                @csrf
+                                <div class="flex justify-center gap-2 mb-4">
+                                    <template x-for="i in [1,2,3,4,5]" :key="i">
+                                        <button type="button"
+                                            @click="rating = i"
+                                            @mouseenter="hoveredStar = i"
+                                            @mouseleave="hoveredStar = 0"
+                                            class="transition-transform hover:scale-110 focus:outline-none p-1">
+                                            <span class="inline-block" :class="(hoveredStar >= i || rating >= i) ? 'text-amber-400' : 'text-gray-200 dark:text-gray-600'">
+                                                <x-icon name="star" style="solid" class="w-8 h-8 transition-colors duration-200" />
+                                            </span>
+                                        </button>
+                                    </template>
                                 </div>
-                                @if($ticket->rating_comment)
-                                    <p class="text-emerald-600 dark:text-emerald-300 italic text-xs">"{{ $ticket->rating_comment }}"</p>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-                @else
-                    <form action="{{ route('user.tickets.reply', $ticket) }}" method="POST">
-                        @csrf
-                        <div class="relative">
-                            <textarea name="message" rows="3"
-                                class="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 dark:border-white/10 dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 resize-none text-sm font-medium transition-all"
-                                placeholder="Digite sua resposta aqui..." required></textarea>
-                            <div class="absolute bottom-3 right-3">
-                                <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20 text-sm">
-                                    <span>Enviar</span>
-                                    <x-icon name="paper-plane" style="solid" class="w-4 h-4" />
+                                <input type="hidden" name="rating" :value="rating" required>
+                                <textarea name="rating_comment" rows="2"
+                                    class="w-full rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-4 focus:ring-primary/10 focus:border-primary mb-4 p-3"
+                                    placeholder="Deixe um comentário (opcional)..."></textarea>
+                                <button type="submit" :disabled="rating === 0"
+                                    class="w-full py-3 px-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-all shadow-lg shadow-primary-500/20">
+                                    Enviar Avaliação
                                 </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @elseif($ticket->status === 'closed' && $ticket->rating)
+                <div class="p-6 border-t border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900 text-center">
+                    <div class="inline-block px-6 py-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-500/20">
+                        <div class="flex items-center gap-2 mb-1 justify-center">
+                            <span class="text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-widest text-[10px]">Avaliado</span>
+                            <div class="flex gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <x-icon name="star" style="solid" class="text-sm {{ $i <= $ticket->rating ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600' }}" />
+                                @endfor
                             </div>
                         </div>
-                    </form>
-                @endif
-            </div>
+                        @if($ticket->rating_comment)
+                            <p class="text-emerald-600 dark:text-emerald-300 italic text-xs">"{{ $ticket->rating_comment }}"</p>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
+
+    @push('scripts')
+    @vite('resources/js/ticket-chat.js')
+    @endpush
 </x-paneluser::layouts.master>

@@ -139,7 +139,7 @@
                                         <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ $ticket->priority === 'high' ? 'Alta' : ($ticket->priority === 'medium' ? 'Média' : 'Baixa') }} prioridade</span>
                                     </div>
                                     <h3 class="text-xl font-black text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors mb-2 leading-tight">{{ $ticket->subject }}</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{{ Str::limit($ticket->messages->first()?->message ?? 'Sem descrição', 80) }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{{ \App\Helpers\TicketHelper::safeMessagePreview($ticket->messages->first()?->message, 80) ?: 'Sem descrição' }}</p>
                                 </div>
 
                                 @if($isPro && $ticket->assignedAgent)
