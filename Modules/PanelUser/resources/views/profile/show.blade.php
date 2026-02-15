@@ -170,8 +170,8 @@
                                     $personalFields = [
                                         ['label' => 'Nome Completo', 'value' => $user->full_name, 'icon' => 'user'],
                                         ['label' => 'E-mail', 'value' => $user->email, 'icon' => 'envelope'],
-                                        ['label' => 'CPF', 'value' => $user->cpf ? preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $user->cpf) : null, 'icon' => 'id-card', 'verified' => !empty($user->cpf)],
-                                        ['label' => 'Telefone', 'value' => $user->phone, 'icon' => 'phone'],
+                                        ['label' => 'CPF', 'value' => lgpd_format_cpf($user->cpf ?? null), 'icon' => 'id-card', 'verified' => !empty($user->cpf)],
+                                        ['label' => 'Telefone', 'value' => lgpd_format_phone($user->phone ?? null), 'icon' => 'phone'],
                                         ['label' => 'Data de Nascimento', 'value' => $user->birth_date?->format('d/m/Y'), 'icon' => 'cake-candles'],
                                         ['label' => 'Fotos de Perfil', 'value' => $user->photos->count() . ' de 3', 'icon' => 'images'],
                                     ];

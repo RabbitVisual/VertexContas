@@ -14,7 +14,7 @@
         default => $invoice->gateway_slug ? ucfirst($invoice->gateway_slug) : '—',
     };
     $currency = $invoice->currency ?? 'BRL';
-    $amountFormatted = 'R$ ' . number_format((float) $invoice->amount, 2, ',', '.');
+    $amountFormatted = format_currency((float) $invoice->amount);
 @endphp
 <table>
     <tr class="heading-row">

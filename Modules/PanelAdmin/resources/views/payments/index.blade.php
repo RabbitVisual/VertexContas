@@ -58,7 +58,7 @@
                             </td>
                             <td class="px-6 py-4 uppercase font-bold text-xs">{{ $payment->gateway_slug }}</td>
                             <td class="px-6 py-4 font-mono font-medium text-gray-900 dark:text-white">
-                                {{ $payment->currency }} {{ number_format($payment->amount, 2, ',', '.') }}
+                                {{ format_currency($payment->amount, $payment->currency ?? 'R$') }}
                             </td>
                             <td class="px-6 py-4">
                                 @php

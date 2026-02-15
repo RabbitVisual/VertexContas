@@ -2,7 +2,7 @@
 
 @php
     $shouldHide = \Modules\Core\Services\InspectionGuard::shouldHideFinancialData();
-    $displayValue = \Modules\Core\Services\InspectionGuard::maskValue($value, $prefix);
+    $displayValue = format_currency($value, $prefix);
     $maskClasses = \Modules\Core\Services\InspectionGuard::maskClasses();
 @endphp
 

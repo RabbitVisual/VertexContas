@@ -60,7 +60,7 @@
                     <div class="min-w-0 flex-1">
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progresso geral</p>
                         <div class="flex items-center gap-2">
-                            <span class="text-xl font-black text-gray-900 dark:text-white tabular-nums">{{ number_format($avgProgress, 1) }}%</span>
+                            <span class="text-xl font-black text-gray-900 dark:text-white tabular-nums">{{ format_percent($avgProgress, 1) }}</span>
                             <div class="flex-1 h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden min-w-[60px]">
                                 <div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: {{ min($avgProgress, 100) }}%"></div>
                             </div>
@@ -204,7 +204,7 @@
                             <div class="h-full {{ $progressClass }} rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
                         </div>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                            <span class="{{ $textClass }}">{{ number_format($percentage, 0) }}%</span>
+                            <span class="{{ $textClass }}">{{ format_percent($percentage, 0) }}</span>
                             @if($remaining > 0)
                                 <span class="text-gray-500 dark:text-gray-400">Restam <x-core::financial-value :value="$remaining" /></span>
                             @else

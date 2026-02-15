@@ -65,7 +65,7 @@
                     <div class="min-w-0 flex-1">
                         <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Consumo médio</p>
                         <div class="flex items-center gap-2">
-                            <span class="text-xl font-black text-gray-900 dark:text-white tabular-nums">{{ number_format($avgConsumption, 1) }}%</span>
+                            <span class="text-xl font-black text-gray-900 dark:text-white tabular-nums">{{ format_percent($avgConsumption, 1) }}</span>
                             <div class="flex-1 h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden min-w-[60px]">
                                 <div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: {{ min($avgConsumption, 100) }}%"></div>
                             </div>
@@ -123,7 +123,7 @@
                     <div class="rounded-2xl bg-gray-50 dark:bg-gray-950/50 p-4 border border-gray-200 dark:border-white/5">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{{ $crit->category->name }}</span>
-                            <span class="text-xs font-bold text-rose-600 dark:text-rose-400">{{ number_format($crit->usage_percentage, 0) }}%</span>
+                            <span class="text-xs font-bold text-rose-600 dark:text-rose-400">{{ format_percent($crit->usage_percentage, 0) }}</span>
                         </div>
                         <div class="w-full h-1.5 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden">
                             <div class="h-full bg-rose-500 rounded-full" style="width: {{ min($crit->usage_percentage, 100) }}%"></div>
@@ -211,7 +211,7 @@
                             <div class="h-full {{ $progressClass }} rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
                         </div>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
-                            <span class="{{ $textClass }}">{{ number_format($budget->usage_percentage, 1) }}% utilizado</span>
+                            <span class="{{ $textClass }}">{{ format_percent($budget->usage_percentage, 1) }} utilizado</span>
                             @if(!$isExceeded)
                                 <span class="text-gray-500 dark:text-gray-400"><x-core::financial-value :value="$remaining" /> disponíveis</span>
                             @else

@@ -4,8 +4,8 @@
 
 <x-paneluser::layouts.master :title="'Editar Meta'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{
-    targetAmount: '{{ number_format($goal->target_amount, 2, ',', '.') }}',
-    currentAmount: '{{ number_format($goal->current_amount, 2, ',', '.') }}',
+    targetAmount: '{{ format_number($goal->target_amount, 2) }}',
+    currentAmount: '{{ format_number($goal->current_amount, 2) }}',
     formatCurrency(field) {
         let value = String(this[field] || '').replace(/\D/g, '');
         if (value === '') { this[field] = ''; return; }

@@ -71,7 +71,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Saldo Total</div>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['account_balance'], 2, ',', '.') }}</div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ format_currency($financialSnapshot['account_balance']) }}</div>
                 </div>
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Contas</div>
@@ -92,11 +92,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
                         <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Renda Mensal Declarada</span>
-                        <div class="text-xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['monthly_income'], 2, ',', '.') }}</div>
+                        <div class="text-xl font-bold text-gray-900 dark:text-white">{{ format_currency($financialSnapshot['monthly_income']) }}</div>
                     </div>
                     <div>
                         <span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Saldo em Contas</span>
-                        <div class="text-xl font-bold text-gray-900 dark:text-white">R$ {{ number_format($financialSnapshot['account_balance'], 2, ',', '.') }}</div>
+                        <div class="text-xl font-bold text-gray-900 dark:text-white">{{ format_currency($financialSnapshot['account_balance']) }}</div>
                     </div>
                 </div>
                 @if($financialSnapshot['monthly_income'] > 0)

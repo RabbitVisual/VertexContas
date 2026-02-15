@@ -24,6 +24,11 @@ if (file_exists(__DIR__.'/auth.php')) {
 // Authenticated General Routes
 Route::middleware(['auth'])->group(function () {});
 
+// Error pages test route (local only)
+if (app()->environment('local')) {
+    Route::get('/test-error/{code}', fn (string $code) => abort((int) $code));
+}
+
 // =========================================================================
 // Section 2: Fixed Module Mappings
 // =========================================================================

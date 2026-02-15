@@ -133,11 +133,11 @@
                         </div>
                          <div class="flex justify-between items-center group cursor-default">
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Contato Watts</span>
-                            <span class="text-xs text-slate-800 dark:text-slate-300 font-black group-hover:text-[#11C76F] transition-colors">{{ $ticket->user->phone ?? 'Não informado' }}</span>
+                            <span class="text-xs text-slate-800 dark:text-slate-300 font-black group-hover:text-[#11C76F] transition-colors">{{ lgpd_mask_phone($ticket->user->phone ?? null) }}</span>
                         </div>
                          <div class="flex justify-between items-center group cursor-default">
                             <span class="text-[10px] text-slate-400 font-bold uppercase">CPF Cadastrado</span>
-                            <span class="text-xs text-slate-800 dark:text-slate-300 font-black">{{ $ticket->user->cpf ?? '---' }}</span>
+                            <span class="text-xs text-slate-800 dark:text-slate-300 font-black">{{ lgpd_mask_cpf($ticket->user->cpf ?? null) }}</span>
                         </div>
                     </div>
 

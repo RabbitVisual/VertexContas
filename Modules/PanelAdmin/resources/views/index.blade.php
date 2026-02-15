@@ -29,14 +29,14 @@
                         <x-icon name="vault" class="w-5 h-5 text-white" />
                     </div>
                 </div>
-                <h3 class="text-3xl font-black mb-1">R$ {{ number_format($totalRevenue, 2, ',', '.') }}</h3>
+                <h3 class="text-3xl font-black mb-1">{{ format_currency($totalRevenue) }}</h3>
                 <div class="flex items-center text-xs text-blue-100/90 font-medium">
                     @php
                         $revenueDiff = $monthlyRevenue - $revenueLastMonth;
                         $revPercent = $revenueLastMonth > 0 ? ($revenueDiff / $revenueLastMonth) * 100 : 100;
                     @endphp
                     <x-icon name="{{ $revenueDiff >= 0 ? 'arrow-trend-up' : 'arrow-trend-down' }}" class="w-3 h-3 mr-1" />
-                    <span>{{ number_format(abs($revPercent), 1) }}% em relação ao mês anterior</span>
+                    <span>{{ format_percent(abs($revPercent), 1) }} em relação ao mês anterior</span>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
                         <x-icon name="users-gear" class="w-5 h-5 text-white" />
                     </div>
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ number_format($totalUsers, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-black mb-1">{{ format_number($totalUsers, 0) }}</h3>
                 <div class="flex items-center text-xs text-purple-100/90 font-medium">
                     <x-icon name="user-plus" class="w-3 h-3 mr-1" />
                     <span>+{{ $newUsersThisMonth }} novos este mês</span>
@@ -73,9 +73,9 @@
                         <x-icon name="star" class="w-5 h-5 text-white" />
                     </div>
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ number_format($proUsersCount, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-black mb-1">{{ format_number($proUsersCount, 0) }}</h3>
                 <div class="flex flex-col gap-1 text-xs text-amber-100/90 font-medium">
-                    <span><x-icon name="chart-pie" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? number_format(($proUsersCount/$totalUsers)*100, 1) : 0 }}% da base total</span>
+                    <span><x-icon name="chart-pie" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? format_percent(($proUsersCount/$totalUsers)*100, 1) : '0%' }} da base total</span>
                     <span><x-icon name="arrows-rotate" class="w-3 h-3 mr-1 inline" />{{ $activeSubscriptionsCount ?? 0 }} assinaturas recorrentes ativas</span>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                         <x-icon name="arrow-right-arrow-left" class="w-5 h-5 text-white" />
                     </div>
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ number_format($blogConversionRate, 1) }}%</h3>
+                <h3 class="text-3xl font-black mb-1">{{ format_percent($blogConversionRate, 1) }}</h3>
                 <div class="flex items-center text-xs text-indigo-100/90 font-medium">
                     <x-icon name="users" class="w-3 h-3 mr-1" />
                     <span>Visitantes > Assinantes</span>
@@ -220,7 +220,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-sm font-black text-slate-900 dark:text-white">R$ {{ number_format($payment->amount, 2, ',', '.') }}</div>
+                            <div class="text-sm font-black text-slate-900 dark:text-white">{{ format_currency($payment->amount) }}</div>
                             <span class="inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold {{ $payment->status === 'succeeded' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
                                 <span class="w-1 h-1 rounded-full bg-current mr-1"></span>
                                 {{ strtoupper($payment->status) }}

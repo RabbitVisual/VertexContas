@@ -78,7 +78,7 @@
                     </div>
                     <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Telefone</span>
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ $user->phone ?? 'Não informado' }}</span>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ lgpd_format_phone($user->phone ?? null) }}</span>
                     </div>
                 </div>
             </div>

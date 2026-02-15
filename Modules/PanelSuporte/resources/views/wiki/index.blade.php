@@ -34,6 +34,13 @@
                                 <span>Todas as Categorias</span>
                             </div>
                         </a>
+                        <a href="{{ route('support.wiki.legal-reference') }}"
+                           class="flex items-center justify-between px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('support.wiki.legal-reference') ? 'bg-primary/10 text-primary font-black shadow-sm' : 'text-slate-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 font-bold' }}">
+                            <div class="flex items-center gap-3">
+                                <x-icon name="file-contract" class="text-lg" />
+                                <span>Referência Legal</span>
+                            </div>
+                        </a>
                         @foreach($categories as $category)
                             <a href="{{ route('support.wiki.index', ['category' => $category->slug]) }}"
                                class="flex items-center justify-between px-4 py-3 rounded-2xl transition-all {{ request('category') == $category->slug ? 'bg-primary/10 text-primary font-black shadow-sm' : 'text-slate-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 font-bold' }}">

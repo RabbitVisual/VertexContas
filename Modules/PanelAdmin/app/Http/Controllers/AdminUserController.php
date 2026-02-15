@@ -66,7 +66,7 @@ class AdminUserController extends Controller
 
             $supportStats = [
                 'closed_tickets' => $closedTickets,
-                'avg_rating' => $avgRating ? number_format($avgRating, 1) : 'N/A',
+                'avg_rating' => $avgRating ? format_number($avgRating, 1) : 'N/A',
                 'recent_ratings' => $recentRatings,
             ];
         }

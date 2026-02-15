@@ -217,7 +217,7 @@
                 <div>
                     <div class="flex justify-between text-sm mb-2">
                         <span class="font-bold text-gray-900 dark:text-white">{{ $goal->name }}</span>
-                        <span class="font-black text-primary-500 tabular-nums">{{ number_format($pct, 0) }}%</span>
+                        <span class="font-black text-primary-500 tabular-nums">{{ format_percent($pct, 0) }}</span>
                     </div>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden border border-gray-200/50 dark:border-gray-600/50">
                         <div class="bg-gradient-to-r from-primary-500 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: {{ $pct }}%"></div>

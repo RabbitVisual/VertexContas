@@ -11,6 +11,7 @@ use Modules\PanelAdmin\Http\Controllers\PaymentController;
 use Modules\PanelAdmin\Http\Controllers\SubscriptionController;
 use Modules\PanelAdmin\Http\Controllers\PlanController;
 use Modules\PanelAdmin\Http\Controllers\RoleController;
+use Modules\PanelAdmin\Http\Controllers\LegalManagerController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
 
 /*
@@ -125,6 +126,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::put('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'updateArticle'])->name('articles.update');
         Route::delete('/articles/{article}', [\Modules\PanelAdmin\Http\Controllers\WikiManagerController::class, 'destroyArticle'])->name('articles.destroy');
     });
+    // Central Legal
+    Route::prefix('legal')->name('legal.')->group(function () {
+        Route::get('/', [LegalManagerController::class, 'index'])->name('index');
+        Route::get('/{document}/edit', [LegalManagerController::class, 'edit'])->name('edit');
+        Route::put('/{document}', [LegalManagerController::class, 'update'])->name('update');
+    });
+
     // User Management Extensions
     Route::post('users/{user}/update-photo', [AdminSupportController::class, 'updateUserPhoto'])->name('users.update-photo');
 });

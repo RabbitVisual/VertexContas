@@ -240,12 +240,75 @@ Basta adicionar a diretiva `x-mask` com o nome da máscara desejada. O sistema c
 | `'date'`    | DD/MM/AAAA                        | 25/12/2025         |
 
 ### Melhores Práticas (Backend)
-Lembre-se que as máscaras enviam os caracteres especiais (pontos, traços). Sempre **limpe os dados** no backend antes de salvar no banco ou validar.
+Lembre-se que as máscaras enviam os caracteres especiais (pontos, traços). Use os helpers `lgpd_clean_*` para normalizar dados antes de salvar no banco ou validar.
 
 **Exemplo no Laravel (Request ou Controller):**
 ```php
-// Remover tudo que não for dígito
-$cpfClean = preg_replace('/\D/', '', $request->cpf);
-// Salvar: 12345678900
+$request->merge([
+    'cpf' => lgpd_clean_cpf($request->cpf ?? null) ?: null,
+    'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,
+]);
+// Salvar: 12345678900 (apenas dígitos)
 ```
-Isso garante integridade dos dados e facilita buscas futuras.
+
+---
+
+## 6. Helpers LGPD e Formatação
+
+O sistema possui helpers globais para proteção LGPD e formatação consistente de valores financeiros e dados sensíveis.
+
+### 6.1 LgpdHelper (Segurança LGPD)
+
+Protege dados pessoais conforme LGPD. Use em exibição, logs e contextos de suporte.
+
+| Função | Uso |
+|--------|-----|
+| `lgpd_mask_cpf($cpf)` | Exibe `***.***.***-00` em contextos de terceiros |
+| `lgpd_format_cpf($cpf)` | Formata `123.456.789-00` para perfil próprio |
+| `lgpd_mask_cnpj($cnpj)` | Mascara CNPJ em documentos de terceiros |
+| `lgpd_format_cnpj($cnpj)` | Formata CNPJ para exibição legível |
+| `lgpd_mask_phone($phone)` | Exibe `(11) *****-7777` |
+| `lgpd_format_phone($phone)` | Formata `(11) 98888-7777` |
+| `lgpd_clean_cpf($value)` | Remove não-dígitos (antes de salvar) |
+| `lgpd_clean_cnpj($value)` | Remove não-dígitos |
+| `lgpd_clean_phone($value)` | Remove não-dígitos |
+
+**Política:** Em suporte/inspeção visualizando usuário terceiro → **sempre mask**. Em perfil próprio ou documento da empresa → **format**.
+
+### 6.2 FormatHelper (Moeda, Porcentagem)
+
+| Função | Uso |
+|--------|-----|
+| `format_currency($value)` | `R$ 1.500,50` (respeita InspectionGuard) |
+| `format_percent($value, $decimals)` | `15,5%` |
+| `format_number($value, $decimals)` | `1.500,50` (padrão BRL) |
+
+### 6.3 Máscaras de Input (x-mask) - Autoformatação na Digitação
+
+Campos com `x-mask` formatam automaticamente enquanto o usuário digita:
+
+| Campo      | Máscara   | Onde está aplicado                                              |
+|-----------|-----------|------------------------------------------------------------------|
+| CPF       | `x-mask="'cpf'"`  | Login, Cadastro, Perfil Suporte (edição)                        |
+| CNPJ      | `x-mask="'cnpj'"` | Configurações Admin (documentos)                                |
+| Telefone  | `x-mask="'phone'"`| Cadastro, Perfis (PanelUser, Admin, Suporte), Usuários Suporte  |
+| Data      | `x-mask="'date'"` | Cadastro, Perfis, Usuários Suporte (DD/MM/AAAA)                 |
+| Moeda     | `x-mask="'money'"`| Minha Renda, Onboarding, Transações (formatCurrency)            |
+
+**Componente reutilizável:** `<x-masked-input mask="cpf" name="cpf" />` (em `resources/views/components/masked-input.blade.php`)
+
+### 6.4 Helpers de parsing (backend)
+
+```php
+parse_brl_money($request->amount);  // "R$ 1.500,50" -> 1500.50
+parse_brl_date($request->birth_date); // "25/12/2025" -> "2025-12-25"
+```
+
+### 6.5 Exemplos de exibição
+
+```blade
+{{ format_currency($invoice->amount) }}
+{{ format_percent($budget->usage_percentage, 1) }}
+{{ lgpd_mask_cpf($ticket->user->cpf) }}
+{{ lgpd_format_phone($user->phone) }}
+```

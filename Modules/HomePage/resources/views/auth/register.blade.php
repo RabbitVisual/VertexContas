@@ -99,7 +99,8 @@
                                 <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
                                     <x-icon name="calendar" />
                                 </div>
-                                <input type="date" name="birth_date" id="birth_date" value="{{ old('birth_date') }}"
+                                <input type="text" name="birth_date" id="birth_date" value="{{ old('birth_date') }}"
+                                    x-mask="'date'" placeholder="dd/mm/aaaa"
                                     class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 transition-all font-medium">
                             </div>
                         </div>

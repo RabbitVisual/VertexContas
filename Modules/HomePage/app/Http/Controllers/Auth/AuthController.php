@@ -78,14 +78,20 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $request->merge([
+            'cpf' => lgpd_clean_cpf($request->cpf ?? null) ?: null,
+            'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,
+            'birth_date' => parse_brl_date($request->birth_date ?? null) ?? $request->birth_date,
+        ]);
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'cpf' => ['nullable', 'string', 'max:14', 'unique:users'],
+            'cpf' => ['nullable', 'string', 'size:11', 'unique:users'],
             'birth_date' => ['nullable', 'date'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:15'],
         ]);
 
         $user = \App\Models\User::create([

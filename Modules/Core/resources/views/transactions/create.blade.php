@@ -116,7 +116,7 @@
                             <select name="account_id" id="account_id" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
                                 <option value="">Selecione a conta</option>
                                 @foreach($accounts as $account)
-                                    <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }} — R$ {{ number_format($account->balance, 2, ',', '.') }}</option>
+                                    <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
                                 @endforeach
                             </select>
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">

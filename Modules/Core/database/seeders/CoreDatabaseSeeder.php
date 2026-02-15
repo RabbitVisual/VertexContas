@@ -17,6 +17,9 @@ class CoreDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([SettingSeeder::class]);
+        $this->call([
+            SettingSeeder::class,
+            LegalDocumentSeeder::class,
+        ]);
     }
 }

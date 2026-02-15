@@ -237,11 +237,11 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CNPJ</label>
-                    <input type="text" name="company_cnpj" value="{{ old('company_cnpj', $documents->get('company_cnpj')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <input type="text" name="company_cnpj" value="{{ old('company_cnpj', $documents->get('company_cnpj')) }}" x-mask="'cnpj'" placeholder="00.000.000/0000-00" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone</label>
-                    <input type="text" name="company_phone" value="{{ old('company_phone', $documents->get('company_phone')) }}" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <input type="text" name="company_phone" value="{{ old('company_phone', $documents->get('company_phone')) }}" x-mask="'phone'" placeholder="(00) 00000-0000" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-100 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>

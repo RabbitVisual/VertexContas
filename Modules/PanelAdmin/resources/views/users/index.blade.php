@@ -78,7 +78,7 @@
                                 @endforeach
                             </td>
                             <td class="px-6 py-4">
-                                <span class="font-medium text-gray-900 dark:text-white tabular-nums">R$ {{ number_format($monthlyIncomeByUser[$user->id] ?? 0, 2, ',', '.') }}</span>
+                                <span class="font-medium text-gray-900 dark:text-white tabular-nums">{{ format_currency($monthlyIncomeByUser[$user->id] ?? 0) }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md">

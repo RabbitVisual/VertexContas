@@ -178,6 +178,9 @@ class SettingsController extends Controller
             'limit_download_report_per_day' => 'required|integer|min:0|max:999',
         ]);
 
+        $data['company_cnpj'] = lgpd_clean_cnpj($data['company_cnpj'] ?? null) ?: null;
+        $data['company_phone'] = lgpd_clean_phone($data['company_phone'] ?? null) ?: null;
+
         foreach ($data as $key => $value) {
             $type = in_array($key, ['limit_download_invoice_per_day', 'limit_download_report_per_day']) ? 'integer' : 'string';
             $this->settingService->set($key, $value, 'document_templates', $type);

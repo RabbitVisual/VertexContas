@@ -7,6 +7,7 @@ use Modules\PanelUser\Http\Controllers\SecurityController;
 use Modules\PanelUser\Http\Controllers\SubscriptionController;
 use Modules\PanelUser\Http\Controllers\SupportTicketController;
 use Modules\PanelUser\Http\Controllers\BlogController;
+use Modules\PanelUser\Http\Controllers\LegalAcceptanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,11 @@ use Modules\PanelUser\Http\Controllers\BlogController;
 |
 */
 
-Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|admin', 'financial.setup'])->group(function () {
+Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|admin', 'financial.setup', 'legal.acceptance'])->group(function () {
+
+    // Legal Acceptance (Compliance Wall)
+    Route::get('/legal/aceitar', [LegalAcceptanceController::class, 'index'])->name('paneluser.legal.acceptance');
+    Route::post('/legal/aceitar', [LegalAcceptanceController::class, 'store'])->name('paneluser.legal.store');
 
     // Panel Dashboard
     Route::get('/', [PanelUserController::class, 'index'])->name('paneluser.index');

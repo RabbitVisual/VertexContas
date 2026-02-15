@@ -39,7 +39,7 @@
                 <span class="sensitive-value"><x-core::financial-value :value="$budget->spent_amount" /> / <x-core::financial-value :value="$budget->limit_amount" /></span>
             </span>
             <span class="font-bold {{ $isExceeded ? 'text-rose-500' : 'text-slate-600 dark:text-slate-300' }}">
-                {{ number_format($usage, 1) }}%
+                {{ format_percent($usage, 1) }}
             </span>
         </div>
 
@@ -55,7 +55,7 @@
             </p>
         @elseif($usage > $alertThreshold)
             <p class="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-2 flex items-center gap-1.5">
-                <x-icon name="exclamation-circle" style="duotone" class="w-3.5 h-3.5" /> Atenção: {{ number_format(100 - $usage, 1) }}% restante
+                <x-icon name="exclamation-circle" style="duotone" class="w-3.5 h-3.5" /> Atenção: {{ format_percent(100 - $usage, 1) }} restante
             </p>
         @else
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">

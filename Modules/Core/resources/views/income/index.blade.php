@@ -3,7 +3,7 @@
     $prepareRows = function ($items) {
         return collect($items)->map(fn ($i) => [
             'description' => $i['description'] ?? '',
-            'amount' => isset($i['amount']) ? number_format((float) $i['amount'], 2, ',', '.') : '',
+            'amount' => isset($i['amount']) ? format_number((float) $i['amount'], 2) : '',
             'day' => (string) ($i['day'] ?? '1'),
             'account_id' => $i['account_id'] ?? '',
             'category_id' => $i['category_id'] ?? '',

@@ -84,7 +84,7 @@
                             </td>
                             <td class="px-6 py-4 uppercase font-bold text-xs">{{ $sub->gateway_slug }}</td>
                             <td class="px-6 py-4 font-mono font-medium text-gray-900 dark:text-white">
-                                {{ $sub->currency }} {{ number_format((float) $sub->amount, 2, ',', '.') }}/mês
+                                {{ format_currency((float) $sub->amount, $sub->currency ?? 'R$') }}/mês
                             </td>
                             <td class="px-6 py-4">
                                 @php

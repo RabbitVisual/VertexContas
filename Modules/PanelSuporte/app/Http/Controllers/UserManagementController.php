@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SupportAuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Core\Models\LegalDocument;
+use Modules\Core\Models\UserLegalAcceptance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Modules\Core\Services\FinancialHealthService;
@@ -25,7 +27,22 @@ class UserManagementController extends Controller
         $financialHealthService = app(FinancialHealthService::class);
         $financialSnapshot = $financialHealthService->getUserFinancialSnapshot($user);
 
-        return view('panelsuporte::users.show', compact('user', 'financialSnapshot'));
+        $requiredDocs = LegalDocument::active()->requiresAcceptance()->orderBy('slug')->get();
+        $complianceStatus = $requiredDocs->map(function (LegalDocument $doc) use ($user) {
+            $acceptance = UserLegalAcceptance::where('user_id', $user->id)
+                ->where('legal_document_id', $doc->id)
+                ->first();
+            $isUpToDate = $acceptance && $acceptance->version === $doc->version;
+
+            return [
+                'document' => $doc,
+                'accepted_version' => $acceptance?->version,
+                'accepted_at' => $acceptance?->accepted_at,
+                'is_up_to_date' => $isUpToDate,
+            ];
+        });
+
+        return view('panelsuporte::users.show', compact('user', 'financialSnapshot', 'complianceStatus'));
     }
 
     /**
@@ -50,6 +67,11 @@ class UserManagementController extends Controller
         if (! $user->support_access_expires_at || $user->support_access_expires_at->isPast()) {
             return redirect()->route('support.tickets.index')->with('error', 'Acesso ao perfil do usuário não autorizado ou expirado.');
         }
+
+        $request->merge([
+            'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,
+            'birth_date' => parse_brl_date($request->birth_date ?? null) ?? $request->birth_date,
+        ]);
 
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],

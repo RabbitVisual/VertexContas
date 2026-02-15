@@ -49,6 +49,7 @@
                         <div class="space-y-2">
                             <label for="phone" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Telefone</label>
                             <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                                x-mask="'phone'" placeholder="(00) 00000-0000"
                                 class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-bold placeholder-slate-400 transition-all" />
                             @error('phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
@@ -58,7 +59,8 @@
                         <!-- Birth Date -->
                         <div class="space-y-2">
                             <label for="birth_date" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Data de Nascimento</label>
-                            <input type="date" name="birth_date" id="birth_date" value="{{ old('birth_date', $user->birth_date?->format('Y-m-d')) }}"
+                            <input type="text" name="birth_date" id="birth_date" value="{{ old('birth_date', $user->birth_date?->format('d/m/Y')) }}"
+                                x-mask="'date'" placeholder="dd/mm/aaaa"
                                 class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-bold placeholder-slate-400 transition-all" />
                             @error('birth_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>

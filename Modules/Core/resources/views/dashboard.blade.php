@@ -81,7 +81,7 @@
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 shrink-0">
                         <x-icon name="arrow-trend-up" style="duotone" class="w-6 h-6" />
                     </div>
-                    <span class="flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg">+{{ number_format($incomeTrendPercentage, 1) }}%</span>
+                    <span class="flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg">+{{ format_percent($incomeTrendPercentage, 1) }}</span>
                 </div>
                 <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Receitas do Mês</p>
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyIncome" /></h3>
@@ -111,7 +111,7 @@
                     <div class="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 ring-1 ring-black/5 dark:ring-white/10 shrink-0">
                         <x-icon name="arrow-trend-down" style="duotone" class="w-6 h-6" />
                     </div>
-                    <span class="flex items-center text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 px-2.5 py-1 rounded-lg">{{ number_format($expenseTrendPercentage, 1) }}%</span>
+                    <span class="flex items-center text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 px-2.5 py-1 rounded-lg">{{ format_percent($expenseTrendPercentage, 1) }}</span>
                 </div>
                 <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Despesas do Mês</p>
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyExpenses" /></h3>

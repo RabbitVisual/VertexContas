@@ -165,6 +165,13 @@
                     </a>
                     @endif
 
+                    {{-- Meus Contratos e Termos --}}
+                    <a href="{{ route('paneluser.legal.acceptance') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('paneluser.legal.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="file-contract" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('paneluser.legal.*') ? $proIconActive : $proIconInactive }}" />
+                        Meus Contratos e Termos
+                    </a>
+
                     {{-- Sair --}}
                     <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
                         <form method="POST" action="{{ route('logout') }}">
@@ -292,6 +299,13 @@
                         </a>
                     </li>
                     @endif
+                    <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700"><span class="{{ $sectionLabelClass }}">Legal</span></li>
+                    <li>
+                        <a href="{{ route('paneluser.legal.acceptance') }}" class="{{ $navItemClass }} {{ request()->routeIs('paneluser.legal.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="file-contract" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('paneluser.legal.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Meus Contratos e Termos</span>
+                        </a>
+                    </li>
                     <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

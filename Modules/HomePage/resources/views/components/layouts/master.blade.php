@@ -15,9 +15,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    {{-- Anti-FOUC: Flowbite/Tailwind dark mode --}}
+    {{-- Anti-FOUC: Flowbite/Tailwind dark mode + modo privacidade (sensitive) --}}
     <script>
-        (function(){var d=localStorage.getItem('color-theme')==='dark'||(!('color-theme' in localStorage)&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();
+        (function(){
+            var d=localStorage.getItem('color-theme')==='dark'||(!('color-theme' in localStorage)&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark',d);
+            var isHidden=localStorage.getItem('sensitive-hidden')==='true';
+            if(document.body){document.body.classList.toggle('sensitive-hidden',isHidden);}
+            else{window.addEventListener('DOMContentLoaded',function(){document.body.classList.toggle('sensitive-hidden',isHidden);});}
+        })();
     </script>
 
     <title>{{ $title ?? 'Vertex Contas - HomePage' }}</title>

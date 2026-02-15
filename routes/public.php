@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\HomePage\Http\Controllers\HomePageController;
+use Modules\HomePage\Http\Controllers\LegalController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -20,9 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Add other public routes here
-Route::get('/', function () {
-    return view('homepage::homepage');
-})->name('homepage');
+Route::get('/', [HomePageController::class, 'home'])->name('homepage');
 
 Route::get('/termos', function () {
     return view('homepage::legal.terms');
@@ -31,6 +30,9 @@ Route::get('/termos', function () {
 Route::get('/privacidade', function () {
     return view('homepage::legal.privacy');
 })->name('privacy');
+
+// Dynamic Legal Documents (Termos, Privacidade, etc.)
+Route::get('/legal/{slug}', [LegalController::class, 'show'])->name('public.legal.show');
 
 // Help Center
 Route::view('/ajuda', 'homepage::help-center')->name('help-center');

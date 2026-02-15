@@ -67,7 +67,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                      <div class="bg-gray-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100/50 dark:border-gray-800/50">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">CPF</span>
-                                        <span class="text-base text-slate-900 dark:text-white font-bold tracking-tighter">{{ $user->cpf ?? '—' }}</span>
+                                        <span class="text-base text-slate-900 dark:text-white font-bold tracking-tighter">{{ lgpd_mask_cpf($user->cpf ?? null) }}</span>
                                     </div>
                                     <div class="bg-gray-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100/50 dark:border-gray-800/50">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nascimento</span>
@@ -109,6 +109,42 @@
                                     </div>
                                 </div>
 
+                                {{-- Status de Compliance --}}
+                                <div class="mt-6">
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <x-icon name="file-contract" style="solid" class="text-primary" />
+                                        Status de Compliance
+                                    </h4>
+                                    <div class="space-y-2">
+                                        @forelse($complianceStatus ?? [] as $item)
+                                            <div class="flex items-center justify-between p-3 rounded-xl border {{ $item['is_up_to_date'] ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/20' : 'border-rose-200 dark:border-rose-500/30 bg-rose-50/50 dark:bg-rose-900/20' }}">
+                                                <div class="flex items-center gap-3">
+                                                    @if($item['is_up_to_date'])
+                                                        <span class="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[10px] font-black rounded-lg uppercase">
+                                                            <x-icon name="check" style="solid" class="w-3 h-3" /> Em dia
+                                                        </span>
+                                                    @else
+                                                        <span class="flex items-center gap-1.5 px-2 py-0.5 bg-rose-500/20 text-rose-700 dark:text-rose-400 text-[10px] font-black rounded-lg uppercase">
+                                                            <x-icon name="xmark" style="solid" class="w-3 h-3" /> Desatualizado
+                                                        </span>
+                                                    @endif
+                                                    <span class="text-sm font-bold text-slate-800 dark:text-white">{{ $item['document']->title }}</span>
+                                                    <span class="text-[10px] text-slate-500">v{{ $item['document']->version }}</span>
+                                                    @if($item['accepted_version'])
+                                                        <span class="text-[10px] text-slate-400">(aceitou v{{ $item['accepted_version'] }})</span>
+                                                    @endif
+                                                </div>
+                                                <a href="{{ route('public.legal.show', $item['document']->slug) }}" target="_blank" rel="noopener" class="text-[10px] font-bold text-primary hover:underline flex items-center gap-1">
+                                                    <x-icon name="envelope" style="solid" class="w-3 h-3" />
+                                                    Enviar por E-mail
+                                                </a>
+                                            </div>
+                                        @empty
+                                            <p class="text-xs text-slate-500">Nenhum documento com exigência de aceite.</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+
                                 {{-- Solvência (Financial Health) --}}
                                 <div class="mt-6">
                                     <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Solvência</h4>
@@ -121,7 +157,7 @@
                                                 <div>
                                                     <span class="text-sm font-bold text-rose-700 dark:text-rose-400">High Risk / Negative Cashflow</span>
                                                     <p class="text-xs text-rose-600 dark:text-rose-400/90 mt-1">O usuário apresenta fluxo de caixa negativo. Despesas do mês superam a renda declarada.</p>
-                                                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-2">Fluxo livre: R$ {{ number_format($financialSnapshot['free_cashflow'] ?? 0, 2, ',', '.') }}</p>
+                                                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-2">Fluxo livre: {{ format_currency($financialSnapshot['free_cashflow'] ?? 0) }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -133,7 +169,7 @@
                                                 </div>
                                                 <div>
                                                     <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400">Fluxo de Caixa Positivo</span>
-                                                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Fluxo livre: R$ {{ number_format($financialSnapshot['free_cashflow'] ?? 0, 2, ',', '.') }}</p>
+                                                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Fluxo livre: {{ format_currency($financialSnapshot['free_cashflow'] ?? 0) }}</p>
                                                 </div>
                                             </div>
                                         </div>

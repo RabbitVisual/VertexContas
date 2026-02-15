@@ -30,6 +30,7 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:admin|support'])
 
     // Wiki
     Route::get('/wiki', [\Modules\PanelSuporte\Http\Controllers\WikiController::class, 'index'])->name('wiki.index');
+    Route::get('/wiki/legal-reference', [\Modules\PanelSuporte\Http\Controllers\LegalReferenceController::class, 'index'])->name('wiki.legal-reference');
     Route::get('/wiki/{article:slug}', [\Modules\PanelSuporte\Http\Controllers\WikiController::class, 'show'])->name('wiki.show');
     Route::post('/wiki/suggestion', [\Modules\PanelSuporte\Http\Controllers\WikiController::class, 'storeSuggestion'])->name('wiki.suggestion.store');
 

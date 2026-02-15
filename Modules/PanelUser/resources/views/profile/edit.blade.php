@@ -102,7 +102,8 @@
                                     </div>
                                     <div class="space-y-1 md:col-span-2">
                                         <label for="birth_date" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500">Data de Nascimento</label>
-                                        <input type="date" name="birth_date" id="birth_date" value="{{ old('birth_date', $user->birth_date?->format('Y-m-d')) }}"
+                                        <input type="text" name="birth_date" id="birth_date" value="{{ old('birth_date', $user->birth_date?->format('d/m/Y')) }}"
+                                        x-mask="'date'" placeholder="dd/mm/aaaa"
                                             class="modern-input w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 text-gray-900 dark:text-white font-semibold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all">
                                         @error('birth_date') <p class="text-[10px] text-red-500 font-bold mt-1 uppercase">{{ $message }}</p> @enderror
                                     </div>
@@ -120,6 +121,7 @@
                                 <div class="space-y-1">
                                     <label for="phone" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500">Telefone</label>
                                     <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                                        x-mask="'phone'" placeholder="(00) 00000-0000"
                                         class="modern-input w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 text-gray-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all">
                                     @error('phone') <p class="text-[10px] text-red-500 font-bold mt-1 uppercase">{{ $message }}</p> @enderror
                                 </div>
@@ -145,7 +147,7 @@
                                         CPF <x-icon name="lock" style="solid" class="w-3 h-3 text-slate-400" />
                                     </label>
                                     <div class="relative">
-                                        <input type="text" id="cpf" value="{{ $user->cpf ? preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $user->cpf) : 'Não informado' }}"
+                                        <input type="text" id="cpf" value="{{ lgpd_format_cpf($user->cpf ?? null) }}"
                                             class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 font-mono font-medium cursor-not-allowed" readonly disabled>
                                         <div class="absolute right-4 top-1/2 -translate-y-1/2">
                                             @if($user->cpf)

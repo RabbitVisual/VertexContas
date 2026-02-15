@@ -50,8 +50,14 @@ class ProfileController extends Controller
 
         // 2. CPF Security Logic: Only Admin can edit CPF
         if ($user->hasRole('admin')) {
-            $rules['cpf'] = ['nullable', 'string', 'size:14', Rule::unique('users')->ignore($user->id)];
+            $rules['cpf'] = ['nullable', 'string', 'size:11', Rule::unique('users')->ignore($user->id)];
+            $request->merge(['cpf' => lgpd_clean_cpf($request->cpf ?? null) ?: null]);
         }
+
+        $request->merge([
+            'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,
+            'birth_date' => parse_brl_date($request->birth_date ?? null) ?? $request->birth_date,
+        ]);
 
         $validated = $request->validate($rules);
 

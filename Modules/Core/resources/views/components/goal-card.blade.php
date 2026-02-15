@@ -38,7 +38,7 @@
                 <x-core::financial-value :value="$goal->current_amount" />
             </span>
             <span class="font-bold text-primary-600 dark:text-primary-400">
-                {{ number_format($progress, 1) }}%
+                {{ format_percent($progress, 1) }}
             </span>
         </div>
 

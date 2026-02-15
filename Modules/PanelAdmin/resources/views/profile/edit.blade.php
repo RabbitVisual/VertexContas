@@ -56,6 +56,7 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-4">Telefone (Opcional)</label>
                         <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
+                            x-mask="'phone'" placeholder="(00) 00000-0000"
                             class="w-full px-6 py-4 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:ring-4 focus:ring-[#11C76F]/20 text-slate-800 dark:text-white font-black text-sm transition-all">
                         @error('phone') <p class="text-[10px] text-red-500 font-black uppercase tracking-widest ml-4 mt-1">{{ $message }}</p> @enderror
                     </div>

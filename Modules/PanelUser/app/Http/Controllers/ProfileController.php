@@ -38,6 +38,11 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         // 1. Base Validation Rules - Email and CPF are NEVER editable by user (only admin/support when permitted)
+        $request->merge([
+            'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,
+            'birth_date' => parse_brl_date($request->birth_date ?? null) ?? $request->birth_date,
+        ]);
+
         $rules = [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

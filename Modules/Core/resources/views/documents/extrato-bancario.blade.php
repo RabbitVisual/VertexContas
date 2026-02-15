@@ -24,17 +24,17 @@
             <td>{{ $item['transaction']->description ?? '—' }}</td>
             <td>{{ $item['transaction']->category?->name ?? '—' }}</td>
             <td>{{ $item['transaction']->account?->name ?? '—' }}</td>
-            <td class="text-right">{{ $item['credit'] > 0 ? 'R$ ' . number_format($item['credit'], 2, ',', '.') : '—' }}</td>
-            <td class="text-right">{{ $item['debit'] > 0 ? 'R$ ' . number_format($item['debit'], 2, ',', '.') : '—' }}</td>
-            <td class="text-right" style="{{ ($item['balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">R$ {{ number_format($item['balance'] ?? 0, 2, ',', '.') }}</td>
+            <td class="text-right">{{ $item['credit'] > 0 ? format_currency($item['credit']) : '—' }}</td>
+            <td class="text-right">{{ $item['debit'] > 0 ? format_currency($item['debit']) : '—' }}</td>
+            <td class="text-right" style="{{ ($item['balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency($item['balance'] ?? 0) }}</td>
         </tr>
         @endforeach
         @if(!empty($totals))
         <tr class="total-row">
             <td colspan="4">TOTAL</td>
-            <td class="text-right">R$ {{ number_format($totals['total_credit'] ?? 0, 2, ',', '.') }}</td>
-            <td class="text-right">R$ {{ number_format($totals['total_debit'] ?? 0, 2, ',', '.') }}</td>
-            <td class="text-right" style="{{ ($totals['final_balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">R$ {{ number_format($totals['final_balance'] ?? 0, 2, ',', '.') }}</td>
+            <td class="text-right">{{ format_currency($totals['total_credit'] ?? 0) }}</td>
+            <td class="text-right">{{ format_currency($totals['total_debit'] ?? 0) }}</td>
+            <td class="text-right" style="{{ ($totals['final_balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency($totals['final_balance'] ?? 0) }}</td>
         </tr>
         @endif
     </tbody>

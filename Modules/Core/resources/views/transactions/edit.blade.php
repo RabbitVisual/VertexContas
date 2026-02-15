@@ -8,7 +8,7 @@
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
      x-data="{
          type: '{{ old('type', $transaction->type) }}',
-         amount: '{{ number_format($transaction->amount, 2, ',', '.') }}',
+         amount: '{{ format_number($transaction->amount, 2) }}',
          categoryId: '{{ $transaction->category_id }}',
          planning: {},
          init() {
@@ -100,7 +100,7 @@
                             </div>
                             <select name="account_id" id="account_id" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
                                 @foreach($accounts as $account)
-                                    <option value="{{ $account->id }}" {{ old('account_id', $transaction->account_id) == $account->id ? 'selected' : '' }}>{{ $account->name }} — R$ {{ number_format($account->balance, 2, ',', '.') }}</option>
+                                    <option value="{{ $account->id }}" {{ old('account_id', $transaction->account_id) == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
                                 @endforeach
                             </select>
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">

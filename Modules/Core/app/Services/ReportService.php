@@ -377,7 +377,7 @@ class ReportService
             $totalIncome = $cashFlow->sum('income');
             $totalExpense = $cashFlow->sum('expense');
             $totalBalance = $cashFlow->sum('balance');
-            $totalsRow = ['TOTAL', 'R$ ' . number_format($totalIncome, 2, ',', '.'), 'R$ ' . number_format($totalExpense, 2, ',', '.'), 'R$ ' . number_format($totalBalance, 2, ',', '.')];
+            $totalsRow = ['TOTAL', format_currency($totalIncome, 'R$', false), format_currency($totalExpense, 'R$', false), format_currency($totalBalance, 'R$', false)];
         }
 
         return $this->exportToCsv($cashFlow, $filename, $headerBlock, $totalsRow);
@@ -561,13 +561,13 @@ class ReportService
         $rows = $ranking->map(fn ($item) => [
             'Categoria' => $item['category'],
             'Transações' => $item['count'],
-            'Total' => 'R$ ' . number_format($item['total'], 2, ',', '.'),
+            'Total' => format_currency($item['total'], 'R$', false),
         ]);
 
         $totalsRow = null;
         if ($ranking->isNotEmpty()) {
             $total = $ranking->sum('total');
-            $totalsRow = ['TOTAL', $ranking->sum('count'), 'R$ ' . number_format($total, 2, ',', '.')];
+            $totalsRow = ['TOTAL', $ranking->sum('count'), format_currency($total, 'R$', false)];
         }
 
         return $this->exportToCsv($rows, $filename, $headerBlock, $totalsRow);
@@ -591,14 +591,14 @@ class ReportService
                 'Descrição' => $item['transaction']->description ?? '—',
                 'Categoria' => $item['transaction']->category?->name ?? '—',
                 'Conta' => $item['transaction']->account?->name ?? '—',
-                'Crédito' => 'R$ ' . number_format($item['credit'], 2, ',', '.'),
-                'Débito' => 'R$ ' . number_format($item['debit'], 2, ',', '.'),
-                'Saldo' => 'R$ ' . number_format($item['balance'], 2, ',', '.'),
+                'Crédito' => format_currency($item['credit'], 'R$', false),
+                'Débito' => format_currency($item['debit'], 'R$', false),
+                'Saldo' => format_currency($item['balance'], 'R$', false),
             ];
         });
 
         $totals = $this->getBankStatementTotals($statement);
-        $totalsRow = ['TOTAL', '', '', '', 'R$ ' . number_format($totals['total_credit'], 2, ',', '.'), 'R$ ' . number_format($totals['total_debit'], 2, ',', '.'), 'R$ ' . number_format($totals['final_balance'], 2, ',', '.')];
+        $totalsRow = ['TOTAL', '', '', '', format_currency($totals['total_credit'], 'R$', false), format_currency($totals['total_debit'], 'R$', false), format_currency($totals['final_balance'], 'R$', false)];
 
         return $this->exportToCsv($rows, $filename, $headerBlock, $totalsRow);
     }

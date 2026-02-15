@@ -110,6 +110,14 @@
             <span>Comentários</span>
         </a>
 
+        <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Jurídico</p>
+
+        <a href="{{ route('admin.legal.index') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.legal.*') ? 'bg-[#11C76F]/10 text-[#11C76F] font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+            <x-icon name="file-contract" style="duotone" class="w-5" />
+            <span>Central Legal</span>
+        </a>
+
         <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">Configuração</p>
 
         <a href="{{ route('admin.settings.index') }}"

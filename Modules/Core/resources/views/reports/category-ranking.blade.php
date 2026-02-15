@@ -134,7 +134,7 @@
                 </div>
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                     <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Taxa de Poupança</span>
-                    <p class="text-2xl font-black text-blue-700 dark:text-blue-300">{{ number_format($summary['savings_rate'], 1) }}%</p>
+                    <p class="text-2xl font-black text-blue-700 dark:text-blue-300">{{ format_percent($summary['savings_rate'], 1) }}</p>
                 </div>
             </div>
 
@@ -163,7 +163,7 @@
                                 <td class="px-6 py-4 text-right font-bold text-slate-700 dark:text-slate-200">
                                     <span class="sensitive-value"><x-core::financial-value :value="$item['total']" /></span>
                                 </td>
-                                <td class="px-6 py-4 text-right text-slate-500 font-medium">{{ $totalExp > 0 ? number_format(($item['total'] / $totalExp) * 100, 1) : 0 }}%</td>
+                                <td class="px-6 py-4 text-right text-slate-500 font-medium">{{ $totalExp > 0 ? format_percent(($item['total'] / $totalExp) * 100, 1) : '0%' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

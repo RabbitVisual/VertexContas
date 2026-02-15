@@ -64,7 +64,7 @@
                                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">CPF (Documento)</span>
                                     <div class="flex items-center justify-between">
                                         <span class="text-base text-slate-900 dark:text-white font-black tracking-tighter">
-                                            {{ $user->cpf ? preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $user->cpf) : 'Não informado' }}
+                                            {{ lgpd_format_cpf($user->cpf ?? null) }}
                                         </span>
                                         @if($user->cpf)
                                             <span class="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-lg">
@@ -78,7 +78,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="bg-gray-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100/50 dark:border-gray-800/50">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Telefone</span>
-                                        <span class="text-base text-slate-900 dark:text-white font-bold">{{ $user->phone ?? '—' }}</span>
+                                        <span class="text-base text-slate-900 dark:text-white font-bold">{{ lgpd_format_phone($user->phone ?? null) }}</span>
                                     </div>
                                     <div class="bg-gray-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100/50 dark:border-gray-800/50">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nascimento</span>

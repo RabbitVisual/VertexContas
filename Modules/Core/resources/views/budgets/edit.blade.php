@@ -4,7 +4,7 @@
 
 <x-paneluser::layouts.master :title="'Editar Orçamento'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8" x-data="{
-    limitAmount: '{{ number_format($budget->limit_amount, 2, ',', '.') }}',
+    limitAmount: '{{ format_number($budget->limit_amount, 2) }}',
     alertThreshold: {{ (int) ($budget->alert_threshold ?? 80) }},
     allowExceed: {{ $budget->allow_exceed ? 'true' : 'false' }},
     formatCurrency() {

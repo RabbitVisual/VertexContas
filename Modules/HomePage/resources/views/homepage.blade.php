@@ -33,7 +33,7 @@
                     <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4 animate-fade-in-up delay-150">
                         @auth
                             @php
-                                $dashboardRoute = 'user.index';
+                                $dashboardRoute = 'paneluser.index';
                                 if(Auth::user()->hasRole('admin')) $dashboardRoute = 'admin.index';
                                 elseif(Auth::user()->hasRole('support')) $dashboardRoute = 'support.index';
                             @endphp
@@ -52,24 +52,82 @@
                         </a>
                     </div>
 
-                    <div class="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-60">
+                    @auth
+                    <div class="flex items-center justify-center lg:justify-start gap-8 pt-8 {{ $financialSnapshot ? '' : 'opacity-60' }}">
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="text-2xl font-black dark:text-white">+R$ 0</span>
+                            <span class="sensitive-value text-2xl font-black dark:text-white">+<x-core::financial-value :value="$financialSnapshot['monthly_income'] ?? 0" /></span>
                             <span class="text-xs font-bold uppercase tracking-widest">Renda Bruta</span>
                         </div>
                         <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
                         <div class="flex flex-col items-center lg:items-start">
-                            <span class="text-2xl font-black dark:text-white">0%</span>
+                            <span class="sensitive-value text-2xl font-black dark:text-white">{{ $financialSnapshot ? $financialSnapshot['savings_rate'] . '%' : '0%' }}</span>
                             <span class="text-xs font-bold uppercase tracking-widest">Economia</span>
                         </div>
                     </div>
+                    @else
+                    <div class="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-60">
+                        <div class="flex flex-col items-center lg:items-start">
+                            <span class="sensitive-value text-2xl font-black dark:text-white">+<x-core::financial-value :value="0" /></span>
+                            <span class="text-xs font-bold uppercase tracking-widest">Renda Bruta</span>
+                        </div>
+                        <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="flex flex-col items-center lg:items-start">
+                            <span class="sensitive-value text-2xl font-black dark:text-white">0%</span>
+                            <span class="text-xs font-bold uppercase tracking-widest">Economia</span>
+                        </div>
+                    </div>
+                    @endauth
                 </div>
 
                 <!-- Hero Mockup/Illustration -->
                 <div class="w-full lg:w-2/5 relative animate-fade-in-right">
                     <div class="relative bg-gradient-to-br from-slate-100 to-white dark:from-slate-800 dark:to-slate-900 p-6 rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700 transform lg:rotate-2 group hover:rotate-0 transition-transform duration-700">
                         @auth
-                            <!-- Auth Welcome Card -->
+                            @php $isPro = Auth::user()->isPro(); @endphp
+                            @if($isPro)
+                            {{-- PRO Card: premium design --}}
+                            <div class="absolute -top-10 -left-10 w-80 bg-gradient-to-br from-amber-50 via-white to-amber-50/50 dark:from-amber-950/30 dark:via-slate-900 dark:to-amber-950/20 rounded-[2.5rem] shadow-2xl p-6 border-2 border-amber-200/60 dark:border-amber-500/30 z-10 animate-fade-in-up rotate-[-6deg] group-hover:rotate-0 transition-transform duration-500 overflow-hidden">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                                <div class="relative flex flex-col items-center text-center">
+                                    <div class="relative mb-4">
+                                        @if(Auth::user()->photo)
+                                            <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="w-24 h-24 rounded-[2rem] object-cover ring-4 ring-amber-400/40">
+                                        @else
+                                            <div class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center font-black text-4xl ring-4 ring-amber-400/40">
+                                                {{ substr(Auth::user()->first_name, 0, 1) }}
+                                            </div>
+                                        @endif
+                                        <div class="absolute -bottom-2 -right-2 bg-amber-500 text-white p-2 rounded-2xl shadow-lg shadow-amber-500/30">
+                                            <x-icon name="crown" style="solid" class="text-xs" />
+                                        </div>
+                                    </div>
+                                    <h4 class="text-lg font-black text-slate-800 dark:text-white leading-tight mb-1">{{ Auth::user()->full_name }}</h4>
+                                    <span class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-4 shadow-lg shadow-amber-500/25">
+                                        <x-icon name="crown" style="solid" class="w-3 h-3" /> Vertex PRO
+                                    </span>
+                                    @if($financialSnapshot)
+                                    <div class="w-full mb-4 p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-200/50 dark:border-amber-500/20">
+                                        <div class="sensitive-value text-2xl font-black text-slate-800 dark:text-white"><x-core::financial-value :value="$financialSnapshot['total_balance']" /></div>
+                                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Saldo Total</span>
+                                    </div>
+                                    @endif
+                                    <div class="w-full space-y-3 pt-4 border-t border-amber-200/50 dark:border-amber-500/20">
+                                        <div class="flex justify-between items-center text-[10px] font-bold">
+                                            <span class="text-slate-400 uppercase tracking-widest">Nascimento</span>
+                                            <span class="sensitive-value text-slate-600 dark:text-gray-300">{{ Auth::user()->birth_date ? Auth::user()->birth_date->format('d/m/Y') : 'Não informado' }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center text-[10px] font-bold">
+                                            <span class="text-slate-400 uppercase tracking-widest">Status</span>
+                                            <span class="text-emerald-500 flex items-center gap-1 uppercase tracking-widest">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                                                Online
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @else
+                            {{-- FREE Card --}}
                             <div class="absolute -top-10 -left-10 w-72 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-6 border border-slate-100 dark:border-slate-800 z-10 animate-fade-in-up rotate-[-6deg] group-hover:rotate-0 transition-transform duration-500">
                                 <div class="flex flex-col items-center text-center">
                                     <div class="relative mb-4">
@@ -84,23 +142,19 @@
                                             <x-icon name="check" class="text-xs" />
                                         </div>
                                     </div>
-
                                     <h4 class="text-lg font-black text-slate-800 dark:text-white leading-tight mb-1">{{ Auth::user()->full_name }}</h4>
-
                                     @php
                                         $roleName = 'Usuário Free';
                                         if(Auth::user()->hasRole('admin')) $roleName = 'Administrador';
                                         elseif(Auth::user()->hasRole('support')) $roleName = 'Agente de Suporte';
-                                        elseif(Auth::user()->membership === 'pro') $roleName = 'Usuário Pro';
                                     @endphp
                                     <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
                                         {{ $roleName }}
                                     </span>
-
                                     <div class="w-full space-y-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                                         <div class="flex justify-between items-center text-[10px] font-bold">
                                             <span class="text-slate-400 uppercase tracking-widest">Nascimento</span>
-                                            <span class="text-slate-600 dark:text-gray-300">{{ Auth::user()->birth_date ? Auth::user()->birth_date->format('d/m/Y') : 'Não informado' }}</span>
+                                            <span class="sensitive-value text-slate-600 dark:text-gray-300">{{ Auth::user()->birth_date ? Auth::user()->birth_date->format('d/m/Y') : 'Não informado' }}</span>
                                         </div>
                                         <div class="flex justify-between items-center text-[10px] font-bold">
                                             <span class="text-slate-400 uppercase tracking-widest">Status</span>
@@ -112,21 +166,67 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         @endauth
 
-                        <!-- Simulated Card -->
+                        <!-- Balance Card -->
                         <div class="bg-primary p-6 rounded-2xl mb-6 text-white overflow-hidden relative">
                             <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                             <div class="flex justify-between items-start mb-8">
                                 <span class="text-xs font-bold uppercase opacity-80">Saldo Principal</span>
                                 <x-icon name="nfc" class="text-xl opacity-60" />
                             </div>
-                            <div class="text-3xl font-black mb-1">R$ 15.750,00</div>
-                            <div class="text-xs font-medium opacity-60">Vertex Oh Pro - Platinum</div>
+                            <div class="text-3xl font-black mb-1">@auth <span class="sensitive-value">@if($financialSnapshot)<x-core::financial-value :value="$financialSnapshot['total_balance']" />@else<x-core::financial-value :value="0" />@endif</span> @else <span class="sensitive-value"><x-core::financial-value :value="15750" /></span> @endauth</div>
+                            <div class="text-xs font-medium opacity-60">@auth {{ Auth::user()->isPro() ? 'Vertex PRO - Platinum' : 'Vertex Contas' }} @else Vertex Oh Pro - Platinum @endauth</div>
                         </div>
 
-                        <!-- Simulated Transations -->
+                        <!-- Recent Transactions -->
                         <div class="space-y-4">
+                            @auth
+                            @if($financialSnapshot && $financialSnapshot['recent_transactions']->isNotEmpty())
+                                @foreach($financialSnapshot['recent_transactions'] as $tx)
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full {{ $tx->type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500' }} flex items-center justify-center">
+                                            <x-icon name="{{ $tx->type === 'income' ? 'plus' : 'cart-shopping' }}" style="solid" />
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold dark:text-white">{{ $tx->description ?: ($tx->category?->name ?? 'Transação') }}</div>
+                                            <div class="text-xs text-slate-400">{{ $tx->date->diffForHumans() }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="sensitive-value text-sm font-black {{ $tx->type === 'income' ? 'text-green-500' : 'text-red-500' }}">
+                                        {{ $tx->type === 'income' ? '+' : '-' }} <x-core::financial-value :value="$tx->amount" />
+                                    </span>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
+                                            <x-icon name="plus" style="solid" />
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold dark:text-white">Renda Mensal</div>
+                                            <div class="text-xs text-slate-400">Hoje, 10:45</div>
+                                        </div>
+                                    </div>
+                                    <span class="sensitive-value text-sm font-black text-green-500">+ <x-core::financial-value :value="5000" /></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center">
+                                            <x-icon name="cart-shopping" />
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold dark:text-white">Supermercado</div>
+                                            <div class="text-xs text-slate-400">Ontem, 20:30</div>
+                                        </div>
+                                    </div>
+                                    <span class="sensitive-value text-sm font-black text-red-500">- <x-core::financial-value :value="450.20" /></span>
+                                </div>
+                            @endif
+                            @else
                             <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
@@ -137,7 +237,7 @@
                                         <div class="text-xs text-slate-400">Hoje, 10:45</div>
                                     </div>
                                 </div>
-                                <span class="text-sm font-black text-green-500">+ R$ 5.000,00</span>
+                                <span class="sensitive-value text-sm font-black text-green-500">+ <x-core::financial-value :value="5000" /></span>
                             </div>
                             <div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
                                 <div class="flex items-center gap-3">
@@ -149,8 +249,9 @@
                                         <div class="text-xs text-slate-400">Ontem, 20:30</div>
                                     </div>
                                 </div>
-                                <span class="text-sm font-black text-red-500">- R$ 450,20</span>
+                                <span class="sensitive-value text-sm font-black text-red-500">- <x-core::financial-value :value="450.20" /></span>
                             </div>
+                            @endauth
                         </div>
                     </div>
                 </div>

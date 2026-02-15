@@ -54,7 +54,7 @@ class ProcessRecurringTransactions extends Command
                 $this->line(sprintf(
                     'Processed: %s - R$ %s for user %s',
                     $recurring->description,
-                    number_format($recurring->amount, 2, ',', '.'),
+                    format_number($recurring->amount, 2),
                     $recurring->user->name
                 ));
 

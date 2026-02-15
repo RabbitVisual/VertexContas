@@ -23,6 +23,9 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
 
             <!-- Actions -->
             <div class="hidden md:flex items-center gap-4">
+                @auth
+                    <x-paneluser::sensitive-toggle />
+                @endauth
                 <button @click="darkMode = !darkMode" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400">
                     <x-icon x-show="!darkMode" name="moon" />
                     <x-icon x-show="darkMode" name="sun" />
@@ -37,31 +40,35 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
 
                 @auth
                     @php
-                        $dashboardRoute = 'user.index';
+                        $dashboardRoute = 'paneluser.index';
                         if(Auth::user()->hasRole('admin')) $dashboardRoute = 'admin.index';
                         elseif(Auth::user()->hasRole('support')) $dashboardRoute = 'support.index';
                     @endphp
-                    <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group decoration-transparent">
-                        <div class="relative">
+                    <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 p-2 pr-5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group decoration-transparent">
+                        <div class="relative flex-shrink-0">
                             @if(Auth::user()->photo)
-                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="w-8 h-8 rounded-full object-cover border-2 border-primary/20 group-hover:border-primary transition-all">
+                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="w-9 h-9 rounded-full object-cover border-2 border-primary/20 group-hover:border-primary transition-all" alt="">
                             @else
-                                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-xs border-2 border-primary/20 group-hover:border-primary transition-all">
+                                <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm border-2 border-primary/20 group-hover:border-primary transition-all">
                                     {{ substr(Auth::user()->first_name, 0, 1) }}
                                 </div>
                             @endif
                             <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></div>
                         </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Olá,</span>
-                            <span class="text-xs font-bold text-slate-700 dark:text-gray-200 leading-none">{{ Auth::user()->first_name }}</span>
+                        <div class="flex flex-col items-start min-w-0">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Olá,</span>
+                            <span class="text-sm font-bold text-slate-700 dark:text-gray-200 leading-tight truncate max-w-[120px]">{{ Auth::user()->first_name }}</span>
                         </div>
+                        <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     </a>
                 @endauth
             </div>
 
             <!-- Mobile Menu Button -->
             <div class="md:hidden flex items-center gap-3">
+                @auth
+                    <x-paneluser::sensitive-toggle />
+                @endauth
                 <button @click="darkMode = !darkMode" class="p-2 rounded-full text-slate-500 dark:text-slate-400">
                     <x-icon x-show="!darkMode" name="moon" />
                     <x-icon x-show="darkMode" name="sun" />
@@ -99,7 +106,7 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
 
             @auth
                 @php
-                    $dashboardRoute = 'user.index';
+                    $dashboardRoute = 'paneluser.index';
                     if(Auth::user()->hasRole('admin')) $dashboardRoute = 'admin.index';
                     elseif(Auth::user()->hasRole('support')) $dashboardRoute = 'support.index';
                 @endphp

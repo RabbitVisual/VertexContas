@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/ticket-chat.js',
                 'resources/js/cashflow-dashboard.js',
+                'resources/js/legal-editor.js',
             ],
             refresh: [
                 'resources/views/**',

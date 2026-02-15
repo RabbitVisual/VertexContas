@@ -149,8 +149,8 @@
                     @if(!empty($templateData['company_address']) || !empty($templateData['company_cnpj']) || !empty($templateData['company_phone']) || !empty($templateData['company_email']))
                     <div class="company-meta">
                         @if(!empty($templateData['company_address']))<div>{{ $templateData['company_address'] }}</div>@endif
-                        @if(!empty($templateData['company_cnpj']))<div>CNPJ: {{ $templateData['company_cnpj'] }}</div>@endif
-                        @if(!empty($templateData['company_phone']))<div>Tel: {{ $templateData['company_phone'] }}</div>@endif
+                        @if(!empty($templateData['company_cnpj']))<div>CNPJ: {{ lgpd_format_cnpj($templateData['company_cnpj']) }}</div>@endif
+                        @if(!empty($templateData['company_phone']))<div>Tel: {{ lgpd_format_phone($templateData['company_phone']) }}</div>@endif
                         @if(!empty($templateData['company_email']))<div>{{ $templateData['company_email'] }}</div>@endif
                     </div>
                     @endif

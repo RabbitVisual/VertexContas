@@ -32,7 +32,7 @@
             </div>
              <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total de Acessos</span>
-                <span class="text-3xl font-black text-slate-800 dark:text-white">{{ number_format(\Modules\Blog\Models\Post::sum('views')) }}</span>
+                <span class="text-3xl font-black text-slate-800 dark:text-white">{{ format_number(\Modules\Blog\Models\Post::sum('views'), 0) }}</span>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-5 text-center font-bold text-slate-500 dark:text-slate-400 text-sm">
-                                    {{ number_format($post->views) }}
+                                    {{ format_number($post->views, 0) }}
                                 </td>
                                 <td class="px-6 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

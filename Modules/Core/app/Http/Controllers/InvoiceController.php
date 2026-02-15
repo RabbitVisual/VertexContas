@@ -62,7 +62,7 @@ class InvoiceController extends Controller
         if ($activeSubscription && $activeSubscription->current_period_end) {
             $nextDue = $activeSubscription->current_period_end;
             $nextDueLabel = $nextDue->format('d/m/Y');
-            $amount = number_format((float) $activeSubscription->amount, 2, ',', '.');
+            $amount = format_number((float) $activeSubscription->amount, 2);
             $nextDueSubtext = "Próxima cobrança de R$ {$amount} será debitada nesta data. Assinatura mensal recorrente.";
         } else {
             // Fallback: último pagamento + 1 mês

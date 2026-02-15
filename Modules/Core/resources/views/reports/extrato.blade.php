@@ -135,9 +135,9 @@
                             <td class="px-6 py-4">{{ $item['transaction']->description ?? '—' }}</td>
                             <td class="px-6 py-4">{{ $item['transaction']->category?->name ?? '—' }}</td>
                             <td class="px-6 py-4">{{ $item['transaction']->account?->name ?? '—' }}</td>
-                            <td class="px-6 py-4 text-right text-emerald-600 font-medium"><span class="sensitive-value">{{ $item['credit'] > 0 ? 'R$ ' . number_format($item['credit'], 2, ',', '.') : '—' }}</span></td>
-                            <td class="px-6 py-4 text-right text-red-600 font-medium"><span class="sensitive-value">{{ $item['debit'] > 0 ? 'R$ ' . number_format($item['debit'], 2, ',', '.') : '—' }}</span></td>
-                            <td class="px-6 py-4 text-right font-bold {{ $item['balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}"><span class="sensitive-value">R$ {{ number_format($item['balance'], 2, ',', '.') }}</span></td>
+                            <td class="px-6 py-4 text-right text-emerald-600 font-medium"><span class="sensitive-value">{{ $item['credit'] > 0 ? format_currency($item['credit']) : '—' }}</span></td>
+                            <td class="px-6 py-4 text-right text-red-600 font-medium"><span class="sensitive-value">{{ $item['debit'] > 0 ? format_currency($item['debit']) : '—' }}</span></td>
+                            <td class="px-6 py-4 text-right font-bold {{ $item['balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}"><span class="sensitive-value">{{ format_currency($item['balance']) }}</span></td>
                         </tr>
                     @empty
                         <tr>
@@ -151,9 +151,9 @@
                 <tfoot class="bg-slate-100 dark:bg-slate-800/50 font-bold">
                     <tr>
                         <td colspan="4" class="px-6 py-4">TOTAL</td>
-                        <td class="px-6 py-4 text-right text-emerald-600"><span class="sensitive-value">R$ {{ number_format($totals['total_credit'], 2, ',', '.') }}</span></td>
-                        <td class="px-6 py-4 text-right text-red-600"><span class="sensitive-value">R$ {{ number_format($totals['total_debit'], 2, ',', '.') }}</span></td>
-                        <td class="px-6 py-4 text-right {{ $totals['final_balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}"><span class="sensitive-value">R$ {{ number_format($totals['final_balance'], 2, ',', '.') }}</span></td>
+                        <td class="px-6 py-4 text-right text-emerald-600"><span class="sensitive-value">{{ format_currency($totals['total_credit']) }}</span></td>
+                        <td class="px-6 py-4 text-right text-red-600"><span class="sensitive-value">{{ format_currency($totals['total_debit']) }}</span></td>
+                        <td class="px-6 py-4 text-right {{ $totals['final_balance'] >= 0 ? 'text-emerald-600' : 'text-red-600' }}"><span class="sensitive-value">{{ format_currency($totals['final_balance']) }}</span></td>
                     </tr>
                 </tfoot>
                 @endif

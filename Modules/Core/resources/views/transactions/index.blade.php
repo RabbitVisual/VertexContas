@@ -52,7 +52,7 @@
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         <span>Renda planejada</span>
-                        <span class="text-gray-900 dark:text-white">{{ number_format($incomeProgress, 0) }}%</span>
+                        <span class="text-gray-900 dark:text-white">{{ format_percent($incomeProgress, 0) }}</span>
                     </div>
                     <div class="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: {{ $incomeProgress }}%"></div>
@@ -62,7 +62,7 @@
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         <span>Gastos fixos</span>
-                        <span class="text-gray-900 dark:text-white">{{ number_format($expenseProgress, 0) }}%</span>
+                        <span class="text-gray-900 dark:text-white">{{ format_percent($expenseProgress, 0) }}</span>
                     </div>
                     <div class="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div class="h-full bg-rose-500 rounded-full transition-all duration-500" style="width: {{ $expenseProgress }}%"></div>

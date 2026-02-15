@@ -180,7 +180,7 @@
 
                     <div class="flex items-center justify-between">
                          <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none">CPF</span>
-                         <span class="text-[11px] font-bold text-slate-700 dark:text-gray-300 tracking-tight">{{ $ticket->user->cpf ?? 'Não inf.' }}</span>
+                         <span class="text-[11px] font-bold text-slate-700 dark:text-gray-300 tracking-tight">{{ lgpd_mask_cpf($ticket->user->cpf ?? null) }}</span>
                     </div>
                 </div>
 

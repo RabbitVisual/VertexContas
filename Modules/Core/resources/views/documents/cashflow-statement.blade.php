@@ -18,17 +18,17 @@
         @foreach($cashFlow ?? [] as $item)
         <tr class="item-row">
             <td>{{ $item['month'] ?? '—' }}</td>
-            <td class="text-right">R$ {{ number_format($item['income'] ?? 0, 2, ',', '.') }}</td>
-            <td class="text-right">R$ {{ number_format($item['expense'] ?? 0, 2, ',', '.') }}</td>
-            <td class="text-right" style="{{ ($item['balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">R$ {{ number_format($item['balance'] ?? 0, 2, ',', '.') }}</td>
+            <td class="text-right">{{ format_currency($item['income'] ?? 0) }}</td>
+            <td class="text-right">{{ format_currency($item['expense'] ?? 0) }}</td>
+            <td class="text-right" style="{{ ($item['balance'] ?? 0) >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency($item['balance'] ?? 0) }}</td>
         </tr>
         @endforeach
         @if(($cashFlow ?? collect())->isNotEmpty())
         <tr class="total-row">
             <td>TOTAL</td>
-            <td class="text-right">R$ {{ number_format(collect($cashFlow)->sum('income'), 2, ',', '.') }}</td>
-            <td class="text-right">R$ {{ number_format(collect($cashFlow)->sum('expense'), 2, ',', '.') }}</td>
-            <td class="text-right" style="{{ collect($cashFlow)->sum('balance') >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">R$ {{ number_format(collect($cashFlow)->sum('balance'), 2, ',', '.') }}</td>
+            <td class="text-right">{{ format_currency(collect($cashFlow)->sum('income')) }}</td>
+            <td class="text-right">{{ format_currency(collect($cashFlow)->sum('expense')) }}</td>
+            <td class="text-right" style="{{ collect($cashFlow)->sum('balance') >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency(collect($cashFlow)->sum('balance')) }}</td>
         </tr>
         @endif
     </tbody>
@@ -51,9 +51,9 @@
         <tr class="item-row">
             <td>{{ $row['month_name'] }}</td>
             <td>{{ $row['account_name'] }}</td>
-            <td class="text-right">R$ {{ number_format($row['income'], 2, ',', '.') }}</td>
-            <td class="text-right">R$ {{ number_format($row['expense'], 2, ',', '.') }}</td>
-            <td class="text-right" style="{{ $row['balance'] >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">R$ {{ number_format($row['balance'], 2, ',', '.') }}</td>
+            <td class="text-right">{{ format_currency($row['income']) }}</td>
+            <td class="text-right">{{ format_currency($row['expense']) }}</td>
+            <td class="text-right" style="{{ $row['balance'] >= 0 ? 'color: #059669;' : 'color: #dc2626;' }}">{{ format_currency($row['balance']) }}</td>
         </tr>
         @endforeach
     </tbody>
@@ -76,7 +76,7 @@
         <tr class="item-row">
             <td>{{ $row['category'] }}</td>
             <td style="text-align: center;">{{ $row['count'] }}</td>
-            <td class="text-right">R$ {{ number_format($row['total'], 2, ',', '.') }}</td>
+            <td class="text-right">{{ format_currency($row['total']) }}</td>
         </tr>
         @endforeach
     </tbody>

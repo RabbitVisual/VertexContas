@@ -34,7 +34,7 @@
                     <x-icon name="check-double" class="text-7xl text-emerald-500" />
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Taxa de Resolução</p>
-                <h3 class="text-3xl font-black text-emerald-500 mt-2">{{ number_format($resolutionRate, 1) }}%</h3>
+                <h3 class="text-3xl font-black text-emerald-500 mt-2">{{ format_percent($resolutionRate, 1) }}</h3>
                 <div class="mt-4 flex items-center gap-2">
                     <div class="h-1.5 flex-1 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div class="h-full bg-emerald-500" style="width: {{ $resolutionRate }}%"></div>
@@ -48,7 +48,7 @@
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Tempo Médio Resposta</p>
                 <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">
-                    {{ $averageResponseTime->avg_time ? number_format($averageResponseTime->avg_time, 0) : '0' }} <span class="text-sm font-bold text-gray-400">min</span>
+                    {{ $averageResponseTime->avg_time ? format_number($averageResponseTime->avg_time, 0) : '0' }} <span class="text-sm font-bold text-gray-400">min</span>
                 </h3>
                 <div class="mt-4 flex items-center gap-2">
                     <div class="h-1.5 flex-1 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -136,7 +136,7 @@
                 <div class="mt-12 p-5 bg-primary/5 rounded-[2rem] border border-primary/10">
                     <p class="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Status Geral</p>
                     <p class="text-[11px] text-slate-800 dark:text-gray-300 leading-snug font-medium">
-                        O sistema está operando com <span class="font-black text-primary">{{ number_format($resolutionRate, 0) }}%</span> de eficiência na resolução.
+                        O sistema está operando com <span class="font-black text-primary">{{ format_percent($resolutionRate, 0) }}</span> de eficiência na resolução.
                     </p>
                 </div>
             </div>

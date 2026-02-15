@@ -50,7 +50,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-5 text-center font-bold text-slate-500 dark:text-slate-400 text-sm">
-                                    {{ number_format($article->views) }}
+                                    {{ format_number($article->views, 0) }}
                                 </td>
                                 <td class="px-6 py-5">
                                     <div class="flex justify-end gap-2">
