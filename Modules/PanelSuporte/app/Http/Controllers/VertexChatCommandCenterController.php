@@ -24,7 +24,7 @@ class VertexChatCommandCenterController extends Controller
 
     public function index(): View
     {
-        $conversations = Conversation::with(['user', 'assignedAgent', 'latestMessage'])
+        $conversations = Conversation::with(['user', 'assignedAgent', 'latestMessage.sender'])
             ->whereIn('status', ['open', 'transferred'])
             ->latest('updated_at')
             ->get();
@@ -40,7 +40,7 @@ class VertexChatCommandCenterController extends Controller
         $this->authorizeAgent($conversation);
         $conversation->load(['messages.sender', 'user', 'assignedAgent']);
 
-        $conversations = Conversation::with(['user', 'assignedAgent', 'latestMessage'])
+        $conversations = Conversation::with(['user', 'assignedAgent', 'latestMessage.sender'])
             ->whereIn('status', ['open', 'transferred'])
             ->latest('updated_at')
             ->get();
@@ -71,11 +71,16 @@ class VertexChatCommandCenterController extends Controller
         $message = $this->chatService->sendMessage($conversation, Auth::user(), $request->body);
 
         if ($request->wantsJson()) {
+            $sender = $message->sender;
+            $avatarUrl = $sender ? $sender->photo_url : null;
+            $senderInitial = $sender ? strtoupper(mb_substr($sender->first_name ?? '?', 0, 1)) : '?';
             return response()->json([
                 'message' => [
                     'id' => $message->id,
                     'sender_id' => $message->sender_id,
-                    'sender_name' => $message->sender?->first_name.' '.$message->sender?->last_name,
+                    'sender_name' => $sender ? $sender->first_name.' '.$sender->last_name : '',
+                    'sender_photo' => $avatarUrl,
+                    'sender_initial' => $senderInitial,
                     'body' => $message->body,
                     'type' => $message->type,
                     'created_at' => $message->created_at?->toIso8601String(),

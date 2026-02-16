@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\PanelAdmin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\SupportAuditLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Core\Services\SettingService;
 
 class SettingsController extends Controller
@@ -15,7 +19,7 @@ class SettingsController extends Controller
         $this->settingService = $settingService;
     }
 
-    protected const ALLOWED_TABS = ['general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'tools'];
+    protected const ALLOWED_TABS = ['general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'homepage', 'tools', 'gemini'];
 
     /**
      * Show the settings form.
@@ -35,8 +39,10 @@ class SettingsController extends Controller
         $blog = $this->settingService->getByGroup('blog');
         $documents = $this->settingService->getByGroup('document_templates');
         $pusher = $this->settingService->getByGroup('pusher');
+        $homepage = $this->settingService->getByGroup('homepage');
+        $gemini = $this->settingService->getByGroup('gemini');
 
-        return view('paneladmin::settings.index', compact('general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'tab'));
+        return view('paneladmin::settings.index', compact('general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'homepage', 'gemini', 'tab'));
     }
 
     /**
@@ -265,21 +271,45 @@ class SettingsController extends Controller
     }
 
     /**
-     * Update security settings.
+     * Update security settings (Segurança Avançada).
      */
     public function updateSecurity(Request $request)
     {
         $data = $request->validate([
-            'max_login_attempts' => 'required|integer|min:1|max:20',
-            'session_lifetime' => 'required|integer|min:15|max:10080', // 15 min to 1 week
+            'security_login_max_attempts' => 'required|integer|min:1|max:20',
+            'security_lockout_time' => 'required|integer|min:1|max:120',
+            'security_session_lifetime' => 'required|integer|min:15|max:10080',
+            'security_single_session' => 'nullable',
+            'security_password_min_chars' => 'required|integer|min:6|max:32',
+            'security_password_require_special' => 'nullable',
+            'security_audit_retention_days' => 'required|integer|min:30|max:365',
+            'security_inspection_max_duration' => 'required|integer|min:60|max:86400',
             'recaptcha_enabled' => 'nullable',
             'recaptcha_site_key' => 'nullable|string|max:255',
             'recaptcha_secret_key' => 'nullable|string|max:255',
             'recaptcha_min_score' => 'nullable|numeric|min:0|max:1',
         ]);
 
-        $this->settingService->set('max_login_attempts', (int) $data['max_login_attempts'], 'security', 'integer');
-        $this->settingService->set('session_lifetime', (int) $data['session_lifetime'], 'security', 'integer');
+        $changed = [];
+        $securityKeys = [
+            'security_login_max_attempts' => ['value' => (int) $data['security_login_max_attempts'], 'type' => 'integer'],
+            'security_lockout_time' => ['value' => (int) $data['security_lockout_time'], 'type' => 'integer'],
+            'security_session_lifetime' => ['value' => (int) $data['security_session_lifetime'], 'type' => 'integer'],
+            'security_single_session' => ['value' => $request->has('security_single_session'), 'type' => 'boolean'],
+            'security_password_min_chars' => ['value' => (int) $data['security_password_min_chars'], 'type' => 'integer'],
+            'security_password_require_special' => ['value' => $request->has('security_password_require_special'), 'type' => 'boolean'],
+            'security_audit_retention_days' => ['value' => (int) $data['security_audit_retention_days'], 'type' => 'integer'],
+            'security_inspection_max_duration' => ['value' => (int) $data['security_inspection_max_duration'], 'type' => 'integer'],
+        ];
+
+        foreach ($securityKeys as $key => $config) {
+            $old = $this->settingService->get($key);
+            $this->settingService->set($key, $config['value'], 'security', $config['type']);
+            if ($old != $config['value']) {
+                $changed[$key] = $config['value'];
+            }
+        }
+
         $this->settingService->set('recaptcha_enabled', $request->has('recaptcha_enabled'), 'security', 'boolean');
         $this->settingService->set('recaptcha_site_key', $data['recaptcha_site_key'] ?? '', 'security');
         if (! empty($data['recaptcha_secret_key'] ?? null)) {
@@ -287,9 +317,33 @@ class SettingsController extends Controller
         }
         $this->settingService->set('recaptcha_min_score', (float) ($data['recaptcha_min_score'] ?? 0.5), 'security', 'string');
 
+        if (! empty($changed) && Auth::check()) {
+            SupportAuditLog::create([
+                'agent_id' => Auth::id(),
+                'user_id' => Auth::id(),
+                'action' => 'security_policy_updated',
+                'metadata' => ['changed' => $changed],
+                'ip_address' => $request->ip(),
+            ]);
+        }
+
         $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'security';
 
         return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações de segurança atualizadas!');
+    }
+
+    /**
+     * Clear audit logs older than retention period.
+     */
+    public function clearAuditLogs(Request $request)
+    {
+        $retentionDays = (int) $this->settingService->get('security_audit_retention_days', 90);
+        $cutoff = now()->subDays($retentionDays);
+
+        $deleted = SupportAuditLog::where('created_at', '<', $cutoff)->delete();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'security'])
+            ->with('success', "{$deleted} registro(s) de auditoria removido(s).");
     }
 
     /**
@@ -306,6 +360,36 @@ class SettingsController extends Controller
     }
 
     /**
+     * Update homepage settings (conteúdo, contato, redes sociais, cookie, SEO).
+     */
+    public function updateHomepage(Request $request)
+    {
+        $data = $request->validate([
+            'homepage_hero_subtitle' => 'nullable|string|max:500',
+            'homepage_footer_description' => 'nullable|string|max:1000',
+            'homepage_contact_email' => 'nullable|email|max:255',
+            'homepage_contact_email_privacy' => 'nullable|email|max:255',
+            'homepage_social_facebook' => 'nullable|url|max:255',
+            'homepage_social_instagram' => 'nullable|url|max:255',
+            'homepage_social_linkedin' => 'nullable|url|max:255',
+            'homepage_cookie_consent_message' => 'nullable|string|max:1000',
+            'homepage_meta_description' => 'nullable|string|max:500',
+            'homepage_meta_keywords' => 'nullable|string|max:500',
+        ]);
+
+        foreach ($data as $key => $value) {
+            $this->settingService->set($key, $value ?? '', 'homepage');
+        }
+
+        $this->settingService->set('homepage_cookie_consent_enabled', $request->has('homepage_cookie_consent_enabled'), 'homepage', 'boolean');
+        $this->settingService->set('homepage_show_back_to_top', $request->has('homepage_show_back_to_top'), 'homepage', 'boolean');
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'homepage';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações da Homepage atualizadas com sucesso!');
+    }
+
+    /**
      * Update blog settings.
      */
     public function updateBlog(Request $request)
@@ -319,5 +403,23 @@ class SettingsController extends Controller
         $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'blog';
 
         return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações do blog atualizadas com sucesso!');
+    }
+
+    /**
+     * Update Gemini / Vertex Bot IA settings.
+     */
+    public function updateGemini(Request $request)
+    {
+        $geminiEnabled = $request->has('gemini_enabled');
+        $this->settingService->set('gemini_enabled', $geminiEnabled, 'gemini', 'boolean');
+
+        $apiKey = $request->input('gemini_api_key');
+        if ($apiKey !== null && $apiKey !== '') {
+            $this->settingService->set('gemini_api_key', $apiKey, 'gemini', 'string', true);
+        }
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'gemini';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações da IA (Vertex Bot) atualizadas com sucesso!');
     }
 }

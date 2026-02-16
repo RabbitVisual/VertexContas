@@ -175,7 +175,7 @@
                     const data = await response.json();
                     if (data && data.active === false) {
                         clearInterval(sessionCheckInterval);
-                        window.location.reload();
+                        window.location.href = data.redirect || window.location.href;
                     }
                 } catch (error) {
                     console.error('Erro ao verificar sessão de inspeção:', error);

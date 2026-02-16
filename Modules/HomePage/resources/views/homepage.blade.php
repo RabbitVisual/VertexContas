@@ -56,7 +56,7 @@
                         @if($isPro ?? false)
                             Aqui está o que importa para suas finanças este mês.
                         @else
-                            O único sistema que utiliza a regra 50/30/20 e um mentor virtual para transformar sua relação com o dinheiro.
+                            {{ setting('homepage_hero_subtitle') ?: 'O único sistema que utiliza a regra 50/30/20 e um mentor virtual para transformar sua relação com o dinheiro.' }}
                         @endif
                     </p>
 

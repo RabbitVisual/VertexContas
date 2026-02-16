@@ -7,40 +7,82 @@
 
 @php
     $levelStyles = [
-        'info' => 'bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/30 text-blue-700 dark:text-blue-300',
-        'success' => 'bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/30 text-emerald-700 dark:text-emerald-300',
-        'warning' => 'bg-amber-500/10 dark:bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-300',
-        'danger' => 'bg-rose-500/10 dark:bg-rose-500/20 border-rose-500/30 text-rose-700 dark:text-rose-300',
+        'info' => 'bg-slate-950/90 dark:bg-slate-900/95 border-slate-600/30 text-white dark:text-slate-100',
+        'success' => 'bg-slate-950/90 dark:bg-slate-900/95 border-emerald-500/40 text-white dark:text-slate-100',
+        'warning' => 'bg-slate-950/90 dark:bg-slate-900/95 border-amber-500/40 text-white dark:text-slate-100',
+        'danger' => 'bg-slate-950/90 dark:bg-slate-900/95 border-rose-500/40 text-white dark:text-slate-100',
     ];
     $bubbleClass = $levelStyles[$insight['level'] ?? 'info'] ?? $levelStyles['info'];
     $isSuccess = ($insight['level'] ?? '') === 'success';
     $key = $insightKey ?? $insight['insight_key'] ?? null;
     $medalUnlocked = $insight['medal'] ?? null;
+    $content = $insight['content'] ?? '';
 @endphp
 
+{{-- Vertex Bot: na área de conteúdo (à direita do sidebar), na zona entre cards e lista, sempre visível. z-50 acima do sidebar. --}}
 <div
-    x-data="{ showBubble: true, dismissed: false }"
-    class="fixed bottom-20 right-6 sm:bottom-6 z-40 flex flex-col items-end gap-3"
+    x-data="{
+        showBubble: true,
+        dismissed: false,
+        fullText: '',
+        displayedText: '',
+        index: 0,
+        isTyping: true,
+        init() {
+            const el = this.$el.querySelector('[data-vertex-content]');
+            this.fullText = el ? el.textContent : '';
+            const type = () => {
+                if (this.index < this.fullText.length) {
+                    this.displayedText += this.fullText[this.index];
+                    this.index++;
+                    setTimeout(type, 22);
+                } else {
+                    this.isTyping = false;
+                }
+            };
+            setTimeout(type, 350);
+        }
+    }"
+    class="fixed z-50 flex flex-col items-start gap-3 max-w-[calc(100vw-3rem)] sm:max-w-sm
+           bottom-6 left-6
+           sm:left-[17rem] sm:bottom-[10rem]"
 >
-    {{-- Speech bubble (above robot) --}}
+    {{-- Hidden content source for typewriter (LGPD: no PII) --}}
+    <span data-vertex-content class="hidden">{{ $content }}</span>
+
+    {{-- Speech bubble: Premium Fintech Elite - backdrop-blur-xl, larger, Spring animation --}}
     <div
         x-show="showBubble && !dismissed"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-4"
-        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:enter="transition ease-out duration-500"
+        x-transition:enter-start="opacity-0 scale-95 -translate-x-4"
+        x-transition:enter-end="opacity-100 scale-100 translate-x-0"
         x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 translate-y-4"
-        class="max-w-sm rounded-2xl border backdrop-blur-md shadow-xl p-4 {{ $bubbleClass }} {{ $medalUnlocked ? 'ring-2 ring-amber-400/50 animate-pulse' : '' }}"
+        x-transition:leave-start="opacity-100 translate-x-0"
+        x-transition:leave-end="opacity-0 -translate-x-4"
+        class="rounded-2xl border backdrop-blur-xl shadow-2xl p-5 {{ $bubbleClass }} {{ $medalUnlocked ? 'ring-2 ring-amber-400/50' : '' }} max-w-md"
+        style="font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;"
     >
-        <div class="flex items-start gap-3">
-            <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-white/50 dark:bg-black/20">
-                <x-icon name="comment-dots" style="solid" class="w-5 h-5 text-current" />
+        {{-- Badge: Mentor Vertex --}}
+        <div class="flex items-center gap-2 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-300 dark:text-indigo-400">Mentor Vertex</span>
+        </div>
+        <div class="flex items-start gap-4">
+            {{-- Avatar: pulsing when typing --}}
+            <div
+                class="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#2563eb] to-[#1e3a8a] shadow-lg shadow-indigo-500/25 border border-indigo-400/20"
+                :class="{ 'animate-pulse': $data.isTyping }"
+            >
+                <x-icon name="robot" style="solid" class="w-6 h-6 text-white" />
             </div>
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium leading-relaxed">{{ $insight['content'] ?? '' }}</p>
-                @if(Route::has('user.achievements.index'))
-                    <a href="{{ route('user.achievements.index') }}" class="mt-2 block text-xs font-bold text-current/80 hover:underline">
+                <p class="text-[14px] font-medium leading-relaxed text-white dark:text-slate-100 min-h-[2.5rem]" x-text="displayedText"></p>
+                @php
+                    $analysisUrl = (auth()->user()?->isPro() ?? false) && Route::has('core.dashboard')
+                        ? route('core.dashboard')
+                        : route('paneluser.index');
+                @endphp
+                @if(Route::has('paneluser.index'))
+                    <a href="{{ $analysisUrl }}" class="mt-2 block text-xs font-bold text-indigo-300 dark:text-indigo-400 hover:underline">
                         Ver análise detalhada
                     </a>
                 @endif
@@ -61,7 +103,7 @@
                         }
                         dismissed = true;
                     "
-                    class="mt-3 text-xs font-bold uppercase tracking-wider hover:underline"
+                    class="mt-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white dark:hover:text-slate-200 transition-colors"
                 >
                     Entendi
                 </button>
@@ -69,8 +111,11 @@
         </div>
     </div>
 
-    {{-- Robot icon (floating animation, glow when success) --}}
-    <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center animate-bounce {{ $isSuccess ? 'shadow-lg shadow-emerald-500/50' : 'shadow-lg' }}">
-        <x-icon name="robot" style="solid" class="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+    {{-- Bot avatar: Vertex gradient, pulsing when analyzing --}}
+    <div
+        class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563eb] to-[#1e3a8a] flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/20 hover:shadow-indigo-500/35 transition-all duration-300 {{ $isSuccess ? 'ring-2 ring-emerald-400/50' : '' }}"
+        :class="{ 'animate-pulse': $data.isTyping }"
+    >
+        <x-icon name="robot" style="solid" class="w-7 h-7 text-white" />
     </div>
 </div>

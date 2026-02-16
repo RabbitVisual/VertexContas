@@ -7,19 +7,32 @@
                     <x-logo type="full" context="homepage" size="text-xl" />
                 </div>
                 <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                    Tome o controle total da sua vida financeira com a plataforma mais completa de gestão pessoal 100% local e segura.
+                    {{ setting('homepage_footer_description', 'Tome o controle total da sua vida financeira com a plataforma mais completa de gestão pessoal 100% local e segura.') }}
                 </p>
+                @php
+                    $facebook = setting('homepage_social_facebook');
+                    $instagram = setting('homepage_social_instagram');
+                    $linkedin = setting('homepage_social_linkedin');
+                @endphp
+                @if($facebook || $instagram || $linkedin)
                 <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
-                        <x-icon name="facebook" style="brands" />
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
-                        <x-icon name="instagram" style="brands" />
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
-                        <x-icon name="linkedin" style="brands" />
-                    </a>
+                    @if($facebook)
+                        <a href="{{ $facebook }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
+                            <x-icon name="facebook" style="brands" />
+                        </a>
+                    @endif
+                    @if($instagram)
+                        <a href="{{ $instagram }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
+                            <x-icon name="instagram" style="brands" />
+                        </a>
+                    @endif
+                    @if($linkedin)
+                        <a href="{{ $linkedin }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all">
+                            <x-icon name="linkedin" style="brands" />
+                        </a>
+                    @endif
                 </div>
+                @endif
             </div>
 
             <!-- Links -->
@@ -49,7 +62,7 @@
                 <ul class="space-y-4">
                     <li class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
                         <x-icon name="envelope" style="duotone" class="text-primary" />
-                        suporte@vertexcontas.com
+                        <a href="mailto:{{ setting('homepage_contact_email', setting('mail_from_address', 'suporte@vertexcontas.com')) }}" class="hover:text-primary transition-colors">{{ setting('homepage_contact_email', setting('mail_from_address', 'suporte@vertexcontas.com')) }}</a>
                     </li>
                     <li class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
                         <x-icon name="location-dot" style="duotone" class="text-primary" />

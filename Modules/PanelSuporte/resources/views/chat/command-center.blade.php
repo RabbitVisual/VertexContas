@@ -1,6 +1,7 @@
 <x-panelsuporte::layouts.master title="Chat VIP - Central de Comando" :navbarTitle="'Chat VIP - Central de Comando'">
-    <div class="flex flex-col h-[calc(100vh-8rem)] -m-6">
-        <div class="flex flex-1 min-h-0 overflow-hidden">
+    {{-- Container integrado ao painel (sem -m-6): ocupa altura disponível dentro do main --}}
+    <div class="flex flex-col min-h-[calc(100vh-14rem)] rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 shadow-sm overflow-hidden">
+        <div class="flex flex-1 min-h-0">
             {{-- Left: Chat List --}}
             <div class="w-80 shrink-0 flex flex-col border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                 <div class="p-4 border-b border-gray-100 dark:border-slate-800">
@@ -28,10 +29,14 @@
                                 <div class="flex items-center gap-2 mt-0.5">
                                     @php
                                         $sectorLabels = ['support' => 'Suporte', 'technical' => 'Técnico', 'billing' => 'Financeiro', 'admin' => 'Admin'];
+                                        $latest = $conv->latestMessage;
                                     @endphp
                                     <span class="text-[10px] font-bold text-slate-500 uppercase">{{ $sectorLabels[$conv->sector] ?? $conv->sector }}</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                 </div>
+                                @if($latest)
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-1">{{ $latest->isSystemNotice() ? 'Sistema' : ($latest->sender?->first_name ?? '?') }}: {{ Str::limit($latest->body, 40) }}</p>
+                                @endif
                             </div>
                         </a>
                     @empty
@@ -70,7 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <div id="support-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
                         @foreach($conv->messages as $msg)
                             <div class="{{ $msg->isSystemNotice() ? 'flex justify-center' : ($msg->sender_id === auth()->id() ? 'flex justify-end' : 'flex justify-start') }}">
                                 @if($msg->isSystemNotice())
@@ -89,14 +94,14 @@
                             </div>
                         @endforeach
                     </div>
-                    <form action="{{ route('support.chat.send', $conv) }}" method="POST" class="shrink-0 p-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900"
+                    <form id="support-chat-form" action="{{ route('support.chat.send', $conv) }}" method="POST" class="shrink-0 p-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900" data-no-loading
                           x-data="supportChatTyping()">
                         @csrf
                         <div class="flex gap-3">
-                            <input type="text" name="body" required placeholder="Escreva aqui sua resposta técnica..."
+                            <input type="text" name="body" id="support-chat-input" required placeholder="Escreva aqui sua resposta técnica..."
                                    @input="onTyping()"
                                    class="flex-1 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                            <button type="submit" class="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shrink-0">
+                            <button type="submit" id="support-chat-submit" class="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shrink-0">
                                 Enviar
                             </button>
                         </div>
@@ -214,8 +219,92 @@
     @include('paneluser::components.flash-messages', ['class' => 'mb-4'])
 
     @if($selectedConversation ?? null)
-    @php $typingUrl = route('support.chat.typing', $selectedConversation); @endphp
+    @php
+        $typingUrl = route('support.chat.typing', $selectedConversation);
+        $sendUrl = route('support.chat.send', $selectedConversation);
+    @endphp
+    @if(config('broadcasting.default') === 'pusher' && config('broadcasting.connections.pusher.key'))
     <script>
+        window.supportChatPusherConfig = {
+            conversationId: {{ $selectedConversation->id }},
+            currentUserId: {{ auth()->id() }},
+            pusherKey: @json(config('broadcasting.connections.pusher.key')),
+            pusherCluster: @json(config('broadcasting.connections.pusher.options.cluster', 'mt1'))
+        };
+    </script>
+    @vite('resources/js/support-chat-pusher.js')
+    @endif
+    @push('scripts')
+    <script>
+        (function() {
+            const form = document.getElementById('support-chat-form');
+            const input = document.getElementById('support-chat-input');
+            const submitBtn = document.getElementById('support-chat-submit');
+            const messagesEl = document.getElementById('support-chat-messages');
+            const sendUrl = @json($sendUrl);
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text ?? '';
+                return div.innerHTML;
+            }
+            function formatTime(iso) {
+                if (!iso) return '';
+                const d = new Date(iso);
+                return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+            }
+            function appendAgentMessage(msg) {
+                if (!messagesEl) return;
+                const bodySafe = escapeHtml(msg.body ?? '');
+                const wrap = document.createElement('div');
+                wrap.className = 'flex justify-end';
+                wrap.innerHTML = '<div class="max-w-[75%] order-2"><p class="text-[10px] font-bold text-slate-500 mb-1">' + escapeHtml(msg.sender_name) + '</p><div class="px-4 py-3 rounded-2xl bg-primary text-white rounded-tr-md">' + bodySafe + '</div><p class="text-[9px] text-slate-400 mt-1">' + formatTime(msg.created_at) + '</p></div>';
+                messagesEl.appendChild(wrap);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            if (form && input && submitBtn && messagesEl && sendUrl) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const body = (input.value || '').trim();
+                    if (!body) return;
+                    const origLabel = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enviando...';
+                    fetch(sendUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams({ body: body, _token: csrf }),
+                    })
+                        .then(function(res) {
+                            if (res.ok) return res.json();
+                            throw new Error('Falha ao enviar');
+                        })
+                        .then(function(data) {
+                            if (data.message) {
+                                appendAgentMessage(data.message);
+                                input.value = '';
+                            }
+                        })
+                        .catch(function() {
+                            submitBtn.textContent = 'Erro – tente novamente';
+                            window.dispatchEvent(new CustomEvent('new-notification', {
+                                detail: { type: 'danger', title: 'Erro', message: 'Falha ao enviar. Verifique a conexão e tente novamente.', icon: 'circle-xmark' }
+                            }));
+                        })
+                        .finally(function() {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = origLabel;
+                        });
+                });
+            }
+        })();
         document.addEventListener('alpine:init', () => {
             Alpine.data('supportChatTyping', () => ({
                 timeout: null,
@@ -234,5 +323,6 @@
             }));
         });
     </script>
+    @endpush
     @endif
 </x-panelsuporte::layouts.master>

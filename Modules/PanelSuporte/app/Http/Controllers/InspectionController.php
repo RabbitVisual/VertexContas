@@ -222,15 +222,67 @@ class InspectionController extends Controller
     /**
      * Check if the current user has an active inspection session.
      * Usado via AJAX pelo banner. Se acessado diretamente no navegador, redireciona.
+     * Auto-expires inspection if security_inspection_max_duration exceeded.
      */
-    public function checkSession()
+    public function checkSession(Request $request)
     {
         if (! request()->ajax() && ! request()->wantsJson()) {
             return redirect()->route('paneluser.index');
         }
 
-        return response()->json([
-            'active' => session()->has('impersonate_inspection_id')
-        ]);
+        $inspectionId = session('impersonate_inspection_id');
+        if (! $inspectionId) {
+            return response()->json(['active' => false]);
+        }
+
+        $inspection = Inspection::find($inspectionId);
+        if (! $inspection || $inspection->status !== 'active') {
+            session()->forget('impersonate_inspection_id');
+            session()->forget('original_agent_id');
+
+            return response()->json(['active' => false]);
+        }
+
+        $maxDuration = (int) setting('security_inspection_max_duration', 1800);
+        $startedAt = $inspection->started_at;
+
+        if ($startedAt && $startedAt->diffInSeconds(now()) >= $maxDuration) {
+            $originalAgentId = session('original_agent_id') ?? $inspection->agent_id;
+
+            $inspection->update([
+                'status' => 'completed',
+                'ended_at' => now(),
+            ]);
+
+            session()->forget('impersonate_inspection_id');
+            session()->forget('original_agent_id');
+
+            Auth::logout();
+            Auth::loginUsingId($originalAgentId);
+
+            SupportAuditLog::create([
+                'agent_id' => $originalAgentId,
+                'user_id' => $inspection->user_id,
+                'action' => 'inspection_expired',
+                'metadata' => [
+                    'report' => 'Sessão expirada automaticamente por tempo máximo configurado.',
+                    'duration_seconds' => $startedAt->diffInSeconds(now()),
+                    'ticket_id' => $inspection->ticket_id,
+                    'conversation_id' => $inspection->conversation_id,
+                ],
+                'ip_address' => $request->ip(),
+            ]);
+
+            $redirect = $inspection->conversation_id
+                ? route('support.chat.show', $inspection->conversation)
+                : ($inspection->ticket_id ? route('support.tickets.show', $inspection->ticket_id) : route('support.index'));
+
+            return response()->json([
+                'active' => false,
+                'redirect' => $redirect,
+            ]);
+        }
+
+        return response()->json(['active' => true]);
     }
 }

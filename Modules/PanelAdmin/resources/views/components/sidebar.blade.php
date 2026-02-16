@@ -154,6 +154,9 @@
                         <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.payments.*') ? $linkActive : $linkInactive }}"><x-icon name="receipt" style="duotone" class="size-4 shrink-0" />Pagamentos</a>
                         <a href="{{ route('admin.subscriptions.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.subscriptions.*') ? $linkActive : $linkInactive }}"><x-icon name="arrows-rotate" style="duotone" class="size-4 shrink-0" />Assinaturas</a>
                         <a href="{{ route('admin.support.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.support.*') ? $linkActive : $linkInactive }}"><x-icon name="headset" style="duotone" class="size-4 shrink-0" />Central de Suporte</a>
+                        @if(Route::has('support.chat.index'))
+                            <a href="{{ route('support.chat.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('support.chat.*') ? $linkActive : $linkInactive }}"><x-icon name="comments" style="duotone" class="size-4 shrink-0" />Chat VIP</a>
+                        @endif
                     </div>
                 </div>
 

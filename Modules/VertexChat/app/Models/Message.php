@@ -12,6 +12,9 @@ class Message extends Model
 {
     protected $table = 'vertex_chat_messages';
 
+    /** Atualiza conversation.updated_at ao criar/atualizar mensagem para o painel do suporte ordenar corretamente. */
+    protected $touches = ['conversation'];
+
     protected $fillable = [
         'conversation_id',
         'sender_id',

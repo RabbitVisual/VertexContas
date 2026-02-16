@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Modules\Core\Services\GamificationService;
 use Modules\VertexChat\Models\Conversation;
 
@@ -32,11 +33,22 @@ class AppServiceProvider extends ServiceProvider
     {
         Route::bind('conversation', fn (string $value) => Conversation::findOrFail($value));
 
+        Password::defaults(function () {
+            $minChars = (int) setting('security_password_min_chars', 8);
+            $rule = Password::min(max(6, $minChars));
+            if (setting('security_password_require_special', true)) {
+                $rule->letters()->numbers()->symbols();
+            }
+
+            return $rule;
+        });
+
         // Login rate limiter (configurable via Admin > Configurações > Segurança)
         RateLimiter::for('login', function (Request $request) {
             $attempts = 5;
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                $attempts = (int) app(\Modules\Core\Services\SettingService::class)->get('max_login_attempts', 5);
+                $settings = app(\Modules\Core\Services\SettingService::class);
+                $attempts = (int) ($settings->get('security_login_max_attempts') ?? $settings->get('max_login_attempts') ?? 5);
             }
             $attempts = max(1, min($attempts, 20));
 

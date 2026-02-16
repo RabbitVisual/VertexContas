@@ -34,13 +34,20 @@ class MessageSent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         $this->message->load('sender');
+        $sender = $this->message->sender;
+        $avatarUrl = $sender ? $sender->photo_url : null;
+        $senderInitial = $sender
+            ? strtoupper(mb_substr($sender->first_name ?? '?', 0, 1))
+            : '?';
 
         return [
             'message' => [
                 'id' => $this->message->id,
                 'conversation_id' => $this->message->conversation_id,
                 'sender_id' => $this->message->sender_id,
-                'sender_name' => $this->message->sender?->first_name.' '.$this->message->sender?->last_name,
+                'sender_name' => $sender ? $sender->first_name.' '.$sender->last_name : '',
+                'sender_photo' => $avatarUrl,
+                'sender_initial' => $senderInitial,
                 'body' => $this->message->body,
                 'type' => $this->message->type,
                 'created_at' => $this->message->created_at?->toIso8601String(),

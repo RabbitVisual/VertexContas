@@ -305,6 +305,15 @@
                             <span class="ms-3 flex-1">Chamados</span>
                         </a>
                     </li>
+                    @if(vertex_chat_enabled() && Route::has('vertexchat.chat.index'))
+                    <li>
+                        <a href="{{ route('vertexchat.chat.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('vertexchat.chat.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="comments" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('vertexchat.chat.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3 flex-1">Chat VIP</span>
+                            <span class="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
+                        </a>
+                    </li>
+                    @endif
                     <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700"><span class="{{ $sectionLabelClass }}">Assinatura</span></li>
                     <li>
                         <a href="{{ route('user.subscription.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('user.subscription.*') ? $navItemActiveClass : '' }}">

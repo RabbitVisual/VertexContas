@@ -7,6 +7,9 @@ namespace Modules\HomePage\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 use Modules\Core\Services\RecaptchaService;
 
 class AuthController extends Controller
@@ -71,9 +74,23 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $ip = $request->ip();
+            Cache::forget('login_attempts_' . $ip);
+            Cache::forget('login_lockout_' . $ip);
+
             $request->session()->regenerate();
 
             $user = Auth::user();
+
+            if (setting('security_single_session', false)
+                && config('session.driver') === 'database'
+                && \Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+                $currentSessionId = $request->session()->getId();
+                DB::table('sessions')
+                    ->where('user_id', $user->id)
+                    ->where('id', '!=', $currentSessionId)
+                    ->delete();
+            }
 
             if ($user->hasRole('admin')) {
                 return redirect()->route('admin.index');
@@ -84,6 +101,20 @@ class AuthController extends Controller
             } else {
                 return redirect()->route('paneluser.index');
             }
+        }
+
+        $ip = $request->ip();
+        $attemptsKey = 'login_attempts_' . $ip;
+        $lockoutKey = 'login_lockout_' . $ip;
+
+        $maxAttempts = (int) setting('security_login_max_attempts', setting('max_login_attempts', 5));
+        $lockoutMinutes = (int) setting('security_lockout_time', 15);
+
+        $attempts = (int) Cache::get($attemptsKey, 0) + 1;
+        Cache::put($attemptsKey, $attempts, $lockoutMinutes * 60 + 3600);
+
+        if ($attempts >= $maxAttempts) {
+            Cache::put($lockoutKey, true, $lockoutMinutes * 60);
         }
 
         return back()->withErrors([
@@ -114,7 +145,7 @@ class AuthController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'confirmed', Password::defaults()],
             'cpf' => ['nullable', 'string', 'size:11', 'unique:users'],
             'birth_date' => ['nullable', 'date'],
             'phone' => ['nullable', 'string', 'max:15'],

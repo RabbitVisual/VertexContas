@@ -293,3 +293,11 @@ if (! function_exists('recaptcha_site_key')) {
         return app(\Modules\Core\Services\RecaptchaService::class)->getSiteKey();
     }
 }
+
+if (! function_exists('setting')) {
+    /** Retorna valor de configuração do SettingService por chave. */
+    function setting(string $key, mixed $default = null): mixed
+    {
+        return app(\Modules\Core\Services\SettingService::class)->get($key, $default);
+    }
+}

@@ -38,9 +38,17 @@
                 <x-icon name="satellite-dish" style="duotone" class="size-5 shrink-0" />
                 <span>Pusher (Chat)</span>
             </a>
+            <a href="{{ route('admin.settings.index', ['tab' => 'homepage']) }}" @click.prevent="activeTab = 'homepage'; history.replaceState(null, '', $event.currentTarget.href)" :class="activeTab === 'homepage' ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15 border-l-[#11C76F]' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 border-l-transparent'" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border-l-2 transition-colors">
+                <x-icon name="house" style="duotone" class="size-5 shrink-0" />
+                <span>Homepage</span>
+            </a>
             <a href="{{ route('admin.settings.index', ['tab' => 'tools']) }}" @click.prevent="activeTab = 'tools'; history.replaceState(null, '', $event.currentTarget.href)" :class="activeTab === 'tools' ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15 border-l-[#11C76F]' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 border-l-transparent'" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border-l-2 transition-colors">
                 <x-icon name="screwdriver-wrench" style="duotone" class="size-5 shrink-0" />
                 <span>Ferramentas</span>
+            </a>
+            <a href="{{ route('admin.settings.index', ['tab' => 'gemini']) }}" @click.prevent="activeTab = 'gemini'; history.replaceState(null, '', $event.currentTarget.href)" :class="activeTab === 'gemini' ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15 border-l-[#11C76F]' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 border-l-transparent'" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border-l-2 transition-colors">
+                <x-icon name="robot" style="duotone" class="size-5 shrink-0" />
+                <span>IA / Vertex Bot</span>
             </a>
         </nav>
     </aside>
@@ -77,17 +85,17 @@
             <div class="grid grid-cols-1 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome da Aplicação</label>
-                    <input type="text" name="app_name" value="{{ old('app_name', $general->get('app_name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                    <input type="text" name="app_name" value="{{ old('app_name', $general->get('app_name') ?? config('app.name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Descrição</label>
-                    <textarea name="app_description" rows="3" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('app_description', $general->get('app_description')) }}</textarea>
+                    <textarea name="app_description" rows="3" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('app_description', $general->get('app_description') ?? 'Sistema de Controle Financeiro Profissional') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">URL da Aplicação</label>
-                    <input type="url" name="app_url" value="{{ old('app_url', $general->get('app_url')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                    <input type="url" name="app_url" value="{{ old('app_url', $general->get('app_url') ?? config('app.url')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -169,53 +177,155 @@
         </form>
     </div>
 
-    <!-- Security Settings -->
+    <!-- Security Settings (Segurança Avançada) -->
     <div x-show="activeTab === 'security'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
-        <form action="{{ route('admin.settings.security') }}" method="POST">
+        <form id="form-settings-security" action="{{ route('admin.settings.security') }}" method="POST">
             @csrf
             <input type="hidden" name="tab" value="security">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tentativas de Login (por minuto)</label>
-                    <input type="number" name="max_login_attempts" value="{{ old('max_login_attempts', $security->get('max_login_attempts') ?? 5) }}" min="1" max="20" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                    <p class="text-xs text-gray-500 mt-1">Limite por IP antes de bloquear por 1 minuto.</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Duração da Sessão (minutos)</label>
-                    <input type="number" name="session_lifetime" value="{{ old('session_lifetime', $security->get('session_lifetime') ?? 120) }}" min="15" max="10080" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                    <p class="text-xs text-gray-500 mt-1">Tempo de inatividade até logout (15 min a 7 dias).</p>
-                </div>
-                <div class="col-span-1 md:col-span-2 flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">Google reCAPTCHA v3</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Proteção contra bots no login e registro. <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener" class="text-[#11C76F] hover:underline">Obter chaves grátis</a>.</p>
+            <div class="space-y-6">
+                {{-- Card 1: Proteção de Acesso --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                            <x-icon name="shield-check" style="duotone" class="text-amber-600 dark:text-amber-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Proteção de Acesso</h3>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="recaptcha_enabled" value="1" class="sr-only peer" {{ $security->get('recaptcha_enabled') ? 'checked' : '' }}>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
-                    </label>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Máximo de tentativas de login</label>
+                            <input type="number" name="security_login_max_attempts" value="{{ old('security_login_max_attempts', $security->get('security_login_max_attempts') ?? $security->get('max_login_attempts') ?? 5) }}" min="1" max="20" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Antes do bloqueio por IP.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tempo de bloqueio (minutos)</label>
+                            <input type="number" name="security_lockout_time" value="{{ old('security_lockout_time', $security->get('security_lockout_time') ?? 15) }}" min="1" max="120" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Após exceder tentativas.</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Site Key (pública)</label>
-                    <input type="text" name="recaptcha_site_key" value="{{ old('recaptcha_site_key', $security->get('recaptcha_site_key')) }}" placeholder="6Lc..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+
+                {{-- Card 2: Gestão de Sessão --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <x-icon name="user-lock" style="duotone" class="text-blue-600 dark:text-blue-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Gestão de Sessão</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Duração da sessão (minutos)</label>
+                            <input type="number" name="security_session_lifetime" value="{{ old('security_session_lifetime', $security->get('security_session_lifetime') ?? $security->get('session_lifetime') ?? 120) }}" min="15" max="10080" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Tempo de inatividade até logout (15 min a 7 dias).</p>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-900 dark:text-white">Sessão única</h4>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Desloga de outros dispositivos ao entrar.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="security_single_session" value="1" class="sr-only peer" {{ $security->get('security_single_session') ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Secret Key</label>
-                    <input type="password" name="recaptcha_secret_key" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                    <p class="text-xs text-gray-500 mt-1">Deixe em branco para manter a atual.</p>
+
+                {{-- Card 3: Políticas de Senha --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                            <x-icon name="key" style="duotone" class="text-emerald-600 dark:text-emerald-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Políticas de Senha</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tamanho mínimo da senha</label>
+                            <input type="number" name="security_password_min_chars" value="{{ old('security_password_min_chars', $security->get('security_password_min_chars') ?? 8) }}" min="6" max="32" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Caracteres (ex: 8).</p>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-900 dark:text-white">Exigir números e especiais</h4>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Letras, números e caracteres especiais.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="security_password_require_special" value="1" class="sr-only peer" {{ ($security->get('security_password_require_special') ?? true) ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Score mínimo (0 a 1)</label>
-                    <input type="number" name="recaptcha_min_score" value="{{ old('recaptcha_min_score', $security->get('recaptcha_min_score') ?? 0.5) }}" step="0.1" min="0" max="1" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                    <p class="text-xs text-gray-500 mt-1">0.5 = equilibrado, 0.7+ = mais rigoroso.</p>
+
+                {{-- Card 4: Auditoria --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                            <x-icon name="clock-rotate-left" style="duotone" class="text-slate-600 dark:text-slate-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Auditoria e Inspeção</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Retenção de logs (dias)</label>
+                            <input type="number" name="security_audit_retention_days" value="{{ old('security_audit_retention_days', $security->get('security_audit_retention_days') ?? 90) }}" min="30" max="365" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">LGPD: dias para manter logs (ex: 90).</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Duração máxima de inspeção (segundos)</label>
+                            <input type="number" name="security_inspection_max_duration" value="{{ old('security_inspection_max_duration', $security->get('security_inspection_max_duration') ?? 1800) }}" min="60" max="86400" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Sessão de inspeção remota.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
-                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
-                        <x-icon name="save" style="solid" class="mr-2" /> Salvar Segurança
-                    </button>
+
+                {{-- Google reCAPTCHA (mantido) --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 overflow-hidden">
+                    <div class="p-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-slate-900 dark:text-white">Google reCAPTCHA v3</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Proteção contra bots no login e registro. <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener" class="text-[#11C76F] hover:underline">Obter chaves grátis</a>.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="recaptcha_enabled" value="1" class="sr-only peer" {{ $security->get('recaptcha_enabled') ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
+                        </label>
+                    </div>
+                    <div class="p-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Site Key (pública)</label>
+                            <input type="text" name="recaptcha_site_key" value="{{ old('recaptcha_site_key', $security->get('recaptcha_site_key')) }}" placeholder="6Lc..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Secret Key</label>
+                            @php $hasRecaptchaSecret = $security->get('recaptcha_secret_key') || setting('recaptcha_secret_key'); @endphp
+                            <input type="password" name="recaptcha_secret_key" placeholder="{{ $hasRecaptchaSecret ? '•••••••• (já configurada)' : '••••••••' }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Deixe em branco para manter a atual. {{ $hasRecaptchaSecret ? 'Digite nova chave para alterar.' : '' }}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Score mínimo (0 a 1)</label>
+                        <input type="number" name="recaptcha_min_score" value="{{ old('recaptcha_min_score', $security->get('recaptcha_min_score') ?? 0.5) }}" step="0.1" min="0" max="1" class="w-full max-w-xs rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <p class="text-xs text-slate-500 mt-1">0.5 = equilibrado, 0.7+ = mais rigoroso.</p>
+                    </div>
                 </div>
+
             </div>
         </form>
+        <div class="flex flex-wrap gap-4 justify-between items-center pt-4 mt-4 border-t border-slate-200 dark:border-slate-600">
+            <form action="{{ route('admin.settings.security.clear-logs') }}" method="POST" class="m-0" onsubmit="return confirm('Excluir logs de auditoria mais antigos que a retenção configurada?');">
+                @csrf
+                <button type="submit" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium text-sm transition-colors flex items-center gap-2">
+                    <x-icon name="broom" style="solid" class="size-4" />
+                    Limpar Logs Antigos Agora
+                </button>
+            </form>
+            <button type="submit" form="form-settings-security" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
+                <x-icon name="save" style="solid" class="mr-2" /> Salvar Segurança
+            </button>
+        </div>
     </div>
 
     <!-- Features Settings -->
@@ -237,6 +347,48 @@
                 <div class="flex justify-end">
                     <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Recursos
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- IA / Vertex Bot (Gemini) Settings -->
+    <div x-show="activeTab === 'gemini'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
+        <form action="{{ route('admin.settings.gemini') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tab" value="gemini">
+            <div class="space-y-6">
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <x-icon name="robot" style="duotone" class="text-indigo-600 dark:text-indigo-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Vertex Bot com IA (Gemini)</h3>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white">Usar Gemini AI</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Ativa dicas personalizadas via IA. Se desativado ou em falha, usa as 100+ dicas locais (Plano B).</p>
+                            </div>
+                            @php $geminiEnabled = $gemini->get('gemini_enabled'); $geminiEnabledChecked = filter_var($geminiEnabled, FILTER_VALIDATE_BOOLEAN); @endphp
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="gemini_enabled" value="1" class="sr-only peer" {{ $geminiEnabledChecked ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
+                            </label>
+                        </div>
+                        @php $hasGeminiKey = $gemini->get('gemini_api_key') || setting('gemini_api_key'); @endphp
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">API Key (opcional)</label>
+                            <input type="password" name="gemini_api_key" value="" placeholder="{{ $hasGeminiKey ? '•••••••• (já configurada)' : 'Deixe em branco para usar GEMINI_API_KEY do .env' }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-gray-500 mt-1">Chave em <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-[#11C76F] hover:underline">Google AI Studio</a>. Se vazio, usa a variável de ambiente. {{ $hasGeminiKey ? 'Para alterar, digite a nova chave.' : '' }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
+                        <x-icon name="save" style="solid" class="mr-2" /> Salvar IA
                     </button>
                 </div>
             </div>
@@ -516,6 +668,144 @@
         </form>
     </div>
 
+    <!-- Homepage Settings -->
+    <div x-show="activeTab === 'homepage'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
+        <form action="{{ route('admin.settings.homepage') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tab" value="homepage">
+            <div class="space-y-6">
+                {{-- Card: Conteúdo da Home --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <x-icon name="text" style="duotone" class="text-indigo-600 dark:text-indigo-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Conteúdo da Home</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subtítulo do Hero</label>
+                            <input type="text" name="homepage_hero_subtitle" value="{{ old('homepage_hero_subtitle', $homepage->get('homepage_hero_subtitle')) }}" placeholder="Texto exibido abaixo do título principal" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Descrição do Rodapé</label>
+                            <textarea name="homepage_footer_description" rows="3" placeholder="Breve descrição da empresa no rodapé" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('homepage_footer_description', $homepage->get('homepage_footer_description')) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card: Contato --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                            <x-icon name="envelope" style="duotone" class="text-emerald-600 dark:text-emerald-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Contato</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">E-mail Público (Suporte)</label>
+                            <input type="email" name="homepage_contact_email" value="{{ old('homepage_contact_email', $homepage->get('homepage_contact_email') ?? $mail->get('mail_from_address')) }}" placeholder="suporte@exemplo.com" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Exibido no rodapé e formulários.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">E-mail Privacidade/LGPD</label>
+                            <input type="email" name="homepage_contact_email_privacy" value="{{ old('homepage_contact_email_privacy', $homepage->get('homepage_contact_email_privacy')) }}" placeholder="privacidade@exemplo.com" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <p class="text-xs text-slate-500 mt-1">Contato para questões de privacidade.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card: Redes Sociais --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                            <x-icon name="share-nodes" style="duotone" class="text-blue-600 dark:text-blue-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Redes Sociais</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Facebook</label>
+                            <input type="url" name="homepage_social_facebook" value="{{ old('homepage_social_facebook', $homepage->get('homepage_social_facebook')) }}" placeholder="https://facebook.com/..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Instagram</label>
+                            <input type="url" name="homepage_social_instagram" value="{{ old('homepage_social_instagram', $homepage->get('homepage_social_instagram')) }}" placeholder="https://instagram.com/..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">LinkedIn</label>
+                            <input type="url" name="homepage_social_linkedin" value="{{ old('homepage_social_linkedin', $homepage->get('homepage_social_linkedin')) }}" placeholder="https://linkedin.com/..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                    </div>
+                    <p class="px-4 pb-4 text-xs text-slate-500">Deixe vazio para não exibir o ícone no rodapé.</p>
+                </div>
+
+                {{-- Card: Cookie e UX --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                            <x-icon name="cookie" style="duotone" class="text-amber-600 dark:text-amber-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">Cookie e UX</h3>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-800 dark:text-white">Banner de Consentimento de Cookies</h4>
+                                <p class="text-xs text-slate-500">Exibir banner na homepage pedindo consentimento.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="homepage_cookie_consent_enabled" value="1" class="sr-only peer" {{ $homepage->get('homepage_cookie_consent_enabled') ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-[#11C76F]"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Mensagem do Banner</label>
+                            <textarea name="homepage_cookie_consent_message" rows="2" placeholder="Utilizamos cookies para melhorar sua experiência..." class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('homepage_cookie_consent_message', $homepage->get('homepage_cookie_consent_message')) }}</textarea>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-800 dark:text-white">Botão Voltar ao Topo</h4>
+                                <p class="text-xs text-slate-500">Exibir botão flutuante para voltar ao topo ao rolar a página.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="homepage_show_back_to_top" value="1" class="sr-only peer" {{ ($homepage->get('homepage_show_back_to_top') ?? true) ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-[#11C76F]"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card: SEO Home --}}
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                            <x-icon name="magnifying-glass" style="duotone" class="text-violet-600 dark:text-violet-400 size-5" />
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white">SEO da Home</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Meta Description</label>
+                            <textarea name="homepage_meta_description" rows="2" placeholder="Descrição exibida nos resultados de busca" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('homepage_meta_description', $homepage->get('homepage_meta_description')) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Meta Keywords</label>
+                            <input type="text" name="homepage_meta_keywords" value="{{ old('homepage_meta_keywords', $homepage->get('homepage_meta_keywords')) }}" placeholder="finanças, controle financeiro, orçamento" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
+                        <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações da Homepage
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Tools (Logs, Telescope, Pulse) -->
     <div x-show="activeTab === 'tools'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <div class="space-y-6">
@@ -573,6 +863,7 @@
     </div>
 
     <!-- Blog Settings -->
+    <div x-show="activeTab === 'blog'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
         <form action="{{ route('admin.settings.blog') }}" method="POST">
             @csrf
             <input type="hidden" name="tab" value="blog">

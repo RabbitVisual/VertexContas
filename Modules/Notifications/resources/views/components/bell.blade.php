@@ -1,4 +1,6 @@
-<div x-data="notificationSystem()" x-init="init()" class="relative">
+@props(['url' => null])
+@php $fetchUrl = $url ?? url(route('notifications.unread')); @endphp
+<div x-data="notificationSystem({{ json_encode($fetchUrl) }})" x-init="init()" class="relative">
     <!-- Bell Icon -->
     <button @click.stop="toggleDropdown()" class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-800 transition-colors focus:outline-none">
         <x-icon name="bell" style="duotone" class="w-6 h-6" />
@@ -105,18 +107,21 @@
 </div>
 
 <script>
-    function notificationSystem() {
+    function notificationSystem(fetchUrl) {
         return {
             isOpen: false,
             count: 0,
             notifications: [],
             loading: false,
+            fetchUrl: fetchUrl || '/notifications/unread',
+            fetchFailCount: 0,
 
             init() {
                 this.fetchNotifications();
-                // Polling every 15 seconds
+                const self = this;
                 setInterval(() => {
-                    this.fetchNotifications(true); // silent update
+                    if (self.fetchFailCount >= 5) return;
+                    self.fetchNotifications(true);
                 }, 15000);
             },
 
@@ -130,7 +135,7 @@
             fetchNotifications(silent = false) {
                 if (!silent) this.loading = true;
 
-                fetch('/notifications/unread', {
+                fetch(this.fetchUrl, {
                     headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 })
                     .then(response => response.json())
@@ -153,7 +158,7 @@
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error fetching notifications:', error);
+                        this.fetchFailCount++;
                         this.loading = false;
                     });
             },

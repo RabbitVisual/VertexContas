@@ -38,6 +38,15 @@
                 </div>
                 <span x-show="sidebarOpen" class="font-bold text-sm">Manual do Agente</span>
             </a>
+            @if(vertex_chat_enabled() && Route::has('support.chat.index'))
+            <a href="{{ route('support.chat.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.chat.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.chat.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="comments" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Chat VIP</span>
+            </a>
+            @endif
             <a href="{{ route('support.tickets.index') }}"
                class="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.tickets.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
                 <div class="flex items-center gap-3">

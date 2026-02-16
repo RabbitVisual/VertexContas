@@ -20,4 +20,20 @@ class LegalController extends Controller
 
         return view('homepage::legal.show', compact('document'));
     }
+
+    /**
+     * Display Terms of Use (slug: termos-de-uso).
+     */
+    public function showTerms()
+    {
+        return $this->show('termos-de-uso');
+    }
+
+    /**
+     * Display Privacy Policy (slug: privacidade).
+     */
+    public function showPrivacy()
+    {
+        return $this->show('privacidade');
+    }
 }

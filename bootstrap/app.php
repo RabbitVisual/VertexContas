@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\Modules\Core\Http\Middleware\CheckMaintenanceMode::class);
         $middleware->append(\Modules\Core\Http\Middleware\BlockSensitiveInspectionActions::class);
         $middleware->append(\Modules\Core\Http\Middleware\StoreInspectionViewUrl::class);
+        $middleware->append(\Modules\Core\Http\Middleware\EnsureInspectionNotExpired::class);
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'financial.setup' => \Modules\PanelUser\Http\Middleware\EnsureFinancialSetup::class,
             'legal.acceptance' => \Modules\PanelUser\Http\Middleware\EnsureLegalAcceptance::class,
             'chat.access' => \Modules\VertexChat\Http\Middleware\EnsureChatAccess::class,
+            'lockout' => \Modules\Core\Http\Middleware\EnsureNotLockedOut::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

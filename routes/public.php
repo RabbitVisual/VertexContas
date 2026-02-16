@@ -23,13 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Add other public routes here
 Route::get('/', [HomePageController::class, 'home'])->name('homepage');
 
-Route::get('/termos', function () {
-    return view('homepage::legal.terms');
-})->name('terms');
-
-Route::get('/privacidade', function () {
-    return view('homepage::legal.privacy');
-})->name('privacy');
+Route::get('/termos', [LegalController::class, 'showTerms'])->name('terms');
+Route::get('/privacidade', [LegalController::class, 'showPrivacy'])->name('privacy');
 
 // Dynamic Legal Documents (Termos, Privacidade, etc.)
 Route::get('/legal/{slug}', [LegalController::class, 'show'])->name('public.legal.show');

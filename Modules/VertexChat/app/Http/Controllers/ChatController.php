@@ -85,12 +85,19 @@ class ChatController extends Controller
     private function formatMessage($message): array
     {
         $message->load('sender');
+        $sender = $message->sender;
+        $avatarUrl = $sender ? $sender->photo_url : null;
+        $senderInitial = $sender
+            ? strtoupper(mb_substr($sender->first_name ?? '?', 0, 1))
+            : '?';
 
         return [
             'id' => $message->id,
             'conversation_id' => $message->conversation_id,
             'sender_id' => $message->sender_id,
-            'sender_name' => $message->sender?->first_name.' '.$message->sender?->last_name,
+            'sender_name' => $sender ? $sender->first_name.' '.$sender->last_name : '',
+            'sender_photo' => $avatarUrl,
+            'sender_initial' => $senderInitial,
             'body' => $message->body,
             'type' => $message->type,
             'created_at' => $message->created_at?->toIso8601String(),

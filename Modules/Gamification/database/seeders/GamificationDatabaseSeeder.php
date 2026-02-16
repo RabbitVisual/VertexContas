@@ -46,6 +46,8 @@ class GamificationDatabaseSeeder extends Seeder
         }
 
         $this->call([
+            DidacticInsightsSeeder::class,
+            ProfessionalInsightsSeeder::class,
             MedalsSeeder::class,
             CoachingRulesSeeder::class,
         ]);

@@ -127,8 +127,8 @@ class CoreServiceProvider extends ServiceProvider
                 ]);
             }
 
-            // Override session lifetime from security settings
-            $sessionLifetime = (int) $settings->get('session_lifetime', config('session.lifetime', 120));
+            // Override session lifetime from security settings (fallback for migration)
+            $sessionLifetime = (int) ($settings->get('security_session_lifetime') ?? $settings->get('session_lifetime') ?? config('session.lifetime', 120));
             if ($sessionLifetime > 0) {
                 config(['session.lifetime' => $sessionLifetime]);
             }

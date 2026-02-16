@@ -23,14 +23,14 @@
 
     {{-- SEO Meta Tags --}}
     <title>{{ $title }}</title>
-    <meta name="description" content="{{ $metaDescription }}">
-    <meta name="keywords" content="{{ $metaKeywords }}">
+    <meta name="description" content="{{ setting('homepage_meta_description') ?: $metaDescription }}">
+    <meta name="keywords" content="{{ setting('homepage_meta_keywords') ?: $metaKeywords }}">
     <meta name="robots" content="index, follow">
 
     {{-- Open Graph (Facebook, LinkedIn, etc.) --}}
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $title }}">
-    <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:description" content="{{ setting('homepage_meta_description') ?: $metaDescription }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="{{ $ogImage ?? asset('images/og-image.svg') }}">
     <meta property="og:site_name" content="{{ config('app.name') }}">
@@ -39,7 +39,7 @@
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $title }}">
-    <meta name="twitter:description" content="{{ $metaDescription }}">
+    <meta name="twitter:description" content="{{ setting('homepage_meta_description') ?: $metaDescription }}">
     <meta name="twitter:image" content="{{ $ogImage ?? asset('images/og-image.svg') }}">
 
     {{-- Favicon & Apple Touch Icon --}}
@@ -69,6 +69,9 @@
 
     <!-- Main Content -->
     {{ $slot }}
+
+    @include('homepage::components.cookie-consent')
+    @include('homepage::components.back-to-top')
 
     {{-- Scripts --}}
     @stack('scripts')

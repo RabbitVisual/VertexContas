@@ -7,6 +7,7 @@ namespace Modules\Core\Services;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\Blog\Models\Post;
 use Modules\Core\Models\Budget;
 use Modules\Core\Models\Transaction;
 use Modules\Gamification\Models\Achievement;
@@ -18,7 +19,9 @@ class GamificationService
     public function __construct(
         protected FinancialHealthService $financialHealth,
         protected ReportService $reportService,
-        protected RuleEngineService $ruleEngine
+        protected RuleEngineService $ruleEngine,
+        protected SettingService $settingService,
+        protected GeminiService $geminiService
     ) {}
 
     /**
@@ -59,7 +62,7 @@ class GamificationService
 
         $insight = $this->ruleEngine->evaluate($user);
         if ($insight === null) {
-            $insight = $this->resolveInsight($user, $snapshot, $summary, $income, $expense, $balance, $monthlyExpenses);
+            $insight = $this->resolveInsight($user, $snapshot, $summary, $income, $expense, $balance, $monthlyExpenses, $financialScore, $metrics, $coachingStats);
         }
 
         return [
@@ -72,6 +75,7 @@ class GamificationService
 
     /**
      * Resolve which insight to show (priority: low_balance → budget_reached → savings_milestone → daily_tip).
+     * Tries Gemini AI when enabled; falls back to local insights on failure or when disabled.
      */
     protected function resolveInsight(
         User $user,
@@ -80,7 +84,10 @@ class GamificationService
         float $income,
         float $expense,
         float $balance,
-        float $monthlyExpenses
+        float $monthlyExpenses,
+        int $financialScore,
+        array $metrics,
+        array $coachingStats
     ): ?array {
         $monthKey = now()->format('Y-m');
         $todayKey = now()->toDateString();
@@ -91,13 +98,13 @@ class GamificationService
         if ($monthlyExpenses > 0 && $balance < ($monthlyExpenses * 0.5)) {
             $achievementKey = "low_balance_{$monthKey}";
             if (! in_array($achievementKey, $dismissed, true) && ! Achievement::hasAchieved($user, $achievementKey, now()->startOfMonth())) {
-                $insight = Insight::getRandomForTrigger('low_balance', $isPro);
-                if ($insight) {
+                $content = $this->resolveInsightContent('low_balance', $user, $financialScore, $metrics, $coachingStats, $isPro, null);
+                if ($content) {
                     $this->recordAchievement($user, $achievementKey);
 
                     return [
-                        'content' => $insight->content,
-                        'level' => $insight->level ?: 'danger',
+                        'content' => $content,
+                        'level' => 'danger',
                         'trigger' => 'low_balance',
                         'insight_key' => $achievementKey,
                     ];
@@ -114,18 +121,18 @@ class GamificationService
             }
             $achievementKey = "budget_warning_{$budget->id}_{$monthKey}";
             if (! in_array($achievementKey, $dismissed, true) && ! Achievement::hasAchieved($user, $achievementKey, now()->startOfMonth())) {
-                $insight = Insight::getRandomForTrigger('budget_reached', $isPro);
-                if ($insight) {
+                $triggerExtra = [
+                    'category' => $budget->category?->name ?? 'Orçamento',
+                    'percent' => round($budget->usage_percentage, 1),
+                ];
+                $content = $this->resolveInsightContent('budget_reached', $user, $financialScore, $metrics, $coachingStats, $isPro, $triggerExtra);
+                if ($content) {
                     $this->recordAchievement($user, $achievementKey, [
                         'budget_id' => $budget->id,
                         'category' => $budget->category?->name,
                         'percent' => round($budget->usage_percentage, 1),
                     ]);
-                    $content = $this->replacePlaceholders($insight->content, [
-                        'category' => $budget->category?->name ?? 'Orçamento',
-                        'percent' => round($budget->usage_percentage, 1),
-                    ]);
-                    $level = $budget->is_exceeded ? 'danger' : ($insight->level ?: 'warning');
+                    $level = $budget->is_exceeded ? 'danger' : 'warning';
 
                     return [
                         'content' => $content,
@@ -141,13 +148,13 @@ class GamificationService
         if ($income > 0 && ($expense / $income) < 0.5) {
             $achievementKey = "savings_milestone_{$monthKey}";
             if (! in_array($achievementKey, $dismissed, true) && ! Achievement::hasAchieved($user, $achievementKey, now()->startOfMonth())) {
-                $insight = Insight::getRandomForTrigger('savings_milestone', $isPro);
-                if ($insight) {
+                $content = $this->resolveInsightContent('savings_milestone', $user, $financialScore, $metrics, $coachingStats, $isPro, null);
+                if ($content) {
                     $this->recordAchievement($user, $achievementKey);
 
                     return [
-                        'content' => $insight->content,
-                        'level' => $insight->level ?: 'success',
+                        'content' => $content,
+                        'level' => 'success',
                         'trigger' => 'savings_milestone',
                         'insight_key' => $achievementKey,
                     ];
@@ -155,16 +162,17 @@ class GamificationService
             }
         }
 
-        // 4. daily_tip: first login today (show once per day)
-        $achievementKey = "daily_tip_{$todayKey}";
+        // 4. daily_tip: low score = more tips (every 4h), mid = every 8h, high = once/day
+        $slot = $this->getDailyTipSlot($financialScore);
+        $achievementKey = "daily_tip_{$todayKey}" . ($slot !== null ? "_{$slot}" : '');
         if (! in_array($achievementKey, $dismissed, true) && ! Achievement::hasAchieved($user, $achievementKey, now()->startOfDay())) {
-            $insight = Insight::getRandomForTrigger('daily_tip', $isPro);
-            if ($insight) {
+            $content = $this->resolveInsightContent('daily_tip', $user, $financialScore, $metrics, $coachingStats, $isPro, null);
+            if ($content) {
                 $this->recordAchievement($user, $achievementKey);
 
                 return [
-                    'content' => $insight->content,
-                    'level' => $insight->level ?: 'info',
+                    'content' => $content,
+                    'level' => 'info',
                     'trigger' => 'daily_tip',
                     'insight_key' => $achievementKey,
                 ];
@@ -172,6 +180,71 @@ class GamificationService
         }
 
         return null;
+    }
+
+    /**
+     * Resolve insight content: try Gemini when enabled, fallback to local insights (Plano B).
+     *
+     * @param  array{category?: string, percent?: float}|null  $triggerExtra
+     */
+    protected function resolveInsightContent(
+        string $trigger,
+        User $user,
+        int $financialScore,
+        array $metrics,
+        array $coachingStats,
+        bool $isPro,
+        ?array $triggerExtra
+    ): ?string {
+        $useGemini = (bool) ($this->settingService->get('gemini_enabled') ?? false) && $this->geminiService->isAvailable();
+
+        if ($useGemini) {
+            $contextData = $this->buildPromptContext($financialScore, $metrics, $coachingStats, $triggerExtra);
+            $content = $this->geminiService->generateInsight($contextData, $trigger, $isPro);
+            if ($content !== null && trim($content) !== '') {
+                return trim($content);
+            }
+        }
+
+        $insight = Insight::getRandomForTrigger($trigger, $isPro);
+        if (! $insight) {
+            return null;
+        }
+
+        return $this->replacePlaceholders($insight->content, $triggerExtra ?? []);
+    }
+
+    /**
+     * Build context data for Gemini prompt. LGPD: metrics only, no PII.
+     *
+     * @param  array{category?: string, percent?: float}|null  $triggerExtra
+     * @return array{financial_score: int, coaching_stats: array, trigger_extra?: array, metrics: array, blog_titles: array}
+     */
+    protected function buildPromptContext(int $financialScore, array $metrics, array $coachingStats, ?array $triggerExtra): array
+    {
+        $blogTitles = [];
+        if (class_exists(Post::class)) {
+            $blogTitles = Post::query()
+                ->where('status', 'published')
+                ->latest()
+                ->take(3)
+                ->pluck('title')
+                ->values()
+                ->toArray();
+        }
+
+        $data = [
+            'financial_score' => $financialScore,
+            'coaching_stats' => $coachingStats,
+            'metrics' => $metrics,
+            'blog_titles' => $blogTitles,
+        ];
+
+        if ($triggerExtra !== null && $triggerExtra !== []) {
+            $data['trigger_extra'] = $triggerExtra;
+        }
+
+        return $data;
     }
 
     /**
@@ -223,6 +296,23 @@ class GamificationService
             'triggered_at' => now(),
             'metadata' => $metadata ?: null,
         ]);
+    }
+
+    /**
+     * Daily tip slot for low-score users: more frequent tips when score is low.
+     * Score <= 40: slot every 4h (0-5). Score 41-70: slot every 8h (0-2). Score > 70: null (once/day).
+     */
+    protected function getDailyTipSlot(int $financialScore): ?int
+    {
+        $hour = (int) now()->format('H');
+        if ($financialScore <= 40) {
+            return (int) floor($hour / 4);
+        }
+        if ($financialScore <= 70) {
+            return (int) floor($hour / 8);
+        }
+
+        return null;
     }
 
     protected function replacePlaceholders(string $content, array $replace): string
