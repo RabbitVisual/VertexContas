@@ -14,7 +14,7 @@
 
                 <div class="text-center mb-10">
                     <div class="mb-6 flex justify-center">
-                        <x-logo type="full" size="text-3xl" />
+                        <x-logo type="full" context="homepage" size="text-3xl" />
                     </div>
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Crie sua conta</h2>
                     <p class="text-slate-500 dark:text-slate-400 font-medium">Inicie sua jornada financeira local hoje</p>
@@ -32,8 +32,11 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-6">
+                <form method="POST" action="{{ route('register') }}" class="space-y-6" @if($recaptchaEnabled ?? false) id="register-form" @endif>
                     @csrf
+                    @if($recaptchaEnabled ?? false)
+                        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- First Name -->
@@ -163,6 +166,24 @@
                     </button>
                 </form>
 
+                @if($recaptchaEnabled ?? false)
+                    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}" async defer></script>
+                    <script>
+                        document.getElementById('register-form')?.addEventListener('submit', function(e) {
+                            const input = document.getElementById('g-recaptcha-response');
+                            if (input && input.value) return;
+                            e.preventDefault();
+                            const form = this;
+                            grecaptcha.ready(function() {
+                                grecaptcha.execute('{{ $recaptchaSiteKey }}', { action: 'register' }).then(function(token) {
+                                    input.value = token;
+                                    form.submit();
+                                });
+                            });
+                        });
+                    </script>
+                @endif
+
                 <div class="mt-10 text-center">
                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
                         Já tem uma conta?
@@ -173,7 +194,7 @@
 
             <!-- Footer Small -->
             <p class="mt-8 text-center text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
-                &copy; {{ date('Y') }} VertexContas &bull; 100% Local &bull; Seguro
+                &copy; {{ date('Y') }} {{ config('app.name') }} &bull; 100% Local &bull; Seguro
             </p>
         </div>
     </main>

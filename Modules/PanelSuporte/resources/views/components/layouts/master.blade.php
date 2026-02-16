@@ -22,9 +22,9 @@
         (function(){var d=localStorage.getItem('color-theme')==='dark'||(!('color-theme' in localStorage)&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();
     </script>
 
-    <title>{{ $title ?? 'Vertex Contas - Support Panel' }}</title>
+    <title>{{ $title ?? branding_panel_name('suporte') . ' - ' . config('app.name') }}</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

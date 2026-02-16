@@ -49,6 +49,34 @@ class SettingSeeder extends Seeder
                 'type' => 'string',
                 'is_encrypted' => false,
             ],
+            [
+                'key' => 'maintenance_mode',
+                'value' => false,
+                'group' => 'general',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'panel_user_name',
+                'value' => env('APP_NAME', 'Vertex Contas'),
+                'group' => 'general',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'panel_admin_name',
+                'value' => 'Administração',
+                'group' => 'general',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'panel_suporte_name',
+                'value' => 'Suporte',
+                'group' => 'general',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
 
             // Branding Settings
             [
@@ -62,6 +90,62 @@ class SettingSeeder extends Seeder
                 'key' => 'app_favicon',
                 'value' => null,
                 'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_user',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_user_dark',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_admin',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_admin_dark',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_suporte',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'logo_suporte_dark',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'favicon',
+                'value' => null,
+                'group' => 'branding',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'company_legal_name',
+                'value' => 'Vertex Solutions LTDA',
+                'group' => 'document_templates',
                 'type' => 'string',
                 'is_encrypted' => false,
             ],
@@ -179,6 +263,68 @@ class SettingSeeder extends Seeder
                 'value' => 5,
                 'group' => 'document_templates',
                 'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+
+            // Security Settings
+            [
+                'key' => 'max_login_attempts',
+                'value' => 5,
+                'group' => 'security',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'session_lifetime',
+                'value' => 120,
+                'group' => 'security',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'recaptcha_enabled',
+                'value' => false,
+                'group' => 'security',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'recaptcha_site_key',
+                'value' => env('RECAPTCHA_SITE_KEY'),
+                'group' => 'security',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'recaptcha_secret_key',
+                'value' => env('RECAPTCHA_SECRET_KEY'),
+                'group' => 'security',
+                'type' => 'string',
+                'is_encrypted' => true,
+            ],
+            [
+                'key' => 'recaptcha_min_score',
+                'value' => 0.5,
+                'group' => 'security',
+                'type' => 'float',
+                'is_encrypted' => false,
+            ],
+
+            // Features Settings (Vertex Chat, etc.)
+            [
+                'key' => 'vertex_chat_enabled',
+                'value' => true,
+                'group' => 'features',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+
+            // Maintenance custom message
+            [
+                'key' => 'maintenance_message',
+                'value' => null,
+                'group' => 'general',
+                'type' => 'string',
                 'is_encrypted' => false,
             ],
         ];

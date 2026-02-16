@@ -9,7 +9,7 @@ class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out f
         <div class="flex justify-between items-center">
             <!-- Logo -->
             <a href="{{ route('homepage') }}" class="flex items-center gap-2 group decoration-transparent">
-                <x-logo type="full" size="text-2xl" />
+                <x-logo type="full" context="homepage" size="text-2xl" />
             </a>
 
             <!-- Desktop Navigation -->

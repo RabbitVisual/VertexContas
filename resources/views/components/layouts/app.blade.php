@@ -20,7 +20,7 @@
 
     <title>{{ $title ?? config('app.name', 'Vertex Oh Pro') }}</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
     <!-- Anti-Flicker Script -->
     <script>

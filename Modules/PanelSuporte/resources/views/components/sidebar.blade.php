@@ -2,14 +2,13 @@
     <!-- Logo Area -->
     <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 transition-all duration-300">
         <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0" class="flex items-center gap-3">
-            <x-logo type="icon" class="h-9 w-9 text-primary drop-shadow-sm" />
+            <x-logo type="icon" context="suporte" class="h-9 w-9 text-primary drop-shadow-sm" />
             <div class="flex flex-col">
-                <span class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white leading-none">Vertex</span>
-                <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-0.5">Support</span>
+                <span class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white leading-none">{{ branding_panel_name('suporte') }}</span>
             </div>
         </div>
         <div x-show="!sidebarOpen" x-transition class="flex justify-center w-full">
-            <x-logo type="icon" class="h-8 w-8 text-primary shadow-sm" />
+            <x-logo type="icon" context="suporte" class="h-8 w-8 text-primary shadow-sm" />
         </div>
     </div>
 

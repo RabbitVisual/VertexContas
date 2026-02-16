@@ -33,7 +33,7 @@
     <meta property="og:description" content="{{ $metaDescription }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="{{ $ogImage ?? asset('images/og-image.svg') }}">
-    <meta property="og:site_name" content="Vertex Contas">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:locale" content="pt_BR">
 
     {{-- Twitter Card --}}
@@ -43,10 +43,7 @@
     <meta name="twitter:image" content="{{ $ogImage ?? asset('images/og-image.svg') }}">
 
     {{-- Favicon & Apple Touch Icon --}}
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
-    <link rel="icon" type="image/svg+xml" sizes="32x32" href="{{ asset('storage/logos/favicon-32x32.svg') }}">
-    <link rel="icon" type="image/svg+xml" sizes="16x16" href="{{ asset('storage/logos/favicon-16x16.svg') }}">
-    <link rel="apple-touch-icon" href="{{ asset('storage/logos/apple-touch-icon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
     {{-- Anti-FOUC: Flowbite/Tailwind dark mode + modo privacidade (sensitive) --}}
     <script>

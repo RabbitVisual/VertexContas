@@ -15,6 +15,7 @@ export default defineConfig({
                 'resources/js/ticket-chat.js',
                 'resources/js/cashflow-dashboard.js',
                 'resources/js/legal-editor.js',
+                'resources/js/vertex-chat.js',
             ],
             refresh: [
                 'resources/views/**',

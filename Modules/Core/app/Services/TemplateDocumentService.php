@@ -81,17 +81,18 @@ class TemplateDocumentService
     {
         $settings = $this->settingService->getByGroup('document_templates');
         $general = $this->settingService->getByGroup('general');
-        $branding = $this->settingService->getByGroup('branding');
+
+        $companyName = $settings->get('company_name') ?? $general->get('app_name') ?? config('app.name', 'Vertex Contas');
 
         return [
-            'company_name' => $settings->get('company_name') ?? $general->get('app_name') ?? 'Vertex Contas',
+            'company_name' => $companyName,
             'company_address' => $settings->get('company_address') ?? '',
             'company_cnpj' => $settings->get('company_cnpj') ?? '',
             'company_phone' => $settings->get('company_phone') ?? '',
             'company_email' => $settings->get('company_email') ?? '',
-            'document_footer_text' => $settings->get('document_footer_text') ?? 'Vertex Contas - Sistema de Gestão Financeira',
+            'document_footer_text' => $settings->get('document_footer_text') ?? $companyName . ' - Sistema de Gestão Financeira',
             'app_url' => $general->get('app_url') ?? config('app.url'),
-            'logo_path' => $branding->get('app_logo') ? asset($branding->get('app_logo')) : asset('storage/logos/logo.svg'),
+            'logo_path' => branding_logo_url('default', false),
         ];
     }
 

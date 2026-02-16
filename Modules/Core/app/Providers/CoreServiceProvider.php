@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Providers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -49,12 +50,26 @@ class CoreServiceProvider extends ServiceProvider
         // Share inspection sync flag: real user has active inspection (not agent) → enable real-time URL sync
         View::composer(['paneluser::components.layouts.master', 'paneluser::layouts.master'], function ($view) {
             $syncActive = false;
-            if (auth()->check() && !session('original_agent_id')) {
-                $syncActive = \Modules\Core\Models\Inspection::where('user_id', auth()->id())
+            if (Auth::check() && !session('original_agent_id')) {
+                $syncActive = \Modules\Core\Models\Inspection::where('user_id', Auth::id())
                     ->where('status', 'active')
                     ->exists();
             }
             $view->with('inspectionSyncActive', $syncActive);
+        });
+
+        // Share branding variables for logo, favicon and panel names across all relevant views
+        View::composer([
+            'paneladmin::*',
+            'paneluser::*',
+            'panelsuporte::*',
+            'homepage::*',
+            'core::*',
+            'errors.*',
+        ], function ($view) {
+            $view->with('brandingLogoUrl', fn (string $context = 'default', bool $dark = false) => branding_logo_url($context, $dark));
+            $view->with('brandingFaviconUrl', branding_favicon_url());
+            $view->with('brandingPanelName', fn (string $panel) => branding_panel_name($panel));
         });
     }
 
@@ -97,6 +112,26 @@ class CoreServiceProvider extends ServiceProvider
                 'mail.from.address' => $settings->get('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
                 'mail.from.name' => $settings->get('mail_from_name', env('MAIL_FROM_NAME', env('APP_NAME', 'Vertex Contas'))),
             ]);
+
+            // Override Pusher/broadcasting configs (prioridade: DB > .env)
+            $broadcastConn = $settings->get('broadcast_connection') ?? env('BROADCAST_CONNECTION', 'log');
+            config(['broadcasting.default' => $broadcastConn]);
+
+            $pusherAppId = $settings->get('pusher_app_id') ?? env('PUSHER_APP_ID');
+            if ($pusherAppId) {
+                config([
+                    'broadcasting.connections.pusher.key' => $settings->get('pusher_app_key', env('PUSHER_APP_KEY')),
+                    'broadcasting.connections.pusher.secret' => $settings->get('pusher_app_secret', env('PUSHER_APP_SECRET')),
+                    'broadcasting.connections.pusher.app_id' => $pusherAppId,
+                    'broadcasting.connections.pusher.options.cluster' => $settings->get('pusher_app_cluster', env('PUSHER_APP_CLUSTER', 'mt1')),
+                ]);
+            }
+
+            // Override session lifetime from security settings
+            $sessionLifetime = (int) $settings->get('session_lifetime', config('session.lifetime', 120));
+            if ($sessionLifetime > 0) {
+                config(['session.lifetime' => $sessionLifetime]);
+            }
         } catch (\Exception $e) {
             // Silently fail if database is not ready (e.g., during migrations)
             \Illuminate\Support\Facades\Log::debug('Settings override skipped: ' . $e->getMessage());

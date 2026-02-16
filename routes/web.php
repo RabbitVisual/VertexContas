@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Facades\Module;
 
@@ -20,6 +21,9 @@ use Nwidart\Modules\Facades\Module;
 if (file_exists(__DIR__.'/auth.php')) {
     require __DIR__.'/auth.php';
 }
+
+// Broadcasting auth (Vertex Chat / Pusher private channels)
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 // Authenticated General Routes
 Route::middleware(['auth'])->group(function () {});

@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Erro' }} - Vertex Contas</title>
-    <link rel="icon" href="{{ asset('storage/logos/favicon.svg') }}">
+    <title>{{ $title ?? 'Erro' }} - {{ config('app.name') }}</title>
+    <link rel="icon" href="{{ branding_favicon_url() }}">
     @vite(['resources/css/app.css'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
     <div class="relative z-10 flex flex-col items-center justify-center px-6 text-center max-w-2xl mx-auto">
         {{-- Logo --}}
         <a href="{{ url('/') }}" class="mb-10 focus:outline-none focus:ring-2 focus:ring-[#11c76f] focus:ring-offset-2 focus:ring-offset-slate-950 rounded-lg">
-            <img src="{{ asset('storage/logos/logo-white.svg') }}" alt="Vertex Contas" class="h-12 w-auto hover:opacity-90 transition-opacity" loading="eager">
+            <img src="{{ branding_logo_url('default', true) }}" alt="{{ config('app.name') }}" class="h-12 w-auto hover:opacity-90 transition-opacity" loading="eager">
         </a>
 
         {{-- Content Slot --}}

@@ -15,18 +15,28 @@ class SettingsController extends Controller
         $this->settingService = $settingService;
     }
 
+    protected const ALLOWED_TABS = ['general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'tools'];
+
     /**
      * Show the settings form.
      */
     public function index()
     {
+        $tab = request()->get('tab', 'general');
+        if (! in_array($tab, self::ALLOWED_TABS, true)) {
+            $tab = 'general';
+        }
+
         $general = $this->settingService->getByGroup('general');
         $branding = $this->settingService->getByGroup('branding');
+        $security = $this->settingService->getByGroup('security');
+        $features = $this->settingService->getByGroup('features');
         $mail = $this->settingService->getByGroup('mail');
         $blog = $this->settingService->getByGroup('blog');
         $documents = $this->settingService->getByGroup('document_templates');
+        $pusher = $this->settingService->getByGroup('pusher');
 
-        return view('paneladmin::settings.index', compact('general', 'branding', 'mail', 'blog', 'documents'));
+        return view('paneladmin::settings.index', compact('general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'tab'));
     }
 
     /**
@@ -40,17 +50,26 @@ class SettingsController extends Controller
             'app_url' => 'required|url',
             'app_timezone' => ['required', 'string', 'timezone'],
             'app_locale' => 'required|string|in:pt_BR,en',
+            'panel_user_name' => 'nullable|string|max:100',
+            'panel_admin_name' => 'nullable|string|max:100',
+            'panel_suporte_name' => 'nullable|string|max:100',
+            'maintenance_message' => 'nullable|string|max:500',
         ]);
 
         foreach ($data as $key => $value) {
-            $this->settingService->set($key, $value, 'general');
+            $this->settingService->set($key, $value ?? '', 'general');
         }
 
         // Handle Checkbox for Maintenance Mode (if not in request, it's false)
         $maintenanceMode = $request->has('maintenance_mode');
         $this->settingService->set('maintenance_mode', $maintenanceMode, 'general', 'boolean');
 
-        return back()->with('success', 'Configurações gerais atualizadas com sucesso!');
+        // Mensagem customizável de manutenção
+        $this->settingService->set('maintenance_message', $data['maintenance_message'] ?? null, 'general');
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'general';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações gerais atualizadas com sucesso!');
     }
 
     /**
@@ -59,21 +78,42 @@ class SettingsController extends Controller
     public function updateBranding(Request $request)
     {
         $request->validate([
-            'app_logo' => 'nullable|image|mimes:png,jpg,svg|max:2048',
+            'app_logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'app_favicon' => 'nullable|image|mimes:png,ico|max:512',
+            'logo_user' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'logo_user_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'logo_admin' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'logo_admin_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'logo_suporte' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'logo_suporte_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'favicon' => 'nullable|image|mimes:png,ico|max:512',
         ]);
 
-        if ($request->hasFile('app_logo')) {
-            $path = $request->file('app_logo')->store('logos', 'public');
-            $this->settingService->set('app_logo', 'storage/'.$path, 'branding');
+        $logoKeys = [
+            'app_logo',
+            'app_favicon',
+            'logo_user',
+            'logo_user_dark',
+            'logo_admin',
+            'logo_admin_dark',
+            'logo_suporte',
+            'logo_suporte_dark',
+            'favicon',
+        ];
+
+        foreach ($logoKeys as $key) {
+            if ($request->hasFile($key)) {
+                $file = $request->file($key);
+                $ext = $file->getClientOriginalExtension();
+                $filename = str_replace('_', '-', $key) . '.' . $ext;
+                $path = $file->storeAs('logos', $filename, 'public');
+                $this->settingService->set($key, 'storage/' . $path, 'branding');
+            }
         }
 
-        if ($request->hasFile('app_favicon')) {
-            $path = $request->file('app_favicon')->store('logos', 'public');
-            $this->settingService->set('app_favicon', 'storage/'.$path, 'branding');
-        }
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'branding';
 
-        return back()->with('success', 'Marca atualizada com sucesso!');
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Marca atualizada com sucesso!');
     }
 
     /**
@@ -103,9 +143,13 @@ class SettingsController extends Controller
                     ->subject('Teste de Configuração SMTP');
             });
 
-            return back()->with('success', 'E-mail de teste enviado com sucesso para '.$request->email);
+            $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
+
+            return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'E-mail de teste enviado com sucesso para '.$request->email);
         } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao enviar e-mail: '.$e->getMessage());
+            $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
+
+            return redirect()->route('admin.settings.index', ['tab' => $tab])->with('error', 'Erro ao enviar e-mail: '.$e->getMessage());
         }
     }
 
@@ -135,7 +179,9 @@ class SettingsController extends Controller
             $this->settingService->set($key, $value, 'mail', 'string', $encrypt);
         }
 
-        return back()->with('success', 'Configurações de e-mail atualizadas com sucesso!');
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações de e-mail atualizadas com sucesso!');
     }
 
     /**
@@ -169,6 +215,7 @@ class SettingsController extends Controller
     {
         $data = $request->validate([
             'company_name' => 'required|string|max:255',
+            'company_legal_name' => 'nullable|string|max:255',
             'company_address' => 'nullable|string|max:500',
             'company_cnpj' => 'nullable|string|max:20',
             'company_phone' => 'nullable|string|max:30',
@@ -186,7 +233,76 @@ class SettingsController extends Controller
             $this->settingService->set($key, $value, 'document_templates', $type);
         }
 
-        return back()->with('success', 'Configurações de documentos atualizadas com sucesso!');
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'documents';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações de documentos atualizadas com sucesso!');
+    }
+
+    /**
+     * Update Pusher/broadcasting settings.
+     */
+    public function updatePusher(Request $request)
+    {
+        $data = $request->validate([
+            'broadcast_connection' => 'required|in:log,pusher,null',
+            'pusher_app_id' => 'nullable|string|max:100',
+            'pusher_app_key' => 'nullable|string|max:100',
+            'pusher_app_secret' => 'nullable|string|max:255',
+            'pusher_app_cluster' => 'nullable|string|max:50',
+        ]);
+
+        foreach ($data as $key => $value) {
+            if ($key === 'pusher_app_secret' && empty($value)) {
+                continue;
+            }
+            $encrypt = $key === 'pusher_app_secret';
+            $this->settingService->set($key, $value ?? '', 'pusher', 'string', $encrypt);
+        }
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'pusher';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações do Pusher atualizadas com sucesso!');
+    }
+
+    /**
+     * Update security settings.
+     */
+    public function updateSecurity(Request $request)
+    {
+        $data = $request->validate([
+            'max_login_attempts' => 'required|integer|min:1|max:20',
+            'session_lifetime' => 'required|integer|min:15|max:10080', // 15 min to 1 week
+            'recaptcha_enabled' => 'nullable',
+            'recaptcha_site_key' => 'nullable|string|max:255',
+            'recaptcha_secret_key' => 'nullable|string|max:255',
+            'recaptcha_min_score' => 'nullable|numeric|min:0|max:1',
+        ]);
+
+        $this->settingService->set('max_login_attempts', (int) $data['max_login_attempts'], 'security', 'integer');
+        $this->settingService->set('session_lifetime', (int) $data['session_lifetime'], 'security', 'integer');
+        $this->settingService->set('recaptcha_enabled', $request->has('recaptcha_enabled'), 'security', 'boolean');
+        $this->settingService->set('recaptcha_site_key', $data['recaptcha_site_key'] ?? '', 'security');
+        if (! empty($data['recaptcha_secret_key'] ?? null)) {
+            $this->settingService->set('recaptcha_secret_key', $data['recaptcha_secret_key'], 'security', 'string', true);
+        }
+        $this->settingService->set('recaptcha_min_score', (float) ($data['recaptcha_min_score'] ?? 0.5), 'security', 'string');
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'security';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações de segurança atualizadas!');
+    }
+
+    /**
+     * Update features (Vertex Chat, etc).
+     */
+    public function updateFeatures(Request $request)
+    {
+        $vertexChatEnabled = $request->has('vertex_chat_enabled');
+        $this->settingService->set('vertex_chat_enabled', $vertexChatEnabled, 'features', 'boolean');
+
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'features';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Recursos atualizados com sucesso!');
     }
 
     /**
@@ -200,6 +316,8 @@ class SettingsController extends Controller
         $autoApproveComments = $request->has('auto_approve_comments');
         $this->settingService->set('auto_approve_comments', $autoApproveComments, 'blog', 'boolean');
 
-        return back()->with('success', 'Configurações do blog atualizadas com sucesso!');
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'blog';
+
+        return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'Configurações do blog atualizadas com sucesso!');
     }
 }

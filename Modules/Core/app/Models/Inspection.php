@@ -10,6 +10,7 @@ class Inspection extends Model
 {
     protected $fillable = [
         'ticket_id',
+        'conversation_id',
         'agent_id',
         'user_id',
         'status',
@@ -28,6 +29,11 @@ class Inspection extends Model
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
+    }
+
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\VertexChat\Models\Conversation::class);
     }
 
     public function agent(): BelongsTo

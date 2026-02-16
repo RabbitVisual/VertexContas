@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\HomePage\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Modules\Core\Services\RecaptchaService;
 
 class AuthController extends Controller
 {
@@ -13,7 +16,10 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        return view('homepage::auth.login');
+        return view('homepage::auth.login', [
+            'recaptchaEnabled' => recaptcha_enabled(),
+            'recaptchaSiteKey' => recaptcha_site_key(),
+        ]);
     }
 
     /**
@@ -21,7 +27,10 @@ class AuthController extends Controller
      */
     public function showRegister()
     {
-        return view('homepage::auth.register');
+        return view('homepage::auth.register', [
+            'recaptchaEnabled' => recaptcha_enabled(),
+            'recaptchaSiteKey' => recaptcha_site_key(),
+        ]);
     }
 
     /**
@@ -45,6 +54,15 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $recaptcha = app(RecaptchaService::class);
+        if ($recaptcha->isEnabled()) {
+            $request->validate(['g-recaptcha-response' => ['required', 'string']]);
+            if (! $recaptcha->verify($request->input('g-recaptcha-response'), 'login')) {
+                return back()->withErrors(['g-recaptcha-response' => 'Verificação de segurança falhou. Tente novamente.'])
+                    ->onlyInput('email', 'remember');
+            }
+        }
+
         $loginField = $request->input('login_type') === 'cpf' ? 'cpf' : 'email';
 
         $credentials = $request->validate([
@@ -78,6 +96,14 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $recaptcha = app(RecaptchaService::class);
+        if ($recaptcha->isEnabled()) {
+            $request->validate(['g-recaptcha-response' => ['required', 'string']]);
+            if (! $recaptcha->verify($request->input('g-recaptcha-response'), 'register')) {
+                return back()->withErrors(['g-recaptcha-response' => 'Verificação de segurança falhou. Tente novamente.']);
+            }
+        }
+
         $request->merge([
             'cpf' => lgpd_clean_cpf($request->cpf ?? null) ?: null,
             'phone' => lgpd_clean_phone($request->phone ?? null) ?: null,

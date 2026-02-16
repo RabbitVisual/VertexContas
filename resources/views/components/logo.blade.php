@@ -1,9 +1,11 @@
-@props(['type' => 'full', 'class' => '', 'light' => false, 'size' => 'text-2xl'])
+@props(['type' => 'full', 'class' => '', 'light' => false, 'size' => 'text-2xl', 'context' => 'default'])
 
 @php
-    $basePath = asset('storage/logos');
+    $logoLight = branding_logo_url($context, false);
+    $logoDark = branding_logo_url($context, true);
+    $faviconUrl = branding_favicon_url();
+    $appName = config('app.name', 'Vertex Contas');
 
-    // Size mapping for the container/image
     $dimensions = match($size) {
         'text-sm' => 'h-6',
         'text-base' => 'h-8',
@@ -16,20 +18,20 @@
 
 <div {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 select-none ' . $class]) }}>
     @if($type === 'icon')
-        <img src="{{ $basePath . '/favicon.svg' }}"
-             alt="Vertex Contas"
+        <img src="{{ $faviconUrl }}"
+             alt="{{ $appName }}"
              class="{{ $dimensions }} w-auto transition-transform duration-300 hover:scale-105"
              loading="eager">
     @else
         {{-- Light Mode Logo --}}
-        <img src="{{ $basePath . '/logo.svg' }}"
-             alt="Vertex Contas"
+        <img src="{{ $logoLight }}"
+             alt="{{ $appName }}"
              class="{{ $dimensions }} w-auto transition-transform duration-300 hover:scale-105 {{ $light ? 'hidden' : 'dark:hidden' }}"
              loading="eager">
 
         {{-- Dark Mode / Light Variant Logo --}}
-        <img src="{{ $basePath . '/logo-white.svg' }}"
-             alt="Vertex Contas"
+        <img src="{{ $logoDark }}"
+             alt="{{ $appName }}"
              class="{{ $dimensions }} w-auto transition-transform duration-300 hover:scale-105 {{ $light ? 'block' : 'hidden dark:block' }}"
              loading="eager">
     @endif

@@ -25,8 +25,8 @@
         {{-- Bloco da logo no topo (estilo Vertex CBAV) --}}
         <div class="h-16 shrink-0 flex items-center justify-center px-6 border-b border-gray-200 dark:border-amber-500/10">
             <div class="relative">
-                <img src="{{ asset('storage/logos/logo.svg') }}" alt="Vertex Contas" class="h-9 block dark:hidden" />
-                <img src="{{ asset('storage/logos/logo-white.svg') }}" alt="Vertex Contas" class="h-9 hidden dark:block" />
+                <img src="{{ branding_logo_url('user', false) }}" alt="{{ branding_panel_name('user') }}" class="h-9 block dark:hidden" />
+                <img src="{{ branding_logo_url('user', true) }}" alt="{{ branding_panel_name('user') }}" class="h-9 hidden dark:block" />
                 <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-white dark:ring-slate-900" title="Vertex PRO">
                     <x-icon name="crown" style="solid" class="w-2.5 h-2.5 text-white" />
                 </span>
@@ -135,6 +135,13 @@
                     <div class="pt-4 pb-2">
                         <p class="{{ $proSectionLabel }}">Suporte</p>
                     </div>
+                    @if(vertex_chat_enabled() && Route::has('vertexchat.chat.index'))
+                    <a href="{{ route('vertexchat.chat.index') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('vertexchat.chat.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="comments" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('vertexchat.chat.*') ? $proIconActive : $proIconInactive }}" />
+                        Chat VIP
+                    </a>
+                    @endif
                     <a href="{{ route('user.tickets.index') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('user.tickets.*') ? $proNavActive : $proNavInactive }}">
                         <x-icon name="ticket" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('user.tickets.*') ? $proIconActive : $proIconInactive }}" />

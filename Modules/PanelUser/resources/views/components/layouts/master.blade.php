@@ -22,9 +22,9 @@
         })();
     </script>
 
-    <title>{{ $title ?? 'Vertex Contas - Painel do Usuário' }}</title>
+    <title>{{ $title ?? branding_panel_name('user') . ' - ' . config('app.name') }}</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if(request()->routeIs('core.dashboard') || request()->routeIs('core.reports.*') || request()->routeIs('user.index'))
@@ -67,6 +67,8 @@
     @if(auth()->check() && (auth()->user()->show_assistant ?? true) && isset($vertexBot) && ($vertexBot['insight'] ?? null))
         <x-gamification::vertex-bot :insight="$vertexBot['insight']" :financial-score="$vertexBot['financial_score'] ?? 0" />
     @endif
+
+    <x-vertexchat::widget />
 
     @stack('scripts')
 

@@ -2,10 +2,9 @@
 <!-- Logo Area -->
 <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
     <div class="flex items-center gap-3">
-        <x-logo type="icon" class="h-9 w-9 text-primary drop-shadow-sm" />
+        <x-logo type="icon" context="suporte" class="h-9 w-9 text-primary drop-shadow-sm" />
         <div class="flex flex-col">
-            <span class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white leading-none">Vertex</span>
-            <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-0.5">Support</span>
+            <span class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white leading-none">{{ branding_panel_name('suporte') }}</span>
         </div>
     </div>
 </div>
@@ -30,6 +29,15 @@
             <div class="flex items-center justify-center w-6"><x-icon name="book-user" style="duotone" class="text-xl" /></div>
             <span class="font-bold text-sm">Manual do Agente</span>
         </a>
+        @if(vertex_chat_enabled())
+        <a href="{{ route('support.chat.index') }}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.chat.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+            <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.chat.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                <x-icon name="comments" style="duotone" class="text-xl" />
+            </div>
+            <span class="font-bold text-sm">Chat VIP</span>
+        </a>
+        @endif
         <a href="{{ route('support.tickets.index') }}"
            class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.tickets.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
             <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.tickets.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">

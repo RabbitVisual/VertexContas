@@ -184,3 +184,112 @@ if (! function_exists('plan_free_name')) {
         return (string) $settings->get('plan_free_name', $default);
     }
 }
+
+if (! function_exists('branding_logo_url')) {
+    /**
+     * Retorna a URL da logo para o contexto e modo (claro/escuro).
+     * Context: user, admin, suporte, homepage, default.
+     * Fallback: logo específica -> app_logo -> storage/logos/logo.svg ou logo-white.svg.
+     */
+    function branding_logo_url(string $context = 'default', bool $dark = false): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+        $basePath = asset('storage/logos');
+
+        $key = match ($context) {
+            'user', 'homepage' => $dark ? 'logo_user_dark' : 'logo_user',
+            'admin' => $dark ? 'logo_admin_dark' : 'logo_admin',
+            'suporte' => $dark ? 'logo_suporte_dark' : 'logo_suporte',
+            default => null,
+        };
+
+        $path = $key ? $settings->get($key) : null;
+        if (! $path) {
+            $path = $settings->get('app_logo');
+        }
+
+        if ($path) {
+            return str_starts_with((string) $path, 'storage/') ? asset($path) : asset('storage/' . $path);
+        }
+
+        return $dark ? $basePath . '/logo-white.svg' : $basePath . '/logo.svg';
+    }
+}
+
+if (! function_exists('branding_favicon_url')) {
+    /** Retorna a URL do favicon. Fallback: app_favicon -> storage/logos/favicon.svg */
+    function branding_favicon_url(): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+        $path = $settings->get('favicon') ?? $settings->get('app_favicon');
+
+        if ($path) {
+            return str_starts_with((string) $path, 'storage/') ? asset($path) : asset('storage/' . $path);
+        }
+
+        return asset('storage/logos/favicon.svg');
+    }
+}
+
+if (! function_exists('branding_panel_name')) {
+    /** Nome do painel (user, admin, suporte). Fallback para app_name ou padrões. */
+    function branding_panel_name(string $panel): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+        $appName = $settings->get('app_name', config('app.name', 'Vertex Contas'));
+
+        return match ($panel) {
+            'user' => (string) ($settings->get('panel_user_name') ?: $appName),
+            'admin' => (string) ($settings->get('panel_admin_name') ?: 'Administração'),
+            'suporte' => (string) ($settings->get('panel_suporte_name') ?: 'Suporte'),
+            default => $appName,
+        };
+    }
+}
+
+if (! function_exists('branding_company_legal_name')) {
+    /** Nome legal da empresa (documentos, rodapés). */
+    function branding_company_legal_name(): string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+
+        return (string) ($settings->get('company_legal_name') ?: $settings->get('company_name', config('app.name', 'Vertex Solutions LTDA')));
+    }
+}
+
+if (! function_exists('vertex_chat_enabled')) {
+    /** Verifica se o Vertex Chat VIP está habilitado globalmente. */
+    function vertex_chat_enabled(): bool
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+
+        return (bool) $settings->get('vertex_chat_enabled', true);
+    }
+}
+
+if (! function_exists('maintenance_message')) {
+    /** Mensagem customizável exibida na página de manutenção. */
+    function maintenance_message(): ?string
+    {
+        $settings = app(\Modules\Core\Services\SettingService::class);
+        $msg = $settings->get('maintenance_message');
+
+        return $msg ? (string) $msg : null;
+    }
+}
+
+if (! function_exists('recaptcha_enabled')) {
+    /** Verifica se reCAPTCHA v3 está habilitado. */
+    function recaptcha_enabled(): bool
+    {
+        return app(\Modules\Core\Services\RecaptchaService::class)->isEnabled();
+    }
+}
+
+if (! function_exists('recaptcha_site_key')) {
+    /** Retorna a chave pública do reCAPTCHA (para o frontend). */
+    function recaptcha_site_key(): ?string
+    {
+        return app(\Modules\Core\Services\RecaptchaService::class)->getSiteKey();
+    }
+}

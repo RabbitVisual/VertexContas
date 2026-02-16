@@ -4,7 +4,7 @@
             <!-- Brand -->
             <div class="col-span-1 md:col-span-1">
                 <div class="mb-6">
-                    <x-logo type="full" size="text-xl" />
+                    <x-logo type="full" context="homepage" size="text-xl" />
                 </div>
                 <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
                     Tome o controle total da sua vida financeira com a plataforma mais completa de gestão pessoal 100% local e segura.
@@ -53,7 +53,7 @@
                     </li>
                     <li class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
                         <x-icon name="location-dot" style="duotone" class="text-primary" />
-                        Vertex Solutions LTDA, Brasil
+                        {{ branding_company_legal_name() }}, Brasil
                     </li>
                 </ul>
             </div>
@@ -62,7 +62,7 @@
         <div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex flex-col md:flex-row items-center gap-4">
                 <p class="text-slate-400 dark:text-slate-500 text-xs text-center md:text-left">
-                    &copy; {{ date('Y') }} <strong class="text-slate-600 dark:text-slate-400">Vertex Solutions LTDA</strong>. Todos os direitos reservados.
+                    &copy; {{ date('Y') }} <strong class="text-slate-600 dark:text-slate-400">{{ branding_company_legal_name() }}</strong>. Todos os direitos reservados.
                 </p>
                 @auth
                     <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800">
@@ -72,7 +72,7 @@
                 @endauth
             </div>
             <p class="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1">
-                Desenvolvido com <x-icon name="heart" style="duotone" class="text-red-500 animate-pulse" /> por Vertex Solutions LTDA
+                Desenvolvido com <x-icon name="heart" style="duotone" class="text-red-500 animate-pulse" /> por {{ branding_company_legal_name() }}
             </p>
         </div>
     </div>

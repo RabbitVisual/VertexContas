@@ -13,7 +13,7 @@
 
                 <div class="text-center mb-10">
                     <div class="mb-6 flex justify-center">
-                        <x-logo type="full" size="text-3xl" />
+                        <x-logo type="full" context="homepage" size="text-3xl" />
                     </div>
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Nova senha</h2>
                     <p class="text-slate-500 dark:text-slate-400 font-medium">Crie uma nova credencial segura</p>
@@ -81,7 +81,7 @@
 
             <!-- Footer Small -->
             <p class="mt-8 text-center text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
-                &copy; {{ date('Y') }} VertexContas &bull; 100% Local &bull; Seguro
+                &copy; {{ date('Y') }} {{ config('app.name') }} &bull; 100% Local &bull; Seguro
             </p>
         </div>
     </main>

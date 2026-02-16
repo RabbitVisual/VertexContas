@@ -14,7 +14,7 @@
 
                 <div class="text-center mb-10">
                     <div class="mb-6 flex justify-center">
-                        <x-logo type="full" size="text-3xl" />
+                        <x-logo type="full" context="homepage" size="text-3xl" />
                     </div>
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Login</h2>
                 </div>
@@ -43,10 +43,13 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                <form method="POST" action="{{ route('login') }}" class="space-y-6" @if($recaptchaEnabled ?? false) id="login-form" data-recaptcha-key="{{ $recaptchaSiteKey }}" @endif>
                     @csrf
 
                     <input type="hidden" name="login_type" :value="loginType">
+                    @if($recaptchaEnabled ?? false)
+                        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+                    @endif
 
                     <!-- Email Field -->
                     <div class="space-y-2" x-show="loginType === 'email'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
@@ -144,6 +147,24 @@
                     @endif
                 </form>
 
+                @if($recaptchaEnabled ?? false)
+                    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}" async defer></script>
+                    <script>
+                        document.getElementById('login-form')?.addEventListener('submit', function(e) {
+                            const input = document.getElementById('g-recaptcha-response');
+                            if (input && input.value) return;
+                            e.preventDefault();
+                            const form = this;
+                            grecaptcha.ready(function() {
+                                grecaptcha.execute('{{ $recaptchaSiteKey }}', { action: 'login' }).then(function(token) {
+                                    input.value = token;
+                                    form.submit();
+                                });
+                            });
+                        });
+                    </script>
+                @endif
+
                 <div class="mt-10 text-center">
                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
                         Não tem uma conta?
@@ -154,7 +175,7 @@
 
             <!-- Footer Small -->
             <p class="mt-8 text-center text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
-                &copy; {{ date('Y') }} VertexContas &bull; 100% Local &bull; Seguro
+                &copy; {{ date('Y') }} {{ config('app.name') }} &bull; 100% Local &bull; Seguro
             </p>
         </div>
     </main>

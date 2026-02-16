@@ -8,7 +8,7 @@
 
         <div class="hidden sm:flex flex-col justify-center gap-0.5 min-h-[2.5rem]">
             <h2 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">
-                {{ $title ?? 'Vertex Admin' }}
+                {{ $title ?? branding_panel_name('admin') }}
             </h2>
             <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-tight flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#11C76F] animate-pulse shrink-0"></span>

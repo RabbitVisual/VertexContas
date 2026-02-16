@@ -76,7 +76,12 @@
             </h3>
 
             <p class="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-4 sm:mb-6 max-w-lg mx-auto px-1">
-                O agente <span class="text-slate-900 dark:text-white font-black underline decoration-orange-500/30">{{ $pendingInspection->agent->name }}</span> precisa visualizar o seu painel em tempo real para resolver o chamado <span class="font-black text-primary">#{{ $pendingInspection->ticket_id }}</span>.
+                O agente <span class="text-slate-900 dark:text-white font-black underline decoration-orange-500/30">{{ $pendingInspection->agent->name }}</span> precisa visualizar o seu painel em tempo real
+                @if($pendingInspection->ticket_id)
+                    para resolver o chamado <span class="font-black text-primary">#{{ $pendingInspection->ticket_id }}</span>.
+                @else
+                    no atendimento via Chat VIP.
+                @endif
             </p>
 
             <!-- Privacy Toggle -->

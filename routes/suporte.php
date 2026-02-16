@@ -21,6 +21,15 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:admin|support'])
     Route::get('/reports', [\Modules\PanelSuporte\Http\Controllers\SupportReportController::class, 'index'])->name('reports.index');
 
     // Tickets
+    // Chat VIP Command Center
+    Route::get('/chat', [\Modules\PanelSuporte\Http\Controllers\VertexChatCommandCenterController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{conversation}', [\Modules\PanelSuporte\Http\Controllers\VertexChatCommandCenterController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{conversation}/messages', [\Modules\PanelSuporte\Http\Controllers\VertexChatCommandCenterController::class, 'sendMessage'])->name('chat.send');
+    Route::post('/chat/{conversation}/transfer', [\Modules\PanelSuporte\Http\Controllers\VertexChatCommandCenterController::class, 'transfer'])->name('chat.transfer');
+    Route::post('/chat/{conversation}/inspection/request', [\Modules\PanelSuporte\Http\Controllers\InspectionController::class, 'requestFromChat'])->name('chat.inspection.request');
+    Route::post('/chat/{conversation}/typing', [\Modules\PanelSuporte\Http\Controllers\VertexChatCommandCenterController::class, 'typing'])->name('chat.typing');
+
+    // Tickets
     Route::get('/tickets', [SupportAgentController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/{ticket}/messages', [SupportAgentController::class, 'messages'])->name('tickets.messages');
     Route::get('/tickets/{ticket}', [SupportAgentController::class, 'show'])->name('tickets.show');

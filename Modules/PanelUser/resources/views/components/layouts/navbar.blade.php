@@ -49,9 +49,9 @@
                     </div>
                 @else
                     <a href="{{ ($user && $user->isPro() && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index') }}" class="flex items-center gap-2.5 group">
-                        <img src="{{ asset('storage/logos/logo.svg') }}" class="h-8 dark:hidden transition-transform group-hover:scale-105" alt="Vertex Contas" />
-                        <img src="{{ asset('storage/logos/logo-white.svg') }}" class="h-8 hidden dark:block transition-transform group-hover:scale-105" alt="Vertex Contas" />
-                        <span class="self-center text-lg font-bold whitespace-nowrap text-gray-900 dark:text-white hidden sm:inline">Vertex Contas</span>
+                        <img src="{{ branding_logo_url('user', false) }}" class="h-8 dark:hidden transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" />
+                        <img src="{{ branding_logo_url('user', true) }}" class="h-8 hidden dark:block transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" />
+                        <span class="self-center text-lg font-bold whitespace-nowrap text-gray-900 dark:text-white hidden sm:inline">{{ branding_panel_name('user') }}</span>
                     </a>
                 @endif
             </div>

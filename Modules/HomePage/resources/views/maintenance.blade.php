@@ -8,9 +8,13 @@
                 Em Manutenção
             </h1>
             <p class="mb-6 text-base font-normal text-gray-500 md:text-lg dark:text-gray-400">
-                Pedimos desculpas pelo inconveniente. Estamos realizando manutenção no momento. Se precisar, você pode sempre
-                <a href="{{ route('help-center') }}" class="text-primary-600 hover:underline dark:text-primary-500 font-medium">entrar em contato</a>,
-                caso contrário voltaremos em breve!
+                @if(maintenance_message())
+                    {{ maintenance_message() }}
+                @else
+                    Pedimos desculpas pelo inconveniente. Estamos realizando manutenção no momento. Se precisar, você pode sempre
+                    <a href="{{ route('help-center') }}" class="text-primary-600 hover:underline dark:text-primary-500 font-medium">entrar em contato</a>,
+                    caso contrário voltaremos em breve!
+                @endif
             </p>
             <a href="{{ route('homepage') }}"
                class="inline-flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 transition-colors">

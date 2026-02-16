@@ -1,6 +1,7 @@
 @php
-    $logoLight = Storage::url('logos/logo.svg');
-    $logoDark = Storage::url('logos/logo-white.svg');
+    $logoLight = branding_logo_url('admin', false);
+    $logoDark = branding_logo_url('admin', true);
+    $panelName = branding_panel_name('admin');
     $linkActive = 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15';
     $linkInactive = 'text-slate-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800';
 @endphp
@@ -13,9 +14,9 @@
         <div class="w-16 flex flex-col shrink-0 border-r border-gray-100 dark:border-white/5">
             {{-- Logo --}}
             <div class="inline-flex size-16 items-center justify-center shrink-0 border-b border-gray-100 dark:border-white/5">
-                <a href="{{ route('admin.index') }}" class="flex size-full items-center justify-center overflow-hidden px-2 transition-opacity hover:opacity-90" title="Vertex Admin">
-                    <img src="{{ $logoLight }}" alt="Vertex Contas" class="h-9 w-auto max-w-full object-contain dark:hidden" />
-                    <img src="{{ $logoDark }}" alt="Vertex Contas" class="hidden h-9 w-auto max-w-full object-contain dark:block" />
+                <a href="{{ route('admin.index') }}" class="flex size-full items-center justify-center overflow-hidden px-2 transition-opacity hover:opacity-90" title="{{ $panelName }}">
+                    <img src="{{ $logoLight }}" alt="{{ $panelName }}" class="h-9 w-auto max-w-full object-contain dark:hidden" />
+                    <img src="{{ $logoDark }}" alt="{{ $panelName }}" class="hidden h-9 w-auto max-w-full object-contain dark:block" />
                 </a>
             </div>
 

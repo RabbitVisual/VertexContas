@@ -20,9 +20,9 @@
         (function(){var d=localStorage.getItem('color-theme')==='dark'||(!('color-theme' in localStorage)&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();
     </script>
 
-    <title>@yield('title', $title ?? 'Vertex Contas - Admin Panel')</title>
+    <title>@yield('title', $title ?? branding_panel_name('admin') . ' - ' . config('app.name'))</title>
 
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if(request()->routeIs('admin.index'))
