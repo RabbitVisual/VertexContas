@@ -133,6 +133,9 @@ class CoreController extends Controller
         $monthlyCapacity = $this->financialHealthService->calculateMonthlyCapacity($user);
         $incomeBreakdown = $this->financialHealthService->getIncomeBreakdown($user);
 
+        // Projection data for Vertex AI card (PRO)
+        $projectionData = $this->financialHealthService->getProjectionData($user);
+
         return view('core::dashboard', compact(
             'accounts',
             'totalBalance',
@@ -148,7 +151,8 @@ class CoreController extends Controller
             'categoryData',
             'recentTransactions',
             'monthlyCapacity',
-            'incomeBreakdown'
+            'incomeBreakdown',
+            'projectionData'
         ));
     }
 

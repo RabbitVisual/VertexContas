@@ -38,6 +38,11 @@ class ProfessionalInsightsSeeder extends Seeder
                 ]
             );
         }
+
+        // Corrige dica repetida que o bot exibia em excesso (variar mensagem)
+        Insight::where('trigger_event', 'daily_tip')
+            ->where('content', 'Manter reserva de emergência evita usar crédito caro em imprevistos; juros de rotativo anulam o ganho de muitos investimentos.')
+            ->update(['content' => 'Ter dinheiro guardado para imprevistos reduz a necessidade de cartão ou empréstimo; priorize quitar o rotativo antes de novos investimentos.']);
     }
 
     /** @return array<int, array{trigger_event: string, content: string, level: string, is_active?: bool, is_pro_only?: bool}> */
@@ -136,7 +141,7 @@ class ProfessionalInsightsSeeder extends Seeder
             // Gestão de dívidas
             ['trigger_event' => 'daily_tip', 'content' => 'Pagar dívidas com juros altos (rotativo) antes de investir costuma dar melhor "retorno" que CDB; depois foque em reserva e aporte.', 'level' => 'info'],
             ['trigger_event' => 'daily_tip', 'content' => 'Amortizar dívidas caras libera fluxo para reserva de emergência e, em seguida, para aporte mensal em CDB ou IPCA+.', 'level' => 'info'],
-            ['trigger_event' => 'daily_tip', 'content' => 'Manter reserva de emergência evita usar crédito caro em imprevistos; juros de rotativo anulam o ganho de muitos investimentos.', 'level' => 'info'],
+            ['trigger_event' => 'daily_tip', 'content' => 'Ter dinheiro guardado para imprevistos reduz a necessidade de cartão ou empréstimo; priorize quitar o rotativo antes de novos investimentos.', 'level' => 'info'],
             // Análise de consumo
             ['trigger_event' => 'daily_tip', 'content' => 'Analisar gastos por categoria mostra onde cortar para aumentar o aporte mensal sem perder qualidade de vida.', 'level' => 'info'],
             ['trigger_event' => 'daily_tip', 'content' => 'Reduzir 5% em uma categoria de consumo e direcionar ao investimento acelera o efeito dos juros compostos no patrimônio.', 'level' => 'info'],

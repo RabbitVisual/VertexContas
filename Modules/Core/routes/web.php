@@ -5,6 +5,7 @@ use Modules\Core\Http\Controllers\CoreController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [CoreController::class, 'dashboard'])->middleware('pro')->name('core.dashboard');
+    Route::post('/dashboard/projection/analyze', [\Modules\Core\Http\Controllers\ProjectionController::class, 'analyze'])->name('core.projection.analyze');
 
     // Faturas (PRO apenas)
     Route::get('/invoices', [\Modules\Core\Http\Controllers\InvoiceController::class, 'index'])

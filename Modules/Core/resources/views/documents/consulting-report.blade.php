@@ -108,14 +108,18 @@
     </tbody>
 </table>
 
-{{-- Recommendations --}}
+{{-- Recommendations (AI conclusion or static list) --}}
 @if($recommendations)
-<h3 class="section-title">Recomendações</h3>
-<ol style="margin: 0; padding-left: 20px; color: #334155; font-size: 11px; line-height: 1.6;">
+<h3 class="section-title">Conclusão Estratégica do Especialista</h3>
+<div style="margin: 0; color: #334155; font-size: 11px; line-height: 1.6;">
     @foreach($recommendations as $rec)
-    <li style="margin-bottom: 8px;">{{ $rec }}</li>
+        @foreach(explode("\n\n", $rec) as $para)
+            @if(trim($para) !== '')
+            <p style="margin: 0 0 12px 0;">{{ $para }}</p>
+            @endif
+        @endforeach
     @endforeach
-</ol>
+</div>
 @endif
 
 {{-- Achievements / Medals --}}

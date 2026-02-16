@@ -64,6 +64,34 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // Apply mail config from Admin settings (real-time)
+        if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+            $mailer = setting('mail_mailer');
+            if ($mailer) {
+                config(['mail.default' => $mailer]);
+            }
+            $fromAddr = setting('mail_from_address');
+            if ($fromAddr) {
+                config(['mail.from.address' => $fromAddr]);
+            }
+            $fromName = setting('mail_from_name');
+            if ($fromName) {
+                config(['mail.from.name' => $fromName]);
+            }
+            if ($mailer === 'smtp') {
+                $host = setting('mail_host');
+                if ($host) {
+                    config([
+                        'mail.mailers.smtp.host' => $host,
+                        'mail.mailers.smtp.port' => (int) (setting('mail_port') ?? 587),
+                        'mail.mailers.smtp.username' => setting('mail_username'),
+                        'mail.mailers.smtp.password' => setting('mail_password'),
+                        'mail.mailers.smtp.encryption' => setting('mail_encryption') ?: 'tls',
+                    ]);
+                }
+            }
+        }
+
         View::composer(['paneluser::layouts.master', 'paneluser::components.layouts.master'], function ($view): void {
             if (! Auth::check()) {
                 return;

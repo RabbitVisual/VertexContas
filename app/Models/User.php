@@ -94,4 +94,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(\Modules\PanelUser\Models\UserPhoto::class);
     }
+
+    /**
+     * Send the password reset notification using Vertex custom template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $url = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ]));
+
+        \Illuminate\Support\Facades\Mail::to($this->email)
+            ->queue(new \App\Mail\ResetPasswordEmail($this->email, $url));
+    }
 }

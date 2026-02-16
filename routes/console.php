@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Processar transações recorrentes agendadas (Repetir) diariamente ao amanhecer
 Schedule::command('core:run-recurring')->dailyAt('06:00');
+
+// Processar fila de e-mails e jobs (para shared hosting: cron * * * * * php artisan schedule:run)
+Schedule::command('queue:work database --stop-when-empty --max-time=55')->everyMinute();

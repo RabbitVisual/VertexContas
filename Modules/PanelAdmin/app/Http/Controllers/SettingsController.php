@@ -164,16 +164,17 @@ class SettingsController extends Controller
      */
     public function updateMail(Request $request)
     {
-        $data = $request->validate([
-            'mail_mailer' => 'required|string',
-            'mail_host' => 'required|string',
-            'mail_port' => 'required|integer',
+        $rules = [
+            'mail_mailer' => 'required|string|in:smtp,ses,mailgun,resend,log',
+            'mail_host' => 'nullable|required_if:mail_mailer,smtp|string',
+            'mail_port' => 'nullable|required_if:mail_mailer,smtp|integer',
             'mail_username' => 'nullable|string',
             'mail_password' => 'nullable|string',
-            'mail_encryption' => 'nullable|string',
+            'mail_encryption' => 'nullable|string|in:tls,ssl,null',
             'mail_from_address' => 'required|email',
-            'mail_from_name' => 'required|string',
-        ]);
+            'mail_from_name' => 'required|string|max:255',
+        ];
+        $data = $request->validate($rules);
 
         foreach ($data as $key => $value) {
             // Only update password if provided, otherwise keep existing

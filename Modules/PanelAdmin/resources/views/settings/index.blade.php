@@ -501,63 +501,84 @@
     </div>
 
     <!-- Mail Settings -->
-    <div x-show="activeTab === 'mail'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak>
+    <div x-show="activeTab === 'mail'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6" x-cloak x-data="{ mailMailer: '{{ old('mail_mailer', $mail->get('mail_mailer') ?? 'smtp') }}' }">
         <form action="{{ route('admin.settings.mail') }}" method="POST">
             @csrf
             <input type="hidden" name="tab" value="mail">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Driver de E-mail</label>
-                    <select name="mail_mailer" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                    <select name="mail_mailer" x-model="mailMailer" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                         <option value="smtp" {{ $mail->get('mail_mailer') == 'smtp' ? 'selected' : '' }}>SMTP</option>
-                        <option value="log" {{ $mail->get('mail_mailer') == 'log' ? 'selected' : '' }}>Log (Dev)</option>
+                        <option value="ses" {{ $mail->get('mail_mailer') == 'ses' ? 'selected' : '' }}>Amazon SES</option>
                         <option value="mailgun" {{ $mail->get('mail_mailer') == 'mailgun' ? 'selected' : '' }}>Mailgun</option>
+                        <option value="resend" {{ $mail->get('mail_mailer') == 'resend' ? 'selected' : '' }}>Resend</option>
+                        <option value="log" {{ $mail->get('mail_mailer') == 'log' ? 'selected' : '' }}>Log (Dev)</option>
                     </select>
+                    <p class="text-xs text-slate-500 mt-1">SES, Mailgun e Resend usam credenciais do .env.</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Host SMTP</label>
-                    <input type="text" name="mail_host" value="{{ old('mail_host', $mail->get('mail_host')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Porta</label>
-                        <input type="number" name="mail_port" value="{{ old('mail_port', $mail->get('mail_port')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                <template x-if="mailMailer === 'smtp'">
+                    <div class="col-span-1 md:col-span-2 space-y-4 rounded-xl border border-slate-200 dark:border-slate-600 p-4 bg-slate-50 dark:bg-slate-800/50">
+                        <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Configuração SMTP</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Host SMTP</label>
+                                <input type="text" name="mail_host" value="{{ old('mail_host', $mail->get('mail_host')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Porta</label>
+                                    <input type="number" name="mail_port" value="{{ old('mail_port', $mail->get('mail_port') ?? 587) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Criptografia</label>
+                                    <select name="mail_encryption" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                        <option value="tls" {{ $mail->get('mail_encryption') == 'tls' ? 'selected' : '' }}>TLS</option>
+                                        <option value="ssl" {{ $mail->get('mail_encryption') == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                        <option value="null" {{ $mail->get('mail_encryption') == 'null' ? 'selected' : '' }}>Nenhuma</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Usuário SMTP</label>
+                                <input type="text" name="mail_username" value="{{ old('mail_username', $mail->get('mail_username')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Senha SMTP</label>
+                                <input type="password" name="mail_password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                <p class="text-xs text-slate-500 mt-1">Deixe em branco para manter a senha atual.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Criptografia</label>
-                         <select name="mail_encryption" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                            <option value="tls" {{ $mail->get('mail_encryption') == 'tls' ? 'selected' : '' }}>TLS</option>
-                            <option value="ssl" {{ $mail->get('mail_encryption') == 'ssl' ? 'selected' : '' }}>SSL</option>
-                            <option value="null" {{ $mail->get('mail_encryption') == 'null' ? 'selected' : '' }}>Nenhuma</option>
-                        </select>
+                </template>
+                <template x-if="mailMailer !== 'smtp'">
+                    <div class="col-span-1 md:col-span-2">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Configure as chaves API no arquivo .env (AWS_* para SES, MAILGUN_* ou RESEND_API_KEY).</p>
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Usuário SMTP</label>
-                    <input type="text" name="mail_username" value="{{ old('mail_username', $mail->get('mail_username')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Senha SMTP</label>
-                    <input type="password" name="mail_password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
-                    <p class="text-xs text-gray-500 mt-1">Deixe em branco para manter a senha atual.</p>
-                </div>
+                </template>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">E-mail Remetente</label>
-                    <input type="email" name="mail_from_address" value="{{ old('mail_from_address', $mail->get('mail_from_address')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                    <input type="email" name="mail_from_address" value="{{ old('mail_from_address', $mail->get('mail_from_address')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nome Remetente</label>
-                    <input type="text" name="mail_from_name" value="{{ old('mail_from_name', $mail->get('mail_from_name')) }}" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                    <input type="text" name="mail_from_name" value="{{ old('mail_from_name', $mail->get('mail_from_name')) }}" placeholder="Vertex Contas" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                 </div>
 
-                <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
-                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
+                <div class="col-span-1 md:col-span-2 flex flex-wrap gap-4 justify-between items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+                    <form action="{{ route('admin.settings.mail.test') }}" method="POST" class="flex items-center gap-2">
+                        @csrf
+                        <input type="hidden" name="tab" value="mail">
+                        <input type="email" name="email" placeholder="E-mail para teste" required class="rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm py-2 px-3 focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] w-48">
+                        <button type="submit" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium text-sm transition-colors flex items-center gap-2">
+                            <x-icon name="envelope" style="solid" class="size-4" />
+                            Enviar E-mail de Teste
+                        </button>
+                    </form>
+                    <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações de E-mail
                     </button>
                 </div>

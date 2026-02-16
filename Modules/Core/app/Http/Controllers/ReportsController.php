@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\SupportAuditLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\Core\Models\Account;
@@ -363,6 +364,19 @@ class ReportsController extends Controller
             'consultoria-' . now()->format('Y-m'),
             $request
         );
+
+        if (! empty($consultingData['generated_with_ai'])) {
+            SupportAuditLog::create([
+                'agent_id' => $user->id,
+                'user_id' => $user->id,
+                'action' => 'report.consulting.ai_generated',
+                'metadata' => [
+                    'period' => now()->format('Y-m'),
+                    'financial_score' => $consultingData['financial_score'] ?? 0,
+                ],
+                'ip_address' => $request->ip(),
+            ]);
+        }
 
         $templateData = $this->templateService->getTemplateData();
 

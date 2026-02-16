@@ -138,6 +138,82 @@
             </div>
         </div>
 
+        {{-- Projeção Vertex AI - Card interativo --}}
+        <div
+            x-data="{
+                projection: null,
+                loading: false,
+                error: null,
+                async analyze() {
+                    this.loading = true;
+                    this.error = null;
+                    this.projection = null;
+                    try {
+                        const r = await fetch('{{ route('core.projection.analyze') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || ''
+                            }
+                        });
+                        const data = await r.json();
+                        if (!r.ok) {
+                            this.error = data.error || 'Erro ao analisar.';
+                            return;
+                        }
+                        this.projection = data.projection || null;
+                    } catch (e) {
+                        this.error = 'Falha na conexão. Tente novamente.';
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }"
+            class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden"
+        >
+            <div class="p-6 lg:p-8">
+                <div class="flex items-center gap-2.5 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <x-icon name="chart-line" style="duotone" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Projeção Vertex AI</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Análise e projeção do seu futuro financeiro</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{{ $projectionData['trend_summary'] ?? 'Carregando tendências...' }}</p>
+                <div class="flex flex-wrap gap-4 mb-4 text-xs">
+                    <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300">
+                        Reserva: {{ $projectionData['reserve_months'] ?? 0 }} meses
+                    </span>
+                    <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300">
+                        Taxa de poupança: {{ $projectionData['savings_rate'] ?? 0 }}%
+                    </span>
+                </div>
+                <button
+                    @click="analyze()"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm transition-colors"
+                >
+                    <span x-show="!loading" class="flex items-center gap-2">
+                        <x-icon name="wand-magic-sparkles" style="solid" class="w-4 h-4" />
+                        Analisar meu futuro
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Analisando...
+                    </span>
+                </button>
+                <div x-show="error" x-text="error" class="mt-3 text-sm text-rose-600 dark:text-rose-400"></div>
+                <div x-show="projection" x-transition class="mt-4 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50">
+                    <p class="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-2">Projeção em 1 ano:</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300" x-text="projection"></p>
+                </div>
+            </div>
+        </div>
+
         {{-- Charts Section - Visão Geral (CBAV cards) --}}
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {{-- Minhas Contas --}}

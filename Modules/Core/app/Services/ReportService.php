@@ -18,6 +18,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportService
 {
+    public function __construct(
+        protected GeminiService $geminiService,
+        protected SettingService $settingService
+    ) {}
+
     /**
      * Base query for cash flow (excludes transfers - internal movements).
      */
@@ -753,9 +758,9 @@ class ReportService
 
     /**
      * Get consulting data for Premium Financial Report (PRO only).
-     * Aggregates budget analysis, financial score, recommendations, and medals.
+     * Aggregates budget analysis, financial score, recommendations (AI or static), and medals.
      *
-     * @return array{budget_analysis: array, financial_score: int, recommendations: array, medals: \Illuminate\Support\Collection, period_label: string}
+     * @return array{budget_analysis: array, financial_score: int, recommendations: array, medals: \Illuminate\Support\Collection, period_label: string, generated_with_ai: bool}
      */
     public function getConsultingData(User $user): array
     {
@@ -766,6 +771,21 @@ class ReportService
         $gamificationData = $gamification->analyzeUser($user);
 
         $recommendations = $this->buildRecommendations($budgetAnalysis);
+        $generatedWithAi = false;
+
+        $useGemini = (bool) ($this->settingService->get('gemini_enabled') ?? false) && $this->geminiService->isAvailable();
+        if ($useGemini) {
+            $contextData = [
+                'budget_analysis' => $budgetAnalysis,
+                'financial_score' => $gamificationData['financial_score'],
+                'metrics' => $gamificationData['metrics'] ?? [],
+            ];
+            $conclusion = $this->geminiService->generateConsultingConclusion($contextData);
+            if ($conclusion !== null && trim($conclusion) !== '') {
+                $recommendations = [trim($conclusion)];
+                $generatedWithAi = true;
+            }
+        }
 
         $medals = UserMedal::where('user_id', $user->id)
             ->whereBetween('unlocked_at', [now()->startOfMonth(), now()->endOfMonth()])
@@ -785,6 +805,7 @@ class ReportService
             'recommendations' => $recommendations,
             'medals' => $medals,
             'period_label' => now()->locale('pt_BR')->translatedFormat('F Y'),
+            'generated_with_ai' => $generatedWithAi,
         ];
     }
 

@@ -397,6 +397,49 @@ class FinancialHealthService
     }
 
     /**
+     * Projection data for Vertex AI card: reserve months, savings rate, trend summary.
+     *
+     * @return array{reserve_months: float, savings_rate: float, monthly_surplus: float, months_until_reserve_depleted: float|null, trend_summary: string, balance: float, monthly_income: float, monthly_expense: float}
+     */
+    public function getProjectionData(User $user): array
+    {
+        $snapshot = $this->getUserFinancialSnapshot($user);
+        $income = (float) ($snapshot['monthly_income'] ?? 0);
+        $expense = (float) ($snapshot['monthly_expenses'] ?? 0);
+        $balance = (float) ($snapshot['account_balance'] ?? 0);
+        $surplus = $income - $expense;
+
+        $reserveMonths = $expense > 0 ? round($balance / $expense, 1) : 0.0;
+        $savingsRate = $income > 0 ? max(0.0, ($surplus / $income) * 100) : 0.0;
+
+        $monthsUntilDepleted = null;
+        if ($surplus < 0 && $balance > 0) {
+            $monthsUntilDepleted = round($balance / abs($surplus), 1);
+        }
+
+        if ($surplus < 0 && $monthsUntilDepleted !== null) {
+            $trendSummary = sprintf('Se continuar gastando assim, sua reserva acaba em aproximadamente %.0f meses.', $monthsUntilDepleted);
+        } elseif ($savingsRate >= 20) {
+            $trendSummary = sprintf('Com taxa de poupança de %.0f%%, seu patrimônio tende a crescer. Mantenha a disciplina!', $savingsRate);
+        } elseif ($savingsRate > 0) {
+            $trendSummary = sprintf('Reserva de %.1f meses de gastos. Taxa de poupança de %.0f%% — há espaço para melhorar.', $reserveMonths, $savingsRate);
+        } else {
+            $trendSummary = sprintf('Sua reserva cobre %.1f meses de gastos. Considere reduzir despesas para recompor.', $reserveMonths);
+        }
+
+        return [
+            'reserve_months' => $reserveMonths,
+            'savings_rate' => round($savingsRate, 1),
+            'monthly_surplus' => round($surplus, 2),
+            'months_until_reserve_depleted' => $monthsUntilDepleted,
+            'trend_summary' => $trendSummary,
+            'balance' => $balance,
+            'monthly_income' => $income,
+            'monthly_expense' => $expense,
+        ];
+    }
+
+    /**
      * Reserve months: account_balance / average_monthly_expenses.
      * Returns 0 if no meaningful expenses (anti-gaming: no infinite reserve).
      */

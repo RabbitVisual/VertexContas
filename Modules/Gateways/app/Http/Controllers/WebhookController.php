@@ -400,6 +400,7 @@ class WebhookController extends Controller
                 'pro',
                 route('paneluser.index')
             );
+            \Illuminate\Support\Facades\Mail::to($user)->queue(new \App\Mail\ProSubscriptionConfirmation($user));
         } catch (\Exception $e) {
             Log::error('Failed to send PRO notification: ' . $e->getMessage());
         }
