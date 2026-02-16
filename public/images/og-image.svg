@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative orbs -->
+  <circle cx="1080" cy="80" r="200" fill="#3b82f6" opacity="0.15" filter="url(#glow)"/>
+  <circle cx="120" cy="550" r="180" fill="#6366f1" opacity="0.12" filter="url(#glow)"/>
+  <circle cx="600" cy="315" r="150" fill="#60a5fa" opacity="0.08"/>
+
+  <!-- Grid accent line -->
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="url(#accent)" stroke-width="1" opacity="0.2"/>
+
+  <!-- Logo Icon -->
+  <g transform="translate(80, 180)">
+    <rect width="200" height="200" rx="48" fill="url(#iconGrad)"/>
+    <path d="M58 110 L100 170 L162 50" fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="162" cy="50" r="12" fill="#93c5fd"/>
+  </g>
+
+  <!-- Brand Text -->
+  <g font-family="'Poppins', 'Inter', system-ui, sans-serif">
+    <text x="320" y="270" font-weight="800" font-size="72" fill="white" letter-spacing="-2">Vertex</text>
+    <text x="320" y="330" font-weight="600" font-size="56" fill="#93c5fd" letter-spacing="2">CONTAS</text>
+  </g>
+
+  <!-- Tagline -->
+  <g font-family="'Poppins', 'Inter', system-ui, sans-serif">
+    <text x="80" y="440" font-weight="700" font-size="38" fill="white" letter-spacing="-0.5">Domine sua Liberdade Financeira</text>
+    <text x="80" y="495" font-weight="500" font-size="26" fill="#94a3b8" letter-spacing="0.5">Regra 50/30/20 &#8226; Mentor Virtual &#8226; Consultoria em PDF</text>
+  </g>
+
+  <!-- Accent bar -->
+  <rect x="80" y="520" width="120" height="6" rx="3" fill="url(#accent)"/>
+
+  <!-- Right side - feature pills -->
+  <g transform="translate(750, 220)">
+    <rect x="0" y="0" width="380" height="50" rx="25" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="190" y="32" font-family="'Poppins', sans-serif" font-weight="600" font-size="18" fill="#93c5fd" text-anchor="middle">Regra 50/30/20</text>
+  </g>
+  <g transform="translate(750, 290)">
+    <rect x="0" y="0" width="380" height="50" rx="25" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="190" y="32" font-family="'Poppins', sans-serif" font-weight="600" font-size="18" fill="#93c5fd" text-anchor="middle">Vertex Bot - Mentor Virtual</text>
+  </g>
+  <g transform="translate(750, 360)">
+    <rect x="0" y="0" width="380" height="50" rx="25" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="190" y="32" font-family="'Poppins', sans-serif" font-weight="600" font-size="18" fill="#93c5fd" text-anchor="middle">Consultoria PRO em PDF</text>
+  </g>
+
+  <!-- CTA hint -->
+  <text x="940" y="470" font-family="'Poppins', sans-serif" font-weight="700" font-size="24" fill="white" text-anchor="middle">Comece Gr&#225;tis &#8594;</text>
+</svg>

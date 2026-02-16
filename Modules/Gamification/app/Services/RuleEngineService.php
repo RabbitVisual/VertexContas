@@ -27,9 +27,17 @@ class RuleEngineService
         $dismissed = session('vertex_bot_dismissed', []);
         $start = now()->startOfMonth();
         $end = now()->endOfMonth();
-        $breakdown = $this->financialHealth->get503020Breakdown($user, $start, $end);
+
+        $effectiveIncome = $this->financialHealth->getEffectiveIncomeForMedals($user, $start, $end);
+        $breakdown = $this->financialHealth->get503020Breakdown($user, $start, $end, $effectiveIncome);
         $reserveMonths = $this->financialHealth->getReserveMonths($user);
         $consecutiveDays = $this->financialHealth->getConsecutiveTransactionDays($user, 30);
+
+        $monthlyExpensesAvg = $this->financialHealth->getMonthlyExpensesAverage($user, 3);
+        $transactionCount = $this->financialHealth->getTransactionCount($user, $start, $end);
+        $baselineIncome = $this->financialHealth->getBaselineIncome($user);
+        $accountAgeDays = $this->financialHealth->getAccountAgeDays($user);
+        $baselineStableDays = $this->financialHealth->getBaselineStableDays($user);
 
         $rules = CoachingRule::with(['medal', 'insight'])
             ->where('is_active', true)
@@ -45,8 +53,18 @@ class RuleEngineService
                 continue;
             }
 
-            $matches = $this->evaluateCondition($rule, $breakdown, $reserveMonths, $consecutiveDays);
-            if (!$matches) {
+            $matches = $this->evaluateCondition(
+                $rule,
+                $user,
+                $breakdown,
+                $reserveMonths,
+                $consecutiveDays
+            );
+            if (! $matches) {
+                continue;
+            }
+
+            if (! $this->passesGuards($rule, $user, $monthlyExpensesAvg, $transactionCount, $baselineIncome, $accountAgeDays, $baselineStableDays)) {
                 continue;
             }
 
@@ -92,6 +110,7 @@ class RuleEngineService
 
     protected function evaluateCondition(
         CoachingRule $rule,
+        User $user,
         array $breakdown,
         float $reserveMonths,
         int $consecutiveDays
@@ -116,15 +135,69 @@ class RuleEngineService
             case 'pillar_threshold':
                 $pillar = $params['pillar'] ?? 'essential';
                 $key = $pillar . '_pct';
+                if (! isset($breakdown[$key])) {
+                    $key = $pillar === 'savings' ? 'savings_pct' : $pillar . '_pct';
+                }
                 $actual = (float) ($breakdown[$key] ?? 0);
                 return $this->compare($actual, $value, $op);
             case 'reserve_months':
                 return $this->compare($reserveMonths, $value, $op);
             case 'consecutive_days':
                 return $this->compare((float) $consecutiveDays, $value, $op);
+            case 'savings_threshold':
+                $savingsPct = (float) ($breakdown['savings_pct'] ?? 0);
+                return $this->compare($savingsPct, $value, $op);
+            case 'pro_subscription':
+                return $user->isPro();
             default:
                 return false;
         }
+    }
+
+    /**
+     * Validate optional guards before awarding medal/insight.
+     * Includes anti-gaming: min_baseline_stable_days for rules that depend on income.
+     */
+    protected function passesGuards(
+        CoachingRule $rule,
+        User $user,
+        float $monthlyExpensesAvg,
+        int $transactionCount,
+        float $baselineIncome,
+        int $accountAgeDays,
+        int $baselineStableDays = 999
+    ): bool {
+        $params = $rule->condition_params ?? [];
+
+        $minMonthlyExpenses = (float) ($params['min_monthly_expenses'] ?? 0);
+        if ($minMonthlyExpenses > 0 && $monthlyExpensesAvg < $minMonthlyExpenses) {
+            return false;
+        }
+
+        $minTransactionCount = (int) ($params['min_transaction_count'] ?? 0);
+        if ($minTransactionCount > 0 && $transactionCount < $minTransactionCount) {
+            return false;
+        }
+
+        $minBaselineIncome = (float) ($params['min_baseline_income'] ?? 0);
+        if ($minBaselineIncome > 0 && $baselineIncome < $minBaselineIncome) {
+            return false;
+        }
+
+        $minAccountAgeDays = (int) ($params['min_account_age_days'] ?? 0);
+        if ($minAccountAgeDays > 0 && $accountAgeDays < $minAccountAgeDays) {
+            return false;
+        }
+
+        $incomeDependentTypes = ['pillar_threshold', 'savings_threshold'];
+        if (in_array($rule->condition_type, $incomeDependentTypes, true)) {
+            $minBaselineStableDays = (int) ($params['min_baseline_stable_days'] ?? 30);
+            if ($minBaselineStableDays > 0 && $baselineStableDays < $minBaselineStableDays) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function compare(float $actual, float $expected, string $op): bool

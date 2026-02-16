@@ -1,4 +1,4 @@
-<x-panelsuporte::layouts.master>
+<x-panelsuporte::layouts.master title="Relatórios de Atendimento - Suporte">
     <div class="space-y-8 animate-in fade-in duration-500">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -8,7 +8,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-white font-bold text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 transition-all shadow-sm">
-                    <x-icon name="download" style="solid" />
+                    <x-icon name="download" style="duotone" />
                     Exportar PDF
                 </button>
             </div>
@@ -18,7 +18,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group">
                 <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500">
-                    <x-icon name="ticket" class="text-7xl text-primary" />
+                    <x-icon name="ticket" style="duotone" class="text-7xl text-primary" />
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Total de Chamados</p>
                 <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $totalTickets }}</h3>
@@ -31,7 +31,7 @@
 
             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group">
                  <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500">
-                    <x-icon name="check-double" class="text-7xl text-emerald-500" />
+                    <x-icon name="check-double" style="duotone" class="text-7xl text-emerald-500" />
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Taxa de Resolução</p>
                 <h3 class="text-3xl font-black text-emerald-500 mt-2">{{ format_percent($resolutionRate, 1) }}</h3>
@@ -44,7 +44,7 @@
 
             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group">
                  <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500">
-                    <x-icon name="clock" class="text-7xl text-amber-500" />
+                    <x-icon name="clock" style="duotone" class="text-7xl text-amber-500" />
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Tempo Médio Resposta</p>
                 <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">
@@ -59,7 +59,7 @@
 
             <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group">
                  <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500">
-                    <x-icon name="bolt" class="text-7xl text-primary" />
+                    <x-icon name="bolt" style="duotone" class="text-7xl text-primary" />
                 </div>
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Em Aberto</p>
                 <h3 class="text-3xl font-black text-primary mt-2">
@@ -120,7 +120,7 @@
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center gap-2">
                                     <div class="w-6 h-6 rounded-lg {{ str_replace('bg-', 'bg-opacity-10 ', $priorityColors[$p]) }} {{ str_replace('bg-', 'text-', $priorityColors[$p]) }} flex items-center justify-center">
-                                        <x-icon name="{{ $priorityIcons[$p] }}" class="text-[10px]" />
+                                        <x-icon name="{{ $priorityIcons[$p] }}" style="duotone" class="text-[10px]" />
                                     </div>
                                     <span class="text-[10px] font-black text-slate-600 dark:text-gray-400 uppercase tracking-widest">{{ $priorityLabels[$p] }}</span>
                                 </div>
@@ -159,7 +159,7 @@
                     <div class="p-5 rounded-3xl bg-{{ $meta['color'] }}-50/50 dark:bg-{{ $meta['color'] }}-500/5 border border-{{ $meta['color'] }}-100 dark:border-{{ $meta['color'] }}-500/10">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-8 h-8 rounded-xl bg-{{ $meta['color'] }}-500 text-white flex items-center justify-center shadow-lg shadow-{{ $meta['color'] }}-500/20">
-                                <x-icon name="{{ $meta['icon'] }}" class="text-xs" />
+                                <x-icon name="{{ $meta['icon'] }}" style="duotone" class="text-xs" />
                             </div>
                             <span class="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest">{{ $meta['label'] }}</span>
                         </div>

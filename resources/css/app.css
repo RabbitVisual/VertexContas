@@ -1,22 +1,9 @@
 @import './font.css';
-/* Font Awesome Pro 7.1 - Webfonts (core + estilos Pro) */
+/* Font Awesome Pro 7.1 - Apenas estilos usados no projeto (duotone, solid, regular, brands) */
 @import '../fw-pro/css/fontawesome.css';
 @import '../fw-pro/css/solid.css';
 @import '../fw-pro/css/regular.css';
-@import '../fw-pro/css/light.css';
-@import '../fw-pro/css/thin.css';
 @import '../fw-pro/css/duotone.css';
-@import '../fw-pro/css/duotone-regular.css';
-@import '../fw-pro/css/duotone-light.css';
-@import '../fw-pro/css/duotone-thin.css';
-@import '../fw-pro/css/sharp-solid.css';
-@import '../fw-pro/css/sharp-regular.css';
-@import '../fw-pro/css/sharp-light.css';
-@import '../fw-pro/css/sharp-thin.css';
-@import '../fw-pro/css/sharp-duotone-solid.css';
-@import '../fw-pro/css/sharp-duotone-regular.css';
-@import '../fw-pro/css/sharp-duotone-light.css';
-@import '../fw-pro/css/sharp-duotone-thin.css';
 @import '../fw-pro/css/brands.css';
 @import 'tailwindcss';
 

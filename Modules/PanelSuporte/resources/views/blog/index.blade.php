@@ -1,16 +1,25 @@
-<x-panelsuporte::layouts.master>
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Gerenciar Blog</h1>
-        <a href="{{ route('suporte.blog.create') }}" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded transition-colors">
-            <x-icon name="plus" class="inline-block w-4 h-4 mr-1" />
-            Novo Post
-        </a>
-    </div>
+<x-panelsuporte::layouts.master title="Gerenciar Blog - Suporte">
+    <div class="space-y-8 animate-in fade-in duration-500">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-primary/10 rounded-2xl text-primary">
+                    <x-icon name="newspaper" style="duotone" class="text-2xl" />
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Gerenciar Blog</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Crie e edite posts do blog.</p>
+                </div>
+            </div>
+            <a href="{{ route('suporte.blog.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-primary/20">
+                <x-icon name="plus" style="duotone" class="w-4 h-4" />
+                Novo Post
+            </a>
+        </div>
 
-    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
         <table class="min-w-full text-left border-collapse">
-            <thead class="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-800/95 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+            <thead class="sticky top-0 z-10 bg-gray-50/95 dark:bg-slate-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Título</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Autor</th>
@@ -45,14 +54,14 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         @if($post->is_premium)
-                            <x-icon name="crown" class="w-5 h-5 text-amber-500" />
+                            <x-icon name="crown" style="duotone" class="w-5 h-5 text-amber-500" />
                         @else
                             <span class="text-xs text-gray-400">Livre</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('suporte.blog.edit', $post->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
-                        <form action="{{ route('suporte.blog.destroy', $post->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Tem certeza?');">
+                        <a href="{{ route('suporte.blog.edit', $post) }}" class="text-primary hover:text-primary-dark font-bold mr-3">Editar</a>
+                        <form action="{{ route('suporte.blog.destroy', $post) }}" method="POST" class="inline-block" onsubmit="return confirm('Tem certeza?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-900">Excluir</button>
@@ -64,9 +73,10 @@
         </table>
         </div>
         @if($posts->hasPages())
-        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700">
+        <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-slate-800/20">
             {{ $posts->links() }}
         </div>
         @endif
+        </div>
     </div>
 </x-panelsuporte::layouts.master>

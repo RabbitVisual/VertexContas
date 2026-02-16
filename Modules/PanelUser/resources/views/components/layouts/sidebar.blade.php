@@ -9,7 +9,7 @@
 
     // PRO: design VertexCBAV-inspired com amber, duotone, animações
     // FREE: design padrão
-    $proNavBase = 'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group';
+    $proNavBase = 'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-150 group';
     $proNavActive = 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 shadow-sm';
     $proNavInactive = 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200';
     $proIconActive = 'text-amber-600 dark:text-amber-400';
@@ -20,7 +20,7 @@
     $sectionLabelClass = 'px-3 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest';
     $proSectionLabel = 'px-4 text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-wider';
 @endphp
-<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen {{ $isPro ? 'pt-0' : 'pt-20' }} transition-transform duration-300 ease-in-out -translate-x-full sm:translate-x-0 shadow-xl {{ $isPro ? 'bg-white dark:bg-slate-900 border-r-2 border-amber-400/20 dark:border-amber-500/10' : 'bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700' }}" aria-label="Menu lateral">
+<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen {{ $isPro ? 'pt-0' : 'pt-20' }} transition-transform duration-300 ease-in-out -translate-x-full sm:translate-x-0 shadow-xl {{ $isPro ? 'bg-white dark:bg-slate-900 border-r-2 border-amber-400/20 dark:border-amber-500/10' : 'bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700' }}" aria-label="Menu lateral" style="contain:layout paint;">
     @if($isPro)
         {{-- Bloco da logo no topo (estilo Vertex CBAV) --}}
         <div class="h-16 shrink-0 flex items-center justify-center px-6 border-b border-gray-200 dark:border-amber-500/10">

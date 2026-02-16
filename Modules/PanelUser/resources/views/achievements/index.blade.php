@@ -57,6 +57,15 @@
             @php
                 $rarity = $medal['rarity'] ?? 'silver';
                 $unlocked = $medal['unlocked'] ?? false;
+                $difficulty = $medal['difficulty'] ?? 'medium';
+                $difficultyLabels = ['easy' => 'Fácil', 'medium' => 'Médio', 'hard' => 'Difícil', 'advanced' => 'Avançado'];
+                $difficultyBadgeClass = match($difficulty) {
+                    'easy' => 'bg-emerald-500/20 text-emerald-400 dark:text-emerald-300',
+                    'medium' => 'bg-blue-500/20 text-blue-400 dark:text-blue-300',
+                    'hard' => 'bg-amber-500/20 text-amber-400 dark:text-amber-300',
+                    'advanced' => 'bg-purple-500/20 text-purple-400 dark:text-purple-300',
+                    default => 'bg-slate-500/20 text-slate-400',
+                };
                 $rarityCardClass = match($rarity) {
                     'bronze' => 'bg-gradient-to-br from-amber-800/80 to-amber-900/90 dark:from-amber-900/80 dark:to-amber-950/90 border-amber-700/50 dark:border-amber-600/30',
                     'silver' => 'bg-gradient-to-br from-slate-300 to-slate-500 dark:from-slate-600 dark:to-slate-700 border-slate-400 dark:border-slate-500/50 shadow-inner',
@@ -71,29 +80,44 @@
                     'platinum' => 'bg-white/30 text-white',
                     default => 'bg-slate-500/30 text-slate-200',
                 };
+                // Text contrast por raridade: gold/silver light = texto escuro; bronze/platinum dark = texto claro
+                $rarityTitleClass = match($rarity) {
+                    'bronze', 'platinum' => 'text-white drop-shadow-sm',
+                    'silver' => 'text-slate-800 dark:text-slate-200',
+                    'gold' => 'text-amber-950 dark:text-amber-100 drop-shadow-sm',
+                    default => 'text-slate-200 dark:text-slate-100',
+                };
+                $rarityDescClass = match($rarity) {
+                    'bronze', 'platinum' => 'text-white/85',
+                    'silver' => 'text-slate-600 dark:text-slate-400',
+                    'gold' => 'text-amber-900/80 dark:text-amber-100/80',
+                    default => 'text-slate-400 dark:text-slate-500',
+                };
             @endphp
-            <div
+            <a
+                href="{{ route('user.achievements.show', $medal['id']) }}"
                 x-data="{ clicked: false, showTooltip: false }"
                 @mouseenter="showTooltip = true"
                 @mouseleave="showTooltip = false"
-                class="relative rounded-2xl border backdrop-blur-xl p-6 transition-all duration-300 {{ $unlocked ? "{$rarityCardClass} hover:scale-[1.02] cursor-pointer" : 'bg-slate-800/50 dark:bg-slate-900/50 border-slate-700/50 grayscale opacity-50' }}"
+                class="block relative overflow-visible rounded-2xl border backdrop-blur-xl p-6 transition-all duration-300 {{ $unlocked ? "{$rarityCardClass} hover:scale-[1.02] cursor-pointer" : "{$rarityCardClass} opacity-90" }}"
                 :class="{ 'scale-110': clicked }"
-                @click="if ({{ $unlocked ? 'true' : 'false' }}) { clicked = true; setTimeout(() => clicked = false, 600) }"
+                @click="clicked = true; setTimeout(() => clicked = false, 600)"
             >
                 @if(!$unlocked)
-                    <div class="absolute inset-0 flex items-center justify-center z-10">
-                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center">
-                            <x-icon name="lock" style="solid" class="w-6 h-6 text-slate-400" />
-                        </div>
+                    <div class="absolute inset-0 z-10 rounded-2xl bg-white/25 dark:bg-black/20 backdrop-blur-lg" aria-hidden="true"></div>
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 dark:bg-white/15 backdrop-blur-sm border border-white/30">
+                        <x-icon name="lock" style="solid" class="w-4 h-4 text-white dark:text-slate-100" />
+                        <span class="text-[10px] font-bold text-white dark:text-slate-100 uppercase tracking-wider">Desbloqueie para revelar</span>
                     </div>
                 @endif
                 <div class="relative flex flex-col items-center text-center {{ !$unlocked ? 'pointer-events-none' : '' }}">
-                    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 {{ $unlocked ? $rarityIconClass : 'bg-slate-700/50' }}">
-                        <x-icon name="{{ $medal['icon_name'] ?? 'medal' }}" style="duotone" class="w-10 h-10 {{ $unlocked ? '' : 'text-slate-500' }}" />
+                    <span class="absolute top-3 right-3 z-10 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase {{ $difficultyBadgeClass }}">{{ $difficultyLabels[$difficulty] ?? $difficulty }}</span>
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 {{ $rarityIconClass }}">
+                        <x-icon name="{{ $medal['icon_name'] ?? 'medal' }}" style="duotone" class="w-10 h-10 {{ $unlocked ? '' : 'opacity-70' }}" />
                     </div>
-                    <h3 class="font-bold text-slate-200 dark:text-slate-100 text-sm leading-tight">{{ $medal['title'] }}</h3>
+                    <h3 class="font-bold {{ $rarityTitleClass }} text-sm leading-tight">{{ $medal['title'] }}</h3>
                     @if($medal['description'] ?? null)
-                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 line-clamp-2">{{ $medal['description'] }}</p>
+                        <p class="text-xs {{ $rarityDescClass }} mt-1 line-clamp-2">{{ $medal['description'] }}</p>
                         <div x-show="showTooltip" x-transition class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-slate-100 text-xs max-w-xs shadow-xl z-20 border border-slate-700" x-cloak>
                             {{ $medal['description'] }}
                             <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900 dark:border-t-slate-800"></span>
@@ -104,17 +128,15 @@
                             <x-icon name="check" style="solid" class="w-3 h-3" /> Conquistada
                         </span>
                         @if($medal['unlocked_at'] ?? null)
-                            <span class="mt-1 text-[9px] text-slate-400 dark:text-slate-500">em {{ $medal['unlocked_at']->format('d/m/Y') }}</span>
+                            <span class="mt-1 text-[9px] {{ $rarity === 'gold' || $rarity === 'silver' ? 'text-slate-600 dark:text-slate-400' : 'text-white/70 dark:text-white/60' }}">em {{ $medal['unlocked_at']->format('d/m/Y') }}</span>
                         @endif
-                        <button type="button" disabled class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 dark:bg-white/5 text-slate-300 dark:text-slate-400 text-[10px] font-bold uppercase cursor-not-allowed" title="Em breve">
+                        <span class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 dark:bg-white/5 {{ $rarity === 'gold' || $rarity === 'silver' ? 'text-slate-700 dark:text-slate-400' : 'text-white/80 dark:text-slate-300' }} text-[10px] font-bold uppercase">
                             <x-icon name="share-nodes" style="solid" class="w-3.5 h-3.5" />
-                            Compartilhar
-                        </button>
-                    @else
-                        <span class="mt-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bloqueada</span>
+                            Ver detalhes
+                        </span>
                     @endif
                 </div>
-            </div>
+            </a>
         @endforeach
     </div>
 

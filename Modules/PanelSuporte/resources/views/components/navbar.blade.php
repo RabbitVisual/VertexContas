@@ -1,0 +1,87 @@
+<header {{ $attributes->merge(['class' => 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-200 dark:border-slate-800 h-16 flex items-center px-4 md:px-6 justify-between transition-colors duration-150 shrink-0']) }}>
+    {{-- Left: Drawer Toggle (mobile) + Sidebar Toggle (desktop) + Title --}}
+    <div class="flex items-center gap-4">
+        {{-- Mobile: Drawer toggle --}}
+        <button type="button"
+                data-drawer-toggle="support-sidebar-drawer"
+                aria-controls="support-sidebar-drawer"
+                class="md:hidden w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-slate-400 hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center border border-gray-100 dark:border-white/5">
+            <x-icon name="bars-staggered" style="duotone" class="text-lg" />
+        </button>
+
+        {{-- Desktop: Sidebar collapse toggle --}}
+        <button @click="sidebarOpen = !sidebarOpen" type="button" aria-label="Alternar menu"
+                class="hidden md:flex w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-slate-400 hover:text-primary hover:bg-primary/10 transition-all items-center justify-center border border-gray-100 dark:border-white/5 active:scale-95">
+            <x-icon name="bars-staggered" style="duotone" class="text-lg" />
+        </button>
+
+        <div class="hidden sm:flex flex-col justify-center gap-0.5 min-h-[2.5rem]">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                {{ $title ?? 'Suporte Técnico' }}
+            </h2>
+            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-tight flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0"></span>
+                Vertex Support
+            </span>
+        </div>
+    </div>
+
+    {{-- Right: Notifications + Dark Mode + User Dropdown --}}
+    <div class="flex items-center gap-2 md:gap-4">
+        <div class="relative">
+            <x-notifications::bell />
+        </div>
+
+        <button @click="darkMode = !darkMode" type="button" aria-label="Alternar tema"
+                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/[0.03] text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 transition-all flex items-center justify-center border border-gray-100 dark:border-white/5">
+            <x-icon x-show="!darkMode" name="moon" style="duotone" class="text-base" />
+            <x-icon x-show="darkMode" name="sun" style="duotone" class="text-base" />
+        </button>
+
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" @click.away="open = false" type="button"
+                    class="flex items-center gap-2 md:gap-3 pl-3 md:pl-4 border-l border-gray-100 dark:border-white/10 group focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-r-lg py-1">
+                <div class="hidden md:flex flex-col text-right justify-center gap-0.5 antialiased">
+                    <span class="text-sm font-semibold text-slate-900 dark:text-white leading-tight group-hover:text-primary transition-colors">
+                        {{ Auth::user()->first_name ?? Auth::user()->name }}
+                    </span>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider leading-tight">
+                        Agente de Suporte
+                    </span>
+                </div>
+                <div class="relative shrink-0">
+                    @if(Auth::user()->photo)
+                        <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="" class="w-9 h-9 md:w-10 md:h-10 rounded-xl object-cover shadow-md border-2 border-white dark:border-slate-800 ring-2 ring-gray-100 dark:ring-white/5 group-hover:ring-primary/30 transition-all">
+                    @else
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-base border-2 border-primary/5 group-hover:border-primary/20 transition-all">
+                            {{ substr(Auth::user()->first_name ?? Auth::user()->name ?? 'A', 0, 1) }}
+                        </div>
+                    @endif
+                </div>
+                <x-icon name="chevron-down" style="duotone" class="w-3.5 h-3.5 text-slate-400 transition-transform shrink-0" x-bind:class="open ? 'rotate-180' : ''" />
+            </button>
+
+            <div x-show="open"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 z-50 py-2 overflow-hidden">
+                <a href="{{ route('support.profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <x-icon name="user" style="duotone" class="w-5 h-5 text-slate-400" />
+                    Ver Perfil
+                </a>
+                <div class="border-t border-gray-100 dark:border-slate-700 my-2"></div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-left">
+                        <x-icon name="right-from-bracket" style="duotone" class="w-5 h-5" />
+                        Sair do Sistema
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>

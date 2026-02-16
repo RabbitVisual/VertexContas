@@ -53,5 +53,6 @@ return [
         'user-robot-xmarks' => 'robot',
         'image-user' => 'image-portrait',
         'user-vneck' => 'user',
+        'chart-pie-simple' => 'chart-pie',
     ],
 ];

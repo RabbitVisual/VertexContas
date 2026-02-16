@@ -25,6 +25,12 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('storage/logos/favicon.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if(request()->routeIs('admin.index'))
+        @vite('resources/js/charts-chartjs.js')
+    @endif
+    @if(request()->routeIs('admin.payments.index'))
+        @vite('resources/js/charts-apex.js')
+    @endif
 
     {{-- Module Specific Assets --}}
     @stack('styles')

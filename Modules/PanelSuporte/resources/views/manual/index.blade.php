@@ -1,4 +1,4 @@
-<x-panelsuporte::layouts.master>
+<x-panelsuporte::layouts.master title="Manual do Agente - Suporte">
     <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <!-- Header -->
         <div class="text-center space-y-4">
@@ -36,7 +36,7 @@
                 <div class="prose prose-slate dark:prose-invert max-w-none space-y-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                     <p>Todas as ações realizadas nos perfis de usuários são monitoradas:</p>
                     <div class="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 rounded-2xl flex items-start gap-3">
-                        <x-icon name="circle-exclamation" class="text-amber-600 mt-1" />
+                        <x-icon name="circle-exclamation" style="duotone" class="text-amber-600 mt-1" />
                         <p class="text-[11px] text-amber-700 dark:text-amber-400 font-bold leading-tight">
                             IMPORTANTE: Alterações em campos sensíveis (como e-mail ou status) geram logs automáticos com os valores anteriores e atuais para fins de auditoria.
                         </p>
@@ -53,7 +53,7 @@
                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">Sempre consulte a Wiki antes de escalar um ticket para o nível administrativo.</p>
                 <a href="{{ route('support.wiki.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
                     Acessar Wiki Completa
-                    <x-icon name="arrow-right" />
+                    <x-icon name="arrow-right" style="duotone" />
                 </a>
             </div>
         </div>

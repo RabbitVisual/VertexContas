@@ -13,6 +13,8 @@ use Modules\PanelAdmin\Http\Controllers\PlanController;
 use Modules\PanelAdmin\Http\Controllers\RoleController;
 use Modules\PanelAdmin\Http\Controllers\InsightAdminController;
 use Modules\PanelAdmin\Http\Controllers\LegalManagerController;
+use Modules\PanelAdmin\Http\Controllers\MedalAdminController;
+use Modules\PanelAdmin\Http\Controllers\CoachingRuleAdminController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
 
 /*
@@ -135,6 +137,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::get('/{insight}/edit', [InsightAdminController::class, 'edit'])->name('edit');
         Route::put('/{insight}', [InsightAdminController::class, 'update'])->name('update');
         Route::delete('/{insight}', [InsightAdminController::class, 'destroy'])->name('destroy');
+    });
+
+    // Gamificação: Medalhas e Regras
+    Route::prefix('gamification')->name('gamification.')->group(function () {
+        Route::resource('medals', MedalAdminController::class)->except(['show']);
+        Route::resource('rules', CoachingRuleAdminController::class)->except(['show'])->parameters(['rules' => 'rule']);
     });
 
     // Central Legal

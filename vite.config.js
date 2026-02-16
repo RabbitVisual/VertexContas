@@ -10,6 +10,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/charts-apex.js',
+                'resources/js/charts-chartjs.js',
                 'resources/js/ticket-chat.js',
                 'resources/js/cashflow-dashboard.js',
                 'resources/js/legal-editor.js',

@@ -1,4 +1,4 @@
-<x-panelsuporte::layouts.master>
+<x-panelsuporte::layouts.master title="Wiki Técnica - Suporte">
     <div x-data="{ suggestionModal: false }" class="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header & Search -->
         <div class="relative bg-gradient-to-br from-primary to-primary-dark rounded-[3rem] p-10 overflow-hidden shadow-2xl">
@@ -12,7 +12,7 @@
                         placeholder="O que você está procurando hoje?"
                         class="w-full pl-14 pr-6 py-5 bg-white rounded-[2rem] border-none shadow-xl focus:ring-4 focus:ring-primary/20 text-slate-800 font-bold placeholder-slate-400 transition-all">
                     <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
-                        <x-icon name="magnifying-glass" class="text-xl" />
+                        <x-icon name="magnifying-glass" style="duotone" class="text-xl" />
                     </div>
                     <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white px-6 py-3 rounded-[1.5rem] font-black text-sm hover:bg-primary-dark transition-all shadow-lg active:scale-95">
                         Buscar
@@ -30,14 +30,14 @@
                         <a href="{{ route('support.wiki.index') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-2xl transition-all {{ !request('category') ? 'bg-primary/10 text-primary font-black shadow-sm' : 'text-slate-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 font-bold' }}">
                             <div class="flex items-center gap-3">
-                                <x-icon name="grid-2" class="text-lg" />
+                                <x-icon name="grid-2" style="duotone" class="text-lg" />
                                 <span>Todas as Categorias</span>
                             </div>
                         </a>
                         <a href="{{ route('support.wiki.legal-reference') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('support.wiki.legal-reference') ? 'bg-primary/10 text-primary font-black shadow-sm' : 'text-slate-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 font-bold' }}">
                             <div class="flex items-center gap-3">
-                                <x-icon name="file-contract" class="text-lg" />
+                                <x-icon name="file-contract" style="duotone" class="text-lg" />
                                 <span>Referência Legal</span>
                             </div>
                         </a>
@@ -45,7 +45,7 @@
                             <a href="{{ route('support.wiki.index', ['category' => $category->slug]) }}"
                                class="flex items-center justify-between px-4 py-3 rounded-2xl transition-all {{ request('category') == $category->slug ? 'bg-primary/10 text-primary font-black shadow-sm' : 'text-slate-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 font-bold' }}">
                                 <div class="flex items-center gap-3">
-                                    <x-icon name="{{ $category->icon ?? 'folder' }}" class="text-lg" />
+                                    <x-icon name="{{ $category->icon ?? 'folder' }}" style="duotone" class="text-lg" />
                                     <span>{{ $category->name }}</span>
                                 </div>
                                 <span class="text-[10px] bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg opacity-60">{{ $category->articles_count }}</span>

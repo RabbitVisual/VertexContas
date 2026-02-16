@@ -68,10 +68,10 @@ class PanelAdminController extends Controller
             ->with('author')
             ->get();
 
-        // Average Financial Score (Gamification)
+        // Average Financial Score (Gamification) - limitar a 100 usuários para evitar N+1 pesado
         $gamificationService = app(\Modules\Core\Services\GamificationService::class);
         $avgFinancialScore = 0;
-        $usersWithScores = \App\Models\User::all();
+        $usersWithScores = \App\Models\User::latest()->take(100)->get();
         if ($usersWithScores->isNotEmpty()) {
             $totalScore = 0;
             foreach ($usersWithScores as $u) {

@@ -49,6 +49,8 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:admin|support'])
         Route::get('/{user}', [\Modules\PanelSuporte\Http\Controllers\UserManagementController::class, 'show'])->name('show');
         Route::get('/{user}/edit', [\Modules\PanelSuporte\Http\Controllers\UserManagementController::class, 'edit'])->name('edit');
         Route::put('/{user}', [\Modules\PanelSuporte\Http\Controllers\UserManagementController::class, 'update'])->name('update');
+        Route::post('/{user}/send-password-reset', [\Modules\PanelSuporte\Http\Controllers\UserManagementController::class, 'sendPasswordReset'])->name('send-password-reset');
+        Route::post('/{user}/logout-all', [\Modules\PanelSuporte\Http\Controllers\UserManagementController::class, 'logoutAll'])->name('logout-all');
     });
 });
 

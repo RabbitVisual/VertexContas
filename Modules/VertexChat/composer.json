@@ -1,0 +1,33 @@
+{
+    "name": "vertex/vertexchat",
+    "version": "1.0.0",
+    "description": "Module vertexchat - © Vertex Solutions LTDA - 2026 - VS.1.0",
+    "authors": [
+        {
+            "name": "Reinan Rodrigues",
+            "email": "r.rodriguesjs@gmail.com",
+            "homepage": "https://vertexsolutions.com.br",
+            "role": "Developer"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\VertexChat\\": "app/",
+            "Modules\\VertexChat\\Database\\Factories\\": "database/factories/",
+            "Modules\\VertexChat\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\VertexChat\\Tests\\": "tests/"
+        }
+    }
+}

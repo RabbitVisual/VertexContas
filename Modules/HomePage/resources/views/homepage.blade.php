@@ -13,7 +13,11 @@
         else $dashboardRoute = 'paneluser.index';
     }
 @endphp
-<x-homepage::layouts.master>
+<x-homepage::layouts.master
+    :title="'Vertex Contas - Domine sua Liberdade Financeira com a Regra 50/30/20'"
+    :metaDescription="'Gerencie suas finanças com inteligência. O único sistema com mentor virtual, análise 50/30/20 e consultoria mensal automática em PDF. Comece grátis!'"
+    :metaKeywords="'gestão financeira, regra 50/30/20, finanças pessoais, planejamento financeiro, vertex contas, saas financeiro'"
+>
     <x-homepage::layouts.navbar />
 
     <main class="font-['Poppins'] overflow-x-hidden">

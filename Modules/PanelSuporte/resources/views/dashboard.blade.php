@@ -22,11 +22,11 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Stat Card 1 -->
+        <!-- Card 1: Tickets em Aberto -->
         <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Abertos</p>
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Tickets em Aberto</p>
                     <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $openTickets }}</h3>
                 </div>
                 <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-500 group-hover:scale-110 transition-transform duration-300">
@@ -35,41 +35,41 @@
             </div>
             <div class="mt-4 flex items-center gap-2">
                 <span class="text-[10px] font-bold py-0.5 px-2 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full">Ativo</span>
-                <span class="text-[11px] text-gray-400 font-medium">Aguardando resposta</span>
+                <a href="{{ route('support.tickets.index') }}" class="text-[11px] text-primary font-bold hover:underline">Ver todos</a>
             </div>
         </div>
 
-        <!-- Stat Card 2 -->
+        <!-- Card 2: Usuários em Risco Financeiro -->
         <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Pendentes</p>
-                    <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $pendingTickets }}</h3>
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Risco Financeiro</p>
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $usersAtFinancialRisk ?? 0 }}</h3>
+                </div>
+                <div class="p-3 bg-rose-50 dark:bg-rose-500/10 rounded-2xl text-rose-500 group-hover:scale-110 transition-transform duration-300">
+                    <x-icon name="triangle-exclamation" style="duotone" class="w-6 h-6" />
+                </div>
+            </div>
+            <div class="mt-4 flex items-center gap-2">
+                <span class="text-[10px] font-bold py-0.5 px-2 bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-full">Cashflow negativo</span>
+                <span class="text-[11px] text-gray-400 font-medium">Com ticket aberto</span>
+            </div>
+        </div>
+
+        <!-- Card 3: Inspeções Ativas -->
+        <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Inspeções Ativas</p>
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white mt-2">{{ $activeInspections ?? 0 }}</h3>
                 </div>
                 <div class="p-3 bg-amber-50 dark:bg-amber-500/10 rounded-2xl text-amber-500 group-hover:scale-110 transition-transform duration-300">
-                    <x-icon name="clock" style="duotone" class="w-6 h-6" />
+                    <x-icon name="magnifying-glass-chart" style="duotone" class="w-6 h-6" />
                 </div>
             </div>
             <div class="mt-4 flex items-center gap-2">
-                <span class="text-[10px] font-bold py-0.5 px-2 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full">Urgente</span>
-                <span class="text-[11px] text-gray-400 font-medium">Requer atenção</span>
-            </div>
-        </div>
-
-        <!-- Stat Card 3 -->
-        <div class="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest">Alta Prioridade</p>
-                    <h3 class="text-3xl font-black text-red-600 dark:text-red-500 mt-2">{{ $highPriority }}</h3>
-                </div>
-                <div class="p-3 bg-red-50 dark:bg-red-500/10 rounded-2xl text-red-500 group-hover:scale-110 transition-transform duration-300">
-                    <x-icon name="fire" style="duotone" class="w-6 h-6" />
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-2">
-                <span class="text-[10px] font-bold py-0.5 px-2 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full">Crítico</span>
-                <span class="text-[11px] text-gray-400 font-medium">Check imediato</span>
+                <span class="text-[10px] font-bold py-0.5 px-2 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full">Pendente/Ativo</span>
+                <span class="text-[11px] text-gray-400 font-medium">Login as</span>
             </div>
         </div>
 
@@ -220,6 +220,50 @@
 
         <!-- Sidebar Activity / Stats -->
         <div class="space-y-6">
+            {{-- Timeline: Atividades Recentes do Suporte --}}
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-50 dark:border-gray-800">
+                    <h3 class="font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wider text-xs">
+                        <x-icon name="clock-rotate-left" style="duotone" class="text-primary" />
+                        Atividades Recentes
+                    </h3>
+                </div>
+                <div class="p-4 max-h-[320px] overflow-y-auto">
+                    @php
+                        $actionLabels = [
+                            'profile_detailed_view' => 'Visualização de perfil',
+                            'profile_update' => 'Atualização de perfil',
+                            'inspection_start' => 'Inspeção iniciada',
+                            'inspection_end' => 'Inspeção finalizada',
+                        ];
+                    @endphp
+                    @forelse($recentSupportActivities ?? [] as $activity)
+                        <div class="flex gap-3 py-3 border-b border-gray-50 dark:border-gray-800/50 last:border-0">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                                <x-icon name="{{ $activity->action === 'profile_update' ? 'pen' : 'eye' }}" style="duotone" class="w-4 h-4" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-800 dark:text-white">
+                                    {{ $actionLabels[$activity->action] ?? $activity->action }}
+                                </p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                                    {{ lgpd_mask_email($activity->user->email ?? null) }} · {{ $activity->agent?->first_name ?? $activity->agent?->name ?? '-' }}
+                                </p>
+                                <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+                                    @if(isset($activity->created_at))
+                                        {{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}
+                                    @else
+                                        —
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-xs text-gray-400 dark:text-gray-500 py-4 text-center">Nenhuma atividade recente</p>
+                    @endforelse
+                </div>
+            </div>
+
             <h3 class="font-black text-slate-800 dark:text-white flex items-center gap-2 uppercase tracking-wider text-xs px-2">
                 Prioridades Atuais
             </h3>

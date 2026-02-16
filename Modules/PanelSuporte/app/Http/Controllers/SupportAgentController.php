@@ -4,9 +4,12 @@ namespace Modules\PanelSuporte\Http\Controllers;
 
 use App\Helpers\TicketHelper;
 use App\Http\Controllers\Controller;
+use App\Models\SupportAuditLog;
 use Illuminate\Http\Request;
+use Modules\Core\Models\Inspection;
 use Modules\Core\Models\Ticket;
 use Modules\Core\Models\TicketMessage;
+use Modules\Core\Services\FinancialHealthService;
 use Illuminate\Support\Facades\Auth;
 use Modules\Notifications\Services\NotificationService;
 
@@ -25,10 +28,28 @@ class SupportAgentController extends Controller
         $pendingTickets = Ticket::where('status', 'pending')->count();
         $highPriority = Ticket::where('status', 'open')->where('priority', 'high')->count();
 
-        $recentTickets = Ticket::with('user')->latest()->take(5)->get();
-        $pendingComments = \Modules\Blog\Models\Comment::where('is_approved', false)->take(5)->get();
+        $financialHealthService = app(FinancialHealthService::class);
+        $usersAtFinancialRisk = $financialHealthService->getUsersAtFinancialRiskCount();
+        $activeInspections = Inspection::whereIn('status', ['pending', 'active'])->count();
 
-        return view('panelsuporte::dashboard', compact('openTickets', 'pendingTickets', 'highPriority', 'recentTickets', 'pendingComments'));
+        $recentTickets = Ticket::with('user')->latest()->take(5)->get();
+        $pendingComments = \Modules\Blog\Models\Comment::with(['post', 'user'])->where('is_approved', false)->take(5)->get();
+
+        $recentSupportActivities = SupportAuditLog::with(['agent', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('panelsuporte::dashboard', compact(
+            'openTickets',
+            'pendingTickets',
+            'highPriority',
+            'usersAtFinancialRisk',
+            'activeInspections',
+            'recentTickets',
+            'pendingComments',
+            'recentSupportActivities'
+        ));
     }
 
     public function index(Request $request)

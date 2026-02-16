@@ -2,10 +2,11 @@
     $isPro = auth()->user()?->isPro() ?? false;
     $stockBalance = $stockBalance ?? 0;
     $financialScore = $vertexBot['financial_score'] ?? 0;
-    $scoreLabel = $financialScore <= 40 ? 'Risco' : ($financialScore <= 70 ? 'Atenção' : 'Saúde Vertex');
-    $scoreTextClass = $financialScore <= 40 ? 'text-red-600 dark:text-red-400' : ($financialScore <= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400');
-    $scoreStrokeClass = $financialScore <= 40 ? 'text-red-500 dark:text-red-400' : ($financialScore <= 70 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-500 dark:text-emerald-400');
-    $scoreBorderClass = $financialScore <= 40 ? 'hover:border-red-500/30' : ($financialScore <= 70 ? 'hover:border-amber-500/30' : 'hover:border-emerald-500/30');
+    // 0 = em análise (sem dados); 1-40 = em risco; 41-70 = atenção; 71-100 = sem risco
+    $scoreLabel = $financialScore === 0 ? 'Em análise' : ($financialScore <= 40 ? 'Em risco' : ($financialScore <= 70 ? 'Atenção' : 'Sem risco'));
+    $scoreTextClass = $financialScore === 0 ? 'text-slate-500 dark:text-slate-400' : ($financialScore <= 40 ? 'text-red-600 dark:text-red-400' : ($financialScore <= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'));
+    $scoreStrokeClass = $financialScore === 0 ? 'text-slate-400 dark:text-slate-500' : ($financialScore <= 40 ? 'text-red-500 dark:text-red-400' : ($financialScore <= 70 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-500 dark:text-emerald-400'));
+    $scoreBorderClass = $financialScore === 0 ? 'hover:border-slate-400/30' : ($financialScore <= 40 ? 'hover:border-red-500/30' : ($financialScore <= 70 ? 'hover:border-amber-500/30' : 'hover:border-emerald-500/30'));
     $totalIncome = $monthlyIncome ?? 0;
     $totalExpense = $monthlyExpense ?? 0;
     $flowCapacity = $flowCapacity ?? 0;
@@ -56,34 +57,13 @@
     {{-- Stats Grid - CBAV style --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {{-- Score Financeiro (Gauge) --}}
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 {{ $scoreBorderClass }} shadow-sm hover:shadow-xl">
-            <div class="relative p-6 flex items-center gap-4">
-                <div class="relative w-20 h-20 shrink-0">
-                    @php
-                        $pct = min(100, max(0, $financialScore)) / 100;
-                        $angle = 180 * (1 - $pct);
-                        $rad = deg2rad($angle);
-                        $cx = 100; $cy = 90; $r = 80;
-                        $x2 = $cx + $r * cos($rad);
-                        $y2 = $cy + $r * sin($rad);
-                        $strokeHex = $financialScore <= 40 ? '#ef4444' : ($financialScore <= 70 ? '#f59e0b' : '#22c55e');
-                    @endphp
-                    <svg viewBox="0 0 200 100" class="w-full h-full -scale-y-100">
-                        <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#e5e7eb" stroke-width="10" stroke-linecap="round" class="dark:stroke-gray-700" style="stroke: #e5e7eb;" />
-                        <path d="M 20 90 A 80 80 0 0 1 {{ $x2 }} {{ $y2 }}" fill="none" stroke="{{ $strokeHex }}" stroke-width="10" stroke-linecap="round" />
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center pt-2">
-                        <span class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ $financialScore }}</span>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Score Financeiro</p>
-                    <p class="text-sm font-bold {{ $scoreTextClass }} mt-0.5">{{ $scoreLabel }}</p>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">0-100: poupança, reserva e consistência</p>
-                </div>
-            </div>
-        </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl">
+        <x-core::financial-score-card
+            :score="$financialScore"
+            :label="$scoreLabel"
+            :score-text-class="$scoreTextClass"
+            :score-border-class="$scoreBorderClass"
+        />
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -92,7 +72,7 @@
                 <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$stockBalance" /></p>
             </div>
         </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="money-bill-trend-up" style="duotone" class="w-6 h-6" />
@@ -101,7 +81,7 @@
                 <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalIncome" /></p>
             </div>
         </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-rose-500/30 shadow-sm hover:shadow-xl">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-rose-500/30 shadow-sm hover:shadow-xl">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="credit-card" style="duotone" class="w-6 h-6" />
@@ -110,7 +90,7 @@
                 <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalExpense" /></p>
             </div>
         </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-indigo-500/30 shadow-sm hover:shadow-xl">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-indigo-500/30 shadow-sm hover:shadow-xl">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="chart-line" style="duotone" class="w-6 h-6" />

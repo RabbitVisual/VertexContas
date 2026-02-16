@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\RecurringTransaction;
+use Modules\Core\Models\Ticket;
 use Modules\Core\Models\Transaction;
 
 class FinancialHealthService
@@ -39,6 +40,42 @@ class FinancialHealthService
             'monthly_expenses' => $monthlyExpenses,
             'free_cashflow' => $freeCashflow,
         ];
+    }
+
+    /**
+     * Count users with open/pending tickets and support access who have negative free cashflow.
+     * Used by Support Dashboard for "Usuários em Risco Financeiro" card.
+     *
+     * @param  int  $maxUsers  Limit for performance (default 50)
+     */
+    public function getUsersAtFinancialRiskCount(int $maxUsers = 50): int
+    {
+        $userIds = Ticket::query()
+            ->whereIn('status', ['open', 'pending'])
+            ->distinct()
+            ->pluck('user_id')
+            ->take($maxUsers)
+            ->toArray();
+
+        if (empty($userIds)) {
+            return 0;
+        }
+
+        $usersWithAccess = User::query()
+            ->whereIn('id', $userIds)
+            ->whereNotNull('support_access_expires_at')
+            ->where('support_access_expires_at', '>', now())
+            ->get();
+
+        $count = 0;
+        foreach ($usersWithAccess as $user) {
+            $snapshot = $this->getUserFinancialSnapshot($user);
+            if (($snapshot['free_cashflow'] ?? 0) < 0) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -200,14 +237,88 @@ class FinancialHealthService
     }
 
     /**
+     * Days since last modification of any baseline income (for anti-gaming).
+     * Returns 999 if never modified or no baseline; 0 if modified today.
+     */
+    public function getBaselineStableDays(User $user): int
+    {
+        $lastModified = RecurringTransaction::where('user_id', $user->id)
+            ->where('type', 'income')
+            ->where('is_baseline', true)
+            ->max('updated_at');
+
+        if (! $lastModified) {
+            return 999;
+        }
+
+        return (int) now()->startOfDay()->diffInDays(Carbon::parse($lastModified)->startOfDay(), false);
+    }
+
+    /**
+     * Average monthly income from actual Transaction records (real receipts).
+     * Used to detect baseline inflation vs. realized income.
+     */
+    public function getRealizedMonthlyIncomeAverage(User $user, int $months = 3): float
+    {
+        if ($months < 1) {
+            return 0.0;
+        }
+
+        $totals = [];
+        for ($i = 0; $i < $months; $i++) {
+            $start = now()->subMonths($i)->startOfMonth();
+            $end = now()->subMonths($i)->endOfMonth();
+            $total = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'income')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+            $totals[] = $total;
+        }
+
+        $sum = array_sum($totals);
+        return $sum > 0 ? round($sum / $months, 2) : 0.0;
+    }
+
+    /**
+     * Income to use for medal evaluation (anti-gaming: prevents temporary baseline inflation).
+     * Uses min(baseline, realized) when baseline was recently changed or suspiciously higher than realized.
+     */
+    public function getEffectiveIncomeForMedals(User $user, Carbon $start, Carbon $end): float
+    {
+        $baseline = $this->getBaselineIncome($user);
+        if ($baseline <= 0) {
+            return (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'income')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+        }
+
+        $stableDays = $this->getBaselineStableDays($user);
+        $realizedAvg = $this->getRealizedMonthlyIncomeAverage($user, 3);
+
+        if ($stableDays < 30 && $realizedAvg > 0) {
+            return min($baseline, $realizedAvg);
+        }
+
+        if ($realizedAvg > 0 && $baseline > $realizedAvg * 1.15) {
+            return min($baseline, $realizedAvg);
+        }
+
+        return $baseline;
+    }
+
+    /**
      * 50/30/20 breakdown: percentages of income in each pillar.
      * Uses type_group (essential, lifestyle, financial). Returns want_pct/savings_pct for RuleEngine compatibility.
+     * When $overrideIncome > 0, uses it instead of baseline (for medal anti-gaming).
      *
      * @return array{essential_pct: float, want_pct: float, savings_pct: float, lifestyle_pct: float, financial_pct: float}
      */
-    public function get503020Breakdown(User $user, Carbon $start, Carbon $end): array
+    public function get503020Breakdown(User $user, Carbon $start, Carbon $end, ?float $overrideIncome = null): array
     {
-        $income = $this->getBaselineIncome($user);
+        $income = $overrideIncome > 0 ? $overrideIncome : $this->getBaselineIncome($user);
         if ($income <= 0) {
             $income = (float) Transaction::where('user_id', $user->id)
                 ->where('type', 'income')
@@ -260,19 +371,65 @@ class FinancialHealthService
     }
 
     /**
-     * Reserve months: account_balance / monthly_expenses (0 if no expenses).
+     * Average monthly expenses over the last N months.
+     * Used for reserve calculation to avoid gaming (e.g. zero expenses in current month).
      */
-    public function getReserveMonths(User $user): float
+    public function getMonthlyExpensesAverage(User $user, int $months = 3): float
     {
-        $snapshot = $this->getUserFinancialSnapshot($user);
-        $balance = (float) $snapshot['account_balance'];
-        $monthlyExpenses = (float) $snapshot['monthly_expenses'];
+        if ($months < 1) {
+            return 0.0;
+        }
+
+        $totals = [];
+        for ($i = 0; $i < $months; $i++) {
+            $start = now()->subMonths($i)->startOfMonth();
+            $end = now()->subMonths($i)->endOfMonth();
+            $total = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'expense')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+            $totals[] = $total;
+        }
+
+        $sum = array_sum($totals);
+        return $sum > 0 ? round($sum / $months, 2) : 0.0;
+    }
+
+    /**
+     * Reserve months: account_balance / average_monthly_expenses.
+     * Returns 0 if no meaningful expenses (anti-gaming: no infinite reserve).
+     */
+    public function getReserveMonths(User $user, int $avgMonths = 3): float
+    {
+        $balance = (float) Account::where('user_id', $user->id)->sum('balance');
+        $monthlyExpenses = $this->getMonthlyExpensesAverage($user, $avgMonths);
 
         if ($monthlyExpenses <= 0) {
-            return $balance > 0 ? 999.0 : 0.0;
+            return 0.0;
         }
 
         return round($balance / $monthlyExpenses, 2);
+    }
+
+    /**
+     * Transaction count within date range (for rule guards).
+     */
+    public function getTransactionCount(User $user, Carbon $start, Carbon $end): int
+    {
+        return Transaction::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->whereBetween('date', [$start, $end])
+            ->count();
+    }
+
+    /**
+     * Account age in days (for rule guards).
+     */
+    public function getAccountAgeDays(User $user): int
+    {
+        $createdAt = $user->created_at ?? now();
+        return (int) now()->diffInDays($createdAt, false);
     }
 
     /**

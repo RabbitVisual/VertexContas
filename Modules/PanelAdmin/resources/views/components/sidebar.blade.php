@@ -68,10 +68,10 @@
 
                     {{-- Central de Insights --}}
                     <a href="{{ route('admin.insights.index') }}"
-                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.insights.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
+                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.insights.*') || request()->routeIs('admin.gamification.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
                         <x-icon name="robot" style="duotone" class="size-5 shrink-0" />
                         <span class="invisible absolute start-full top-1/2 z-50 ms-4 -translate-y-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:visible">
-                            Insights
+                            Gamificação
                         </span>
                     </a>
 
@@ -177,6 +177,8 @@
                     </div>
                     <div class="mt-0.5 space-y-0.5">
                         <a href="{{ route('admin.insights.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.insights.*') ? $linkActive : $linkInactive }}"><x-icon name="lightbulb" style="duotone" class="size-4 shrink-0" />Central de Insights</a>
+                        <a href="{{ route('admin.gamification.medals.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.gamification.medals.*') ? $linkActive : $linkInactive }}"><x-icon name="medal" style="duotone" class="size-4 shrink-0" />Medalhas</a>
+                        <a href="{{ route('admin.gamification.rules.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.gamification.rules.*') ? $linkActive : $linkInactive }}"><x-icon name="list-check" style="duotone" class="size-4 shrink-0" />Regras de Conquistas</a>
                     </div>
                 </div>
 

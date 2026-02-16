@@ -1,2 +1,12 @@
+# Vertex Contas - Robots.txt
+# https://vertexcontas.com.br
+
 User-agent: *
-Disallow:
+Allow: /
+Allow: /user/blog/
+Disallow: /user/
+Disallow: /admin/
+Disallow: /support/
+
+# Sitemap (uncomment when available)
+# Sitemap: https://vertexcontas.com.br/sitemap.xml

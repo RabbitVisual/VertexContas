@@ -1,7 +1,5 @@
-@section('title', 'Central de Notificações - Suporte')
-
-<x-panelsuporte::layouts.master>
-    <div class="max-w-4xl mx-auto">
+<x-panelsuporte::layouts.master title="Central de Notificações - Suporte">
+    <div class="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Central de Notificações</h2>
@@ -10,14 +8,14 @@
 
              <form id="readAllForm" action="{{ route('notifications.read-all') }}" method="POST">
                 @csrf
-                <button type="submit" class="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center shadow-sm">
-                    <x-icon name="check-double" class="w-4 h-4 mr-2" />
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                    <x-icon name="check-double" style="duotone" class="w-4 h-4" />
                     Marcar Todas como Lidas
                 </button>
             </form>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
 
             @php
                 $notifications = auth()->user()->notifications()->paginate(15);
@@ -42,7 +40,7 @@
                                 };
                             @endphp
                             <div class="h-10 w-10 rounded-xl flex items-center justify-center {{ $iconClass }}">
-                                <x-icon :name="$icon" class="w-5 h-5" />
+                                <x-icon :name="$icon" style="duotone" class="w-5 h-5" />
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -69,15 +67,15 @@
                 </div>
             @empty
                 <div class="p-16 text-center text-gray-400">
-                    <div class="w-16 h-16 rounded-full bg-gray-50 dark:bg-slate-900 flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-800">
-                        <x-icon name="bell-slash" class="w-8 h-8 opacity-50" />
+                    <div class="w-16 h-16 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-800">
+                        <x-icon name="bell-slash" style="duotone" class="w-8 h-8 opacity-50" />
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Sem atualizações</h3>
                     <p class="text-sm">Você está em dia com todas as suas notificações técnicos.</p>
                 </div>
             @endforelse
 
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800/30">
                 {{ $notifications->links() }}
             </div>
         </div>

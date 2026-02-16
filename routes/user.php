@@ -32,6 +32,7 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::post('/cta-sidebar/dismiss', [PanelUserController::class, 'dismissSidebarCta'])->name('user.cta-sidebar.dismiss');
     Route::post('/vertex-bot/dismiss', [VertexBotController::class, 'dismissInsight'])->name('user.vertex-bot.dismiss');
     Route::get('/conquistas', [AchievementController::class, 'index'])->name('user.achievements.index');
+    Route::get('/conquistas/{medal}', [AchievementController::class, 'show'])->name('user.achievements.show');
 
     // Financial Baseline (legado) → redireciona para Core
     Route::get('/onboarding/setup-income', fn () => redirect('/minha-renda', 301))->name('paneluser.onboarding.setup-income');

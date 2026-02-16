@@ -7,5 +7,6 @@
     "Core": true,
     "Gateways": true,
     "Notifications": true,
-    "Gamification": true
+    "Gamification": true,
+    "VertexChat": true
 }

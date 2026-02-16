@@ -1,4 +1,4 @@
-<div :class="sidebarOpen ? 'w-72' : 'w-20'" class="bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 flex flex-col z-20 hidden md:flex h-screen sticky top-0">
+<aside :class="sidebarOpen ? 'w-72' : 'w-20'" class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-r border-gray-200/50 dark:border-slate-800/50 transition-[width] duration-300 flex flex-col shrink-0 z-20 hidden md:flex h-screen">
     <!-- Logo Area -->
     <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 transition-all duration-300">
         <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0" class="flex items-center gap-3">
@@ -32,6 +32,13 @@
         <div class="space-y-1">
             <p x-show="sidebarOpen" class="px-3 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Atendimento</p>
 
+            <a href="{{ route('support.manual.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.manual.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.manual.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="book-user" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Manual do Agente</span>
+            </a>
             <a href="{{ route('support.tickets.index') }}"
                class="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.tickets.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
                 <div class="flex items-center gap-3">
@@ -42,18 +49,55 @@
                 </div>
             </a>
             <a href="{{ route('support.wiki.index') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.wiki.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.wiki.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.wiki.index') || request()->routeIs('support.wiki.show') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.wiki.index') || request()->routeIs('support.wiki.show') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
                     <x-icon name="book-open-reader" style="duotone" class="text-xl" />
                 </div>
                 <span x-show="sidebarOpen" class="font-bold text-sm">Wiki Técnica</span>
             </a>
+            <a href="{{ route('support.wiki.legal-reference') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.wiki.legal-reference') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.wiki.legal-reference') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="scale-balanced" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Referência Legal</span>
+            </a>
         </div>
 
-        <!-- Help Group -->
+        <!-- Conteúdo -->
+        <div class="space-y-1">
+            <p x-show="sidebarOpen" class="px-3 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Conteúdo</p>
+            <a href="{{ route('suporte.blog.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('suporte.blog.index') || request()->routeIs('suporte.blog.create') || request()->routeIs('suporte.blog.edit') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('suporte.blog.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="newspaper" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Gerenciar Blog</span>
+            </a>
+            <a href="{{ route('suporte.blog.comments') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('suporte.blog.comments') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('suporte.blog.comments') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="comments" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Comentários</span>
+            </a>
+        </div>
+
+        <!-- Ferramentas -->
+        <div class="space-y-1">
+            <p x-show="sidebarOpen" class="px-3 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Ferramentas</p>
+            <a href="{{ route('support.reports.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('support.reports.*') ? 'bg-primary/10 text-primary shadow-sm shadow-primary/5' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white' }}">
+                <div class="flex items-center justify-center w-6 transition-colors {{ request()->routeIs('support.reports.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
+                    <x-icon name="file-chart-pie" style="duotone" class="text-xl" />
+                </div>
+                <span x-show="sidebarOpen" class="font-bold text-sm">Relatórios</span>
+            </a>
+        </div>
+
+        <!-- Sistema -->
         <div class="space-y-1">
             <p x-show="sidebarOpen" class="px-3 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Sistema</p>
-
             <a href="{{ route('homepage') }}" target="_blank"
                class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white">
                 <div class="flex items-center justify-center w-6 transition-colors text-gray-400 group-hover:text-primary">
@@ -66,23 +110,6 @@
 
     <!-- Footer Area -->
     <div class="p-4 border-t border-gray-100 dark:border-gray-800 space-y-4">
-        <!-- User Info -->
-        <a href="{{ route('support.profile.show') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group">
-            <div class="flex-shrink-0">
-                @if(Auth::user()->photo)
-                    <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="Avatar" class="h-10 w-10 rounded-xl object-cover ring-2 ring-primary/20 group-hover:ring-primary transition-all">
-                @else
-                    <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black ring-2 ring-primary/20 group-hover:ring-primary transition-all">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
-                @endif
-            </div>
-            <div x-show="sidebarOpen" class="flex flex-col min-w-0">
-                <span class="text-sm font-black text-slate-800 dark:text-white truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">Perfil de Agente</span>
-            </div>
-        </a>
-
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group font-bold text-sm">
@@ -93,4 +120,4 @@
             </button>
         </form>
     </div>
-</div>
+</aside>

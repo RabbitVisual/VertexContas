@@ -1,4 +1,4 @@
-<x-panelsuporte::layouts.master>
+<x-panelsuporte::layouts.master title="Gestão de Chamados - Suporte">
 
 
 
@@ -42,7 +42,7 @@
 
                 @if(request()->anyFilled(['status', 'priority']))
                     <a href="{{ route('support.tickets.index') }}" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors" title="Limpar Filtros">
-                        <x-icon name="xmark" style="solid" />
+                        <x-icon name="xmark" style="duotone" />
                     </a>
                 @endif
             </form>
@@ -121,7 +121,7 @@
                                     ];
                                 @endphp
                                 <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] ring-1 inline-flex items-center gap-1.5 {{ $priorityThemes[$ticket->priority] ?? 'bg-gray-50 text-gray-600' }}">
-                                    <x-icon name="signal" class="text-[10px]" />
+                                    <x-icon name="signal" style="duotone" class="text-[10px]" />
                                     {{ $ticket->priority === 'high' ? 'Alta' : ($ticket->priority === 'medium' ? 'Média' : 'Baixa') }}
                                 </span>
                             </td>
