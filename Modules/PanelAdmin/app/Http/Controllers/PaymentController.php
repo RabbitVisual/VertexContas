@@ -27,9 +27,16 @@ class PaymentController extends Controller
 
         $payments = $query->paginate(15)->withQueryString();
 
-        // Daily revenue chart (last 30 days) - succeeded payments only
+        $thirtyDaysAgo = now()->subDays(30);
+        $revenue30d = (float) PaymentLog::where('status', 'succeeded')
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->sum('amount');
+        $countSucceeded = PaymentLog::where('status', 'succeeded')->where('created_at', '>=', $thirtyDaysAgo)->count();
+        $countPending = PaymentLog::where('status', 'pending')->count();
+        $countFailed = PaymentLog::whereIn('status', ['failed'])->count();
+
         $dailyRevenue = PaymentLog::where('status', 'succeeded')
-            ->where('created_at', '>=', now()->subDays(30))
+            ->where('created_at', '>=', $thirtyDaysAgo)
             ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
             ->groupByRaw('DATE(created_at)')
             ->orderByRaw('DATE(created_at)')
@@ -38,6 +45,14 @@ class PaymentController extends Controller
         $chartDates = $dailyRevenue->pluck('date');
         $chartValues = $dailyRevenue->pluck('total');
 
-        return view('paneladmin::payments.index', compact('payments', 'chartDates', 'chartValues'));
+        return view('paneladmin::payments.index', compact(
+            'payments',
+            'chartDates',
+            'chartValues',
+            'revenue30d',
+            'countSucceeded',
+            'countPending',
+            'countFailed'
+        ));
     }
 }

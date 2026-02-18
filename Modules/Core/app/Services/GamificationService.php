@@ -26,10 +26,11 @@ class GamificationService
 
     /**
      * Analyze user and return insight for Vertex Bot (if any) plus financial score, metrics, and coaching_stats.
+     * When $routeName is provided, contextual tips for the current page (Metas, Categorias, Relatórios, etc.) are preferred.
      *
      * @return array{insight: array{content: string, level: string, trigger: string}|null, financial_score: int, metrics: array, coaching_stats: array|null}
      */
-    public function analyzeUser(User $user): array
+    public function analyzeUser(User $user, ?string $routeName = null): array
     {
         if (! ($user->show_assistant ?? true)) {
             return [
@@ -62,7 +63,11 @@ class GamificationService
 
         $insight = $this->ruleEngine->evaluate($user);
         if ($insight === null) {
-            $insight = $this->resolveInsight($user, $snapshot, $summary, $income, $expense, $balance, $monthlyExpenses, $financialScore, $metrics, $coachingStats);
+            $insight = $this->resolveInsight($user, $snapshot, $summary, $income, $expense, $balance, $monthlyExpenses, $financialScore, $metrics, $coachingStats, $routeName);
+        }
+
+        if ($insight !== null && ! $user->isPro() && ! empty($insight['content'] ?? null)) {
+            $insight['content'] = rtrim($insight['content']) . "\n\nNo plano PRO você teria projeção de saldo, relatórios avançados e suporte prioritário.";
         }
 
         return [
@@ -74,7 +79,43 @@ class GamificationService
     }
 
     /**
-     * Resolve which insight to show (priority: low_balance → budget_reached → savings_milestone → daily_tip).
+     * Map route name to page context for contextual Mentor tips (Metas, Categorias, Relatórios, etc.).
+     */
+    protected static function getPageSectionFromRoute(?string $routeName): ?string
+    {
+        if ($routeName === null || $routeName === '') {
+            return null;
+        }
+        if (str_starts_with($routeName, 'core.goals')) {
+            return 'goals';
+        }
+        if (str_starts_with($routeName, 'core.categories')) {
+            return 'categories';
+        }
+        if (str_starts_with($routeName, 'core.reports')) {
+            return 'reports';
+        }
+        if (str_starts_with($routeName, 'core.budgets')) {
+            return 'budgets';
+        }
+        if (str_starts_with($routeName, 'core.income')) {
+            return 'income';
+        }
+        if (str_starts_with($routeName, 'core.transactions')) {
+            return 'transactions';
+        }
+        if (str_starts_with($routeName, 'user.tickets')) {
+            return 'tickets';
+        }
+        if ($routeName === 'paneluser.index' || $routeName === 'core.dashboard') {
+            return 'dashboard';
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve which insight to show (priority: low_balance → budget_reached → savings_milestone → page_context → daily_tip).
      * Tries Gemini AI when enabled; falls back to local insights on failure or when disabled.
      */
     protected function resolveInsight(
@@ -87,7 +128,8 @@ class GamificationService
         float $monthlyExpenses,
         int $financialScore,
         array $metrics,
-        array $coachingStats
+        array $coachingStats,
+        ?string $routeName = null
     ): ?array {
         $monthKey = now()->format('Y-m');
         $todayKey = now()->toDateString();
@@ -156,6 +198,26 @@ class GamificationService
                         'content' => $content,
                         'level' => 'success',
                         'trigger' => 'savings_milestone',
+                        'insight_key' => $achievementKey,
+                    ];
+                }
+            }
+        }
+
+        // 3.5. page_context: dica contextual da página atual (Metas, Categorias, Relatórios, Orçamentos, Minha Renda, etc.)
+        $pageSection = self::getPageSectionFromRoute($routeName);
+        if ($pageSection !== null) {
+            $trigger = "page_{$pageSection}";
+            $achievementKey = "{$trigger}_{$todayKey}";
+            if (! in_array($achievementKey, $dismissed, true) && ! Achievement::hasAchieved($user, $achievementKey, now()->startOfDay())) {
+                $content = $this->resolveInsightContent($trigger, $user, $financialScore, $metrics, $coachingStats, $isPro, null);
+                if ($content) {
+                    $this->recordAchievement($user, $achievementKey);
+
+                    return [
+                        'content' => $content,
+                        'level' => 'info',
+                        'trigger' => $trigger,
                         'insight_key' => $achievementKey,
                     ];
                 }

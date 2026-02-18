@@ -20,9 +20,9 @@
     $firstName = auth()->user()->first_name ?? 'Membro';
 @endphp
 <x-paneluser::layouts.master :title="'Dashboard'">
-<div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-12">
-    {{-- Hero - Vertex CBAV style --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+<div class="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-16">
+    {{-- Hero - Vertex CBAV style (mb = espaçamento fixo por seção, evita colapso com tour/outros) --}}
+    <div class="relative overflow-hidden rounded-[2rem] mb-8 bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -40,7 +40,11 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Aqui está o resumo das suas finanças e sua capacidade mensal.</p>
             </div>
 
-            <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0">
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($dashboardTourId) && count($dashboardTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$dashboardTourId" label="Ver tour desta página" />
+                @endif
+                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl" data-tour="dashboard-balance">
                 <div class="flex items-center gap-4 text-left">
                     <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
                         <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -55,7 +59,7 @@
     </div>
 
     {{-- Stats Grid - CBAV style --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {{-- Score Financeiro (Gauge) --}}
         <x-core::financial-score-card
             :score="$financialScore"
@@ -63,7 +67,7 @@
             :score-text-class="$scoreTextClass"
             :score-border-class="$scoreBorderClass"
         />
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl" data-tour="dashboard-balance">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -72,7 +76,7 @@
                 <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$stockBalance" /></p>
             </div>
         </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl" data-tour="dashboard-income">
             <div class="relative p-6">
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="money-bill-trend-up" style="duotone" class="w-6 h-6" />
@@ -119,10 +123,10 @@
         </div>
     </div>
 
-    {{-- Minhas Contas + Transações e Metas - 3 colunas no desktop --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {{-- Minhas Contas + Transações - grid 1/3 + 2/3 (estilo VertexCBAV) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-8">
         {{-- Minhas Contas --}}
-        <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary-500/20">
             <div class="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
@@ -134,7 +138,7 @@
                     <a href="{{ route('core.accounts.create') }}" class="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline uppercase tracking-wider">Nova</a>
                 @endif
             </div>
-            <div class="p-4 space-y-2 max-h-64 overflow-y-auto">
+            <div class="p-5 pb-6 space-y-2 max-h-64 overflow-y-auto">
                 @forelse($accounts as $account)
                     <a href="{{ Route::has('core.accounts.show') ? route('core.accounts.show', $account) : '#' }}" class="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-primary-50 dark:hover:bg-primary-500/10 border border-transparent hover:border-primary-200 dark:hover:border-primary-500/20 transition-all group">
                         <div>
@@ -161,7 +165,7 @@
         </div>
 
         {{-- Transações Recentes --}}
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary-500/20">
             <div class="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
@@ -174,7 +178,7 @@
                     <x-icon name="arrow-right" style="solid" class="w-3.5 h-3.5" />
                 </a>
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-white/5 max-h-80 overflow-y-auto">
+            <div class="divide-y divide-gray-100 dark:divide-white/5 max-h-80 overflow-y-auto pb-6">
                 @forelse($recentTransactions as $transaction)
                     <a href="{{ ($inspectionReadOnly ?? false) ? route('core.transactions.index') : (Route::has('core.transactions.edit') ? route('core.transactions.edit', $transaction) : route('core.transactions.index')) }}" class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                         <div class="flex items-center gap-4">
@@ -208,8 +212,8 @@
         </div>
     </div>
 
-    {{-- Metas --}}
-    <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+    {{-- Metas - bloco full width --}}
+    <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden mb-8 transition-all duration-300 hover:shadow-xl hover:border-amber-500/20">
         <div class="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                 <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -224,7 +228,7 @@
                 </a>
             @endif
         </div>
-        <div class="p-6 space-y-6">
+        <div class="p-6 pb-8 space-y-6">
             @forelse($goals as $goal)
                 @php $pct = $goal->target_amount > 0 ? min(100, ($goal->current_amount / $goal->target_amount) * 100) : 0; @endphp
                 <div>
@@ -253,60 +257,72 @@
         </div>
     </div>
 
-    {{-- Ações rápidas + CTA Upgrade (FREE) --}}
-    <div class="flex flex-col sm:flex-row items-stretch gap-6">
-        <div class="flex-1 flex flex-wrap items-center gap-3">
-            @if(!($inspectionReadOnly ?? false))
-                <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all shadow-lg shadow-primary-500/20">
-                    <x-icon name="plus" style="solid" class="w-5 h-5" />
-                    Nova Transação
-                </a>
-                @if(Route::has('core.transactions.transfer'))
-                    <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
-                        <x-icon name="right-left" style="duotone" class="w-5 h-5 text-emerald-500" />
-                        Transferir
-                    </a>
-                @endif
-            @endif
-            @if(Route::has('core.income.index') && !($inspectionReadOnly ?? false))
-                <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
-                    <x-icon name="sack-dollar" style="duotone" class="w-5 h-5 text-emerald-500" />
-                    Minha Renda
+    {{-- Ações rápidas --}}
+    <div class="flex flex-wrap items-center gap-4 mb-10" data-tour="dashboard-actions">
+        @if(!($inspectionReadOnly ?? false))
+            <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all shadow-lg shadow-primary-500/20">
+                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                Nova Transação
+            </a>
+            @if(Route::has('core.transactions.transfer'))
+                <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
+                    <x-icon name="right-left" style="duotone" class="w-5 h-5 text-emerald-500" />
+                    Transferir
                 </a>
             @endif
-        </div>
-        @if(!$isPro)
-            <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm shadow-xl shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0">
-                <x-icon name="crown" style="solid" class="w-5 h-5" />
-                Assinar Vertex PRO
+        @endif
+        @if(Route::has('core.income.index') && !($inspectionReadOnly ?? false))
+            <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
+                <x-icon name="sack-dollar" style="duotone" class="w-5 h-5 text-emerald-500" />
+                Minha Renda
             </a>
         @endif
     </div>
 
     @if(!$isPro)
-        {{-- CTA Upgrade card - CBAV style --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
-            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-[100px]"></div>
-            <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-orange-500/10 dark:bg-orange-500/20 rounded-full blur-[100px]"></div>
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <div>
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-14 h-14 rounded-2xl bg-amber-500/20 dark:bg-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                            <x-icon name="crown" style="duotone" class="w-7 h-7" />
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-black text-gray-900 dark:text-white">Desbloqueie o Dashboard Completo</h4>
-                            <p class="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest">Vertex PRO</p>
-                        </div>
+        {{-- CTA único para assinatura PRO (estilo VertexCBAV: card hero + botão destaque) --}}
+        <div class="relative overflow-hidden rounded-3xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-10 shadow-sm dark:shadow-none hover:shadow-xl hover:border-amber-500/30 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-[80px]"></div>
+            <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-[80px]"></div>
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 ring-1 ring-black/5 dark:ring-white/10">
+                        <x-icon name="sparkles" style="duotone" class="w-7 h-7" />
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400 max-w-lg leading-relaxed">Gráficos avançados, contas ilimitadas, metas e orçamentos completos. Assine o Vertex PRO e tenha controle total das suas finanças.</p>
+                    <div>
+                        <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight mb-1">{{ plan_pro_name() }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ pro_benefits_short_description('cta') }}</p>
+                    </div>
                 </div>
-                <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20 shrink-0">
-                    <x-icon name="bolt" style="solid" class="w-5 h-5" />
-                    Ver Planos e Assinar
+                <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-400 text-amber-950 font-black text-sm uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/25 shrink-0">
+                    Assinar {{ plan_pro_name() }}
+                    <x-icon name="arrow-right" style="solid" class="w-4 h-4" />
                 </a>
             </div>
         </div>
     @endif
 </div>
+
+@if(!empty($dashboardTourId) && !empty($dashboardTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($dashboardTourId);
+    var steps = @json($dashboardTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

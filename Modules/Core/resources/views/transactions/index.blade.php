@@ -2,6 +2,23 @@
     $isPro = auth()->user()?->isPro() ?? false;
     $currentMonth = request()->filled('month') ? (int) request('month') : null;
     $currentYear = request()->filled('year') ? (int) request('year') : now()->year;
+    // Parâmetros para exportação PRO (extrato view PDF + Excel): mesmos filtros da página
+    $extratoStart = ($currentMonth && $currentYear)
+        ? \Carbon\Carbon::createFromDate($currentYear, $currentMonth, 1)->startOfMonth()
+        : now()->subMonths(5)->startOfMonth();
+    $extratoEnd = ($currentMonth && $currentYear)
+        ? \Carbon\Carbon::createFromDate($currentYear, $currentMonth, 1)->endOfMonth()
+        : now()->endOfMonth();
+    $extratoQueryParams = [
+        'start_date' => $extratoStart->format('Y-m-d'),
+        'end_date' => $extratoEnd->format('Y-m-d'),
+    ];
+    if (request()->filled('type') && in_array(request('type'), ['income', 'expense'], true)) {
+        $extratoQueryParams['type'] = request('type');
+    }
+    if (request()->filled('account_id')) {
+        $extratoQueryParams['account_id'] = request('account_id');
+    }
     $incomeTotal = $transactions->where('type', 'income')->sum('amount');
     $expenseTotal = $transactions->where('type', 'expense')->sum('amount');
     $balance = $incomeTotal - $expenseTotal;
@@ -15,7 +32,7 @@
 <div x-data="{ filtersOpen: false }" class="contents">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     {{-- Hero --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="transactions-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-slate-600/5 dark:bg-slate-600/10 rounded-full blur-[100px]"></div>
 
@@ -31,6 +48,9 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                @endif
                 <button type="button" @click="filtersOpen = true" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                     <x-icon name="filter" style="duotone" class="w-5 h-5" />
                     Filtros
@@ -41,6 +61,12 @@
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
                             Nova transação
                         </a>
+                        @if($isPro && Route::has('core.transactions.import.upload'))
+                            <button type="button" @click="$dispatch('open-import-modal')" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors shadow-sm">
+                                <x-icon name="file-import" style="duotone" class="w-5 h-5" />
+                                Importar Extrato (CSV)
+                            </button>
+                        @endif
                     @endif
                 @endcan
             </div>
@@ -85,13 +111,13 @@
         @endif
     </div>
 
-    @if(session('success'))
+    @if(session('success') || request('import_success'))
         <div x-data="{ show: true }" x-show="show" x-transition class="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/10 p-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                     <x-icon name="circle-check" style="solid" class="w-5 h-5" />
                 </div>
-                <span class="font-medium text-gray-800 dark:text-gray-200">{{ session('success') }}</span>
+                <span class="font-medium text-gray-800 dark:text-gray-200">{{ request('import_success') ?? session('success') }}</span>
             </div>
             <button type="button" @click="show = false" class="p-2 rounded-lg hover:bg-emerald-500/20 text-gray-500 hover:text-gray-700 transition-colors">
                 <x-icon name="xmark" style="solid" class="w-5 h-5" />
@@ -142,7 +168,7 @@
     </div>
 
     @if($isPro)
-        <div class="rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-gradient-to-r from-amber-500/10 to-amber-600/10 dark:from-amber-500/5 dark:to-amber-600/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-gradient-to-r from-amber-500/10 to-amber-600/10 dark:from-amber-500/5 dark:to-amber-600/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4" data-tour="transactions-pro-export">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                     <x-icon name="crown" style="solid" class="w-6 h-6" />
@@ -153,12 +179,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" title="Exportar PDF" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-rose-500 flex items-center justify-center transition-colors">
+                <a href="{{ route('core.reports.extrato.view', $extratoQueryParams) }}" target="_blank" rel="noopener noreferrer" title="Abrir extrato em HTML para imprimir ou salvar como PDF" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-rose-500 flex items-center justify-center transition-colors">
                     <x-icon name="file-pdf" style="solid" class="w-5 h-5" />
-                </button>
-                <button type="button" title="Exportar Excel" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-emerald-500 flex items-center justify-center transition-colors">
+                </a>
+                <a href="{{ route('core.reports.export.extrato.xlsx', $extratoQueryParams) }}" title="Baixar extrato em Excel" class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-emerald-500 flex items-center justify-center transition-colors">
                     <x-icon name="file-excel" style="solid" class="w-5 h-5" />
-                </button>
+                </a>
                 @if(!($inspectionReadOnly ?? false))
                     <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
                         <x-icon name="right-left" style="solid" class="w-4 h-4" />
@@ -287,6 +313,133 @@
     </div>
 </div>
 
+{{-- Modal Importar Extrato (CSV) — PRO --}}
+@if($isPro && Route::has('core.transactions.import.upload'))
+<div x-data="importCsvModal()" x-cloak x-show="open" class="fixed inset-0 z-[110] overflow-y-auto" aria-modal="true" role="dialog" @open-import-modal.window="open = true; step = 1; error = null; file = null">
+    <div class="fixed inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm transition-opacity" x-show="open" @click="open = false"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div x-show="open" x-transition class="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden" @click.stop>
+            <div class="p-6 sm:p-8 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-gray-800/30">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                            <x-icon name="file-import" style="duotone" class="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Importar Extrato (CSV)</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400" x-text="step === 1 ? 'Envie o arquivo exportado pelo seu banco' : (step === 2 ? 'Associe as colunas do CSV' : 'Revise as categorias e confirme')"></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="open = false" class="w-10 h-10 rounded-xl border border-gray-200 dark:border-white/10 text-gray-500 hover:text-rose-500 flex items-center justify-center transition-colors" aria-label="Fechar">
+                        <x-icon name="xmark" style="solid" class="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 sm:p-8">
+                <p x-show="error" x-text="error" class="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 text-sm"></p>
+
+                <template x-if="step === 1">
+                    <div class="space-y-4">
+                        <label class="block">
+                            <span class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arquivo CSV</span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Selecione o extrato exportado pelo seu banco (formato CSV ou TXT com separador vírgula).</p>
+                            <input type="file" accept=".csv,.txt" @change="onFileSelect($event)" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-500 file:text-white file:font-semibold file:text-sm">
+                        </label>
+                        <button type="button" @click="upload()" :disabled="!file || loading" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2">
+                            <template x-if="loading"><span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span></template>
+                            Enviar arquivo
+                        </button>
+                    </div>
+                </template>
+
+                <template x-if="step === 2">
+                    <div class="space-y-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Foram detectadas <strong x-text="count || 0"></strong> linhas no arquivo. Associe cada campo abaixo à coluna correta do seu CSV.</p>
+                        <p x-show="count > importLimit" class="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3 py-2">As primeiras <span x-text="importLimit"></span> linhas serão categorizadas pela IA; as demais receberão categoria padrão (receita ou despesa) automaticamente.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <label class="block">
+                                <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Data</span>
+                                <select x-model="dateCol" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm">
+                                    <option value="">—</option>
+                                    <template x-for="h in headers" :key="h"><option :value="h" x-text="h"></option></template>
+                                </select>
+                            </label>
+                            <label class="block">
+                                <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Descrição</span>
+                                <select x-model="descCol" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm">
+                                    <option value="">—</option>
+                                    <template x-for="h in headers" :key="h"><option :value="h" x-text="h"></option></template>
+                                </select>
+                            </label>
+                            <label class="block">
+                                <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Valor</span>
+                                <select x-model="amountCol" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm">
+                                    <option value="">—</option>
+                                    <template x-for="h in headers" :key="h"><option :value="h" x-text="h"></option></template>
+                                </select>
+                            </label>
+                        </div>
+                        <button type="button" @click="categorize()" :disabled="!dateCol || !descCol || !amountCol || loading" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2">
+                            <template x-if="loading"><span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span></template>
+                            Categorizar com IA e revisar
+                        </button>
+                    </div>
+                </template>
+
+                <template x-if="step === 3">
+                    <div class="space-y-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Revise as categorias sugeridas pela IA. Ajuste qualquer linha se necessário e escolha a conta na qual as transações serão lançadas.</p>
+                        <div class="flex items-center justify-between gap-4">
+                            <label class="block flex-1">
+                                <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Conta de destino</span>
+                                <select x-model="accountId" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm">
+                                    @foreach($accounts as $acc)
+                                        <option value="{{ $acc->id }}">{{ $acc->name }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                        </div>
+                        <div class="rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden max-h-80 overflow-y-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0">
+                                    <tr>
+                                        <th class="text-left py-2 px-3 font-semibold text-gray-600 dark:text-gray-400">Data</th>
+                                        <th class="text-left py-2 px-3 font-semibold text-gray-600 dark:text-gray-400">Descrição</th>
+                                        <th class="text-right py-2 px-3 font-semibold text-gray-600 dark:text-gray-400">Valor</th>
+                                        <th class="text-left py-2 px-3 font-semibold text-gray-600 dark:text-gray-400">Categoria</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(row, i) in reviewRows" :key="i">
+                                        <tr class="border-t border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+                                            <td class="py-2 px-3 text-gray-900 dark:text-white" x-text="row.date"></td>
+                                            <td class="py-2 px-3 text-gray-700 dark:text-gray-300 truncate max-w-[180px]" :title="row.description" x-text="row.description"></td>
+                                            <td class="py-2 px-3 text-right tabular-nums" :class="row.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'" x-text="(row.type === 'income' ? '+' : '-') + ' ' + formatMoney(row.amount)"></td>
+                                            <td class="py-2 px-3">
+                                                <select x-model.number="row.category_id" class="w-full min-w-[120px] px-2 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-xs">
+                                                    <template x-for="cat in (row.type === 'income' ? incomeCategories : expenseCategories)" :key="cat.id">
+                                                        <option :value="cat.id" x-text="cat.name"></option>
+                                                    </template>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400"><span x-text="reviewRows.length || 0"></span> transações prontas para importar. Duplicatas (mesma data, valor e conta) serão ignoradas.</p>
+                        <button type="button" @click="store()" :disabled="!accountId || reviewRows.length === 0 || loading" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2">
+                            <template x-if="loading"><span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span></template>
+                            Confirmar e importar
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- Drawer de filtros --}}
 <div x-show="filtersOpen" x-cloak class="fixed inset-0 z-[100] overflow-hidden" aria-hidden="true" aria-label="Painel de filtros">
     <div x-show="filtersOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 bg-gray-900/80 dark:bg-black/60 backdrop-blur-sm" @click="filtersOpen = false" aria-hidden="true"></div>
@@ -380,4 +533,138 @@
 </div>
 </div>
 </div>
+
+@if($isPro && Route::has('core.transactions.import.upload'))
+@push('scripts')
+<script>
+document.addEventListener('alpine:init', function() {
+    Alpine.data('importCsvModal', function() {
+        return {
+            open: false,
+            step: 1,
+            file: null,
+            headers: [],
+            count: 0,
+            dateCol: '',
+            descCol: '',
+            amountCol: '',
+            reviewRows: [],
+            accountId: {{ $accounts->isNotEmpty() ? $accounts->first()->id : 'null' }},
+            loading: false,
+            error: null,
+            importLimit: {{ $importCategorizeLimit ?? 200 }},
+            incomeCategories: @json($importIncomeCategories ?? []),
+            expenseCategories: @json($importExpenseCategories ?? []),
+            uploadUrl: @json(route('core.transactions.import.upload')),
+            categorizeUrl: @json(route('core.transactions.import.categorize')),
+            storeUrl: @json(route('core.transactions.import.store')),
+            csrf: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            onFileSelect(e) {
+                this.file = e.target.files?.[0] || null;
+                this.error = null;
+            },
+            formatMoney(n) {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(Number(n)));
+            },
+            async upload() {
+                if (!this.file) return;
+                this.loading = true;
+                this.error = null;
+                const fd = new FormData();
+                fd.append('file', this.file);
+                fd.append('_token', this.csrf);
+                try {
+                    const r = await fetch(this.uploadUrl, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } });
+                    const data = await r.json();
+                    if (!r.ok) throw new Error(data.message || data.errors?.file?.[0] || 'Falha ao enviar');
+                    this.headers = data.headers || [];
+                    this.count = data.count || 0;
+                    this.dateCol = this.headers[0] || '';
+                    this.descCol = this.headers[1] || '';
+                    this.amountCol = this.headers[2] || '';
+                    this.step = 2;
+                } catch (err) {
+                    this.error = err.message || 'Erro ao enviar o arquivo.';
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async categorize() {
+                if (!this.dateCol || !this.descCol || !this.amountCol) return;
+                this.loading = true;
+                this.error = null;
+                try {
+                    const r = await fetch(this.categorizeUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify({ date_col: this.dateCol, desc_col: this.descCol, amount_col: this.amountCol })
+                    });
+                    const data = await r.json();
+                    if (!r.ok) throw new Error(data.message || data.errors?.session?.[0] || 'Falha na análise');
+                    var rows = data.rows || [];
+                    var incomeIds = this.incomeCategories.map(function(c) { return c.id; });
+                    var expenseIds = this.expenseCategories.map(function(c) { return c.id; });
+                    rows.forEach(function(row) {
+                        var allowed = row.type === 'income' ? incomeIds : expenseIds;
+                        if (allowed.indexOf(row.category_id) === -1 && allowed.length) row.category_id = allowed[0];
+                    });
+                    this.reviewRows = rows;
+                    this.step = 3;
+                } catch (err) {
+                    this.error = err.message || 'Erro ao analisar.';
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async store() {
+                if (!this.accountId || this.reviewRows.length === 0) return;
+                this.loading = true;
+                this.error = null;
+                try {
+                    const r = await fetch(this.storeUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify({ account_id: parseInt(this.accountId, 10), rows: this.reviewRows })
+                    });
+                    const data = await r.json();
+                    if (!r.ok) throw new Error(data.message || JSON.stringify(data.errors || {}));
+                    this.open = false;
+                    var url = @json(route('core.transactions.index'));
+                    if (data.message) url += (url.indexOf('?') >= 0 ? '&' : '?') + 'import_success=' + encodeURIComponent(data.message);
+                    window.location.href = url;
+                } catch (err) {
+                    this.error = err.message || 'Erro ao importar.';
+                } finally {
+                    this.loading = false;
+                }
+            }
+        };
+    });
+});
+</script>
+@endpush
+@endif
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

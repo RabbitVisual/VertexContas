@@ -92,7 +92,7 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        View::composer(['paneluser::layouts.master', 'paneluser::components.layouts.master'], function ($view): void {
+        $vertexBotComposer = function ($view): void {
             if (! Auth::check()) {
                 return;
             }
@@ -106,7 +106,18 @@ class AppServiceProvider extends ServiceProvider
                 ]);
                 return;
             }
-            $view->with('vertexBot', app(GamificationService::class)->analyzeUser($user));
-        });
+            $vertexBot = app(GamificationService::class)->analyzeUser($user, request()->route()?->getName());
+            if (isset($vertexBot['insight'])) {
+                session(['vertex_bot_last_insight' => $vertexBot['insight']]);
+                session(['vertex_bot_financial_score' => $vertexBot['financial_score'] ?? 0]);
+            }
+            $view->with('vertexBot', $vertexBot);
+        };
+
+        // Layout: Vertex Bot widget e variáveis globais do painel
+        View::composer(['paneluser::layouts.master', 'paneluser::components.layouts.master'], $vertexBotComposer);
+
+        // Dashboards: score financeiro no card (conteúdo da página usa $vertexBot['financial_score'])
+        View::composer(['core::dashboard', 'paneluser::index'], $vertexBotComposer);
     }
 }

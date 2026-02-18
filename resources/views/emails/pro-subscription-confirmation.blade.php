@@ -3,7 +3,7 @@
 @section('content')
 <p style="margin: 0 0 16px;">Parabéns, <strong>{{ $user->first_name }}</strong>! Você agora é VIP.</p>
 
-<p style="margin: 0 0 16px;">Sua assinatura Vertex PRO foi confirmada. Aproveite todos os benefícios exclusivos:</p>
+<p style="margin: 0 0 16px;">Sua assinatura {{ plan_pro_name() }} foi confirmada. Aproveite todos os benefícios do seu plano:</p>
 
 <ul style="margin: 0 0 16px; padding-left: 20px; color: #374151;">
     <li style="margin-bottom: 8px;"><strong>Chat VIP</strong> – Suporte em tempo real com nossa equipe</li>

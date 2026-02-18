@@ -23,35 +23,38 @@
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Total de Disparos</p>
-                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ $recentNotifications->sum('count') }}</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Total no Sistema</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ $stats['total'] ?? 0 }}</p>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                        <x-icon name="paper-plane" style="duotone" class="w-6 h-6 text-blue-500" />
+                        <x-icon name="bell" style="duotone" class="w-6 h-6 text-blue-500" />
                     </div>
                 </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Notificações armazenadas</p>
             </div>
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Alcance Médio</p>
-                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">98%</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Não Lidas</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ $stats['unread'] ?? 0 }}</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                        <x-icon name="users" style="duotone" class="w-6 h-6 text-emerald-500" />
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                        <x-icon name="envelope" style="duotone" class="w-6 h-6 text-amber-500" />
                     </div>
                 </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Pendentes de visualização</p>
             </div>
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Taxa de Leitura</p>
-                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">74%</p>
+                        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ $stats['read_rate'] ?? 0 }}%</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                        <x-icon name="eye" style="duotone" class="w-6 h-6 text-amber-500" />
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                        <x-icon name="eye" style="duotone" class="w-6 h-6 text-emerald-500" />
                     </div>
                 </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Lidas / Total</p>
             </div>
         </div>
 

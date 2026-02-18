@@ -158,7 +158,7 @@
                                     </div>
                                     <h4 class="text-lg font-black text-slate-800 dark:text-white leading-tight mb-1">{{ Auth::user()->full_name }}</h4>
                                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-4 shadow-lg shadow-amber-500/25">
-                                        <x-icon name="crown" style="solid" class="w-3 h-3" /> Vertex PRO
+                                        <x-icon name="crown" style="solid" class="w-3 h-3" /> {{ plan_pro_name() }}
                                     </span>
                                     @if($financialSnapshot)
                                     <div class="w-full mb-4 p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-200/50 dark:border-amber-500/20">
@@ -232,7 +232,7 @@
                                 <x-icon name="nfc" class="text-xl opacity-60" />
                             </div>
                             <div class="text-3xl font-black mb-1">@auth <span class="sensitive-value">@if($financialSnapshot)<x-core::financial-value :value="$financialSnapshot['total_balance']" />@else<x-core::financial-value :value="0" />@endif</span> @else <span class="sensitive-value"><x-core::financial-value :value="15750" /></span> @endauth</div>
-                            <div class="text-xs font-medium opacity-60">@auth {{ Auth::user()->isPro() ? 'Vertex PRO - Platinum' : 'Vertex Contas' }} @else Vertex Oh Pro - Platinum @endauth</div>
+                            <div class="text-xs font-medium opacity-60">@auth {{ Auth::user()->isPro() ? plan_pro_name() . ' - Platinum' : config('app.name') }} @else {{ plan_pro_name() }} - Platinum @endauth</div>
                         </div>
 
                         <!-- Recent Transactions -->
@@ -557,18 +557,18 @@
         </section>
         @endif
 
-        {{-- Pricing Table - FREE vs PRO (para conversão) --}}
+        {{-- Pricing Table - planos dinâmicos (tabela plans) --}}
         @php
             $proHasLimits = $proHasLimits ?? false;
             $limitsPro = $limitsPro ?? ['account' => -1, 'income' => -1, 'expense' => -1, 'goal' => -1, 'budget' => -1];
-            $freeLimits = $freeLimits ?? ['account' => 1, 'income' => 5, 'expense' => 5, 'goal' => 1, 'budget' => 1];
-            $planProName = $planProName ?? 'Vertex PRO';
-            $planFreeName = $planFreeName ?? 'Plano Gratuito';
+            $freeLimits = $freeLimits ?? ['account' => 1, 'income' => 15, 'expense' => 15, 'goal' => 1, 'budget' => 1];
+            $planFreeName = $planFree ? $planFree->name : 'Plano Gratuito';
             $proAccountDisplay = $proHasLimits && (($limitsPro['account'] ?? -1) >= 0) ? 'Até ' . $limitsPro['account'] . ' contas' : 'Ilimitado';
             $proIncomeDisplay = ($proHasLimits ?? false) && (($limitsPro['income'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['income'] ?? 5000) : 'Ilimitado';
             $proExpenseDisplay = ($proHasLimits ?? false) && (($limitsPro['expense'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['expense'] ?? 5000) : 'Ilimitado';
             $proGoalDisplay = ($proHasLimits ?? false) && (($limitsPro['goal'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['goal'] ?? 15) : 'Ilimitado';
             $proBudgetDisplay = ($proHasLimits ?? false) && (($limitsPro['budget'] ?? -1) >= 0) ? 'Até ' . ($limitsPro['budget'] ?? 20) : 'Ilimitado';
+            $paidPlans = $paidPlans ?? collect();
         @endphp
         <section id="pricing" class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -576,10 +576,10 @@
                     <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-4">Planos</h2>
                     <p class="text-lg text-slate-500 dark:text-slate-400">Escolha o plano ideal para sua jornada financeira.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {{-- FREE --}}
                     <div class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-sm">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $planFreeName ?? 'Plano Gratuito' }}</h3>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $planFreeName }}</h3>
                         <p class="text-3xl font-black text-slate-600 dark:text-slate-300 mb-6">Gratuito</p>
                         <ul class="space-y-3 mb-8">
                             <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -588,11 +588,11 @@
                             </li>
                             <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                 <x-icon name="arrow-up" style="duotone" class="w-4 h-4 text-slate-400" />
-                                Até {{ $freeLimits['income'] ?? 5 }} receitas
+                                Até {{ $freeLimits['income'] ?? 15 }} receitas
                             </li>
                             <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                 <x-icon name="arrow-down" style="duotone" class="w-4 h-4 text-slate-400" />
-                                Até {{ $freeLimits['expense'] ?? 5 }} despesas
+                                Até {{ $freeLimits['expense'] ?? 15 }} despesas
                             </li>
                             <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                 <x-icon name="bullseye" style="duotone" class="w-4 h-4 text-slate-400" />
@@ -610,21 +610,23 @@
                                 <x-icon name="robot" style="duotone" class="w-4 h-4 text-slate-400" />
                                 Vertex Bot básico
                             </li>
-                            <li class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500">
-                                <x-icon name="minus" style="solid" class="w-4 h-4" />
-                                Suporte prioritário
+                            <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
+                                Suporte via Ticket
                             </li>
                         </ul>
                         <a href="{{ route('register') }}" class="block w-full py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                             Começar Grátis
                         </a>
                     </div>
-                    {{-- PRO --}}
+                    @foreach($paidPlans as $index => $paidPlan)
                     <div class="rounded-3xl border-2 border-indigo-500/50 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 dark:from-indigo-900/20 dark:to-violet-900/20 p-8 shadow-xl relative">
+                        @if($index === 0)
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-indigo-500 text-white text-xs font-black uppercase">Recomendado</div>
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $planProName ?? 'Vertex PRO' }}</h3>
-                        <p class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1">R$ 29,90<span class="text-lg font-medium text-slate-500">/mês</span></p>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">7 dias grátis · Cancele quando quiser</p>
+                        @endif
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-1">{{ $paidPlan->name }}</h3>
+                        <p class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1">R$ {{ $paidPlan->amount ? number_format((float) $paidPlan->amount, 2, ',', '.') : '29,90' }}<span class="text-lg font-medium text-slate-500">/{{ $paidPlan->billing_interval === 'yearly' ? 'ano' : 'mês' }}</span></p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">@if($paidPlan->billing_interval === 'monthly')7 dias grátis · @endif Cancele quando quiser</p>
                         <ul class="space-y-3 mb-8">
                             <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                                 <x-icon name="check" style="solid" class="w-4 h-4 text-emerald-500" />
@@ -660,9 +662,10 @@
                             </li>
                         </ul>
                         <a href="{{ auth()->check() ? route('user.subscription.index') : route('register') }}" class="block w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-center shadow-lg shadow-indigo-500/25 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] transition-all">
-                            Assinar {{ $planProName ?? 'Vertex PRO' }}
+                            Assinar {{ $paidPlan->name }}
                         </a>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </section>

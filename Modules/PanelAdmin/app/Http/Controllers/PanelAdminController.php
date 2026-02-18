@@ -46,6 +46,9 @@ class PanelAdminController extends Controller
         // Support Metrics
         $openTicketsCount = \Modules\Core\Models\Ticket::where('status', 'open')->count();
 
+        // Wiki: sugestões pendentes
+        $wikiSuggestionsPending = \Modules\Core\Models\WikiSuggestion::where('status', 'pending')->count();
+
         // Recent Activity
         $recentUsers = \App\Models\User::latest()->take(5)->get();
         $recentPayments = \Modules\Gateways\Models\PaymentLog::with('user')
@@ -103,6 +106,7 @@ class PanelAdminController extends Controller
             'newUsersThisMonth',
             'activeSubscriptionsCount',
             'openTicketsCount',
+            'wikiSuggestionsPending',
             'recentUsers',
             'recentPayments',
             'revenueData',

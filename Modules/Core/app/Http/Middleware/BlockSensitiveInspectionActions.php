@@ -23,11 +23,20 @@ class BlockSensitiveInspectionActions
     ];
 
     /**
+     * Rotas que NUNCA podem ser acessadas durante inspeção (produção).
+     * Garante que logs de auditoria não sejam desativados/limpos pelo agente.
+     */
+    private const INSPECTION_BLOCKED_AUDIT_ROUTES = [
+        'admin.settings.security.clear-logs',
+    ];
+
+    /**
      * Rotas de exportação: bloqueadas quando usuário negou exibir dados financeiros.
      */
     private const FINANCIAL_EXPORT_ROUTES = [
         'core.reports.cashflow.view',
         'core.reports.consultoria.view',
+        'core.reports.consultoria.history',
         'core.reports.export.cashflow.csv',
         'core.reports.export.categories.csv',
         'core.reports.categories.view',
@@ -42,6 +51,17 @@ class BlockSensitiveInspectionActions
     {
         if (! session()->has('impersonate_inspection_id')) {
             return $next($request);
+        }
+
+        // Produção: NUNCA permitir ações em rotas de auditoria durante inspeção
+        if (app()->environment('production') && $request->routeIs(self::INSPECTION_BLOCKED_AUDIT_ROUTES)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Modo inspeção: ações de auditoria não são permitidas.',
+                ], 403);
+            }
+
+            return back()->with('error', 'Modo inspeção ativo: esta ação não é permitida.');
         }
 
         // Bloquear TODAS as mutações (POST, PUT, PATCH, DELETE) exceto as permitidas

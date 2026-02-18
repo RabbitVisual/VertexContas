@@ -1,114 +1,136 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Categorias Wiki</x-slot>
 
-    <div class="space-y-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Categorias da Wiki</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Gerencie as categorias para organizar a base de conhecimento.</p>
+    <x-paneladmin::page title="Categorias da Wiki" subtitle="Organize a base de conhecimento por assunto.">
+        @if(session('success'))
+            <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400 mb-6" role="alert">
+                <x-icon name="circle-check" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('success') }}</p>
             </div>
-            <button onclick="document.getElementById('modal-add-category').classList.remove('hidden')"
-                class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-2xl font-black text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-                <x-icon name="plus" style="duotone" /> Nova Categoria
-            </button>
-        </div>
+        @endif
+        @if(session('error'))
+            <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-4 text-amber-600 dark:text-amber-400 mb-6" role="alert">
+                <x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('error') }}</p>
+            </div>
+        @endif
+
+        <x-slot name="header">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.wiki.articles') }}" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-2">
+                    <x-icon name="file-lines" style="duotone" class="w-4 h-4" /> Artigos
+                </a>
+                <button type="button" @click="$dispatch('open-modal', 'wiki-add-category')" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2">
+                    <x-icon name="plus" style="duotone" class="w-4 h-4" /> Nova Categoria
+                </button>
+            </div>
+        </x-slot>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($categories as $category)
-                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all group">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                            <x-icon name="{{ $category->icon ?? 'book' }}" style="duotone" class="text-xl" />
+            @forelse($categories as $category)
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-slate-200 dark:hover:border-slate-600 transition-all">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-[#11C76F]/10 text-[#11C76F] flex items-center justify-center shrink-0">
+                            <x-icon name="{{ $category->icon ?? 'book' }}" style="duotone" class="w-6 h-6" />
                         </div>
-                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="editCategory({{ json_encode($category) }})" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
-                                <x-icon name="pen" style="duotone" class="text-xs" />
+                        <div class="flex gap-2">
+                            <button type="button" onclick="wikiEditCategory({{ $category->id }}, '{{ addslashes($category->name) }}', '{{ addslashes($category->icon ?? '') }}', '{{ addslashes($category->description ?? '') }}')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-[#11C76F] transition-colors">
+                                <x-icon name="pen" style="duotone" class="w-4 h-4" />
                             </button>
-                            <form action="{{ route('admin.wiki.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Tem certeza? Isso apagará todos os artigos desta categoria.')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-colors">
-                                    <x-icon name="trash" style="duotone" class="text-xs" />
+                            <form action="{{ route('admin.wiki.categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm('Excluir esta categoria? Os artigos vinculados podem ser afetados.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                                    <x-icon name="trash" style="duotone" class="w-4 h-4" />
                                 </button>
                             </form>
                         </div>
                     </div>
-                    <h3 class="text-lg font-black text-slate-800 dark:text-white mb-1">{{ $category->name }}</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 font-medium">{{ $category->description ?? 'Sem descrição disponível.' }}</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-800">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ $category->articles_count }} Artigos</span>
-                        <span class="text-[10px] font-black px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-500 rounded-lg uppercase">Ordem: {{ $category->order }}</span>
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">{{ $category->name }}</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 min-h-[2.5rem]">{{ $category->description ?? 'Sem descrição.' }}</p>
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ $category->articles_count }} artigos</span>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">Ordem {{ $category->order }}</span>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-span-full">
+                    <x-paneladmin::card>
+                        <div class="px-6 py-16 text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
+                                <x-icon name="folder" style="duotone" class="w-8 h-8 text-slate-400" />
+                            </div>
+                            <p class="text-slate-500 dark:text-slate-400 font-medium">Nenhuma categoria cadastrada.</p>
+                            <p class="text-sm text-slate-400 dark:text-slate-500 mt-1">Crie a primeira para organizar os artigos da wiki.</p>
+                            <button type="button" @click="$dispatch('open-modal', 'wiki-add-category')" class="mt-4 text-[#11C76F] font-bold text-sm hover:underline flex items-center gap-2 justify-center mx-auto">
+                                <x-icon name="plus" style="duotone" class="w-4 h-4" /> Nova Categoria
+                            </button>
+                        </div>
+                    </x-paneladmin::card>
+                </div>
+            @endforelse
         </div>
-    </div>
 
-    <!-- Add Category Modal -->
-    <div id="modal-add-category" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.parentElement.classList.add('hidden')"></div>
-            <div class="relative bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-lg p-8 transform transition-all border border-white/20">
-                <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6">Nova Categoria</h3>
-                <form action="{{ route('admin.wiki.categories.store') }}" method="POST" class="space-y-5">
+        <x-core::modal name="wiki-add-category" maxWidth="md">
+            <div class="p-8 space-y-6">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Nova Categoria</h3>
+                <form action="{{ route('admin.wiki.categories.store') }}" method="POST" class="space-y-6">
                     @csrf
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Nome da Categoria</label>
-                        <input type="text" name="name" required class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nome</label>
+                        <input type="text" name="name" required placeholder="Ex: Configurações" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Ícone (FontAwesome)</label>
-                        <input type="text" name="icon" placeholder="ex: book, shield, gear" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ícone (FontAwesome)</label>
+                        <input type="text" name="icon" placeholder="book, gear, shield..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Descrição</label>
-                        <textarea name="description" rows="3" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold resize-none"></textarea>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descrição</label>
+                        <textarea name="description" rows="3" placeholder="O que será abordado nesta categoria?" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium resize-none"></textarea>
                     </div>
-                    <div class="flex gap-4 pt-4">
-                        <button type="button" onclick="this.closest('#modal-add-category').classList.add('hidden')" class="flex-1 px-6 py-4 bg-gray-100 dark:bg-slate-800 text-slate-600 dark:text-gray-400 font-black rounded-2xl hover:bg-gray-200 transition-all">Cancelar</button>
-                        <button type="submit" class="flex-1 px-6 py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">Criar Agora</button>
+                    <div class="flex gap-3">
+                        <button type="button" @click="$dispatch('close-modal', 'wiki-add-category')" class="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 font-bold text-sm">Cancelar</button>
+                        <button type="submit" class="flex-1 py-3 rounded-xl bg-[#11C76F] text-white font-bold text-sm hover:bg-[#0EA85A]">Criar</button>
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
+        </x-core::modal>
 
-    <!-- Edit Category Modal -->
-    <div id="modal-edit-category" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.parentElement.classList.add('hidden')"></div>
-            <div class="relative bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-lg p-8 transform transition-all border border-white/20">
-                <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6">Editar Categoria</h3>
-                <form id="edit-category-form" method="POST" class="space-y-5">
-                    @csrf @method('PUT')
+        <x-core::modal name="wiki-edit-category" maxWidth="md">
+            <div class="p-8 space-y-6">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Editar Categoria</h3>
+                <form id="wiki-edit-category-form" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PUT')
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Nome da Categoria</label>
-                        <input type="text" name="name" id="edit-category-name" required class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nome</label>
+                        <input type="text" name="name" id="wiki-edit-name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Ícone (FontAwesome)</label>
-                        <input type="text" name="icon" id="edit-category-icon" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ícone</label>
+                        <input type="text" name="icon" id="wiki-edit-icon" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Descrição</label>
-                        <textarea name="description" id="edit-category-description" rows="3" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 dark:text-white text-sm font-bold resize-none"></textarea>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descrição</label>
+                        <textarea name="description" id="wiki-edit-description" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium resize-none"></textarea>
                     </div>
-                    <div class="flex gap-4 pt-4">
-                        <button type="button" onclick="this.closest('#modal-edit-category').classList.add('hidden')" class="flex-1 px-6 py-4 bg-gray-100 dark:bg-slate-800 text-slate-600 dark:text-gray-400 font-black rounded-2xl hover:bg-gray-200 transition-all">Cancelar</button>
-                        <button type="submit" class="flex-1 px-6 py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">Salvar Alterações</button>
+                    <div class="flex gap-3">
+                        <button type="button" @click="$dispatch('close-modal', 'wiki-edit-category')" class="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 font-bold text-sm">Cancelar</button>
+                        <button type="submit" class="flex-1 py-3 rounded-xl bg-[#11C76F] text-white font-bold text-sm hover:bg-[#0EA85A]">Salvar</button>
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
+        </x-core::modal>
+    </x-paneladmin::page>
 
     @push('scripts')
     <script>
-        function editCategory(category) {
-            document.getElementById('edit-category-form').action = `/admin/wiki/categories/${category.id}`;
-            document.getElementById('edit-category-name').value = category.name;
-            document.getElementById('edit-category-icon').value = category.icon;
-            document.getElementById('edit-category-description').value = category.description;
-            document.getElementById('modal-edit-category').classList.remove('hidden');
+        function wikiEditCategory(id, name, icon, description) {
+            document.getElementById('wiki-edit-category-form').action = '{{ url('admin/wiki/categories') }}/' + id;
+            document.getElementById('wiki-edit-name').value = name || '';
+            document.getElementById('wiki-edit-icon').value = icon || '';
+            document.getElementById('wiki-edit-description').value = description || '';
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'wiki-edit-category' }));
         }
     </script>
     @endpush

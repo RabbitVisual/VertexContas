@@ -11,6 +11,7 @@ namespace Modules\PanelUser\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Core\Services\FinancialHealthService;
+use Modules\Core\Services\TourService;
 
 class PanelUserController extends Controller
 {
@@ -111,6 +112,11 @@ class PanelUserController extends Controller
         $monthlyCapacity = $financialHealthService->calculateMonthlyCapacity($user);
         $incomeBreakdown = $financialHealthService->getIncomeBreakdown($user);
 
+        // 8. Tour guiado do dashboard (mesmo tour para FREE e PRO)
+        $tourService = app(TourService::class);
+        $dashboardTourId = $tourService->getTourForRoute('paneluser.index', false);
+        $dashboardTourSteps = $dashboardTourId ? $tourService->getStepsForTour($dashboardTourId, false) : [];
+
         return view('paneluser::index', [
             'stockBalance' => $totalBalance,
             'monthlyIncome' => $monthlyIncome,
@@ -124,7 +130,9 @@ class PanelUserController extends Controller
             'spendingByCategory' => $spendingByCategory,
             'recentTransactions' => $recentTransactions,
             'flowCapacity' => $monthlyCapacity,
-            'incomeBreakdown' => $incomeBreakdown
+            'incomeBreakdown' => $incomeBreakdown,
+            'dashboardTourId' => $dashboardTourId,
+            'dashboardTourSteps' => $dashboardTourSteps,
         ]);
     }
 

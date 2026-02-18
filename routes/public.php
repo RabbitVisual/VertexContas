@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\HomePage\Http\Controllers\CookieConsentController;
 use Modules\HomePage\Http\Controllers\HomePageController;
 use Modules\HomePage\Http\Controllers\LegalController;
 /*
@@ -23,11 +24,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Add other public routes here
 Route::get('/', [HomePageController::class, 'home'])->name('homepage');
 
+Route::post('/cookie-consent', [CookieConsentController::class, 'store'])->name('homepage.cookie-consent.store');
+
 Route::get('/termos', [LegalController::class, 'showTerms'])->name('terms');
 Route::get('/privacidade', [LegalController::class, 'showPrivacy'])->name('privacy');
 
 // Dynamic Legal Documents (Termos, Privacidade, etc.)
 Route::get('/legal/{slug}', [LegalController::class, 'show'])->name('public.legal.show');
+
+// Public plans page (content from admin settings)
+Route::get('/planos', [\Modules\HomePage\Http\Controllers\PlanPageController::class, 'show'])->name('planos');
 
 // Help Center
 Route::view('/ajuda', 'homepage::help-center')->name('help-center');

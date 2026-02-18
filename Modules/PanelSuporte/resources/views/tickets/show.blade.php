@@ -154,7 +154,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">Atendimento Prioritário</p>
-                            <p class="text-[11px] text-amber-600/80 dark:text-amber-400/80">Cliente Vertex PRO • Suporte VIP</p>
+                            <p class="text-[11px] text-amber-600/80 dark:text-amber-400/80">Cliente {{ plan_pro_name() }} • Suporte VIP</p>
                         </div>
                     </div>
                     <p class="text-[11px] text-slate-600 dark:text-slate-400">Priorize a resolução deste chamado. Cliente com suporte prioritário.</p>

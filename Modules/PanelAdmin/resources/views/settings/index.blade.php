@@ -2,9 +2,14 @@
     <x-slot name="navbarTitle">Configurações</x-slot>
 
     <x-paneladmin::page title="Configurações do Sistema" subtitle="Ajuste geral, marca, e-mail, blog e documentos.">
+    <x-slot name="header">
+        @if(!empty($settingsTourId) && count($settingsTourSteps ?? []) > 0)
+            <x-core::tour-guide :tour-id="$settingsTourId" label="Ver tour desta página" />
+        @endif
+    </x-slot>
     <div x-data="{ activeTab: '{{ old('tab', $tab) }}' }" class="flex flex-col lg:flex-row gap-6 -mx-4 lg:mx-0">
     {{-- Sidebar vertical - navegação por aba --}}
-    <aside class="w-full lg:w-56 shrink-0 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 p-2 h-fit">
+    <aside class="w-full lg:w-56 shrink-0 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 p-2 h-fit" data-tour="settings-tabs">
         <nav class="space-y-0.5">
             <a href="{{ route('admin.settings.index', ['tab' => 'general']) }}" @click.prevent="activeTab = 'general'; history.replaceState(null, '', $event.currentTarget.href)" :class="activeTab === 'general' ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15 border-l-[#11C76F]' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 border-l-transparent'" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border-l-2 transition-colors">
                 <x-icon name="sliders" style="duotone" class="size-5 shrink-0" />
@@ -344,6 +349,28 @@
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
                     </label>
                 </div>
+                <div class="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <x-icon name="bell" style="duotone" class="size-5" />
+                        Retenção de Notificações
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Controla a limpeza automática de notificações lidas para evitar acúmulo no banco.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Dias de retenção (notificações lidas)</label>
+                        <input type="number" name="notifications_retention_days" value="{{ old('notifications_retention_days', $notifications->get('notifications_retention_days') ?? 90) }}" min="1" max="365" class="w-full max-w-xs rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <p class="text-xs text-gray-500 mt-1">Notificações lidas com mais de X dias são removidas automaticamente (comando diário).</p>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Limpeza automática</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Executar prune diário de notificações lidas antigas.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="notifications_auto_clean_read" value="1" class="sr-only peer" {{ ($notifications->get('notifications_auto_clean_read') ?? true) ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#11C76F]/30 dark:peer-focus:ring-[#11C76F]/50 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#11C76F]"></div>
+                        </label>
+                    </div>
+                </div>
                 <div class="flex justify-end">
                     <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Recursos
@@ -632,6 +659,11 @@
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Limite de Relatórios/Dia</label>
                     <input type="number" name="limit_download_report_per_day" value="{{ old('limit_download_report_per_day', $documents->get('limit_download_report_per_day') ?? 5) }}" min="0" max="999" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
                     <p class="text-xs text-gray-500 mt-1">Máximo de visualizações de relatórios por usuário por dia</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Limite de Relatórios IA/Mês</label>
+                    <input type="number" name="limit_ai_report_per_month" value="{{ old('limit_ai_report_per_month', $documents->get('limit_ai_report_per_month') ?? 5) }}" min="0" max="99" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]" required>
+                    <p class="text-xs text-gray-500 mt-1">Máximo de consultoria e projeção IA por usuário PRO por mês (0 = ilimitado)</p>
                 </div>
                 <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
                     <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors font-bold flex items-center">
@@ -922,4 +954,27 @@
     </div>
     </div>
     </x-paneladmin::page>
+
+    @if(!empty($settingsTourId) && !empty($settingsTourSteps))
+    @push('scripts')
+    <script>
+    (function() {
+        var tourId = @json($settingsTourId);
+        var steps = @json($settingsTourSteps);
+        function register() {
+            if (window.registerVertexTourSteps && steps && steps.length) {
+                window.registerVertexTourSteps(tourId, steps);
+                return;
+            }
+            setTimeout(register, 50);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', register);
+        } else {
+            register();
+        }
+    })();
+    </script>
+    @endpush
+    @endif
 </x-paneladmin::layouts.master>

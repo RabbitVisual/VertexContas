@@ -63,25 +63,37 @@
                     <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Minha <br><span class="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Renda</span></h1>
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Receitas e despesas fixas mensais. Essa é a base da sua capacidade de gasto no Vertex Contas.</p>
                 </div>
-                <a href="{{ $dashboardRoute }}" class="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
-                    <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
-                    Voltar
-                </a>
+                <div class="flex flex-wrap items-center gap-3 shrink-0">
+                    @if(!empty($tourId) && count($tourSteps ?? []) > 0)
+                        <x-core::tour-guide :tour-id="$tourId" label="Ver tour desta página" />
+                    @endif
+                    <a href="{{ $dashboardRoute }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                        <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                        Voltar
+                    </a>
+                </div>
             </div>
         </div>
 
         {{-- Dica: Como funciona --}}
-        <div class="rounded-3xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 p-6 shadow-sm">
+        <div class="rounded-3xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 p-6 shadow-sm" data-tour="income-intro">
             <div class="flex gap-4">
                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                     <x-icon name="circle-info" style="duotone" class="w-5 h-5" />
                 </div>
-                <div>
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funciona no Vertex Contas</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Minha Renda define seu <strong>planejamento mensal</strong>: o que você espera receber e o que já compromete (despesas fixas). A <strong>capacidade mensal</strong> é receitas menos despesas fixas. As <strong>transações</strong> no extrato são os lançamentos reais nas contas. Aqui você só planeja; no Extrato você registra o que de fato entrou e saiu.</p>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-gray-900 dark:text-white">Como funciona no Vertex Contas</h3>
+                            <x-core::help-tooltip
+                                content="Minha Renda é o planejamento: o que você espera receber e comprometer. A capacidade mensal (no dashboard) é receitas menos despesas fixas. Transações no Extrato são os lançamentos reais."
+                                tour-trigger="income"
+                                position="bottom"
+                            />
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Minha Renda define seu <strong>planejamento mensal</strong>: o que você espera receber e o que já compromete (despesas fixas). A <strong>capacidade mensal</strong> é receitas menos despesas fixas. As <strong>transações</strong> no extrato são os lançamentos reais nas contas. Aqui você só planeja; no Extrato você registra o que de fato entrou e saiu.</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
         @if($inspectionReadOnly ?? false)
             <div class="rounded-3xl border-2 border-dashed border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -100,15 +112,22 @@
             @csrf
 
             {{-- Receitas --}}
-            <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+            <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden" data-tour="income-form">
                 <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex flex-wrap items-center justify-between gap-4 bg-emerald-500/5 dark:bg-emerald-500/10">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                             <x-icon name="arrow-trend-up" style="duotone" class="w-5 h-5" />
                         </div>
-                        <div>
-                            <h2 class="font-bold text-gray-900 dark:text-white">Receitas recorrentes</h2>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Salário, bônus, aluguéis — o que entra todo mês</p>
+                        <div class="flex items-center gap-2">
+                            <div>
+                                <h2 class="font-bold text-gray-900 dark:text-white">Receitas recorrentes</h2>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Salário, bônus, aluguéis — o que entra todo mês</p>
+                            </div>
+                            <x-core::help-tooltip
+                                content="Cadastre cada fonte de renda com valor e dia previsto. No plano Free: uma receita; no Pro: várias receitas e despesas fixas."
+                                tour-trigger="income"
+                                position="bottom"
+                            />
                         </div>
                     </div>
                     <button type="button" @click="addIncome()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider transition-colors">
@@ -116,7 +135,7 @@
                         Adicionar receita
                     </button>
                 </div>
-                <div class="p-6 space-y-4">
+                <div class="p-6 space-y-4" data-tour="income-list">
                     <template x-for="(row, index) in incomes" :key="'inc-'+index">
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-950/50 border border-gray-200 dark:border-white/5">
                             <div class="md:col-span-3">
@@ -171,7 +190,7 @@
                                 <h2 class="font-bold text-gray-900 dark:text-white">Despesas fixas</h2>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Aluguel, internet, assinaturas — o que sai todo mês</p>
                             </div>
-                            <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">Vertex Pro</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">{{ plan_pro_name() }}</span>
                         </div>
                         <button type="button" @click="addExpense()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider transition-colors">
                             <x-icon name="plus" style="solid" class="w-4 h-4" />
@@ -232,13 +251,13 @@
                             <x-icon name="lock" style="solid" class="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white">Despesas fixas (Vertex Pro)</h3>
+                            <h3 class="font-bold text-gray-900 dark:text-white">Despesas fixas ({{ plan_pro_name() }})</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Planeje aluguel, contas e assinaturas para ver sua capacidade mensal real.</p>
                         </div>
                     </div>
                     <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors">
                         <x-icon name="sparkles" style="duotone" class="w-4 h-4" />
-                        Vertex Pro
+                        {{ plan_pro_name() }}
                     </a>
                 </div>
             @endif
@@ -256,7 +275,7 @@
         @endif
     </div>
 
-    {{-- Modal: Upgrade Vertex Pro --}}
+    {{-- Modal: Upgrade PRO --}}
     <div x-show="showUpgradeModal"
          x-cloak
          x-transition
@@ -268,7 +287,7 @@
                 <div class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-5 text-amber-600 dark:text-amber-400">
                     <x-icon name="sparkles" style="duotone" class="w-7 h-7" />
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Vertex Pro</h2>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ plan_pro_name() }}</h2>
                 <p class="mt-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                     Múltiplas receitas, despesas fixas e vínculo com contas são recursos exclusivos para assinantes Pro.
                 </p>
@@ -284,4 +303,26 @@
             </div>
         </div>
     </div>
+    @if(!empty($tourId) && !empty($tourSteps))
+    @push('scripts')
+    <script>
+    (function() {
+        var tourId = @json($tourId);
+        var steps = @json($tourSteps);
+        function register() {
+            if (window.registerVertexTourSteps && steps && steps.length) {
+                window.registerVertexTourSteps(tourId, steps);
+                return;
+            }
+            setTimeout(register, 50);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', register);
+        } else {
+            register();
+        }
+    })();
+    </script>
+    @endpush
+    @endif
 </x-paneluser::layouts.master>

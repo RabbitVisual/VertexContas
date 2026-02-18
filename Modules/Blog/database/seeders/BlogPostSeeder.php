@@ -23,9 +23,9 @@ class BlogPostSeeder extends Seeder
      */
     public function run(): void
     {
-        $author = User::where('email', 'admin@vertexcontas.com')->first();
+        $author = User::role('admin')->first();
         if (! $author) {
-            $this->command->warn('Admin user not found. Run DatabaseSeeder first.');
+            $this->command->warn('Admin user not found. Run DatabaseSeeder (RolesAndPermissions + AdminUserSeeder) first.');
             return;
         }
 

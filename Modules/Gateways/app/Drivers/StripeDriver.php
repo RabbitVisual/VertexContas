@@ -52,6 +52,18 @@ class StripeDriver implements PaymentGatewayInterface
     {
         $currency = $this->gateway->metadata['currency'] ?? 'brl';
         $unitAmount = (int) round($amount * 100); // centavos
+        $noTrial = ! empty($metadata['no_trial']);
+
+        $productDescription = $noTrial
+            ? 'Assinatura mensal. Cancele quando quiser.'
+            : 'Assinatura mensal com 7 dias grátis. Cancele quando quiser.';
+
+        $subscriptionData = [
+            'metadata' => $metadata,
+        ];
+        if (! $noTrial) {
+            $subscriptionData['trial_period_days'] = 7;
+        }
 
         $session = Session::create([
             'payment_method_types' => ['card'],
@@ -60,7 +72,7 @@ class StripeDriver implements PaymentGatewayInterface
                     'currency' => $currency,
                     'product_data' => [
                         'name' => 'Vertex Contas PRO',
-                        'description' => 'Assinatura mensal com 7 dias grátis. Cancele quando quiser.',
+                        'description' => $productDescription,
                     ],
                     'unit_amount' => $unitAmount,
                     'recurring' => [
@@ -70,10 +82,7 @@ class StripeDriver implements PaymentGatewayInterface
                 'quantity' => 1,
             ]],
             'mode' => 'subscription',
-            'subscription_data' => [
-                'trial_period_days' => 7,
-                'metadata' => $metadata,
-            ],
+            'subscription_data' => $subscriptionData,
             'customer_email' => $metadata['email'] ?? null,
             'success_url' => route('paneluser.index') . '?payment=success&session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('user.subscription.index') . '?payment=cancelled',

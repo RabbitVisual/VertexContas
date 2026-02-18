@@ -1,134 +1,113 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Novo Post</x-slot>
 
-    <div class="max-w-5xl mx-auto space-y-8">
-        <!-- Header -->
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.blog.index') }}" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 flex items-center justify-center text-slate-400 hover:text-primary transition-all">
-                <x-icon name="arrow-left" style="duotone" />
-            </a>
-            <div>
-                <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Novo Post</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Crie um novo artigo para sua audiência.</p>
+    <x-paneladmin::page title="Novo Post" subtitle="Crie um novo artigo para o blog.">
+        @if(session('error'))
+            <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-4 text-amber-600 dark:text-amber-400 mb-6" role="alert">
+                <x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('error') }}</p>
             </div>
-        </div>
+        @endif
+
+        <x-slot name="header">
+            <a href="{{ route('admin.blog.index') }}" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-2">
+                <x-icon name="arrow-left" style="duotone" class="w-4 h-4" /> Voltar
+            </a>
+        </x-slot>
 
         <form action="{{ route('admin.blog.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             @csrf
-
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-8">
-                <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-                    <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Título do Artigo</label>
-                        <input type="text" name="title" required value="{{ old('title') }}" placeholder="Ex: 5 Dicas para Economizar este Mês" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-bold text-lg">
+            <div class="lg:col-span-2 space-y-6">
+                <x-paneladmin::card title="Conteúdo" subtitle="Título e corpo do artigo.">
+                    <div class="p-6 space-y-6">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Título</label>
+                            <input type="text" name="title" required value="{{ old('title') }}" placeholder="Ex: 5 Dicas para Economizar" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Conteúdo</label>
+                            <textarea name="content" id="editor" rows="18" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm resize-none focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('content') }}</textarea>
+                        </div>
                     </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Conteúdo</label>
-                        <textarea name="content" id="editor" rows="20" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-medium text-sm resize-none">{{ old('content') }}</textarea>
+                </x-paneladmin::card>
+                <x-paneladmin::card title="SEO" subtitle="Meta descrição e imagem OG.">
+                    <div class="p-6 space-y-6">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meta Descrição</label>
+                            <textarea name="meta_description" rows="2" maxlength="160" placeholder="Até 160 caracteres..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm resize-none">{{ old('meta_description') }}</textarea>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Imagem OG</label>
+                            <input type="file" name="og_image" accept="image/*" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm">
+                        </div>
                     </div>
-                </div>
-
-                <!-- SEO Section -->
-                <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-                    <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                        <x-icon name="magnifying-glass" style="duotone" class="text-[#11C76F] text-sm" /> Configurações de SEO
-                    </h3>
-
-                    <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Meta Descrição</label>
-                        <textarea name="meta_description" rows="2" maxlength="160" placeholder="Breve resumo para os buscadores..." class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-medium text-sm resize-none">{{ old('meta_description') }}</textarea>
-                    </div>
-
-                     <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Imagem OG (Redes Sociais)</label>
-                        <input type="file" name="og_image" class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] text-slate-500 font-bold text-sm">
-                    </div>
-                </div>
+                </x-paneladmin::card>
             </div>
-
-            <!-- Sidebar Controls -->
-            <div class="space-y-8">
-                <!-- Status & Category -->
-                <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-                    <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Categoria</label>
-                        <select name="category_id" required class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-bold text-sm">
-                            <option value="">Selecione...</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Status de Publicação</label>
-                        <select name="status" required class="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-[1.5rem] focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white font-bold text-sm">
-                            <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Rascunho</option>
-                            <option value="pending_review" {{ old('status') == 'pending_review' ? 'selected' : '' }}>Revisão Pendente</option>
-                            <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Publicado Agora</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Conteúdo Premium</span>
-                            <span class="text-[9px] text-slate-400 font-bold">Apenas assinantes Pro</span>
+            <div class="space-y-6">
+                <x-paneladmin::card title="Publicação" subtitle="Categoria e status.">
+                    <div class="p-6 space-y-6">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoria</label>
+                            <div class="relative">
+                                <select name="category_id" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                    <option value="">Selecione...</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><x-icon name="chevron-down" style="duotone" class="w-4 h-4 text-slate-400" /></span>
+                            </div>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="is_premium" value="1" class="sr-only peer" {{ old('is_premium') ? 'checked' : '' }}>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Notificar Time</span>
-                            <span class="text-[9px] text-slate-400 font-bold">Enviar aviso global</span>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</label>
+                            <div class="relative">
+                                <select name="status" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                    <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Rascunho</option>
+                                    <option value="pending_review" {{ old('status') == 'pending_review' ? 'selected' : '' }}>Revisão Pendente</option>
+                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Publicado</option>
+                                </select>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><x-icon name="chevron-down" style="duotone" class="w-4 h-4 text-slate-400" /></span>
+                            </div>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="notify_users" value="1" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Featured Image -->
-                <div class="bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Imagem de Destaque</label>
-                    <div class="space-y-4">
-                        <div class="w-full aspect-video bg-gray-50 dark:bg-slate-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-slate-400 group hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden" onclick="document.getElementById('featured_image').click()">
-                            <x-icon name="cloud-arrow-up" style="duotone" class="text-3xl mb-2 group-hover:scale-110 transition-transform" />
-                            <span class="text-[10px] font-black uppercase tracking-widest">Upload Imagem</span>
-                            <input type="file" name="featured_image" id="featured_image" class="hidden" onchange="previewImage(this)">
-                            <img id="preview" class="hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700">
+                            <div><span class="text-sm font-bold text-slate-900 dark:text-white block">Conteúdo Premium</span><span class="text-xs text-slate-500 dark:text-slate-400">Apenas PRO</span></div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_premium" value="1" class="sr-only peer" {{ old('is_premium') ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-600 rounded-full peer peer-checked:bg-[#11C76F] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                            </label>
                         </div>
-                        <p class="text-[9px] text-slate-400 font-bold text-center italic">Recomendado: 1200x630px (Max 2MB)</p>
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700">
+                            <div><span class="text-sm font-bold text-slate-900 dark:text-white block">Notificar usuários</span><span class="text-xs text-slate-500 dark:text-slate-400">Aviso ao publicar</span></div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="notify_users" value="1" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 dark:bg-slate-600 rounded-full peer peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                            </label>
+                        </div>
                     </div>
-                </div>
-
-                <button type="submit" class="w-full py-5 bg-primary text-white font-black rounded-3xl shadow-xl shadow-primary/20 hover:bg-primary-dark transition-all transform hover:-translate-y-1 active:scale-95">
-                    Criar Post Agora
+                </x-paneladmin::card>
+                <x-paneladmin::card title="Imagem de Destaque" subtitle="Recomendado 1200×630px.">
+                    <div class="p-6">
+                        <div class="w-full aspect-video rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-600 flex flex-col items-center justify-center text-slate-400 hover:border-[#11C76F]/40 transition-colors cursor-pointer relative overflow-hidden group" onclick="document.getElementById('featured_image').click()">
+                            <x-icon name="cloud-arrow-up" style="duotone" class="w-10 h-10 mb-2 group-hover:text-[#11C76F] transition-colors" />
+                            <span class="text-xs font-bold uppercase tracking-wider">Clique para enviar</span>
+                            <input type="file" name="featured_image" id="featured_image" class="hidden" accept="image/*" onchange="previewImage(this)">
+                            <img id="preview" class="hidden absolute inset-0 w-full h-full object-cover" alt="">
+                        </div>
+                    </div>
+                </x-paneladmin::card>
+                <button type="submit" class="w-full py-4 bg-[#11C76F] text-white font-black rounded-xl hover:bg-[#0EA85A] transition-colors flex items-center justify-center gap-2">
+                    <x-icon name="plus" style="duotone" class="w-5 h-5" /> Criar Post
                 </button>
             </div>
         </form>
-    </div>
+    </x-paneladmin::page>
 
+    @push('styles')
+    <style>.blog-select{appearance:none!important;-webkit-appearance:none!important;-moz-appearance:none!important;background-image:none!important}</style>
+    @endpush
     @push('scripts')
     <script>
-        function previewImage(input) {
-            const preview = document.getElementById('preview');
-            const placeholder = input.parentElement;
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        function previewImage(input){var p=document.getElementById('preview');if(input.files&&input.files[0]){var r=new FileReader();r.onload=function(e){p.src=e.target.result;p.classList.remove('hidden');};r.readAsDataURL(input.files[0]);}}
     </script>
     @endpush
 </x-paneladmin::layouts.master>

@@ -149,7 +149,7 @@
                         @if($isPro)
                             <li class="flex items-start gap-2 pt-2 border-t border-amber-200 dark:border-amber-700/50">
                                 <x-icon name="crown" style="solid" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                                <span class="font-semibold text-amber-700 dark:text-amber-400">Vertex PRO:</span> Atendimento VIP com verificação de sessão mais rápida e badge exclusivo no banner.
+                                <span class="font-semibold text-amber-700 dark:text-amber-400">{{ plan_pro_name() }}:</span> Atendimento VIP com verificação de sessão mais rápida e badge exclusivo no banner.
                             </li>
                         @endif
                     </ul>

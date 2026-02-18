@@ -58,6 +58,55 @@ class CoreServiceProvider extends ServiceProvider
             $view->with('inspectionSyncActive', $syncActive);
         });
 
+        // Share current page tour id and steps (layout + content views so registerVertexTourSteps works)
+        $pageTourComposer = function ($view): void {
+            $pageTourId = null;
+            $pageTourSteps = [];
+            if (Auth::check() && $route = request()->route()) {
+                $tourService = $this->app->make(\Modules\Core\Services\TourService::class);
+                $pageTourId = $tourService->getTourForRoute($route->getName(), false);
+                if ($pageTourId !== null) {
+                    $pageTourSteps = $tourService->getStepsForTour($pageTourId, Auth::user()->isPro());
+                }
+            }
+            $view->with('pageTourId', $pageTourId);
+            $view->with('pageTourSteps', $pageTourSteps);
+        };
+        View::composer(['paneluser::components.layouts.master', 'paneluser::layouts.master'], $pageTourComposer);
+        View::composer([
+            'core::accounts.index',
+            'core::transactions.index',
+            'core::transactions.create',
+            'core::transactions.transfer',
+            'core::goals.index',
+            'core::budgets.index',
+            'core::reports.index',
+            'core::categories.index',
+            'core::income.index',
+            'paneluser::tickets.index',
+            'paneluser::tickets.create',
+            'paneluser::tickets.show',
+            'paneluser::subscription.index',
+            'paneluser::profile.show',
+            'paneluser::profile.edit',
+            'paneluser::security.index',
+            'paneluser::blog.index',
+            'paneluser::blog.show',
+            'paneluser::legal.acceptance',
+            'paneluser::achievements.index',
+            'paneluser::achievements.show',
+        ], $pageTourComposer);
+
+        // Share dashboard tour data so dashboard view can register steps
+        View::composer('core::dashboard', function ($view) {
+            $tourId = \Modules\Core\Services\TourService::TOUR_DASHBOARD;
+            $tourService = $this->app->make(\Modules\Core\Services\TourService::class);
+            $user = Auth::user();
+            $tourSteps = $user ? $tourService->getStepsForTour($tourId, $user->isPro()) : [];
+            $view->with('dashboardTourId', $tourId);
+            $view->with('dashboardTourSteps', $tourSteps);
+        });
+
         // Share branding variables for logo, favicon and panel names across all relevant views
         View::composer([
             'paneladmin::*',

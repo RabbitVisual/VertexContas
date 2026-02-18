@@ -102,17 +102,16 @@ Acesse: `http://localhost:8000`
 
 ## 📧 E-mails e Fila (Produção / Hostinger)
 
-Os e-mails (boas-vindas, reset de senha, confirmação PRO) são enviados via fila para não travar a navegação. Configure:
+Os e-mails (boas-vindas, reset de senha, confirmação PRO) e notificações são enviados via fila. **É vital** configurar o Cron na Hostinger para que a fila seja processada.
+
+Para um checklist completo de deploy (ambiente, cache, storage, frontend, cron e validação pós-deploy), consulte **[docs/DEPLOY.md](docs/DEPLOY.md)**.
 
 1. **Queue:** No `.env`, defina `QUEUE_CONNECTION=database`.
-2. **Cron Job:** No painel da Hostinger, adicione um Cron que rode a cada minuto:
+2. **Cron Job (obrigatório):** No painel da Hostinger, adicione um Cron que rode **a cada minuto**:
    ```bash
-   * * * * * cd /caminho/do/projeto && php artisan schedule:run >> /dev/null 2>&1
+   * * * * * cd /caminho/absoluto/do/projeto && php artisan schedule:run >> /dev/null 2>&1
    ```
-   Ou, para processar apenas a fila:
-   ```bash
-   * * * * * cd /caminho/do/projeto && php artisan queue:work database --stop-when-empty --max-time=55 >> /dev/null 2>&1
-   ```
+   O `schedule:run` executa automaticamente o `queue:work --stop-when-empty --max-time=55` a cada minuto (definido em `routes/console.php`), além de outras tarefas agendadas (ex.: transações recorrentes diárias).
 
 ---
 

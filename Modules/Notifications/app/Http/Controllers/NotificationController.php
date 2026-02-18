@@ -86,4 +86,49 @@ class NotificationController extends Controller
 
         return back()->with('success', 'Todas as notificações foram marcadas como lidas.');
     }
+
+    /**
+     * Delete a single notification (user's own).
+     */
+    public function delete(string $id)
+    {
+        $user = Auth::user();
+        $deleted = $user->notifications()->where('id', $id)->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => (bool) $deleted]);
+        }
+
+        return back()->with('success', 'Notificação removida.');
+    }
+
+    /**
+     * Delete all read notifications for current user.
+     */
+    public function clearRead()
+    {
+        $user = Auth::user();
+        $deleted = $user->notifications()->whereNotNull('read_at')->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'deleted' => $deleted]);
+        }
+
+        return back()->with('success', $deleted > 0 ? "{$deleted} notificação(ões) removida(s)." : 'Nenhuma notificação lida para remover.');
+    }
+
+    /**
+     * Delete all notifications for current user.
+     */
+    public function clearAll()
+    {
+        $user = Auth::user();
+        $deleted = $user->notifications()->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'deleted' => $deleted]);
+        }
+
+        return back()->with('success', $deleted > 0 ? "{$deleted} notificação(ões) removida(s)." : 'Nenhuma notificação para remover.');
+    }
 }

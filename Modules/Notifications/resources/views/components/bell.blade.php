@@ -13,8 +13,9 @@
         </span>
     </button>
 
-    <!-- Dropdown Panel -->
+    <!-- Dropdown Panel (x-cloak evita flash ao trocar de página antes do Alpine hidratar) -->
     <div x-show="isOpen"
+         x-cloak
          @click.away="isOpen = false"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 translate-y-2"

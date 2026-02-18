@@ -167,7 +167,7 @@
                         Recurso Premium
                     </h2>
                     <p class="mt-2 text-slate-600 dark:text-slate-400">
-                        Acompanhar várias fontes de receita separadamente (salário, bônus, pensão, vale-refeição) é um benefício Vertex PRO. No plano gratuito você pode cadastrar uma única receita total.
+                        Acompanhar várias fontes de receita separadamente (salário, bônus, pensão, vale-refeição) é um benefício {{ plan_pro_name() }}. No {{ plan_free_name() }} você pode cadastrar uma única receita total.
                     </p>
                     <div class="mt-6 flex flex-col sm:flex-row gap-3">
                         <a
@@ -175,7 +175,7 @@
                             class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold transition-colors shadow-lg shadow-amber-500/25"
                         >
                             <x-icon name="crown" style="solid" />
-                            Conhecer Vertex PRO
+                            Conhecer {{ plan_pro_name() }}
                         </a>
                         <button
                             type="button"

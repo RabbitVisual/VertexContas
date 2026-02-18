@@ -14,7 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Account;
-use Modules\Core\Services\SettingService;
+use Modules\Core\Models\Plan;
 use Modules\Core\Models\Transaction;
 use Modules\Gamification\Models\Medal;
 use Modules\HomePage\Services\HomePageProDataService;
@@ -24,7 +24,7 @@ class HomePageController extends Controller
     /**
      * Display the public homepage. PRO users see personalized vitrine.
      */
-    public function home(HomePageProDataService $proDataService, SettingService $settingService)
+    public function home(HomePageProDataService $proDataService)
     {
         $financialSnapshot = null;
         $proHomeData = null;
@@ -79,34 +79,37 @@ class HomePageController extends Controller
             ->take(4)
             ->values();
 
-        $proHasLimits = (bool) $settingService->get('pro_has_limits', 0);
-        $freeLimits = [
-            'account' => (int) $settingService->get('limit_free_account', 1),
-            'income' => (int) $settingService->get('limit_free_income', 5),
-            'expense' => (int) $settingService->get('limit_free_expense', 5),
-            'goal' => (int) $settingService->get('limit_free_goal', 1),
-            'budget' => (int) $settingService->get('limit_free_budget', 1),
-        ];
-        $limitsPro = [
-            'account' => (int) $settingService->get('limit_pro_account', -1),
-            'income' => (int) $settingService->get('limit_pro_income', -1),
-            'expense' => (int) $settingService->get('limit_pro_expense', -1),
-            'goal' => (int) $settingService->get('limit_pro_goal', -1),
-            'budget' => (int) $settingService->get('limit_pro_budget', -1),
-        ];
-        $planFreeName = (string) $settingService->get('plan_free_name', 'Plano Gratuito');
-        $planProName = (string) $settingService->get('plan_pro_name', 'Vertex PRO');
+        $planFree = Plan::getDefaultFree();
+        $paidPlans = Plan::where('is_free', false)->where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+
+        $freeLimits = ['account' => 1, 'income' => 15, 'expense' => 15, 'goal' => 1, 'budget' => 1];
+        $limitsPro = ['account' => -1, 'income' => -1, 'expense' => -1, 'goal' => -1, 'budget' => -1];
+        $proHasLimits = false;
+        if ($planFree) {
+            foreach (Plan::limitEntities() as $entity) {
+                $val = $planFree->getLimit($entity);
+                $freeLimits[$entity] = $val === 'unlimited' ? -1 : (int) $val;
+            }
+        }
+        $firstPaid = $paidPlans->first();
+        if ($firstPaid) {
+            foreach (Plan::limitEntities() as $entity) {
+                $val = $firstPaid->getLimit($entity);
+                $limitsPro[$entity] = $val === 'unlimited' ? -1 : (int) $val;
+            }
+            $proHasLimits = collect($limitsPro)->contains(fn ($v) => $v >= 0);
+        }
 
         return view('homepage::homepage', compact(
             'financialSnapshot',
             'proHomeData',
             'isPro',
             'medals',
+            'planFree',
+            'paidPlans',
             'freeLimits',
             'limitsPro',
-            'proHasLimits',
-            'planFreeName',
-            'planProName'
+            'proHasLimits'
         ));
     }
 

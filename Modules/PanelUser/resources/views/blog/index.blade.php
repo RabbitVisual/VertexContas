@@ -1,7 +1,7 @@
 <x-paneluser::layouts.master :title="'Blog'">
 <div class="max-w-6xl mx-auto space-y-8 px-4 pb-12">
     {{-- Hero (CBAV-style) --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-slate-200 dark:border-slate-700 p-8 sm:p-12 shadow-sm">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-slate-200 dark:border-slate-700 p-8 sm:p-12 shadow-sm" data-tour="blog-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-[100px]" aria-hidden="true"></div>
         <div class="relative z-10">
             <nav class="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-4" aria-label="Navegação">
@@ -88,4 +88,27 @@
         <div class="mt-8">{{ $posts->links() }}</div>
     @endif
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

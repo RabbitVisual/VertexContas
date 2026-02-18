@@ -545,6 +545,24 @@ class FinancialHealthService
                 'amount' => (float) $rt->amount,
             ]);
     }
+
+    /**
+     * Income sources with normalized monthly amounts for consulting report / AI context.
+     */
+    public function getIncomeSourcesForConsulting(User $user): Collection
+    {
+        return RecurringTransaction::query()
+            ->where('user_id', $user->id)
+            ->where('type', 'income')
+            ->where('is_baseline', true)
+            ->active()
+            ->orderBy('description')
+            ->get()
+            ->map(fn (RecurringTransaction $rt) => [
+                'description' => $rt->description ?? 'Receita',
+                'amount' => $this->getNormalizedMonthlyAmount($rt),
+            ]);
+    }
     /**
      * Centralized logic to sync user budget planning (Baseline).
      * Now supports both Income and Expense with Account linkage.

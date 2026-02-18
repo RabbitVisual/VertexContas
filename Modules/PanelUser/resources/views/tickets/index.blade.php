@@ -5,7 +5,7 @@
 <x-paneluser::layouts.master :title="'Central de Ajuda'">
     <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-12">
         {{-- Hero CBAV --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="tickets-intro">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -24,9 +24,13 @@
                             Gerencie seus chamados e obtenha suporte da nossa equipe.
                         @endif
                     </p>
+                    <p class="mt-2 text-sm font-medium text-primary-600 dark:text-primary-400">{{ ticket_sla_message() }}</p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
+                    @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                        <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                    @endif
                     @if($isPro)
                         <a href="{{ route('user.tickets.export') }}"
                             class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
@@ -36,52 +40,50 @@
                     @endif
                     <a href="{{ route('user.tickets.create') }}"
                         class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
+                        <x-icon name="plus" style="duotone" class="w-5 h-5" />
                         Novo Chamado
                     </a>
                 </div>
             </div>
 
-            @if($isPro)
-                <div class="relative z-10 mt-8 pt-8 border-t border-gray-200 dark:border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
-                            <x-icon name="ticket" style="duotone" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total</p>
-                            <p class="text-lg font-black text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
-                        </div>
+            <div class="relative z-10 mt-8 pt-8 border-t border-gray-200 dark:border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
+                        <x-icon name="ticket" style="duotone" class="w-5 h-5" />
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                            <x-icon name="folder-open" style="duotone" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Abertos</p>
-                            <p class="text-lg font-black text-blue-600 dark:text-blue-400">{{ $stats['abertos'] }}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                            <x-icon name="clock" style="duotone" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Pendentes</p>
-                            <p class="text-lg font-black text-amber-600 dark:text-amber-400">{{ $stats['pendentes'] }}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                            <x-icon name="circle-check" style="duotone" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Resolvidos</p>
-                            <p class="text-lg font-black text-emerald-600 dark:text-emerald-400">{{ $stats['resolvidos'] }}</p>
-                        </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total</p>
+                        <p class="text-lg font-black text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
                     </div>
                 </div>
-            @endif
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                        <x-icon name="folder-open" style="duotone" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Abertos</p>
+                        <p class="text-lg font-black text-blue-600 dark:text-blue-400">{{ $stats['abertos'] }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                        <x-icon name="clock" style="duotone" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Pendentes</p>
+                        <p class="text-lg font-black text-amber-600 dark:text-amber-400">{{ $stats['pendentes'] }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <x-icon name="circle-check" style="duotone" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">Resolvidos</p>
+                        <p class="text-lg font-black text-emerald-600 dark:text-emerald-400">{{ $stats['resolvidos'] }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         @if(!$isPro)
@@ -91,7 +93,7 @@
                         <x-icon name="crown" style="duotone" class="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white">Suporte Prioritário com Vertex PRO</h3>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Suporte Prioritário com {{ plan_pro_name() }}</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Exporte histórico, tenha atendimento VIP e respostas mais rápidas.</p>
                     </div>
                 </div>
@@ -103,7 +105,7 @@
         @endif
 
         {{-- Lista de Chamados --}}
-        <div class="grid grid-cols-1 gap-6">
+        <div class="grid grid-cols-1 gap-6" data-tour="tickets-list">
             @forelse($tickets as $ticket)
                 @php
                     $iconClass = match($ticket->status) {
@@ -182,4 +184,27 @@
             </div>
         @endif
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

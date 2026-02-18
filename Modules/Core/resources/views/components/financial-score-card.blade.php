@@ -7,14 +7,12 @@
 ])
 
 @php
-    $pct = min(100, max(0, $score)) / 100;
-    $angle = 180 * (1 - $pct);
-    $rad = deg2rad($angle);
-    $cx = 100;
-    $cy = 90;
+    // Meia-lua: um único path para track e progresso; progresso = stroke-dasharray no mesmo traço.
+    $pct = min(100, max(0, (int) $score)) / 100;
     $r = 80;
-    $x2 = $cx + $r * cos($rad);
-    $y2 = $cy + $r * sin($rad);
+    $arcLength = M_PI * $r; // comprimento do semicírculo (πr)
+    $dashVisible = $pct * $arcLength;
+    $dashGap = $arcLength - $dashVisible;
     $strokeHex = $score === 0 ? '#94a3b8' : ($score <= 40 ? '#ef4444' : ($score <= 70 ? '#f59e0b' : '#22c55e'));
 @endphp
 
@@ -30,9 +28,11 @@
         {{-- Center: Gauge + Number + Status --}}
         <div class="flex flex-col items-center justify-center">
             <div class="relative w-24 h-24 shrink-0">
-                <svg viewBox="0 0 200 100" class="w-full h-full -scale-y-100">
+                <svg viewBox="0 0 200 100" class="w-full h-full -scale-y-100" aria-hidden="true">
+                    {{-- Track (meia-lua): path único --}}
                     <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" class="text-gray-200 dark:text-gray-700" />
-                    <path d="M 20 90 A 80 80 0 0 1 {{ $x2 }} {{ $y2 }}" fill="none" stroke="{{ $strokeHex }}" stroke-width="10" stroke-linecap="round" />
+                    {{-- Progresso: mesmo path, só os primeiros pct% com dasharray = mesmo traço, mesma espessura --}}
+                    <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="{{ $strokeHex }}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{ round($dashVisible, 2) }} {{ round($dashGap, 2) }}" stroke-dashoffset="0" />
                 </svg>
                 <div class="absolute inset-0 flex items-center justify-center pt-2">
                     <span class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ $score }}</span>

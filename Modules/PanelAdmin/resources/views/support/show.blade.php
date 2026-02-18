@@ -2,6 +2,19 @@
     <x-slot name="navbarTitle">Ticket #{{ $ticket->id }}</x-slot>
 
     <div class="h-[calc(100vh-8rem)] flex flex-col">
+        @if(session('success'))
+            <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400 mb-6" role="alert">
+                <x-icon name="circle-check" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-4 text-amber-600 dark:text-amber-400 mb-6" role="alert">
+                <x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('error') }}</p>
+            </div>
+        @endif
+
         <!-- Header -->
         <div class="bg-white dark:bg-slate-800 rounded-xl p-6 mb-6 border border-slate-100 dark:border-slate-700 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
@@ -9,12 +22,14 @@
                     <x-icon name="arrow-left" style="duotone" class="group-hover:-translate-x-1 transition-transform" />
                 </a>
                 <div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs font-black text-[#11C76F] bg-[#11C76F]/10 px-3 py-1 rounded-full uppercase tracking-widest">Support Ticket</span>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-black text-[#11C76F] bg-[#11C76F]/10 px-3 py-1 rounded-full uppercase tracking-widest">
+                            <x-icon name="ticket" style="duotone" class="w-3.5 h-3.5" /> Chamado
+                        </span>
                         <span class="text-xs font-bold text-slate-400">#{{ $ticket->id }}</span>
                         @if($ticket->user->isPro())
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-                                <x-icon name="crown" style="solid" class="w-3 h-3" /> Cliente PRO
+                                <x-icon name="crown" style="duotone" class="w-3 h-3" /> Cliente PRO
                             </span>
                         @endif
                     </div>
@@ -36,10 +51,36 @@
                         'answered' => 'Respondido',
                         'closed' => 'Encerrado',
                     ];
+                    $statusIcon = [
+                        'open' => 'circle-dot',
+                        'pending' => 'clock',
+                        'answered' => 'circle-check',
+                        'closed' => 'circle-xmark',
+                    ];
                 @endphp
-                <div class="flex flex-col items-center px-6 py-2 rounded-2xl {{ $statusTheme[$ticket->status] }} border border-current/10">
-                    <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-60">Status Atual</span>
-                    <span class="text-xs font-black uppercase tracking-widest mt-0.5">{{ $statusLabel[$ticket->status] }}</span>
+                <div class="flex flex-col items-center px-6 py-2.5 rounded-2xl {{ $statusTheme[$ticket->status] }} border border-current/10">
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-60">Status</span>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest mt-0.5">
+                        <x-icon name="{{ $statusIcon[$ticket->status] ?? 'circle-question' }}" style="duotone" class="w-3.5 h-3.5" />
+                        {{ $statusLabel[$ticket->status] }}
+                    </span>
+                </div>
+
+                @php
+                    $priorityTheme = [
+                        'low' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
+                        'medium' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400',
+                        'high' => 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400',
+                    ];
+                    $priorityLabel = ['low' => 'Baixa', 'medium' => 'Média', 'high' => 'Alta'];
+                    $priorityIcon = ['low' => 'arrow-down', 'medium' => 'minus', 'high' => 'arrow-up'];
+                @endphp
+                <div class="flex flex-col items-center px-5 py-2.5 rounded-2xl {{ $priorityTheme[$ticket->priority] ?? 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400' }} border border-current/10">
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-60">Prioridade</span>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest mt-0.5">
+                        <x-icon name="{{ $priorityIcon[$ticket->priority] ?? 'minus' }}" style="duotone" class="w-3.5 h-3.5" />
+                        {{ $priorityLabel[$ticket->priority] ?? $ticket->priority }}
+                    </span>
                 </div>
 
                 <div class="h-10 w-px bg-gray-100 dark:bg-white/5 hidden md:block mx-2"></div>
@@ -120,7 +161,7 @@
                             <span class="px-3 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-widest">{{ $ticket->user->getRoleNames()->first() ?? 'Client' }}</span>
                             @if($ticket->user->isPro())
                                 <span class="px-3 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-lg text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-1">
-                                    <x-icon name="crown" style="solid" class="w-3 h-3" /> Vertex PRO
+                                    <x-icon name="crown" style="duotone" class="w-3 h-3" /> Vertex PRO
                                 </span>
                             @else
                                 <span class="px-3 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-widest">Gratuito</span>
@@ -147,7 +188,7 @@
                     <div class="mt-8 p-5 bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl border border-amber-500/20">
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 flex items-center justify-center bg-amber-500/20 rounded-xl">
-                                <x-icon name="crown" style="solid" class="text-amber-600 dark:text-amber-400 w-5 h-5" />
+                                <x-icon name="crown" style="duotone" class="text-amber-600 dark:text-amber-400 w-5 h-5" />
                             </div>
                             <div>
                                 <p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest">Cliente Vertex PRO</p>
@@ -159,7 +200,8 @@
                     @endif
 
                     <div class="mt-10 pt-8 border-t border-slate-100 dark:border-slate-700">
-                        <a href="{{ route('admin.users.show', $ticket->user) }}" class="w-full flex items-center justify-center py-4 rounded-2xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-[10px] font-black uppercase tracking-[0.1em] hover:scale-105 active:scale-95 transition-all shadow-xl">
+                        <a href="{{ route('admin.users.show', $ticket->user) }}" class="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-[10px] font-black uppercase tracking-[0.1em] hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
+                            <x-icon name="folder-open" style="duotone" class="w-4 h-4" />
                             Visualizar Dossier Completo
                         </a>
                     </div>
@@ -196,7 +238,8 @@
                         </div>
                     @endif
 
-                    <button @click="$dispatch('open-modal', 'assign-modal')" class="w-full py-4 bg-[#11C76F] text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.15em] hover:bg-[#0EA85A] transition-all shadow-lg active:scale-95 relative z-10">
+                    <button @click="$dispatch('open-modal', 'assign-modal')" class="w-full py-4 bg-[#11C76F] text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.15em] hover:bg-[#0EA85A] transition-all shadow-lg active:scale-95 relative z-10 flex items-center justify-center gap-2">
+                        <x-icon name="user-plus" style="duotone" class="w-4 h-4" />
                         Transferir Atendimento
                     </button>
                 </div>

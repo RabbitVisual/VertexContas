@@ -33,7 +33,7 @@ class CategoryController extends Controller
         $user = auth()->user();
         if (! $this->limitService->canCreate($user, 'category')) {
             return redirect()->route('core.categories.index')
-                ->with('error', $this->limitService->getLimitReachedMessage('category'));
+                ->with('error', $this->limitService->getLimitReachedMessage($user, 'category'));
         }
 
         return view('core::categories.create');
@@ -44,7 +44,7 @@ class CategoryController extends Controller
         $user = auth()->user();
         if (! $this->limitService->canCreate($user, 'category')) {
             return redirect()->route('core.categories.index')
-                ->with('error', $this->limitService->getLimitReachedMessage('category'));
+                ->with('error', $this->limitService->getLimitReachedMessage($user, 'category'));
         }
 
         $typeGroup = $request->type === 'expense' ? ($request->type_group ?? 'lifestyle') : null;

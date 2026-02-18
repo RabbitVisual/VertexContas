@@ -1,95 +1,164 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\PanelAdmin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Modules\Core\Services\SettingService;
+use Illuminate\View\View;
+use Modules\Core\Models\Plan;
 
 class PlanController extends Controller
 {
-    protected $settingService;
-
-    public function __construct(SettingService $settingService)
+    /**
+     * List all plans (table).
+     */
+    public function index(): View
     {
-        $this->settingService = $settingService;
+        $plans = Plan::orderBy('sort_order')->orderBy('id')->get();
+
+        return view('paneladmin::plans.index', compact('plans'));
     }
 
     /**
-     * Show the plans and limits configuration page.
+     * Show form to create a new plan.
      */
-    public function index()
+    public function create(): View
     {
-        $limits = [
-            'income' => $this->settingService->get('limit_free_income', 5),
-            'expense' => $this->settingService->get('limit_free_expense', 5),
-            'goal' => $this->settingService->get('limit_free_goal', 1),
-            'budget' => $this->settingService->get('limit_free_budget', 1),
-            'account' => $this->settingService->get('limit_free_account', 1),
-            'category' => $this->settingService->get('limit_free_category', 0),
-        ];
-
-        $planFreeName = $this->settingService->get('plan_free_name', 'Plano Gratuito');
-        $planProName = $this->settingService->get('plan_pro_name', 'Vertex PRO');
-        $proHasLimits = (bool) $this->settingService->get('pro_has_limits', 0);
-        $limitsPro = [
-            'income' => (int) $this->settingService->get('limit_pro_income', -1),
-            'expense' => (int) $this->settingService->get('limit_pro_expense', -1),
-            'goal' => (int) $this->settingService->get('limit_pro_goal', -1),
-            'budget' => (int) $this->settingService->get('limit_pro_budget', -1),
-            'account' => (int) $this->settingService->get('limit_pro_account', -1),
-            'category' => (int) $this->settingService->get('limit_pro_category', -1),
-        ];
-
-        return view('paneladmin::plans.index', compact('limits', 'planFreeName', 'planProName', 'proHasLimits', 'limitsPro'));
+        return view('paneladmin::plans.create', ['plan' => new Plan]);
     }
 
     /**
-     * Update the plans and limits.
+     * Store a new plan.
      */
-    public function update(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'limit_free_income' => 'required|integer|min:0',
-            'limit_free_expense' => 'required|integer|min:0',
-            'limit_free_goal' => 'required|integer|min:0',
-            'limit_free_budget' => 'required|integer|min:0',
-            'limit_free_account' => 'required|integer|min:0',
-            'limit_free_category' => 'required|integer|min:0',
-            'plan_free_name' => 'nullable|string|max:100',
-            'plan_pro_name' => 'nullable|string|max:100',
-            'pro_has_limits' => 'nullable|in:0,1',
-            'limit_pro_income' => 'nullable|integer|min:-1',
-            'limit_pro_expense' => 'nullable|integer|min:-1',
-            'limit_pro_goal' => 'nullable|integer|min:-1',
-            'limit_pro_budget' => 'nullable|integer|min:-1',
-            'limit_pro_account' => 'nullable|integer|min:-1',
-            'limit_pro_category' => 'nullable|integer|min:-1',
+        $validated = $this->validatePlan($request);
+        $this->ensureOneFreePlan($validated, null);
+        $validated = $this->normalizeLimitFields($validated);
+
+        Plan::create($validated);
+
+        return redirect()->route('admin.plans.index')->with('success', 'Plano criado com sucesso.');
+    }
+
+    /**
+     * Show form to edit a plan.
+     */
+    public function edit(Plan $plan): View
+    {
+        return view('paneladmin::plans.edit', compact('plan'));
+    }
+
+    /**
+     * Update a plan.
+     */
+    public function update(Request $request, Plan $plan): RedirectResponse
+    {
+        $validated = $this->validatePlan($request, $plan);
+        if ($plan->is_free && ! ($validated['is_free'] ?? false)) {
+            $otherFree = Plan::where('is_free', true)->where('id', '!=', $plan->id)->exists();
+            if (! $otherFree) {
+                return redirect()->back()->withInput()->with('error', 'Deve existir pelo menos um plano gratuito. Crie outro plano como gratuito antes de desmarcar este.');
+            }
+        }
+        $this->ensureOneFreePlan($validated, $plan);
+        $validated = $this->normalizeLimitFields($validated);
+
+        $plan->update($validated);
+
+        return redirect()->route('admin.plans.index')->with('success', 'Plano atualizado com sucesso.');
+    }
+
+    /**
+     * Delete or deactivate a plan.
+     */
+    public function destroy(Plan $plan): RedirectResponse
+    {
+        $defaultFree = Plan::getDefaultFree();
+        if ($defaultFree && (int) $defaultFree->id === (int) $plan->id) {
+            return redirect()->route('admin.plans.index')
+                ->with('error', 'Não é possível excluir o único plano gratuito. Desative-o ou defina outro plano como gratuito.');
+        }
+
+        $usersCount = $plan->users()->count();
+        if ($usersCount > 0) {
+            return redirect()->route('admin.plans.index')
+                ->with('error', "Existem {$usersCount} usuário(s) neste plano. Reatribua-os antes de excluir ou desative o plano.");
+        }
+
+        $plan->delete();
+
+        return redirect()->route('admin.plans.index')->with('success', 'Plano excluído com sucesso.');
+    }
+
+    private function validatePlan(Request $request, ?Plan $plan = null): array
+    {
+        $slugRule = 'required|string|max:60|unique:plans,slug';
+        if ($plan) {
+            $slugRule = 'required|string|max:60|unique:plans,slug,' . $plan->id;
+        }
+
+        return $request->validate([
+            'name' => 'required|string|max:100',
+            'slug' => $slugRule,
+            'billing_interval' => 'required|in:monthly,yearly',
+            'is_free' => 'nullable|boolean',
+            'limit_account' => 'nullable|integer|min:-1',
+            'limit_income' => 'nullable|integer|min:-1',
+            'limit_expense' => 'nullable|integer|min:-1',
+            'limit_goal' => 'nullable|integer|min:-1',
+            'limit_budget' => 'nullable|integer|min:-1',
+            'limit_category' => 'nullable|integer|min:-1',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
+            'stripe_price_id' => 'nullable|string|max:255',
+            'mercadopago_plan_id' => 'nullable|string|max:255',
+            'amount' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:3',
+        ], [], [
+            'name' => 'nome',
+            'slug' => 'slug',
+            'billing_interval' => 'recorrência',
+            'is_free' => 'plano gratuito',
+            'limit_account' => 'limite contas',
+            'limit_income' => 'limite receitas',
+            'limit_expense' => 'limite despesas',
+            'limit_goal' => 'limite metas',
+            'limit_budget' => 'limite orçamentos',
+            'limit_category' => 'limite categorias',
+            'sort_order' => 'ordem',
+            'is_active' => 'ativo',
         ]);
+    }
 
-        $stringKeys = ['plan_free_name', 'plan_pro_name'];
-        $integerKeys = [
-            'limit_free_income', 'limit_free_expense', 'limit_free_goal',
-            'limit_free_budget', 'limit_free_account', 'limit_free_category',
-            'pro_has_limits',
-            'limit_pro_income', 'limit_pro_expense', 'limit_pro_goal',
-            'limit_pro_budget', 'limit_pro_account', 'limit_pro_category',
-        ];
+    private function ensureOneFreePlan(array $validated, ?Plan $exclude): void
+    {
+        $willBeFree = (bool) ($validated['is_free'] ?? false);
+        if (! $willBeFree) {
+            return;
+        }
+        $query = Plan::where('is_free', true);
+        if ($exclude) {
+            $query->where('id', '!=', $exclude->id);
+        }
+        if ($query->exists()) {
+            $query->update(['is_free' => false]);
+        }
+    }
 
-        foreach ($validated as $key => $value) {
-            if (in_array($key, $stringKeys, true)) {
-                $this->settingService->set($key, $value ?? '', 'limits', 'string');
-            } elseif (in_array($key, $integerKeys, true)) {
-                $this->settingService->set($key, (int) $value, 'limits', 'integer');
+    private function normalizeLimitFields(array $validated): array
+    {
+        foreach (Plan::limitEntities() as $entity) {
+            $key = 'limit_' . $entity;
+            if (array_key_exists($key, $validated) && ($validated[$key] === '' || $validated[$key] === null)) {
+                $validated[$key] = -1;
             }
         }
-
-        if (empty($validated['pro_has_limits']) || (int) $validated['pro_has_limits'] === 0) {
-            foreach (['income', 'expense', 'goal', 'budget', 'account', 'category'] as $entity) {
-                $this->settingService->set("limit_pro_{$entity}", -1, 'limits', 'integer');
-            }
-        }
-
-        return back()->with('success', 'Configurações de planos atualizadas com sucesso!');
+        $validated['is_free'] = (bool) ($validated['is_free'] ?? false);
+        $validated['is_active'] = (bool) ($validated['is_active'] ?? true);
+        return $validated;
     }
 }

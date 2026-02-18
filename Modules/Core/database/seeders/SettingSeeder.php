@@ -265,6 +265,13 @@ class SettingSeeder extends Seeder
                 'type' => 'integer',
                 'is_encrypted' => false,
             ],
+            [
+                'key' => 'limit_ai_report_per_month',
+                'value' => 5,
+                'group' => 'document_templates',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
 
             // Security Settings
             [
@@ -324,6 +331,95 @@ class SettingSeeder extends Seeder
                 'key' => 'maintenance_message',
                 'value' => null,
                 'group' => 'general',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+
+            // Notifications retention
+            [
+                'key' => 'notifications_retention_days',
+                'value' => 90,
+                'group' => 'notifications',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'notifications_auto_clean_read',
+                'value' => true,
+                'group' => 'notifications',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+
+            // Public plan page (copy editable in Admin > Plan)
+            [
+                'key' => 'plan_page_headline',
+                'value' => 'Assuma o Controle da sua Elite Financeira',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_subhead',
+                'value' => 'Pare de apenas anotar gastos. Comece a construir riqueza com a Inteligência do Vertex PRO.',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_monthly_price',
+                'value' => '29,90',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_yearly_price',
+                'value' => '197,00',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_yearly_savings',
+                'value' => '160,00',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_cta_text',
+                'value' => 'QUERO SER VERTEX PRO',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_features_html',
+                'value' => '',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'plan_page_table_html',
+                'value' => '',
+                'group' => 'homepage',
+                'type' => 'string',
+                'is_encrypted' => false,
+            ],
+            // Cookie consent (LGPD) – exibido para todos os visitantes, inclusive anônimos
+            [
+                'key' => 'homepage_cookie_consent_enabled',
+                'value' => true,
+                'group' => 'homepage',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'homepage_cookie_consent_message',
+                'value' => 'Utilizamos cookies para garantir a melhor experiência, segurança e funcionamento do site. Ao continuar navegando, você concorda com nossa Política de Cookies e com o tratamento de dados conforme a LGPD. Você pode revogar ou alterar suas preferências a qualquer momento.',
+                'group' => 'homepage',
                 'type' => 'string',
                 'is_encrypted' => false,
             ],

@@ -3,9 +3,9 @@
     $dashboardRoute = ($isPro && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index');
 @endphp
 <x-paneluser::layouts.master :title="'Minhas Contas'">
-    <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
-        {{-- Hero CBAV --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
+        {{-- Hero CBAV (mesmo padrão Metas/Categorias: data-tour no card inteiro, sem ícone ? no hero) --}}
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="accounts-intro">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-teal-600/5 dark:bg-teal-600/10 rounded-full blur-[100px]"></div>
 
@@ -20,9 +20,12 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Cada conta tem seu saldo. As transações do <a href="{{ route('core.transactions.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Extrato</a> movimentam o saldo da conta escolhida.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
+                    @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                        <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                    @endif
                     @can('create', \Modules\Core\Models\Account::class)
                         @if(!($inspectionReadOnly ?? false))
-                            <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                            <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20" data-tour="accounts-new-account">
                                 <x-icon name="plus" style="solid" class="w-5 h-5" />
                                 Nova conta
                             </a>
@@ -36,7 +39,7 @@
             </div>
 
             {{-- Stats no hero (saldo + qtd) --}}
-            <div class="relative z-10 mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-wrap items-center justify-between gap-6">
+            <div class="relative z-10 mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-wrap items-center justify-between gap-6" data-tour="accounts-balance">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                         <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -96,40 +99,53 @@
             </div>
         </div>
 
-        {{-- Pro: Resumo por tipo --}}
-        @if($isPro && $accounts->count() > 0)
-            <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex items-center gap-3 bg-amber-500/5 dark:bg-amber-500/10">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+        {{-- Pro: Resumo por tipo (sempre exibir bloco para PRO para o tour ter alvo) --}}
+        @if($isPro)
+            @if($accounts->count() > 0)
+                <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden" data-tour="accounts-summary-by-type">
+                    <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex items-center gap-3 bg-amber-500/5 dark:bg-amber-500/10">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                            <x-icon name="chart-pie" style="duotone" class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 dark:text-white">Resumo por tipo</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ plan_pro_name() }}</p>
+                        </div>
+                        <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-white/5">
+                        @php
+                            $byType = $accounts->groupBy('type');
+                            $typeLabels = ['checking' => 'Corrente', 'savings' => 'Poupança', 'cash' => 'Dinheiro'];
+                        @endphp
+                        @foreach($typeLabels as $key => $label)
+                            @php $items = $byType->get($key, collect()); $sum = $items->sum('balance'); @endphp
+                            @if($items->count() > 0)
+                                <div class="p-6">
+                                    <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ $label }}</p>
+                                    <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white mt-1 font-mono tabular-nums"><x-core::financial-value :value="$sum" /></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $items->count() }} conta(s)</p>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden p-6 flex items-center gap-3 bg-amber-500/5 dark:bg-amber-500/10" data-tour="accounts-summary-by-type">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                         <x-icon name="chart-pie" style="duotone" class="w-5 h-5" />
                     </div>
                     <div>
                         <h3 class="font-bold text-gray-900 dark:text-white">Resumo por tipo</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Vertex Pro</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Quando você tiver contas, aqui aparecerá o total por tipo: Corrente, Poupança e Dinheiro. Exclusivo Vertex PRO.</p>
                     </div>
                     <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded">PRO</span>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-white/5">
-                    @php
-                        $byType = $accounts->groupBy('type');
-                        $typeLabels = ['checking' => 'Corrente', 'savings' => 'Poupança', 'cash' => 'Dinheiro'];
-                    @endphp
-                    @foreach($typeLabels as $key => $label)
-                        @php $items = $byType->get($key, collect()); $sum = $items->sum('balance'); @endphp
-                        @if($items->count() > 0)
-                            <div class="p-6">
-                                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ $label }}</p>
-                                <p class="sensitive-value text-xl font-black text-gray-900 dark:text-white mt-1 font-mono tabular-nums"><x-core::financial-value :value="$sum" /></p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $items->count() }} conta(s)</p>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
+            @endif
         @endif
 
         {{-- Cards: Pro = layout cartão virtual (flip); Free = cartão físico simples --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" data-tour="accounts-cards">
             @forelse($accounts as $index => $account)
                 @php
                     $gradients = [
@@ -217,7 +233,7 @@
 
             @if($accounts->count() > 0 && $accounts->count() < 20 && !($inspectionReadOnly ?? false))
                 @can('create', \Modules\Core\Models\Account::class)
-                    <a href="{{ route('core.accounts.create') }}" class="flex flex-col items-center justify-center min-h-[240px] border-2 border-dashed border-gray-300 dark:border-white/10 rounded-3xl hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-all group">
+                    <a href="{{ route('core.accounts.create') }}" class="flex flex-col items-center justify-center min-h-[240px] border-2 border-dashed border-gray-300 dark:border-white/10 rounded-3xl hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-all group" data-tour="accounts-new-account-card">
                         <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-4 transition-colors">
                             <x-icon name="plus" style="solid" class="w-8 h-8 text-gray-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
                         </div>
@@ -227,4 +243,27 @@
             @endif
         </div>
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

@@ -31,7 +31,7 @@
                                             <x-icon name="crown" class="w-8 h-8 text-white" />
                                         </div>
                                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Conteúdo Exclusivo PRO</h2>
-                                        <p class="text-gray-600 dark:text-gray-300 mb-6">Este artigo contém estratégias avançadas reservadas para assinantes Vertex PRO.</p>
+                                        <p class="text-gray-600 dark:text-gray-300 mb-6">Este artigo contém estratégias avançadas reservadas para assinantes {{ plan_pro_name() }}.</p>
                                         <a href="{{ route('paneluser.subscription.index') }}" class="inline-block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                             Desbloquear Acesso Agora
                                         </a>

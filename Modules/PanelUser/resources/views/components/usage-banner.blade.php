@@ -93,7 +93,7 @@
 
     <div class="flex items-center justify-between">
         <p class="text-xs text-gray-500 dark:text-gray-400">
-            Você está usando {{ $percentage }}% do seu plano gratuito.
+            Você está usando {{ $percentage }}% do seu {{ plan_free_name() }}.
         </p>
 
         @if($percentage >= 80)

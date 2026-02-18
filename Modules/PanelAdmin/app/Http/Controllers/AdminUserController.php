@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\FinancialHealthService;
+use Modules\Gateways\Models\Subscription;
 
 class AdminUserController extends Controller
 {
@@ -16,29 +17,33 @@ class AdminUserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with('roles');
+        $query = User::with(['roles', 'plan']);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        if ($request->has('role') && $request->input('role') !== '') {
-            $role = $request->input('role');
-            $query->whereHas('roles', function($q) use ($role) {
-                $q->where('name', $role);
-            });
+        if ($request->filled('role')) {
+            $query->whereHas('roles', fn ($q) => $q->where('name', $request->input('role')));
         }
 
-        $users = $query->paginate(10)->withQueryString();
+        $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         $financialHealthService = app(FinancialHealthService::class);
         $monthlyIncomeByUser = $financialHealthService->getMonthlyIncomeForUserIds($users->pluck('id')->toArray());
 
-        return view('paneladmin::users.index', compact('users', 'monthlyIncomeByUser'));
+        $userIds = $users->pluck('id')->toArray();
+        $activeSubscriptionByUser = Subscription::whereIn('user_id', $userIds)
+            ->where('status', 'active')
+            ->get()
+            ->keyBy('user_id');
+
+        return view('paneladmin::users.index', compact('users', 'monthlyIncomeByUser', 'activeSubscriptionByUser'));
     }
 
     /**
@@ -46,6 +51,9 @@ class AdminUserController extends Controller
      */
     public function show(User $user)
     {
+        $user->load(['roles', 'plan']);
+        $permissions = $user->getAllPermissions();
+
         $financialHealthService = app(FinancialHealthService::class);
         $financialSnapshot = $financialHealthService->getUserFinancialSnapshot($user);
 
@@ -53,7 +61,9 @@ class AdminUserController extends Controller
         $transactionCount = Transaction::where('user_id', $user->id)->count();
         $lastLogin = \Modules\Core\Models\AccessLog::where('user_id', $user->id)->latest()->first();
 
-        // Support Agent Stats
+        $plan = $user->getPlan();
+        $activeSubscription = Subscription::where('user_id', $user->id)->where('status', 'active')->latest()->first();
+
         $supportStats = null;
         if ($user->hasRole('support')) {
             $closedTickets = \Modules\Core\Models\Ticket::where('closed_by', $user->id)->count();
@@ -63,7 +73,6 @@ class AdminUserController extends Controller
                 ->latest('updated_at')
                 ->take(5)
                 ->get();
-
             $supportStats = [
                 'closed_tickets' => $closedTickets,
                 'avg_rating' => $avgRating ? format_number($avgRating, 1) : 'N/A',
@@ -71,7 +80,17 @@ class AdminUserController extends Controller
             ];
         }
 
-        return view('paneladmin::users.show', compact('user', 'accountCount', 'transactionCount', 'financialSnapshot', 'lastLogin', 'supportStats'));
+        return view('paneladmin::users.show', compact(
+            'user',
+            'accountCount',
+            'transactionCount',
+            'financialSnapshot',
+            'lastLogin',
+            'supportStats',
+            'plan',
+            'activeSubscription',
+            'permissions'
+        ));
     }
 
     /**

@@ -5,7 +5,7 @@
 <x-paneluser::layouts.master :title="'Nova Transação'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     {{-- Hero --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="transactions-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-slate-600/5 dark:bg-slate-600/10 rounded-full blur-[100px]"></div>
 
@@ -20,7 +20,11 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Cada lançamento atualiza o saldo da conta escolhida. Sua capacidade mensal vem do <a href="{{ route('core.income.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">planejamento</a>.</p>
             </div>
 
-            <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0">
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                @endif
+                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0">
                 <div class="flex items-center gap-4 text-left">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                         <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -29,6 +33,7 @@
                         <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Contas ativas</p>
                         <p class="text-2xl font-black text-gray-900 dark:text-white leading-tight">{{ $accounts->count() }}</p>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -184,7 +189,7 @@
                 </div>
 
                 @if($isPro)
-                    {{-- Vertex Pro: Repetir (visível só para Pro) --}}
+                    {{-- Repetir (visível só para Pro) --}}
                     <div class="p-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                         <div class="flex items-center justify-between gap-4 flex-wrap">
                             <div class="flex items-center gap-3">
@@ -193,7 +198,7 @@
                                 </div>
                                 <div>
                                     <p class="font-bold text-gray-900 dark:text-white text-sm">Repetir todo mês</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Vertex Pro: esta transação será criada automaticamente todo mês na mesma data.</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ plan_pro_name() }}: esta transação será criada automaticamente todo mês na mesma data.</p>
                                 </div>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
@@ -227,9 +232,32 @@
             </div>
             <div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funciona no Vertex Contas</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada transação altera o <strong>saldo da conta</strong> que você escolher: receitas somam e despesas subtraem. O valor da sua <strong>capacidade mensal</strong> vem do planejamento (Minha Renda), não da soma das transações. Use categorias para organizar e, se for Vertex Pro, marque &quot;Repetir&quot; para agendar o mesmo lançamento todo mês.</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada transação altera o <strong>saldo da conta</strong> que você escolher: receitas somam e despesas subtraem. O valor da sua <strong>capacidade mensal</strong> vem do planejamento (Minha Renda), não da soma das transações. Use categorias para organizar e, se for {{ plan_pro_name() }}, marque &quot;Repetir&quot; para agendar o mesmo lançamento todo mês.</p>
             </div>
         </div>
     </div>
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

@@ -9,14 +9,18 @@ use App\Models\SupportAuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Services\SettingService;
+use Modules\Core\Services\TourService;
 
 class SettingsController extends Controller
 {
     protected $settingService;
 
-    public function __construct(SettingService $settingService)
+    protected $tourService;
+
+    public function __construct(SettingService $settingService, TourService $tourService)
     {
         $this->settingService = $settingService;
+        $this->tourService = $tourService;
     }
 
     protected const ALLOWED_TABS = ['general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'homepage', 'tools', 'gemini'];
@@ -41,8 +45,12 @@ class SettingsController extends Controller
         $pusher = $this->settingService->getByGroup('pusher');
         $homepage = $this->settingService->getByGroup('homepage');
         $gemini = $this->settingService->getByGroup('gemini');
+        $notifications = $this->settingService->getByGroup('notifications');
 
-        return view('paneladmin::settings.index', compact('general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'homepage', 'gemini', 'tab'));
+        $settingsTourId = $this->tourService->getTourForRoute(request()->route()?->getName(), true);
+        $settingsTourSteps = $settingsTourId ? $this->tourService->getStepsForTour($settingsTourId, true) : [];
+
+        return view('paneladmin::settings.index', compact('general', 'branding', 'security', 'features', 'mail', 'blog', 'documents', 'pusher', 'homepage', 'gemini', 'notifications', 'tab', 'settingsTourId', 'settingsTourSteps'));
     }
 
     /**
@@ -230,13 +238,14 @@ class SettingsController extends Controller
             'document_footer_text' => 'nullable|string|max:500',
             'limit_download_invoice_per_day' => 'required|integer|min:0|max:999',
             'limit_download_report_per_day' => 'required|integer|min:0|max:999',
+            'limit_ai_report_per_month' => 'required|integer|min:0|max:99',
         ]);
 
         $data['company_cnpj'] = lgpd_clean_cnpj($data['company_cnpj'] ?? null) ?: null;
         $data['company_phone'] = lgpd_clean_phone($data['company_phone'] ?? null) ?: null;
 
         foreach ($data as $key => $value) {
-            $type = in_array($key, ['limit_download_invoice_per_day', 'limit_download_report_per_day']) ? 'integer' : 'string';
+            $type = in_array($key, ['limit_download_invoice_per_day', 'limit_download_report_per_day', 'limit_ai_report_per_month']) ? 'integer' : 'string';
             $this->settingService->set($key, $value, 'document_templates', $type);
         }
 
@@ -354,6 +363,14 @@ class SettingsController extends Controller
     {
         $vertexChatEnabled = $request->has('vertex_chat_enabled');
         $this->settingService->set('vertex_chat_enabled', $vertexChatEnabled, 'features', 'boolean');
+
+        $request->validate([
+            'notifications_retention_days' => 'nullable|integer|min:1|max:365',
+            'notifications_auto_clean_read' => 'nullable',
+        ]);
+        $retentionDays = $request->input('notifications_retention_days');
+        $this->settingService->set('notifications_retention_days', (int) ($retentionDays !== null && $retentionDays !== '' ? $retentionDays : 90), 'notifications', 'integer');
+        $this->settingService->set('notifications_auto_clean_read', $request->has('notifications_auto_clean_read'), 'notifications', 'boolean');
 
         $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'features';
 

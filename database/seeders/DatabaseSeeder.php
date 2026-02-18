@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,55 +14,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            RolesAndPermissionsSeeder::class,
-        ]);
+        // 1. Roles and permissions (required for admin role)
+        $this->call(RolesAndPermissionsSeeder::class);
 
-        // User::factory(10)->create();
+        // 2. Único usuário inicial: admin Reinan Rodrigues
+        $this->call(AdminUserSeeder::class);
 
-        $demoUsers = [
-            [
-                'email' => 'admin@vertexcontas.com',
-                'first_name' => 'Admin',
-                'last_name' => 'User',
-                'role' => 'admin',
-            ],
-            [
-                'email' => 'pro@vertexcontas.com',
-                'first_name' => 'Pro',
-                'last_name' => 'User',
-                'role' => 'pro_user',
-            ],
-            [
-                'email' => 'user@vertexcontas.com',
-                'first_name' => 'Free',
-                'last_name' => 'User',
-                'role' => 'free_user',
-            ],
-            [
-                'email' => 'support@vertexcontas.com',
-                'first_name' => 'Suporte',
-                'last_name' => 'Técnico',
-                'role' => 'support',
-            ],
-        ];
+        // 3. Settings (inclui homepage_cookie_consent_enabled) e documentos legais (termos, privacidade, cookies)
+        $this->call(\Modules\Core\Database\Seeders\CoreDatabaseSeeder::class);
 
-        foreach ($demoUsers as $demo) {
-            $user = User::updateOrCreate(
-                ['email' => $demo['email']],
-                [
-                    'first_name' => $demo['first_name'],
-                    'last_name' => $demo['last_name'],
-                    'password' => bcrypt('password'),
-                ]
-            );
-            $user->syncRoles([$demo['role']]);
-        }
+        // 4. Gateways (Stripe e Mercado Pago inativos; configurar em Admin > Gateways)
+        $this->call(\Modules\Gateways\Database\Seeders\GatewaysDatabaseSeeder::class);
 
-        $this->call([
-            \Modules\Blog\Database\Seeders\BlogDatabaseSeeder::class,
-            WikiCategorySeeder::class,
-            WikiArticleSeeder::class,
-        ]);
+        // 5. Blog (categorias e posts; dependem de BlogCategory e do admin)
+        $this->call(\Modules\Blog\Database\Seeders\BlogDatabaseSeeder::class);
+
+        // 6. Wiki (categorias primeiro, depois artigos que referenciam o admin)
+        $this->call(WikiCategorySeeder::class);
+        $this->call(WikiArticleSeeder::class);
     }
 }

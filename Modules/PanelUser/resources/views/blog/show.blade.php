@@ -1,5 +1,5 @@
 <x-paneluser::layouts.master :title="$post->title">
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8" data-tour="blog-intro">
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         <div class="lg:col-span-8">
             <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 backdrop-blur overflow-hidden shadow-sm">
@@ -90,4 +90,27 @@
         </aside>
     </div>
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

@@ -16,6 +16,8 @@ use Modules\PanelAdmin\Http\Controllers\LegalManagerController;
 use Modules\PanelAdmin\Http\Controllers\MedalAdminController;
 use Modules\PanelAdmin\Http\Controllers\CoachingRuleAdminController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
+use Modules\PanelAdmin\Http\Controllers\AdminVertexChatController;
+use Modules\PanelSuporte\Http\Controllers\InspectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,9 +69,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::resource('gateways', GatewayConfigController::class)->only(['index', 'edit', 'update']);
     Route::post('/gateways/{gateway}/toggle', [GatewayConfigController::class, 'toggle'])->name('gateways.toggle');
 
-    // Plans & Limits
+    // Plans (CRUD)
     Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
-    Route::post('/plans', [PlanController::class, 'update'])->name('plans.update');
+    Route::get('/plans/create', [PlanController::class, 'create'])->name('plans.create');
+    Route::post('/plans', [PlanController::class, 'store'])->name('plans.store');
+    Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('/plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
+    Route::delete('/plans/{plan}', [PlanController::class, 'destroy'])->name('plans.destroy');
+
+    // Public plan page copy (editable content for /planos)
+    Route::get('/plan', [\Modules\PanelAdmin\Http\Controllers\PlanPageSettingsController::class, 'index'])->name('plan.index');
+    Route::post('/plan', [\Modules\PanelAdmin\Http\Controllers\PlanPageSettingsController::class, 'update'])->name('plan.update');
 
     // User Management
     Route::resource('users', AdminUserController::class);
@@ -94,26 +104,35 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::post('/{ticket}/takeover', [AdminSupportController::class, 'takeover'])->name('takeover');
     });
 
-    // Blog Management
+    // Chat VIP — Central de Comando (admin)
+    Route::prefix('chat-vip')->name('chat.')->group(function () {
+        Route::get('/', [AdminVertexChatController::class, 'index'])->name('index');
+        Route::get('/{conversation}', [AdminVertexChatController::class, 'show'])->name('show');
+        Route::post('/{conversation}/messages', [AdminVertexChatController::class, 'sendMessage'])->name('send');
+        Route::post('/{conversation}/transfer', [AdminVertexChatController::class, 'transfer'])->name('transfer');
+        Route::post('/{conversation}/typing', [AdminVertexChatController::class, 'typing'])->name('typing');
+        Route::post('/{conversation}/inspection/request', [InspectionController::class, 'requestFromChat'])->name('inspection.request');
+    });
+
+    // Blog Management (rotas estáticas antes de /{id} para evitar que "comments" ou "categories" sejam interpretados como id)
     Route::prefix('blog')->name('blog.')->group(function () {
-        // Posts
         Route::get('/', [AdminBlogController::class, 'index'])->name('index');
         Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
         Route::post('/', [AdminBlogController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [AdminBlogController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [AdminBlogController::class, 'update'])->name('update');
-        Route::delete('/{id}', [AdminBlogController::class, 'destroy'])->name('destroy');
 
-        // Categories
         Route::get('/categories', [AdminBlogController::class, 'categories'])->name('categories');
         Route::post('/categories', [AdminBlogController::class, 'storeCategory'])->name('categories.store');
         Route::put('/categories/{id}', [AdminBlogController::class, 'updateCategory'])->name('categories.update');
         Route::delete('/categories/{id}', [AdminBlogController::class, 'destroyCategory'])->name('categories.destroy');
 
-        // Comments
         Route::get('/comments', [AdminBlogController::class, 'comments'])->name('comments');
         Route::post('/comments/{id}/approve', [AdminBlogController::class, 'approveComment'])->name('comments.approve');
         Route::delete('/comments/{id}/reject', [AdminBlogController::class, 'rejectComment'])->name('comments.reject');
+
+        Route::get('/{id}', [AdminBlogController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AdminBlogController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminBlogController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminBlogController::class, 'destroy'])->name('destroy');
     });
     // Wiki Management
     Route::prefix('wiki')->name('wiki.')->group(function () {

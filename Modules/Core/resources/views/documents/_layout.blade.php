@@ -4,149 +4,164 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>@yield('documentTitle', 'Documento') - {{ $templateData['company_name'] ?? 'Vertex Contas' }}</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>@yield('documentTitle', 'Documento')</title>
     <style>
-        *, *::before, *::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
+        /* Stripe-inspired enterprise document - A4, 1.27cm margins */
+        *, *::before, *::after { box-sizing: border-box; }
         body {
             margin: 0;
-            padding: 20px 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            line-height: 1.45;
-            color: #334155;
-            background: #e5e7eb;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #1a1f36;
+            background: #fff;
         }
         .doc-wrap {
             max-width: 210mm;
             margin: 0 auto;
-            padding: 0 56px;
+            padding: 0;
             background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        /* Header: logo + meta (Templid-style) */
         .doc-header {
-            padding: 32px 0 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 20px;
             border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
         }
-        .doc-header-inner {
-            display: table;
-            width: 100%;
-            border-collapse: collapse;
+        .company-logo { max-height: 36px; width: auto; display: block; }
+        .doc-title {
+            font-size: 18pt;
+            font-weight: 600;
+            color: #1a1f36;
+            margin: 0;
+            letter-spacing: -0.02em;
         }
-        .doc-header-inner td { vertical-align: top; padding: 0; }
-        .doc-header-inner .col-meta {
+        .doc-meta {
             text-align: right;
-            white-space: nowrap;
+            font-size: 9pt;
+            color: #697386;
         }
-        .company-logo { max-height: 40px; width: auto; display: block; }
-        .company-name {
-            font-size: 11px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-top: 6px;
-        }
-        .doc-meta-label {
-            font-size: 10px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 2px;
-        }
-        .doc-meta-value {
-            font-size: 11px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .doc-meta-cell { padding-left: 24px; }
-        .doc-meta-cell.border-r { border-right: 1px solid #e2e8f0; padding-right: 24px; }
-        /* From/To */
+        .doc-meta div { margin-top: 2px; }
+        .doc-meta strong { color: #1a1f36; }
         .doc-fromto {
-            background: #f8fafc;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             padding: 20px 0;
-            font-size: 11px;
+            font-size: 10pt;
             border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 24px;
         }
-        .doc-fromto-inner { display: table; width: 100%; border-collapse: collapse; }
-        .doc-fromto-inner td { vertical-align: top; width: 50%; padding: 0; }
-        .doc-fromto .from-label,
-        .doc-fromto .to-label {
+        .doc-fromto-block label {
+            display: block;
+            font-size: 9pt;
             font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 4px;
+            color: #697386;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
         }
-        .doc-fromto .from-meta,
-        .doc-fromto .to-meta {
-            color: #475569;
-            line-height: 1.5;
+        .doc-fromto-block .value { color: #1a1f36; line-height: 1.5; }
+        .doc-body { padding: 0; }
+        .doc-body .section-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: #1a1f36;
+            margin: 24px 0 12px 0;
+            letter-spacing: -0.01em;
         }
-        .doc-fromto .to-block { text-align: right; }
-        /* Body + tables */
-        .doc-body { padding: 28px 0 32px; }
+        .doc-body .section-title:first-child { margin-top: 0; }
         .doc-body table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
-            margin-bottom: 24px;
+            font-size: 10pt;
+            margin-bottom: 20px;
         }
-        .doc-body table:last-child { margin-bottom: 0; }
-        .doc-body td, .doc-body th {
-            padding: 10px 12px;
-            vertical-align: middle;
+        .doc-body th {
             text-align: left;
-        }
-        .doc-body .heading-row th,
-        .doc-body .heading-row td {
-            background: #334155;
-            color: #fff;
             font-weight: 600;
-            font-size: 10px;
+            font-size: 9pt;
+            color: #697386;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            border: none;
+            letter-spacing: 0.03em;
             padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
         }
-        .doc-body .heading-row th.text-right,
-        .doc-body .heading-row td.text-right { text-align: right; }
-        .doc-body .item-row td {
-            border-bottom: 1px solid #e2e8f0;
-            color: #334155;
-        }
-        .doc-body .item-row:nth-child(even) td { background: #fafafa; }
-        .doc-body .item-row td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
-        .doc-body .total-row td {
-            border-top: 2px solid #334155;
-            background: #334155 !important;
-            color: #fff !important;
-            font-weight: 700;
+        .doc-body th.text-right { text-align: right; }
+        .doc-body td {
             padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            color: #1a1f36;
+            font-size: 10pt;
         }
-        .doc-body .total-row td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
-        .doc-body .section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-top: 28px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+        .doc-body tr:nth-child(even) td { background: #f8fafc; }
+        .doc-body td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+        .doc-body .report-block {
+            page-break-inside: avoid;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 16px;
         }
-        .doc-body .section-title:first-child { margin-top: 0; }
-        /* Footer */
+        .doc-body .report-block-emerald {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
         .doc-footer {
-            padding: 16px 0 24px;
+            margin-top: 32px;
+            padding-top: 16px;
             border-top: 1px solid #e2e8f0;
-            font-size: 10px;
-            color: #94a3b8;
+            font-size: 9pt;
+            color: #697386;
             text-align: center;
         }
+        .doc-actions {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+            transition: opacity 0.3s ease;
+        }
+        .doc-actions.btn-print-hidden { opacity: 0; pointer-events: none; }
+        .doc-actions .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #635bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .doc-actions .btn-print:hover { background: #5851ea; }
         .no-print { display: block; }
-        /* Print */
+        .print-only { display: none !important; }
+        .typewriter-cursor { animation: blink 0.8s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .score-gauge-wrap, .score-gauge-svg, .score-value, .medal-card, .medal-icon-cell,
+        .doc-body .report-block, .doc-body .report-block-emerald, .doc-body table th,
+        .doc-body table tr:nth-child(even) td {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        /* A4: 210x297mm, 1.27cm = 12.7mm margins on all sides */
         @page {
             size: A4 portrait;
-            margin: 15mm;
+            margin: 12.7mm;
         }
         @media print {
-            body {
+            html, body {
                 background: #fff;
                 padding: 0;
                 margin: 0;
@@ -155,79 +170,72 @@
             }
             .doc-wrap {
                 max-width: none;
-                padding: 0 56px;
-                box-shadow: none;
+                padding: 0;
+                margin: 0;
             }
             .doc-header, .doc-fromto, .doc-body, .doc-footer {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            .doc-body .heading-row th,
-            .doc-body .heading-row td,
-            .doc-body .total-row td {
+            .doc-body th, .doc-body td {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            .doc-body table { page-break-inside: avoid; }
+            .doc-body table, .doc-body .report-block, .doc-body .page-break-avoid,
+            .doc-body .score-gauge-wrap, .doc-body .medal-card {
+                page-break-inside: avoid;
+            }
+            .score-gauge-wrap, .score-gauge-svg, .score-value, .medal-card, .medal-icon-cell,
+            .doc-body .report-block, .doc-body .report-block-emerald, .doc-body table th,
+            .doc-body table tr:nth-child(even) td {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
             .no-print { display: none !important; }
+            .print-only { display: block !important; }
         }
-        @media (max-width: 640px) {
-            .doc-wrap { padding: 0 24px; }
-            .doc-fromto-inner td { display: block; width: 100%; }
-            .doc-fromto .to-block { text-align: left; margin-top: 12px; }
+        @media (max-width: 600px) {
+            .doc-fromto { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+    @hasSection('docActions')
+    <div id="btn-print-wrapper" class="no-print doc-actions @yield('docActionsHiddenClass', '')">
+        @yield('docActions')
+    </div>
+    @endif
     <div class="doc-wrap">
         <header class="doc-header">
-            <table class="doc-header-inner">
-                <tr>
-                    <td style="width: 100%;">
-                        <img src="{{ $templateData['logo_path'] ?? asset('storage/logos/logo.svg') }}" alt="Vertex" class="company-logo">
-                        <div class="company-name">{{ $templateData['company_name'] ?? 'Vertex Contas' }}</div>
-                    </td>
-                    <td style="vertical-align: top; text-align: right; white-space: nowrap;">
-                        <table style="display: inline-table; border-collapse: collapse; text-align: right;">
-                            <tr>
-                                <td class="doc-meta-cell border-r">
-                                    <div class="doc-meta-label">Data</div>
-                                    <div class="doc-meta-value">{{ now()->format('d/m/Y') }}</div>
-                                </td>
-                                <td class="doc-meta-cell">
-                                    <div class="doc-meta-label">@yield('documentRightLabel', 'Período')</div>
-                                    <div class="doc-meta-value">@yield('documentRightValue', '—')</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+            <div>
+                <img src="{{ $templateData['logo_path'] ?? branding_logo_url('default') ?? asset('storage/logos/logo.svg') }}" alt="Vertex" class="company-logo">
+                @hasSection('documentBanner')
+                <h1 class="doc-title" style="margin-top: 12px;">@yield('documentBanner')</h1>
+                @endif
+            </div>
+            <div class="doc-meta">
+                <div><strong>@yield('documentRightLabel', 'Período'):</strong> @yield('documentRightValue', '—')</div>
+                <div><strong>Data:</strong> {{ now()->format('d/m/Y') }}</div>
+            </div>
         </header>
 
         <div class="doc-fromto">
-            <table class="doc-fromto-inner">
-                <tr>
-                    <td>
-                        <div class="from-label">{{ $templateData['company_name'] ?? 'Vertex Contas' }}</div>
-                        <div class="from-meta">
-                            @if(!empty($templateData['company_address']))<div>{{ $templateData['company_address'] }}</div>@endif
-                            @if(!empty($templateData['company_cnpj']))<div>CNPJ: {{ lgpd_format_cnpj($templateData['company_cnpj']) }}</div>@endif
-                            @if(!empty($templateData['company_phone']))<div>Tel: {{ lgpd_format_phone($templateData['company_phone']) }}</div>@endif
-                            @if(!empty($templateData['company_email']))<div>{{ $templateData['company_email'] }}</div>@endif
-                        </div>
-                    </td>
-                    <td>
-                        <div class="to-block">
-                            <div class="to-label">Cliente</div>
-                            <div class="to-meta">
-                                <div>@yield('clientName', auth()->user()->name ?? '—')</div>
-                                <div>@yield('clientEmail', auth()->user()->email ?? '—')</div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+            <div class="doc-fromto-block">
+                <label>Emissor</label>
+                <div class="value">
+                    @if(!empty($templateData['company_address']))<div>{{ $templateData['company_address'] }}</div>@endif
+                    @if(!empty($templateData['company_cnpj']))<div>CNPJ: {{ lgpd_format_cnpj($templateData['company_cnpj']) }}</div>@endif
+                    @if(!empty($templateData['company_phone']))<div>Tel: {{ lgpd_format_phone($templateData['company_phone']) }}</div>@endif
+                    @if(!empty($templateData['company_email']))<div>{{ $templateData['company_email'] }}</div>@endif
+                </div>
+            </div>
+            <div class="doc-fromto-block" style="text-align: right;">
+                <label>Cliente</label>
+                <div class="value">
+                    <div>@yield('clientName', auth()->user()->name ?? '—')</div>
+                    <div>@yield('clientEmail', auth()->user()->email ?? '—')</div>
+                </div>
+            </div>
         </div>
 
         <div class="doc-body">

@@ -19,8 +19,11 @@ class AdminNotificationController extends Controller
 
     public function index()
     {
-        // Simple history: Get recent notifications sent by system
-        // We'll group them by title and message to show "blasts"
+        $totalNotifications = \DB::table('notifications')->count();
+        $readCount = \DB::table('notifications')->whereNotNull('read_at')->count();
+        $unreadCount = $totalNotifications - $readCount;
+        $readRate = $totalNotifications > 0 ? round(($readCount / $totalNotifications) * 100) : 0;
+
         $recentNotifications = \DB::table('notifications')
             ->select('data', \DB::raw('count(*) as count'), \DB::raw('max(created_at) as last_sent'), \DB::raw('max(id) as last_id'))
             ->groupBy('data')
@@ -36,7 +39,13 @@ class AdminNotificationController extends Controller
                 ];
             });
 
-        return view('notifications::admin.index', compact('recentNotifications'));
+        $stats = [
+            'total' => $totalNotifications,
+            'unread' => $unreadCount,
+            'read_rate' => $readRate,
+        ];
+
+        return view('notifications::admin.index', compact('recentNotifications', 'stats'));
     }
 
     public function create()

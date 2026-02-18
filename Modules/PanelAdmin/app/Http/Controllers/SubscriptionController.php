@@ -27,12 +27,14 @@ class SubscriptionController extends Controller
 
         $subscriptions = $query->paginate(15)->withQueryString();
 
-        $activeCount = Subscription::whereIn('status', ['active'])->count();
+        $totalCount = Subscription::count();
+        $activeCount = Subscription::where('status', 'active')->count();
         $pastDueCount = Subscription::where('status', 'past_due')->count();
         $canceledCount = Subscription::where('status', 'canceled')->count();
 
         return view('paneladmin::subscriptions.index', compact(
             'subscriptions',
+            'totalCount',
             'activeCount',
             'pastDueCount',
             'canceledCount'

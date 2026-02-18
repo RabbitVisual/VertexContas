@@ -27,7 +27,7 @@
             <div class="relative">
                 <img src="{{ branding_logo_url('user', false) }}" alt="{{ branding_panel_name('user') }}" class="h-9 block dark:hidden" />
                 <img src="{{ branding_logo_url('user', true) }}" alt="{{ branding_panel_name('user') }}" class="h-9 hidden dark:block" />
-                <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-white dark:ring-slate-900" title="Vertex PRO">
+                <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-white dark:ring-slate-900" title="{{ plan_pro_name() }}">
                     <x-icon name="crown" style="solid" class="w-2.5 h-2.5 text-white" />
                 </span>
             </div>
@@ -179,6 +179,17 @@
                     </a>
                     @endif
 
+                    @if($user && $user->hasRole('admin') && Route::has('admin.index'))
+                    <div class="pt-4 pb-2">
+                        <p class="{{ $proSectionLabel }}">Administração</p>
+                    </div>
+                    <a href="{{ route('admin.index') }}"
+                        class="{{ $proNavBase }} {{ request()->routeIs('admin.*') ? $proNavActive : $proNavInactive }}">
+                        <x-icon name="user-shield" style="duotone" class="w-5 h-5 mr-3 shrink-0 {{ request()->routeIs('admin.*') ? $proIconActive : $proIconInactive }}" />
+                        Administração
+                    </a>
+                    @endif
+
                     {{-- Meus Contratos e Termos --}}
                     <a href="{{ route('paneluser.legal.acceptance') }}"
                         class="{{ $proNavBase }} {{ request()->routeIs('paneluser.legal.*') ? $proNavActive : $proNavInactive }}">
@@ -305,7 +316,7 @@
                             <span class="ms-3 flex-1">Chamados</span>
                         </a>
                     </li>
-                    @if(vertex_chat_enabled() && Route::has('vertexchat.chat.index'))
+                    @if($isPro && vertex_chat_enabled() && Route::has('vertexchat.chat.index'))
                     <li>
                         <a href="{{ route('vertexchat.chat.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('vertexchat.chat.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="comments" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('vertexchat.chat.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
@@ -327,6 +338,15 @@
                         <a href="{{ route('paneluser.blog.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('paneluser.blog.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="newspaper" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('paneluser.blog.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3">Blog</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if($user && $user->hasRole('admin') && Route::has('admin.index'))
+                    <li class="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700"><span class="{{ $sectionLabelClass }}">Administração</span></li>
+                    <li>
+                        <a href="{{ route('admin.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('admin.*') ? $navItemActiveClass : '' }}">
+                            <x-icon name="user-shield" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('admin.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
+                            <span class="ms-3">Administração</span>
                         </a>
                     </li>
                     @endif
@@ -366,9 +386,9 @@
                 </button>
                 <div class="relative z-10 flex items-center gap-2 mb-2">
                     <x-icon name="crown" style="solid" class="w-4 h-4 text-amber-200" />
-                    <p class="text-[11px] font-bold text-amber-100 uppercase tracking-widest">Vertex PRO</p>
+                    <p class="text-[11px] font-bold text-amber-100 uppercase tracking-widest">{{ plan_pro_name() }}</p>
                 </div>
-                <p class="text-xs text-amber-50/95 mb-3 pr-6">Contas ilimitadas, relatórios em PDF/CSV, metas e suporte VIP.</p>
+                <p class="text-xs text-amber-50/95 mb-3 pr-6">{{ pro_benefits_short_description('sidebar') }}</p>
                 <a href="{{ route('user.subscription.index') }}" class="relative z-10 flex items-center justify-center gap-2 w-full py-2.5 px-4 text-sm font-bold text-amber-700 bg-white hover:bg-amber-50 rounded-xl shadow-md transition-all hover:shadow-lg active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-amber-600">
                     <x-icon name="bolt" style="solid" class="w-4 h-4" />
                     Ver Planos

@@ -20,11 +20,15 @@
         <tr>
             <td align="center" style="padding: 32px 16px;">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
-                    {{-- Header: Logo --}}
+                    {{-- Header: Logo (fallback placeholder se storage não disponível) --}}
                     <tr>
                         <td align="center" style="padding: 32px 24px 24px;">
                             <a href="{{ config('app.url') }}" target="_blank" rel="noopener">
-                                <img src="{{ branding_logo_url('default') }}" alt="{{ config('app.name') }}" width="160" height="48" style="display: block; max-width: 160px; height: auto;" />
+                                @php
+                                    $logoUrl = branding_logo_url('default');
+                                    $logoFallback = url('/images/placeholder-vertex.svg');
+                                @endphp
+                                <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" width="160" height="48" style="display: block; max-width: 160px; height: auto;" onerror="this.onerror=null;this.src='{{ $logoFallback }}';" />
                             </a>
                         </td>
                     </tr>

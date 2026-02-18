@@ -2,7 +2,7 @@
     <div class="min-h-[calc(100vh-6rem)] bg-gray-50 dark:bg-slate-950 transition-colors duration-200 pb-24">
         <div class="max-w-7xl mx-auto px-6 pt-8">
             {{-- Dashboard Header --}}
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8" data-tour="profile-intro">
                 <div>
                     <nav class="flex mb-2" aria-label="Breadcrumb">
                         <ol class="flex items-center space-x-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
@@ -173,7 +173,7 @@
                                 <div class="flex items-center gap-4 p-5 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700">
                                     <input type="checkbox" name="show_assistant" id="show_assistant" value="1" {{ old('show_assistant', $user->show_assistant ?? true) ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20 w-5 h-5">
                                     <label for="show_assistant" class="flex-1">
-                                        <span class="block font-bold text-gray-900 dark:text-white">Ativar Assistente Virtual Vertex PRO</span>
+                                        <span class="block font-bold text-gray-900 dark:text-white">Ativar Assistente Virtual {{ plan_pro_name() }}</span>
                                         <span class="block text-sm text-gray-500 dark:text-slate-400 mt-0.5">O robô Vertex aparece com dicas e insights baseados nas suas finanças.</span>
                                     </label>
                                 </div>
@@ -393,4 +393,27 @@
             <x-icon name="chevron-right" style="solid" class="w-6 h-6 text-slate-400" />
         </a>
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

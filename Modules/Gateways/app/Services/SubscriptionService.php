@@ -7,6 +7,7 @@ namespace Modules\Gateways\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\Core\Models\Plan;
 use Modules\Gateways\Models\Subscription;
 use Modules\Gateways\Services\GatewayFactory;
 
@@ -37,8 +38,11 @@ class SubscriptionService
             }
             $result = $driver->cancelSubscription($subscription->external_subscription_id);
         } elseif ($subscription->gateway_slug === 'mercadopago') {
-            // Mercado Pago: cancel preapproval via API (pode ser implementado no MercadoPagoDriver)
-            $result = ['success' => false, 'message' => 'Cancelamento pelo painel: acesse Mercado Pago ou entre em contato com o suporte.'];
+            $driver = GatewayFactory::make('mercadopago');
+            if (! method_exists($driver, 'cancelSubscription')) {
+                return ['success' => false, 'message' => 'Cancelamento não disponível para este gateway.'];
+            }
+            $result = $driver->cancelSubscription($subscription->external_subscription_id);
         } else {
             $result = ['success' => false, 'message' => 'Gateway não suporta cancelamento por aqui.'];
         }
@@ -48,13 +52,20 @@ class SubscriptionService
         }
 
         $immediate = $result['immediate'] ?? false;
-        DB::transaction(function () use ($subscription, $immediate, $user) {
+        $defaultFree = Plan::getDefaultFree();
+        DB::transaction(function () use ($subscription, $immediate, $user, $defaultFree) {
             if ($immediate) {
                 $subscription->update(['status' => 'canceled', 'canceled_at' => now()]);
                 if ($user->hasRole('pro_user')) {
                     $user->removeRole('pro_user');
                     $user->assignRole('free_user');
+                    if ($defaultFree) {
+                        $user->update(['plan_id' => $defaultFree->id]);
+                    }
                     Log::info("User {$user->id} downgraded to free after immediate subscription cancel.");
+                }
+                if (! $user->trial_used_at) {
+                    $user->update(['trial_used_at' => now()]);
                 }
             } else {
                 $meta = $subscription->metadata ?? [];

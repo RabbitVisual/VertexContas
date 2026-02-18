@@ -73,7 +73,11 @@ class LegalAcceptanceController extends Controller
             })->values();
 
         if ($pending->isEmpty()) {
-            return redirect()->route('paneluser.index')
+            $dashboardRoute = $request->user()->hasRole('admin')
+                ? route('admin.index')
+                : route('paneluser.index');
+
+            return redirect()->to($dashboardRoute)
                 ->with('success', 'Obrigado! Você aceitou todos os termos necessários.');
         }
 

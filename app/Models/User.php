@@ -29,11 +29,13 @@ class User extends Authenticatable
         'photo',
         'membership',
         'status',
+        'plan_id',
         'password',
         'last_login_at',
         'last_login_ip',
         'show_assistant',
         'support_access_expires_at',
+        'trial_used_at',
     ];
 
     /**
@@ -60,6 +62,7 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'show_assistant' => 'boolean',
             'support_access_expires_at' => 'datetime',
+            'trial_used_at' => 'datetime',
         ];
     }
 
@@ -68,7 +71,42 @@ class User extends Authenticatable
      */
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        return trim("{$this->first_name} {$this->last_name}") ?: (string) $this->email;
+    }
+
+    /**
+     * Alias for full name (used in views and notifications).
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->full_name;
+    }
+
+    /**
+     * Get the plan the user belongs to (never null: falls back to default free plan).
+     */
+    public function getPlan(): \Modules\Core\Models\Plan
+    {
+        if ($this->plan_id && $this->relationLoaded('plan') && $this->plan) {
+            return $this->plan;
+        }
+        $plan = $this->plan()->first();
+        if ($plan) {
+            return $plan;
+        }
+        $default = \Modules\Core\Models\Plan::getDefaultFree();
+        if ($default) {
+            return $default;
+        }
+        throw new \RuntimeException('No default free plan found. Run migrations and ensure at least one plan with is_free=true exists.');
+    }
+
+    /**
+     * Get the user's plan (relation; may be null if plan_id not set).
+     */
+    public function plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\Modules\Core\Models\Plan::class, 'plan_id');
     }
 
     /**
@@ -77,6 +115,15 @@ class User extends Authenticatable
     public function isPro(): bool
     {
         return $this->hasRole('pro_user') || $this->hasRole('admin');
+    }
+
+    /**
+     * Whether the user has already used the 7-day free trial (e.g. subscribed and then cancelled).
+     * Used to prevent granting trial again on re-subscription.
+     */
+    public function hasUsedTrial(): bool
+    {
+        return (bool) $this->trial_used_at;
     }
 
     /**

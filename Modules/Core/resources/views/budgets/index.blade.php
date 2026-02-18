@@ -13,7 +13,7 @@
 <x-paneluser::layouts.master :title="'Meus Orçamentos'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
     {{-- Hero CBAV --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="budgets-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-teal-600/5 dark:bg-teal-600/10 rounded-full blur-[100px]"></div>
 
@@ -27,14 +27,19 @@
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Meus <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Orçamentos</span></h1>
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina limites por categoria e acompanhe o consumo. Edite quando quiser sem avisos de limite.</p>
             </div>
-            @can('create', \Modules\Core\Models\Budget::class)
-                @if(!($inspectionReadOnly ?? false))
-                    <a href="{{ route('core.budgets.create') }}" class="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
-                        <x-icon name="plus" style="solid" class="w-5 h-5" />
-                        Novo orçamento
-                    </a>
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
                 @endif
-            @endcan
+                @can('create', \Modules\Core\Models\Budget::class)
+                    @if(!($inspectionReadOnly ?? false))
+                        <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                            <x-icon name="plus" style="solid" class="w-5 h-5" />
+                            Novo orçamento
+                        </a>
+                    @endif
+                @endcan
+            </div>
         </div>
 
         {{-- Stats: só Pro --}}
@@ -135,7 +140,7 @@
     @endif
 
     {{-- Grid de orçamentos --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tour="budgets-list">
         @forelse($budgets as $budget)
             @php
                 $percentage = min($budget->usage_percentage, 100);
@@ -249,4 +254,27 @@
         @endif
     </div>
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

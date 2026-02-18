@@ -124,6 +124,32 @@ class MercadoPagoDriver implements PaymentGatewayInterface
      */
     public function getPublicKey(): string
     {
-        return $this->gateway->api_key;
+        return $this->gateway->api_key ?? '';
+    }
+
+    /**
+     * Cancel subscription (PreApproval) via Mercado Pago API.
+     * Cancellation is immediate; user stops being charged.
+     *
+     * @return array{success: bool, message: string, immediate: bool}
+     */
+    public function cancelSubscription(string $externalSubscriptionId): array
+    {
+        try {
+            $client = new PreApprovalClient();
+            $client->update($externalSubscriptionId, ['status' => 'cancelled']);
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Não foi possível cancelar no Mercado Pago. Tente novamente ou entre em contato com o suporte.',
+                'immediate' => false,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Assinatura cancelada. Você deixa de ser cobrado a partir de agora.',
+            'immediate' => true,
+        ];
     }
 }

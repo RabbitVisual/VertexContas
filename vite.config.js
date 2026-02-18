@@ -17,6 +17,7 @@ export default defineConfig({
                 'resources/js/legal-editor.js',
                 'resources/js/vertex-chat.js',
                 'resources/js/support-chat-pusher.js',
+                'resources/js/tours.js',
             ],
             refresh: [
                 'resources/views/**',

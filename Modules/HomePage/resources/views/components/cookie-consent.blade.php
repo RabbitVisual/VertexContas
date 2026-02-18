@@ -1,19 +1,35 @@
 @php
     $enabled = \Illuminate\Support\Facades\Schema::hasTable('settings')
-        ? (bool) setting('homepage_cookie_consent_enabled', false)
-        : false;
+        ? (bool) setting('homepage_cookie_consent_enabled', true)
+        : true;
     $message = setting('homepage_cookie_consent_message', 'Utilizamos cookies para garantir a melhor experiência em nosso site. Ao continuar, você concorda com nossa Política de Cookies.');
+    $consentUrl = route('homepage.cookie-consent.store');
 @endphp
 @if($enabled)
 <div x-data="{
-    accepted: localStorage.getItem('cookie_consent') !== null,
+    accepted: (function() {
+        try {
+            if (localStorage.getItem('cookie_consent') !== null) return true;
+            var c = document.cookie.match(/cookie_consent=(accepted|rejected)/);
+            return !!c;
+        } catch (e) { return false; }
+    })(),
+    loading: false,
     accept() {
-        localStorage.setItem('cookie_consent', 'accepted');
-        this.accepted = true;
+        this.loading = true;
+        fetch('{{ $consentUrl }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accepted: true })
+        }).then(() => { localStorage.setItem('cookie_consent', 'accepted'); this.accepted = true; }).finally(() => this.loading = false);
     },
     reject() {
-        localStorage.setItem('cookie_consent', 'rejected');
-        this.accepted = true;
+        this.loading = true;
+        fetch('{{ $consentUrl }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accepted: false })
+        }).then(() => { localStorage.setItem('cookie_consent', 'rejected'); this.accepted = true; }).finally(() => this.loading = false);
     }
 }"
 x-show="!accepted"
@@ -40,11 +56,12 @@ aria-live="polite">
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <button @click="reject()" type="button" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <button @click="reject()" type="button" :disabled="loading" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50">
                 Rejeitar
             </button>
-            <button @click="accept()" type="button" class="px-6 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-lg shadow-primary/25 transition-all">
-                Aceitar
+            <button @click="accept()" type="button" :disabled="loading" class="px-6 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-lg shadow-primary/25 transition-all disabled:opacity-50">
+                <span x-show="!loading">Aceitar</span>
+                <span x-show="loading" x-cloak>...</span>
             </button>
         </div>
     </div>

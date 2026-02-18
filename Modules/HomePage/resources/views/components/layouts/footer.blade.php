@@ -40,6 +40,7 @@
             <div class="col-span-1">
                 <h4 class="text-slate-800 dark:text-white font-bold mb-6 text-sm uppercase tracking-widest">Produto</h4>
                 <ul class="space-y-4">
+                    <li><a href="{{ route('planos') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Planos</a></li>
                     <li><a href="{{ route('features.index') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Funcionalidades</a></li>
                     <li><a href="{{ route('features.goals') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Metas e Objetivos</a></li>
                     <li><a href="{{ route('features.reports') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Relatórios</a></li>
@@ -53,6 +54,7 @@
                     <li><a href="{{ route('faq') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Dúvidas Frequentes</a></li>
                     <li><a href="{{ route('privacy') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Privacidade</a></li>
                     <li><a href="{{ route('terms') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Termos de Uso</a></li>
+                    <li><a href="{{ route('public.legal.show', 'politica-cookies') }}" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium">Política de Cookies</a></li>
                 </ul>
             </div>
 

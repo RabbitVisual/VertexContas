@@ -1,7 +1,7 @@
 <x-paneluser::layouts.master :title="'Planos e Assinatura'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-4 pb-12">
     {{-- Hero (padrão CBAV / my-rosters) --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="subscription-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-[100px]" aria-hidden="true"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]" aria-hidden="true"></div>
 
@@ -23,7 +23,8 @@
                     @if($isPro)
                         Obrigado por fazer parte do {{ plan_pro_name() }}. Aproveite todos os benefícios configurados pelo painel.
                     @else
-                        Evolua seu controle financeiro. 7 dias grátis, depois R$ 29,90/mês. Cancele quando quiser.
+                        @php $proAmount = $planPro ? number_format((float) $planPro->amount, 2, ',', '.') : '29,90'; @endphp
+                        Evolua seu controle financeiro. {{ $hasUsedTrial ? "R$ {$proAmount}/mês. Cancele quando quiser." : "7 dias grátis, depois R$ {$proAmount}/mês. Cancele quando quiser." }}
                     @endif
                 </p>
             </div>
@@ -49,6 +50,15 @@
             @endif
         </div>
     </div>
+
+    @if(!$isPro && ($hasUsedTrial ?? false))
+        <div class="rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <x-icon name="circle-info" style="duotone" class="w-5 h-5" />
+            </div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">Você já utilizou seu período de 7 dias grátis. Na próxima assinatura a cobrança começa no primeiro dia.</p>
+        </div>
+    @endif
 
     @if($isPro)
         @php
@@ -148,8 +158,8 @@
         </div>
 
     @else
-        {{-- FREE: Comparação com limites dinâmicos do PanelAdmin --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        {{-- FREE: Comparação com limites dinâmicos do PanelAdmin + todos os planos pagos --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {{-- Plano Grátis --}}
             <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm flex flex-col">
                 <div class="p-8 border-b border-gray-200 dark:border-white/5">
@@ -167,23 +177,23 @@
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">{{ $limits['account'] }} {{ $limits['account'] === 1 ? 'conta' : 'contas' }}</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['account'] < 0)Contas ilimitadas @else {{ $limits['account'] }} {{ $limits['account'] === 1 ? 'conta' : 'contas' }} @endif</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">Até {{ $limits['income'] + $limits['expense'] }} transações (receitas + despesas)</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['income'] < 0 || $limits['expense'] < 0)Transações ilimitadas @else Até {{ $limits['income'] + $limits['expense'] }} transações (receitas + despesas) @endif</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">{{ $limits['goal'] }} {{ $limits['goal'] === 1 ? 'meta' : 'metas' }}, {{ $limits['budget'] }} {{ $limits['budget'] === 1 ? 'orçamento' : 'orçamentos' }}</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['goal'] < 0 && $limits['budget'] < 0)Metas e orçamentos ilimitados @elseif($limits['goal'] < 0)Orçamentos: {{ $limits['budget'] }} {{ $limits['budget'] === 1 ? 'orçamento' : 'orçamentos' }}, metas ilimitadas @elseif($limits['budget'] < 0)Metas: {{ $limits['goal'] }} {{ $limits['goal'] === 1 ? 'meta' : 'metas' }}, orçamentos ilimitados @else {{ $limits['goal'] }} {{ $limits['goal'] === 1 ? 'meta' : 'metas' }}, {{ $limits['budget'] }} {{ $limits['budget'] === 1 ? 'orçamento' : 'orçamentos' }} @endif</span>
                     </li>
                     <li class="flex items-start gap-3 text-gray-400 dark:text-gray-500">
                         <x-icon name="xmark" style="solid" class="w-5 h-5 shrink-0 mt-0.5" />
                         <span class="text-sm line-through">Relatórios exportáveis (PDF/CSV)</span>
                     </li>
-                    <li class="flex items-start gap-3 text-gray-400 dark:text-gray-500">
-                        <x-icon name="xmark" style="solid" class="w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-sm line-through">Suporte prioritário</span>
+                    <li class="flex items-start gap-3">
+                        <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Suporte via Ticket</span>
                     </li>
                 </ul>
                 <div class="p-8 pt-0">
@@ -193,47 +203,59 @@
                 </div>
             </div>
 
-            {{-- Plano PRO --}}
+            @php $paidPlans = $paidPlans ?? collect([$planPro])->filter(); @endphp
+            @foreach($paidPlans as $index => $plan)
+            @php
+                $planLimits = ['account' => -1, 'income' => -1, 'expense' => -1, 'goal' => -1, 'budget' => -1];
+                foreach (\Modules\Core\Models\Plan::limitEntities() as $entity) {
+                    $val = $plan->getLimit($entity);
+                    $planLimits[$entity] = $val === 'unlimited' ? -1 : (int) $val;
+                }
+                $planHasLimits = collect($planLimits)->contains(fn ($v) => $v >= 0);
+                $planBenefitAccounts = ($planHasLimits && $planLimits['account'] >= 0) ? 'Cadastre até ' . $planLimits['account'] . ' contas' : 'Contas ilimitadas';
+                $planBenefitTransactions = ($planHasLimits && ($planLimits['income'] >= 0 || $planLimits['expense'] >= 0))
+                    ? 'Até ' . (($planLimits['income'] >= 0 && $planLimits['expense'] >= 0) ? ($planLimits['income'] + $planLimits['expense']) . ' transações' : max($planLimits['income'], $planLimits['expense']) . ' por tipo (rec/desp)')
+                    : 'Transações ilimitadas';
+                $planBenefitGoals = ($planHasLimits && $planLimits['goal'] >= 0) ? 'Até ' . $planLimits['goal'] . ' metas' : 'Metas ilimitadas';
+                $planBenefitBudgets = ($planHasLimits && $planLimits['budget'] >= 0) ? 'Até ' . $planLimits['budget'] . ' orçamentos' : 'Orçamentos ilimitados';
+                $intervalLabel = $plan->billing_interval === 'yearly' ? 'ano' : 'mês';
+            @endphp
             <div class="relative">
                 <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 rounded-[1.75rem] blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div class="relative bg-gray-900 dark:bg-gray-950 rounded-3xl p-8 flex flex-col h-full border-2 border-amber-500/30 shadow-xl">
                     <div class="absolute top-0 right-0 flex flex-col gap-1">
-                        <span class="inline-block bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">7 dias grátis</span>
+                        @if(!($hasUsedTrial ?? false) && $plan->billing_interval === 'monthly')
+                            <span class="inline-block bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">7 dias grátis</span>
+                        @endif
+                        @if($index === 0)
                         <span class="inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">Popular</span>
+                        @endif
                     </div>
 
                     <div class="mt-6">
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <x-icon name="crown" style="solid" class="text-amber-400 w-6 h-6" />
-                            {{ plan_pro_name() }}
+                            {{ $plan->name }}
                         </h2>
                         <p class="mt-4 flex items-baseline">
-                            <span class="text-4xl font-black text-white">R$ 29,90</span>
-                            <span class="ml-1 text-gray-400">/mês</span>
+                            <span class="text-4xl font-black text-white">R$ {{ $plan->amount ? number_format((float) $plan->amount, 2, ',', '.') : '29,90' }}</span>
+                            <span class="ml-1 text-gray-400">/{{ $intervalLabel }}</span>
                         </p>
-                        <p class="mt-2 text-sm text-gray-400">Após 7 dias grátis. Cancele quando quiser. Reembolso automático se cancelar no trial.</p>
+                        <p class="mt-2 text-sm text-gray-400">{{ ($hasUsedTrial ?? false) ? 'Cobrança. Cancele quando quiser.' : ($plan->billing_interval === 'monthly' ? 'Após 7 dias grátis. Cancele quando quiser.' : 'Pagamento anual. Cancele quando quiser.') }}</p>
                     </div>
 
-                    @php
-                        $proBenefitAccounts = ($proHasLimits && $limitsPro['account'] >= 0) ? 'Cadastre até ' . $limitsPro['account'] . ' contas' : 'Contas ilimitadas';
-                        $proBenefitTransactions = ($proHasLimits && ($limitsPro['income'] >= 0 || $limitsPro['expense'] >= 0))
-                            ? 'Até ' . (($limitsPro['income'] >= 0 && $limitsPro['expense'] >= 0) ? ($limitsPro['income'] + $limitsPro['expense']) . ' transações' : max($limitsPro['income'], $limitsPro['expense']) . ' por tipo (rec/desp)')
-                            : 'Transações ilimitadas';
-                        $proBenefitGoals = ($proHasLimits && $limitsPro['goal'] >= 0) ? 'Até ' . $limitsPro['goal'] . ' metas' : 'Metas ilimitadas';
-                        $proBenefitBudgets = ($proHasLimits && $limitsPro['budget'] >= 0) ? 'Até ' . $limitsPro['budget'] . ' orçamentos' : 'Orçamentos ilimitados';
-                    @endphp
                     <ul class="mt-8 space-y-4 flex-1">
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitAccounts }}</span>
+                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitAccounts }}</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitTransactions }}</span>
+                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitTransactions }}</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
@@ -245,13 +267,13 @@
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $proBenefitGoals }}, {{ $proBenefitBudgets }}</span>
+                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitGoals }}, {{ $planBenefitBudgets }}</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">Suporte prioritário VIP</span>
+                            <span class="text-gray-300 text-sm font-medium">Suporte Prioritário</span>
                         </li>
                     </ul>
 
@@ -262,13 +284,13 @@
                             </button>
                         @else
                             <button @click="open = !open" type="button" class="w-full py-4 px-6 rounded-2xl text-gray-900 font-bold bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-600 shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide hover:-translate-y-0.5 active:scale-[0.98]">
-                                <span x-text="open ? 'Selecionar método' : 'Assinar PRO'"></span>
+                                <span x-text="open ? 'Selecionar método' : 'Assinar {{ $plan->name }}'"></span>
                                 <x-icon name="arrow-right" style="solid" class="w-5 h-5" x-show="!open" />
                                 <x-icon name="chevron-down" style="solid" class="w-5 h-5" x-show="open" />
                             </button>
                             <div x-show="open" x-collapse class="mt-4 space-y-3">
                                 @forelse($gateways as $gateway)
-                                    <a href="{{ route('checkout.init', $gateway->slug) }}" class="flex items-center justify-center w-full py-3 px-4 rounded-2xl border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white transition-colors gap-2 text-sm font-bold">
+                                    <a href="{{ route('checkout.init', $gateway->slug) }}?plan={{ urlencode($plan->slug) }}" class="flex items-center justify-center w-full py-3 px-4 rounded-2xl border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white transition-colors gap-2 text-sm font-bold">
                                         @if($gateway->slug === 'stripe')
                                             <x-icon name="stripe" style="brands" class="w-5 h-5" /> Stripe
                                         @elseif($gateway->slug === 'mercadopago')
@@ -285,6 +307,7 @@
                     </div>
                 </div>
             </div>
+            @endforeach
         </div>
 
         <div class="flex flex-wrap justify-center gap-8 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -357,4 +380,27 @@
         </div>
     </div>
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

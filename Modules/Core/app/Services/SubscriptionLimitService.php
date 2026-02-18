@@ -8,6 +8,7 @@ use App\Models\User;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\Budget;
 use Modules\Core\Models\Goal;
+use Modules\Core\Models\Plan;
 use Modules\Core\Models\Transaction;
 
 class SubscriptionLimitService
@@ -72,28 +73,43 @@ class SubscriptionLimitService
     }
 
     /**
-     * Get the limit for an entity based on user role.
+     * Get the limit for an entity based on user's plan (with Settings fallback when no plan/default).
      *
-     * @return int|string Returns 'unlimited' for pro when pro_has_limits=0 or limit < 0, int otherwise
+     * @return int|string Returns 'unlimited' when plan limit is -1 or null, int otherwise
      */
     public function getLimit(User $user, string $entity): int|string
     {
-        $settings = app(SettingService::class);
+        $defaultFree = Plan::getDefaultFree();
+        if ($defaultFree !== null) {
+            $plan = $user->plan_id ? $user->plan : $defaultFree;
+            if (! $plan) {
+                $plan = $user->plan()->first() ?? $defaultFree;
+            }
+            if ($plan) {
+                return $plan->getLimit($entity);
+            }
+        }
 
+        return $this->getLimitFromSettings($user, $entity);
+    }
+
+    /**
+     * Fallback: get limit from Settings (used when plans table empty or no default free plan).
+     */
+    private function getLimitFromSettings(User $user, string $entity): int|string
+    {
+        $settings = app(SettingService::class);
         if ($user->isPro()) {
             $proHasLimits = (bool) $settings->get('pro_has_limits', 0);
             if (! $proHasLimits) {
                 return 'unlimited';
             }
-
             $proLimit = (int) $settings->get("limit_pro_{$entity}", -1);
             if ($proLimit < 0) {
                 return (int) (self::PRO_LIMITS_DEFAULT[$entity] ?? 0);
             }
-
             return $proLimit;
         }
-
         return (int) $settings->get("limit_free_{$entity}", self::FREE_LIMITS[$entity] ?? 0);
     }
 
@@ -115,8 +131,9 @@ class SubscriptionLimitService
 
     /**
      * Get a user-friendly error message when limit is reached.
+     * Uses current user plan name and suggests next plan when applicable.
      */
-    public function getLimitReachedMessage(string $entity): string
+    public function getLimitReachedMessage(User $user, string $entity): string
     {
         $entityNames = [
             'income' => 'receitas',
@@ -126,11 +143,32 @@ class SubscriptionLimitService
             'account' => 'contas',
             'category' => 'categorias personalizadas',
         ];
-
         $entityName = $entityNames[$entity] ?? $entity;
-        $planProName = (string) app(SettingService::class)->get('plan_pro_name', 'Vertex PRO');
 
-        return "Limite de {$entityName} atingido! Migre para o plano {$planProName} para cadastros ilimitados.";
+        $defaultFree = Plan::getDefaultFree();
+        $plan = $user->plan_id ? $user->plan : $defaultFree;
+        if (! $plan) {
+            $plan = $user->plan()->first() ?? $defaultFree;
+        }
+        if ($plan) {
+            $planName = $plan->name;
+            $nextPlan = Plan::getDefaultPaid();
+            $suggestedName = $nextPlan ? $nextPlan->name : 'Vertex PRO';
+            $limit = $nextPlan ? $nextPlan->getLimit($entity) : 'unlimited';
+            $suffix = ($limit !== 'unlimited' && $limit > 0)
+                ? " para até {$limit} {$entityName}."
+                : ' para cadastros ilimitados.';
+            return "Limite de {$entityName} atingido! Migre para o plano {$suggestedName}{$suffix}";
+        }
+
+        $settings = app(SettingService::class);
+        $planProName = (string) $settings->get('plan_pro_name', 'Vertex PRO');
+        $proHasLimits = (bool) $settings->get('pro_has_limits', 0);
+        $proLimit = (int) $settings->get("limit_pro_{$entity}", -1);
+        $suffix = ($proHasLimits && $proLimit >= 0)
+            ? " para até {$proLimit} {$entityName}."
+            : ' para cadastros ilimitados.';
+        return "Limite de {$entityName} atingido! Migre para o plano {$planProName}{$suffix}";
     }
 
     /**
@@ -176,9 +214,9 @@ class SubscriptionLimitService
         }
 
         $notificationService = app(\Modules\Notifications\Services\NotificationService::class);
-        $settings = app(SettingService::class);
         $cacheKey = "limit_notify_{$user->id}_{$entity}";
-        $planProName = (string) $settings->get('plan_pro_name', 'Vertex PRO');
+        $defaultPaid = Plan::getDefaultPaid();
+        $planProName = $defaultPaid ? $defaultPaid->name : (string) app(SettingService::class)->get('plan_pro_name', 'Vertex PRO');
 
         if ($percentage >= 100) {
             if (! \Illuminate\Support\Facades\Cache::has("{$cacheKey}_100")) {

@@ -6,12 +6,14 @@ namespace Modules\Gateways\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\Client\Invoice\InvoiceClient;
 use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
+use Modules\Core\Models\Plan;
 use Modules\Gateways\Models\Gateway;
 use Modules\Gateways\Models\PaymentLog;
 use Modules\Gateways\Models\Subscription;
@@ -28,7 +30,18 @@ class WebhookController extends Controller
      */
     public function handleStripe(Request $request)
     {
-        $gateway = Gateway::where('slug', 'stripe')->firstOrFail();
+        try {
+            $gateway = Gateway::where('slug', 'stripe')->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            Log::warning('Stripe webhook received but gateway not configured.');
+            return response()->json(['error' => 'Gateway not configured'], 503);
+        }
+
+        if (! $gateway->secret_key) {
+            Log::warning('Stripe webhook: gateway has no secret_key configured.');
+            return response()->json(['error' => 'Gateway misconfigured'], 503);
+        }
+
         Stripe::setApiKey($gateway->secret_key);
 
         if (! $this->verifyStripeWebhook($request, $gateway->webhook_secret)) {
@@ -59,7 +72,18 @@ class WebhookController extends Controller
      */
     public function handleMercadoPago(Request $request)
     {
-        $gateway = Gateway::where('slug', 'mercadopago')->firstOrFail();
+        try {
+            $gateway = Gateway::where('slug', 'mercadopago')->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            Log::warning('Mercado Pago webhook received but gateway not configured.');
+            return response()->json(['error' => 'Gateway not configured'], 503);
+        }
+
+        if (! $gateway->secret_key) {
+            Log::warning('Mercado Pago webhook: gateway has no secret_key configured.');
+            return response()->json(['error' => 'Gateway misconfigured'], 503);
+        }
+
         MercadoPagoConfig::setAccessToken($gateway->secret_key);
 
         // POST com headers: verificar assinatura. GET (notification_url): sem assinatura, validar via API
@@ -89,6 +113,10 @@ class WebhookController extends Controller
 
     protected function verifyStripeWebhook(Request $request, ?string $secret): bool
     {
+        // In production, webhook secret is required to prevent forged requests
+        if (app()->environment('production') && (null === $secret || trim((string) $secret) === '')) {
+            return false;
+        }
         if (! $secret) {
             return true;
         }
@@ -128,7 +156,9 @@ class WebhookController extends Controller
             $amount = $subscription->items->data[0]->price->unit_amount / 100;
         }
 
-        DB::transaction(function () use ($userId, $subscriptionId, $customerId, $amount, $periodEnd, $metadata) {
+        $subscriptionMetadata = array_merge($metadata ?? [], ['had_trial' => true]);
+
+        DB::transaction(function () use ($userId, $subscriptionId, $customerId, $amount, $periodEnd, $metadata, $subscriptionMetadata) {
             Subscription::updateOrCreate(
                 ['external_subscription_id' => $subscriptionId],
                 [
@@ -139,7 +169,7 @@ class WebhookController extends Controller
                     'amount' => $amount ?: 29.90,
                     'currency' => 'BRL',
                     'current_period_end' => $periodEnd,
-                    'metadata' => $metadata,
+                    'metadata' => $subscriptionMetadata,
                 ]
             );
 
@@ -158,24 +188,31 @@ class WebhookController extends Controller
         if (! $sub) {
             return;
         }
-        DB::transaction(function () use ($sub) {
+        $defaultFree = Plan::getDefaultFree();
+        DB::transaction(function () use ($sub, $defaultFree) {
             $sub->update(['status' => 'canceled', 'canceled_at' => now()]);
             $user = User::find($sub->user_id);
             if ($user && $user->hasRole('pro_user')) {
                 $user->removeRole('pro_user');
                 $user->assignRole('free_user');
+                if ($defaultFree) {
+                    $user->update(['plan_id' => $defaultFree->id]);
+                }
                 Log::info("User {$user->id} downgraded to free after Stripe subscription deleted.");
                 try {
                     app(\Modules\Notifications\Services\NotificationService::class)->sendToUser(
                         $user,
-                        'Assinatura Vertex PRO encerrada',
-                        'Sua assinatura foi encerrada. Você continua com acesso ao plano gratuito. Para voltar ao PRO, assine novamente em Planos.',
+                        'Assinatura ' . plan_pro_name() . ' encerrada',
+                        'Sua assinatura foi encerrada. Você continua com acesso ao ' . plan_free_name() . '. Para voltar ao ' . plan_pro_name() . ', assine novamente em Planos.',
                         'info',
                         route('user.subscription.index')
                     );
                 } catch (\Throwable $e) {
                     Log::warning('Failed to send subscription ended notification: ' . $e->getMessage());
                 }
+            }
+            if ($user && ($sub->metadata['had_trial'] ?? false) && ! $user->trial_used_at) {
+                $user->update(['trial_used_at' => now()]);
             }
         });
     }
@@ -368,8 +405,8 @@ class WebhookController extends Controller
                     try {
                         app(\Modules\Notifications\Services\NotificationService::class)->sendToUser(
                             $user,
-                            'Bem-vindo ao Vertex PRO! 👑',
-                            'Seu pagamento foi confirmado e você agora tem acesso ilimitado a todos os recursos.',
+                            'Bem-vindo ao ' . plan_pro_name() . '! 👑',
+                            pro_benefits_welcome_message(),
                             'pro',
                             route('paneluser.index')
                         );
@@ -387,6 +424,18 @@ class WebhookController extends Controller
         if (! $user || ($metadata['plan_type'] ?? '') !== 'pro') {
             return;
         }
+
+        $plan = null;
+        if (! empty($metadata['plan_id'])) {
+            $plan = Plan::where('id', (int) $metadata['plan_id'])->where('is_active', true)->first();
+        }
+        if (! $plan) {
+            $plan = Plan::getDefaultPaid();
+        }
+        if ($plan) {
+            $user->update(['plan_id' => $plan->id]);
+        }
+
         if ($user->hasRole('free_user')) {
             $user->removeRole('free_user');
             $user->assignRole('pro_user');
@@ -395,8 +444,8 @@ class WebhookController extends Controller
         try {
             app(\Modules\Notifications\Services\NotificationService::class)->sendToUser(
                 $user,
-                'Bem-vindo ao Vertex PRO! 👑',
-                'Seu pagamento foi confirmado e você agora tem acesso ilimitado a todos os recursos.',
+                'Bem-vindo ao ' . plan_pro_name() . '! 👑',
+                pro_benefits_welcome_message(),
                 'pro',
                 route('paneluser.index')
             );

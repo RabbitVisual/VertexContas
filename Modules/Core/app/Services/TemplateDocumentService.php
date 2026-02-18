@@ -20,6 +20,11 @@ class TemplateDocumentService
 
     public const TYPE_CONSULTING = 'consulting';
 
+    public const TYPE_PROJECTION = 'projection';
+
+    /** AI report types (Consulting PDF + Year Projection) - share monthly limit */
+    public const AI_REPORT_TYPES = [self::TYPE_CONSULTING, self::TYPE_PROJECTION];
+
     public function __construct(
         protected SettingService $settingService
     ) {}
@@ -40,6 +45,49 @@ class TemplateDocumentService
             ->count();
 
         return $count < $limit;
+    }
+
+    /**
+     * Check if user can request AI report (Consulting or Projection) within monthly limit.
+     */
+    public function canDownloadAiReport(User $user): bool
+    {
+        $limit = (int) $this->settingService->get('limit_ai_report_per_month', 5);
+        if ($limit <= 0) {
+            return true;
+        }
+
+        $count = DocumentDownloadLog::where('user_id', $user->id)
+            ->whereIn('document_type', self::AI_REPORT_TYPES)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        return $count < $limit;
+    }
+
+    /**
+     * Get AI report usage count and limit for current month.
+     *
+     * @return array{count: int, limit: int, remaining: int, resets_at: \Carbon\Carbon}
+     */
+    public function getAiReportUsage(User $user): array
+    {
+        $limit = (int) $this->settingService->get('limit_ai_report_per_month', 5);
+        $count = DocumentDownloadLog::where('user_id', $user->id)
+            ->whereIn('document_type', self::AI_REPORT_TYPES)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $resetsAt = now()->endOfMonth()->addDay();
+
+        return [
+            'count' => $count,
+            'limit' => $limit,
+            'remaining' => max(0, $limit - $count),
+            'resets_at' => $resetsAt,
+        ];
     }
 
     /**

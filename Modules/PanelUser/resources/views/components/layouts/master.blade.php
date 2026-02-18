@@ -65,10 +65,34 @@
     <x-loading-overlay />
 
     @if(auth()->check() && (auth()->user()->show_assistant ?? true) && isset($vertexBot) && ($vertexBot['insight'] ?? null))
-        <x-gamification::vertex-bot :insight="$vertexBot['insight']" :financial-score="$vertexBot['financial_score'] ?? 0" />
+        <x-gamification::vertex-bot :insight="$vertexBot['insight']" :financial-score="$vertexBot['financial_score'] ?? 0" :tour-id="$pageTourId ?? null" />
     @endif
 
     <x-vertexchat::widget />
+
+    {{-- Tour completion: envia para o backend para analytics e gamificação --}}
+    @auth
+    <script>
+    (function() {
+        document.addEventListener('tour-completed', function(e) {
+            var tourId = e.detail && e.detail.tourId;
+            if (!tourId) return;
+            var url = '{{ route("user.tour.complete") }}';
+            var csrf = document.querySelector('meta[name="csrf-token"]') && document.querySelector('meta[name="csrf-token"]').content;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ tour_id: tourId })
+            }).catch(function() {});
+        });
+    })();
+    </script>
+    @endauth
 
     @stack('scripts')
 

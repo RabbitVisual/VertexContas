@@ -28,7 +28,7 @@
         default => 'text-slate-400 dark:text-slate-500',
     };
 @endphp
-<x-paneluser::layouts.master :title="$medal->title . ' | Conquistas'">
+<x-paneluser::layouts.master :title="replace_plan_name_in_text($medal->title) . ' | Conquistas'">
 <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12 px-4">
     {{-- Breadcrumb --}}
     <nav class="flex items-center gap-2 text-xs font-bold text-amber-500 dark:text-amber-400 uppercase tracking-widest" aria-label="Navegação">
@@ -36,19 +36,19 @@
         <span class="w-1 h-1 rounded-full bg-slate-500" aria-hidden="true"></span>
         <a href="{{ route('user.achievements.index') }}" class="hover:underline">Conquistas</a>
         <span class="w-1 h-1 rounded-full bg-slate-500" aria-hidden="true"></span>
-        <span class="text-slate-400 dark:text-slate-500 truncate">{{ $medal->title }}</span>
+        <span class="text-slate-400 dark:text-slate-500 truncate">{{ replace_plan_name_in_text($medal->title) }}</span>
     </nav>
 
     {{-- Card principal --}}
-    <div class="relative overflow-hidden rounded-[2rem] border backdrop-blur-xl p-8 sm:p-12 {{ $rarityCardClass }}">
+    <div class="relative overflow-hidden rounded-[2rem] border backdrop-blur-xl p-8 sm:p-12 {{ $rarityCardClass }}" data-tour="achievements-show-detail">
         <div class="flex flex-col sm:flex-row sm:items-center gap-6">
             <div class="w-24 h-24 rounded-2xl flex items-center justify-center shrink-0 {{ $rarityIconClass }}">
                 <x-icon name="{{ $medal->icon_name ?? 'medal' }}" style="duotone" class="w-14 h-14" />
             </div>
             <div class="flex-1 min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-black {{ $rarityTitleClass }} tracking-tight mb-2">{{ $medal->title }}</h1>
+                <h1 class="text-2xl sm:text-3xl font-black {{ $rarityTitleClass }} tracking-tight mb-2">{{ replace_plan_name_in_text($medal->title) }}</h1>
                 @if($medal->description)
-                    <p class="{{ $rarityDescClass }} text-base leading-relaxed">{{ $medal->description }}</p>
+                    <p class="{{ $rarityDescClass }} text-base leading-relaxed">{{ replace_plan_name_in_text($medal->description) }}</p>
                 @endif
                 @if($unlocked && $userMedal?->unlocked_at)
                     <span class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/25 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-bold">
@@ -71,7 +71,7 @@
                     <x-icon name="circle-question" style="duotone" class="w-5 h-5 text-amber-500" />
                     O que quer dizer?
                 </h2>
-                <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ $medal->explanation }}</p>
+                <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ replace_plan_name_in_text($medal->explanation) }}</p>
             </div>
         @endif
 
@@ -81,7 +81,7 @@
                     <x-icon name="lightbulb" style="duotone" class="w-5 h-5 text-emerald-500" />
                     Por que você conquistou
                 </h2>
-                <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ $medal->tips }}</p>
+                <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ replace_plan_name_in_text($medal->tips) }}</p>
             </div>
         @endif
 
@@ -91,7 +91,7 @@
                     <x-icon name="rocket" style="duotone" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     Continue assim!
                 </h2>
-                <p class="text-emerald-800/90 dark:text-emerald-200/90 leading-relaxed">{{ $medal->incentive_message }}</p>
+                <p class="text-emerald-800/90 dark:text-emerald-200/90 leading-relaxed">{{ replace_plan_name_in_text($medal->incentive_message) }}</p>
             </div>
         @endif
     </div>
@@ -137,4 +137,27 @@
         </div>
     @endif
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

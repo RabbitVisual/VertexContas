@@ -2,6 +2,19 @@
     <x-slot name="navbarTitle">Central de Suporte</x-slot>
 
     <x-paneladmin::page title="Central de Suporte" subtitle="Gestão inteligente e global de todos os chamados.">
+        @if(session('success'))
+            <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-4 text-emerald-600 dark:text-emerald-400 mb-6" role="alert">
+                <x-icon name="circle-check" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-4 text-amber-600 dark:text-amber-400 mb-6" role="alert">
+                <x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5 shrink-0" />
+                <p class="font-bold text-sm">{{ session('error') }}</p>
+            </div>
+        @endif
+
         <!-- Filters Card -->
         <x-paneladmin::card>
             <x-slot name="header">
@@ -9,47 +22,53 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status do Chamado</label>
                     <div class="relative">
-                        <select name="status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none">
+                        <select name="status" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Todos os Status</option>
                             <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Aberto</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
                             <option value="answered" {{ request('status') == 'answered' ? 'selected' : '' }}>Respondido</option>
                             <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Fechado</option>
                         </select>
-                        <x-icon name="chevron-down" style="duotone" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <x-icon name="chevron-down" style="duotone" class="w-4 h-4 text-slate-400" />
+                        </span>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nível de Prioridade</label>
                     <div class="relative">
-                        <select name="priority" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none">
+                        <select name="priority" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="all" {{ request('priority') == 'all' ? 'selected' : '' }}>Todas as Prioridades</option>
                             <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Baixa</option>
                             <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Média</option>
                             <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>Alta</option>
                         </select>
-                        <x-icon name="chevron-down" style="duotone" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <x-icon name="chevron-down" style="duotone" class="w-4 h-4 text-slate-400" />
+                        </span>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Responsável</label>
                     <div class="relative">
-                        <select name="agent" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none">
+                        <select name="agent" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                             <option value="all" {{ request('agent') == 'all' ? 'selected' : '' }}>Qualquer Agente</option>
                             <option value="unassigned" {{ request('agent') == 'unassigned' ? 'selected' : '' }}>Sem Atribuição</option>
                             @foreach($agents as $agent)
                                 <option value="{{ $agent->id }}" {{ request('agent') == $agent->id ? 'selected' : '' }}>{{ $agent->name }}</option>
                             @endforeach
                         </select>
-                        <x-icon name="chevron-down" style="duotone" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <x-icon name="chevron-down" style="duotone" class="w-4 h-4 text-slate-400" />
+                        </span>
                     </div>
                 </div>
 
                 <div class="flex items-end">
                     <button type="submit" class="w-full py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors flex items-center justify-center gap-2">
-                        <x-icon name="magnifying-glass" style="duotone" class="w-4 h-4" /> Aplicar Filtros
+                        <x-icon name="filter" style="duotone" class="w-4 h-4" /> Aplicar Filtros
                     </button>
                 </div>
             </form>
@@ -190,4 +209,15 @@
             @endif
         </x-paneladmin::card>
     </x-paneladmin::page>
+
+    @push('styles')
+    <style>
+        .support-select {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: none !important;
+        }
+    </style>
+    @endpush
 </x-paneladmin::layouts.master>

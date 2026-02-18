@@ -23,6 +23,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/transfer', [\Modules\Core\Http\Controllers\TransactionController::class, 'transfer'])->name('core.transactions.transfer');
     Route::post('/transfer', [\Modules\Core\Http\Controllers\TransactionController::class, 'processTransfer'])->name('core.transactions.processTransfer');
 
+    // CSV Import (PRO only)
+    Route::post('/transactions/import/upload', [\Modules\Core\Http\Controllers\ImportTransactionController::class, 'upload'])->middleware('pro')->name('core.transactions.import.upload');
+    Route::post('/transactions/import/categorize', [\Modules\Core\Http\Controllers\ImportTransactionController::class, 'categorize'])->middleware('pro')->name('core.transactions.import.categorize');
+    Route::post('/transactions/import/store', [\Modules\Core\Http\Controllers\ImportTransactionController::class, 'store'])->middleware('pro')->name('core.transactions.import.store');
+
     // Goals CRUD
     Route::resource('goals', \Modules\Core\Http\Controllers\GoalController::class)->names('core.goals');
 
@@ -51,6 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/categories/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewCategoryRanking'])->name('categories.view');
         Route::get('/extrato/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewExtrato'])->name('extrato.view');
         Route::get('/consultoria/view', [\Modules\Core\Http\Controllers\ReportsController::class, 'viewConsulting'])->middleware('pro')->name('consultoria.view');
+        Route::get('/consultoria/pdf', [\Modules\Core\Http\Controllers\ReportsController::class, 'downloadConsultingPdf'])->middleware('pro')->name('consultoria.pdf');
+        Route::get('/consultoria/history', [\Modules\Core\Http\Controllers\ReportsController::class, 'consultoriaHistory'])->middleware('pro')->name('consultoria.history');
     });
 
     Route::resource('cores', CoreController::class)->names('core');

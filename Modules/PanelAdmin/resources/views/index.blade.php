@@ -1,424 +1,466 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Dashboard</x-slot>
 
-    <x-paneladmin::page title="Painel Administrativo" subtitle="Bem-vindo de volta! Aqui está o que está acontecendo no sistema hoje.">
+    <x-paneladmin::page title="Painel Administrativo" subtitle="Visão geral do sistema, métricas e atalhos rápidos.">
         <x-slot name="header">
-            <div class="flex items-center gap-3">
-                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-xs font-bold flex items-center">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
-                    Sistema Online
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                    Sistema online
                 </span>
-                <div class="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                    {{ now()->format('d/m/Y H:i') }}
-                </div>
+                <span class="text-sm text-slate-500 dark:text-slate-400 font-medium tabular-nums">
+                    {{ now()->format('d/m/Y · H:i') }}
+                </span>
+                @if(($wikiSuggestionsPending ?? 0) > 0)
+                    <a href="{{ route('admin.wiki.suggestions') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-colors">
+                        <x-icon name="lightbulb" style="duotone" class="w-3.5 h-3.5 shrink-0" />
+                        {{ $wikiSuggestionsPending }} sugestão(ões) Wiki
+                    </a>
+                @endif
             </div>
         </x-slot>
 
-    <!-- Main Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Revenue Card -->
-        <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="money-bill-trend-up" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-blue-100/80 font-semibold text-sm uppercase tracking-wider">Receita Total</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="vault" style="duotone" class="w-5 h-5 text-white" />
-                    </div>
+        {{-- KPIs --}}
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {{-- Receita Total --}}
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="vault" style="duotone" class="w-20 h-20 text-indigo-500 shrink-0" />
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ format_currency($totalRevenue) }}</h3>
-                <div class="flex items-center text-xs text-blue-100/90 font-medium">
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Receita total</span>
+                        <div class="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="money-bill-trend-up" style="duotone" class="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        </div>
+                    </div>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ format_currency($totalRevenue) }}</p>
                     @php
                         $revenueDiff = $monthlyRevenue - $revenueLastMonth;
-                        $revPercent = $revenueLastMonth > 0 ? ($revenueDiff / $revenueLastMonth) * 100 : 100;
+                        $revPercent = $revenueLastMonth > 0 ? ($revenueDiff / $revenueLastMonth) * 100 : ($revenueDiff >= 0 ? 100 : 0);
                     @endphp
-                    <x-icon name="{{ $revenueDiff >= 0 ? 'arrow-trend-up' : 'arrow-trend-down' }}" style="duotone" class="w-3 h-3 mr-1" />
-                    <span>{{ format_percent(abs($revPercent), 1) }} em relação ao mês anterior</span>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400 inline-flex items-center gap-1">
+                        <x-icon name="{{ $revenueDiff >= 0 ? 'arrow-trend-up' : 'arrow-trend-down' }}" style="duotone" class="w-3.5 h-3.5 shrink-0 {{ $revenueDiff >= 0 ? 'text-emerald-500' : 'text-red-500' }}" />
+                        {{ format_percent(abs($revPercent), 1) }} vs mês anterior
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <!-- Users Card -->
-        <div class="bg-gradient-to-br from-purple-600 to-pink-700 rounded-xl p-6 text-white shadow-xl shadow-purple-500/20 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="users" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-purple-100/80 font-semibold text-sm uppercase tracking-wider">Total de Usuários</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="users-gear" style="duotone" class="w-5 h-5 text-white" />
+            {{-- Total Usuários --}}
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="users" style="duotone" class="w-20 h-20 text-purple-500 shrink-0" />
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Usuários</span>
+                        <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="users-gear" style="duotone" class="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                        </div>
                     </div>
-                </div>
-                <h3 class="text-3xl font-black mb-1">{{ format_number($totalUsers, 0) }}</h3>
-                <div class="flex items-center text-xs text-purple-100/90 font-medium">
-                    <x-icon name="user-plus" style="duotone" class="w-3 h-3 mr-1" />
-                    <span>+{{ $newUsersThisMonth }} novos este mês</span>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ format_number($totalUsers, 0) }}</p>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400 inline-flex items-center gap-1">
+                        <x-icon name="user-plus" style="duotone" class="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                        +{{ $newUsersThisMonth }} este mês
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <!-- Pro Users Card -->
-        <a href="{{ route('admin.subscriptions.index') }}" class="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-6 text-white shadow-xl shadow-orange-500/20 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/30 transition-all">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="crown" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-amber-100/80 font-semibold text-sm uppercase tracking-wider">Assinantes PRO</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="star" style="duotone" class="w-5 h-5 text-white" />
+            {{-- Assinantes PRO (link) --}}
+            <a href="{{ route('admin.subscriptions.index') }}" class="block bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:border-[#11C76F]/30 hover:shadow-md transition-all">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="crown" style="duotone" class="w-20 h-20 text-amber-500 shrink-0" />
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Assinantes PRO</span>
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="star" style="duotone" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                        </div>
                     </div>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ format_number($proUsersCount, 0) }}</p>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {{ $totalUsers > 0 ? format_percent(($proUsersCount / $totalUsers) * 100, 1) : '0%' }} da base · {{ $activeSubscriptionsCount ?? 0 }} assinaturas ativas
+                    </p>
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ format_number($proUsersCount, 0) }}</h3>
-                <div class="flex flex-col gap-1 text-xs text-amber-100/90 font-medium">
-                    <span><x-icon name="chart-pie" style="duotone" class="w-3 h-3 mr-1 inline" />{{ $totalUsers > 0 ? format_percent(($proUsersCount/$totalUsers)*100, 1) : '0%' }} da base total</span>
-                    <span><x-icon name="arrows-rotate" style="duotone" class="w-3 h-3 mr-1 inline" />{{ $activeSubscriptionsCount ?? 0 }} assinaturas recorrentes ativas</span>
-                </div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Support Card -->
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="headset" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-emerald-100/80 font-semibold text-sm uppercase tracking-wider">Tickets Abertos</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="ticket" style="duotone" class="w-5 h-5 text-white" />
+            {{-- Tickets (link) --}}
+            <a href="{{ route('admin.support.index') }}" class="block bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:border-emerald-500/30 hover:shadow-md transition-all">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="headset" style="duotone" class="w-20 h-20 text-emerald-500 shrink-0" />
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tickets abertos</span>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="ticket" style="duotone" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        </div>
                     </div>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ $openTicketsCount }}</p>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400 inline-flex items-center gap-1">
+                        <x-icon name="clock" style="duotone" class="w-3.5 h-3.5 shrink-0" />
+                        Aguardando resposta
+                    </p>
                 </div>
-                <h3 class="text-3xl font-black mb-1">{{ $openTicketsCount }}</h3>
-                <div class="flex items-center text-xs text-emerald-100/90 font-medium">
-                    <x-icon name="clock" style="duotone" class="w-3 h-3 mr-1" />
-                    <span>Aguardando resposta</span>
-                </div>
-            </div>
-        </div>
-        <!-- Média de Score Financeiro -->
-        <div class="bg-gradient-to-br from-cyan-600 to-teal-700 rounded-xl p-6 text-white shadow-xl shadow-cyan-500/20 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="chart-pie" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-cyan-100/80 font-semibold text-sm uppercase tracking-wider">Média de Score Financeiro</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="wallet" style="duotone" class="w-5 h-5 text-white" />
-                    </div>
-                </div>
-                <h3 class="text-3xl font-black mb-1">{{ $avgFinancialScore ?? 0 }}/100</h3>
-                <div class="flex items-center text-xs text-cyan-100/90 font-medium">
-                    <x-icon name="users" style="duotone" class="w-3 h-3 mr-1" />
-                    <span>Baseado em economia, orçamento e consistência</span>
-                </div>
-            </div>
-        </div>
+            </a>
 
-        <!-- Blog Conversion Rate -->
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <x-icon name="chart-simple" style="duotone" class="w-24 h-24 text-white" />
-            </div>
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                    <p class="text-indigo-100/80 font-semibold text-sm uppercase tracking-wider">Conversão Blog</p>
-                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-md">
-                        <x-icon name="arrow-right-arrow-left" style="duotone" class="w-5 h-5 text-white" />
+            {{-- Score financeiro --}}
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="chart-pie" style="duotone" class="w-20 h-20 text-cyan-500 shrink-0" />
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Score financeiro</span>
+                        <div class="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="wallet" style="duotone" class="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                        </div>
                     </div>
-                </div>
-                <h3 class="text-3xl font-black mb-1">{{ format_percent($blogConversionRate, 1) }}</h3>
-                <div class="flex items-center text-xs text-indigo-100/90 font-medium">
-                    <x-icon name="users" style="duotone" class="w-3 h-3 mr-1" />
-                    <span>Visitantes > Assinantes</span>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ $avgFinancialScore ?? 0 }}/100</p>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">Média (economia, orçamento, consistência)</p>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Charts & Lists Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Revenue Chart -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="chart-line" style="duotone" class="text-indigo-500" />
-                    Evolução da Receita
+            {{-- Conversão Blog --}}
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+                <div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <x-icon name="chart-simple" style="duotone" class="w-20 h-20 text-indigo-500 shrink-0" />
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Conversão blog</span>
+                        <div class="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                            <x-icon name="arrow-right-arrow-left" style="duotone" class="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        </div>
+                    </div>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{{ format_percent($blogConversionRate, 1) }}</p>
+                    <p class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">Visitantes → Assinantes</p>
+                </div>
+            </div>
+        </section>
+
+        {{-- Gráficos --}}
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="chart-line" style="duotone" class="w-5 h-5 text-indigo-500 shrink-0" />
+                        Evolução da receita
+                    </h2>
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-lg">Últimos 6 meses</span>
+                </div>
+                <div class="h-64">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <x-icon name="chart-pie" style="duotone" class="w-5 h-5 text-purple-500 shrink-0" />
+                    Distribuição de usuários
                 </h2>
-                <span class="text-xs font-semibold text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 px-2 py-1 rounded">Últimos 6 Meses</span>
+                <div class="h-48 flex items-center justify-center">
+                    <canvas id="userChart"></canvas>
+                </div>
+                <div class="mt-6 space-y-3">
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">PRO</span>
+                        </div>
+                        <span class="font-bold text-slate-900 dark:text-white">{{ $proUsersCount }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">Gratuitos</span>
+                        </div>
+                        <span class="font-bold text-slate-900 dark:text-white">{{ $freeUsersCount }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="h-64">
-                <canvas id="revenueChart"></canvas>
-            </div>
-        </div>
+        </section>
 
-        <!-- User Distribution Chart -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
-            <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <x-icon name="chart-pie" style="duotone" class="text-purple-500" />
-                Distribuição de Usuários
+        {{-- Atividade recente --}}
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="user-plus" style="duotone" class="w-5 h-5 text-blue-500 shrink-0" />
+                        Últimos cadastros
+                    </h2>
+                    <a href="{{ route('admin.users.index') }}" class="text-xs font-bold text-[#11C76F] hover:text-[#0EA85A] uppercase tracking-wider transition-colors">Ver todos</a>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($recentUsers as $user)
+                        <a href="{{ route('admin.users.show', $user) }}" class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                            <div class="flex items-center gap-3 min-w-0">
+                                @if($user->photo)
+                                    <img src="{{ $user->photo_url }}" alt="" class="h-10 w-10 rounded-xl object-cover shrink-0 border border-slate-200 dark:border-slate-600">
+                                @else
+                                    <div class="h-10 w-10 rounded-xl bg-[#11C76F]/10 text-[#11C76F] flex items-center justify-center shrink-0">
+                                        <x-icon name="user" style="duotone" class="w-5 h-5 shrink-0" />
+                                    </div>
+                                @endif
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ $user->name }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ $user->email }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0 ml-3">
+                                <span class="block text-xs font-medium text-slate-500 dark:text-slate-400">{{ $user->created_at->format('d/m/Y') }}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 mt-1 rounded-lg text-[10px] font-bold uppercase {{ $user->hasRole('pro_user') ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400' }}">
+                                    {{ $user->hasRole('pro_user') ? 'PRO' : 'FREE' }}
+                                </span>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="p-8 text-center">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3 shrink-0">
+                                <x-icon name="users" style="duotone" class="w-6 h-6 text-slate-400 shrink-0" />
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Nenhum cadastro recente.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="credit-card" style="duotone" class="w-5 h-5 text-emerald-500 shrink-0" />
+                        Pagamentos recentes
+                    </h2>
+                    <a href="{{ route('admin.payments.index') }}" class="text-xs font-bold text-[#11C76F] hover:text-[#0EA85A] uppercase tracking-wider transition-colors">Ver logs</a>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($recentPayments as $payment)
+                        <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                                    <x-icon name="receipt" style="duotone" class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ $payment->user->name ?? 'Usuário' }}</p>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono uppercase">{{ $payment->gateway_slug ?? '—' }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0 ml-3">
+                                <p class="text-sm font-black text-slate-900 dark:text-white">{{ format_currency($payment->amount) }}</p>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-lg text-[10px] font-bold {{ $payment->status === 'succeeded' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }}">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-current shrink-0"></span>
+                                    {{ strtoupper($payment->status) }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3 shrink-0">
+                                <x-icon name="credit-card" style="duotone" class="w-6 h-6 text-slate-400 shrink-0" />
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Nenhum pagamento recente.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
+        {{-- Blog --}}
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="newspaper" style="duotone" class="w-5 h-5 text-indigo-500 shrink-0" />
+                        Artigos mais lidos
+                    </h2>
+                    <a href="{{ route('admin.blog.index') }}" class="text-xs font-bold text-[#11C76F] hover:text-[#0EA85A] uppercase tracking-wider transition-colors">Ver blog</a>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($mostReadPosts as $post)
+                        <a href="{{ route('admin.blog.show', $post) }}" class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30 group">
+                            <p class="text-sm font-bold text-slate-900 dark:text-white truncate flex-1 min-w-0">{{ $post->title }}</p>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0 ml-2">{{ $post->views }} views</span>
+                        </a>
+                    @empty
+                        <div class="p-8 text-center">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3 shrink-0">
+                                <x-icon name="newspaper" style="duotone" class="w-6 h-6 text-slate-400 shrink-0" />
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Nenhum artigo publicado.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="feather-pointed" style="duotone" class="w-5 h-5 text-amber-500 shrink-0" />
+                        Top autores
+                    </h2>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($topAuthors as $stat)
+                        <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                            <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ $stat->author->name ?? '—' }}</p>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0 ml-2">{{ $stat->total }} {{ $stat->total === 1 ? 'post' : 'posts' }}</span>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3 shrink-0">
+                                <x-icon name="feather-pointed" style="duotone" class="w-6 h-6 text-slate-400 shrink-0" />
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Nenhum autor com publicações.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <x-icon name="comments" style="duotone" class="w-5 h-5 text-amber-500 shrink-0" />
+                        Comentários recentes
+                    </h2>
+                    <a href="{{ route('admin.blog.comments') }}" class="text-xs font-bold text-[#11C76F] hover:text-[#0EA85A] uppercase tracking-wider transition-colors">Moderar</a>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($recentComments as $comment)
+                        <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
+                            <p class="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{{ $comment->content }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $comment->user->name ?? '—' }} · {{ $comment->created_at->diffForHumans() }}</p>
+                            <a href="{{ route('admin.blog.show', $comment->post) }}" class="text-xs font-bold text-[#11C76F] hover:underline mt-0.5 inline-block truncate max-w-full">{{ $comment->post->title }}</a>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3 shrink-0">
+                                <x-icon name="comments" style="duotone" class="w-6 h-6 text-slate-400 shrink-0" />
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Nenhum comentário recente.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
+        {{-- Atalhos --}}
+        <section class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <x-icon name="bolt" style="duotone" class="w-5 h-5 text-amber-500 shrink-0" />
+                Atalhos do administrador
             </h2>
-            <div class="h-48 flex items-center justify-center">
-                <canvas id="userChart"></canvas>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <a href="{{ route('admin.users.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="users" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Usuários</span>
+                </a>
+                <a href="{{ route('admin.settings.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="gears" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Configurações</span>
+                </a>
+                <a href="{{ route('admin.gateways.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="credit-card" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Gateways</span>
+                </a>
+                <a href="{{ route('admin.plans.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="crown" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-amber-500 mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Planos</span>
+                </a>
+                <a href="{{ route('admin.roles.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="shield-halved" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Permissões</span>
+                </a>
+                <a href="{{ route('admin.notifications.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="bell" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Notificações</span>
+                </a>
+                <a href="{{ route('admin.support.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="headset" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Suporte</span>
+                </a>
+                <a href="{{ route('admin.blog.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="newspaper" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Blog</span>
+                </a>
+                <a href="{{ route('admin.wiki.suggestions') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="book" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Wiki</span>
+                </a>
+                <a href="{{ route('admin.legal.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="scale-balanced" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Legal</span>
+                </a>
+                <a href="{{ route('admin.insights.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-[#11C76F]/50 hover:bg-[#11C76F]/5 transition-all group">
+                    <x-icon name="lightbulb" style="duotone" class="w-7 h-7 text-slate-400 group-hover:text-[#11C76F] mb-2 shrink-0" />
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#11C76F] text-center">Insights</span>
+                </a>
             </div>
-            <div class="mt-6 space-y-3">
-                <div class="flex items-center justify-between text-sm">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">Usuários PRO</span>
-                    </div>
-                    <span class="font-bold text-slate-800 dark:text-white">{{ $proUsersCount }}</span>
-                </div>
-                <div class="flex items-center justify-between text-sm">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-600"></span>
-                        <span class="text-slate-600 dark:text-slate-400 font-medium">Gratuitos</span>
-                    </div>
-                    <span class="font-bold text-slate-800 dark:text-white">{{ $freeUsersCount }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Recent Users -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="user-plus" style="duotone" class="text-blue-500" />
-                    Últimos Cadastros
-                </h2>
-                <a href="{{ route('admin.users.index') }}" class="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Ver Todos</a>
-            </div>
-            <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                @foreach($recentUsers as $user)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
-                                {{ substr($user->first_name, 0, 1) }}
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800 dark:text-white">{{ $user->full_name }}</h4>
-                                <p class="text-xs text-slate-500">{{ $user->email }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="block text-xs font-bold text-slate-400">{{ $user->created_at->format('d/m/Y') }}</span>
-                            <span class="inline-block px-2 py-0.5 mt-1 rounded text-[10px] font-black uppercase {{ $user->hasRole('pro_user') ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-slate-100 text-slate-600 dark:bg-slate-700' }}">
-                                {{ $user->hasRole('pro_user') ? 'PRO' : 'FREE' }}
-                            </span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Recent Payments -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="credit-card" style="duotone" class="text-emerald-500" />
-                    Pagamentos Recentes
-                </h2>
-                <a href="{{ route('admin.payments.index') }}" class="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">Ver Logs</a>
-            </div>
-            <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                @foreach($recentPayments as $payment)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center">
-                                <x-icon name="receipt" style="duotone" class="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800 dark:text-white">{{ $payment->user->full_name ?? 'Usuário Desconhecido' }}</h4>
-                                <p class="text-[10px] text-slate-400 font-mono uppercase">{{ $payment->gateway_slug }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-black text-slate-900 dark:text-white">{{ format_currency($payment->amount) }}</div>
-                            <span class="inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold {{ $payment->status === 'succeeded' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                                <span class="w-1 h-1 rounded-full bg-current mr-1"></span>
-                                {{ strtoupper($payment->status) }}
-                            </span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <!-- Blog Analytics -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Most Read Posts -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="newspaper" style="duotone" class="text-indigo-500" />
-                    Artigos Mais Lidos
-                </h2>
-            </div>
-            <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                @foreach($mostReadPosts as $post)
-                    <a href="{{ route('paneluser.blog.show', $post->slug) }}" target="_blank" class="block p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="text-sm font-bold text-slate-800 dark:text-white truncate">{{ $post->title }}</div>
-                        </div>
-                        <span class="text-xs font-bold text-slate-500 shrink-0 ml-2">{{ $post->views }} views</span>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Top Authors -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="feather-pointed" style="duotone" class="text-amber-500" />
-                    Top Autores
-                </h2>
-            </div>
-            <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                @foreach($topAuthors as $stat)
-                    <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                        <div class="flex items-center gap-3">
-                            <div class="text-sm font-bold text-slate-800 dark:text-white">{{ $stat->author->name ?? "Unknown" }}</div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-bold text-slate-500">{{ $stat->total }} posts</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Recent Comments -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-icon name="comments" style="duotone" class="text-amber-500" />
-                    Comentários Recentes
-                </h2>
-            </div>
-            <div class="divide-y divide-slate-100 dark:divide-slate-700">
-                @forelse($recentComments as $comment)
-                    <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors even:bg-slate-50/50 dark:even:bg-slate-800/30">
-                        <p class="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{{ $comment->content }}</p>
-                        <p class="text-xs text-slate-500 mt-1">{{ $comment->user->name ?? '—' }} · {{ $comment->created_at->diffForHumans() }}</p>
-                        <a href="{{ route('paneluser.blog.show', $comment->post->slug) }}" target="_blank" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5 inline-block">{{ $comment->post->title }}</a>
-                    </div>
-                @empty
-                    <div class="p-4 text-sm text-slate-500 dark:text-slate-400">Nenhum comentário recente.</div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions Grid -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-            <x-icon name="bolt" style="duotone" class="text-amber-500" />
-            Atalhos do Administrador
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <a href="{{ route('admin.users.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="users" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Usuários</span>
-            </a>
-            <a href="{{ route('admin.settings.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="gears" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Configurações</span>
-            </a>
-            <a href="{{ route('admin.gateways.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="credit-card" style="duotone" class="text-2xl text-slate-400 group-hover:text-indigo-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Gateways</span>
-            </a>
-            <a href="{{ route('admin.plans.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="crown" style="duotone" class="text-2xl text-slate-400 group-hover:text-amber-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Planos</span>
-            </a>
-            <a href="{{ route('admin.roles.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="shield-halved" style="duotone" class="text-2xl text-slate-400 group-hover:text-emerald-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Permissões</span>
-            </a>
-            <a href="{{ route('admin.notifications.index') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                <x-icon name="bell" style="duotone" class="text-2xl text-slate-400 group-hover:text-pink-500 mb-2" />
-                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Notificações</span>
-            </a>
-        </div>
-    </div>
-
+        </section>
     </x-paneladmin::page>
 
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Revenue Chart
-            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-            new window.Chart(ctxRevenue, {
-                type: 'line',
-                data: {
-                    labels: {!! json_encode($monthLabels) !!},
-                    datasets: [{
-                        label: 'Receita (R$)',
-                        data: {!! json_encode($revenueData) !!},
-                        fill: true,
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        borderColor: '#4f46e5',
-                        borderWidth: 4,
-                        tension: 0.4,
-                        pointBackgroundColor: '#4f46e5',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+            const ctxRevenue = document.getElementById('revenueChart');
+            if (ctxRevenue) {
+                new window.Chart(ctxRevenue.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: {!! json_encode($monthLabels) !!},
+                        datasets: [{
+                            label: 'Receita (R$)',
+                            data: {!! json_encode($revenueData) !!},
+                            fill: true,
+                            backgroundColor: 'rgba(17, 199, 111, 0.08)',
+                            borderColor: '#11C76F',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointBackgroundColor: '#11C76F',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                            ticks: { font: { weight: 'bold' } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { weight: 'bold' } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(148, 163, 184, 0.15)' },
+                                ticks: { font: { size: 11, weight: '600' } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 11, weight: '600' } }
+                            }
                         }
                     }
-                }
-            });
-
-            // User Distribution Chart
-            const ctxUser = document.getElementById('userChart').getContext('2d');
-            new window.Chart(ctxUser, {
-                type: 'doughnut',
-                data: {
-                    labels: ['PRO', 'FREE'],
-                    datasets: [{
-                        data: [{{ $proUsersCount }}, {{ $freeUsersCount }}],
-                        backgroundColor: ['#6366f1', '#e2e8f0'],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false }
+                });
+            }
+            const ctxUser = document.getElementById('userChart');
+            if (ctxUser) {
+                new window.Chart(ctxUser.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['PRO', 'FREE'],
+                        datasets: [{
+                            data: [{{ $proUsersCount }}, {{ $freeUsersCount }}],
+                            backgroundColor: ['#11C76F', '#cbd5e1'],
+                            borderWidth: 0,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: { legend: { display: false } }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
     @endpush

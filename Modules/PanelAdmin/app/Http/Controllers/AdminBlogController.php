@@ -75,6 +75,12 @@ class AdminBlogController extends Controller
         return redirect()->route('admin.blog.index')->with('success', 'Post criado com sucesso!');
     }
 
+    public function show($id)
+    {
+        $post = Post::with(['author', 'category', 'comments.user'])->findOrFail($id);
+        return view('paneladmin::blog.show', compact('post'));
+    }
+
     public function edit($id)
     {
         $post = Post::findOrFail($id);

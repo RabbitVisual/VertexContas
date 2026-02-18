@@ -14,6 +14,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications/unread', [NotificationController::class, 'fetchUnread'])->name('notifications.unread');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/delete', [NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::post('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
+    Route::post('/notifications/clear-all', [NotificationController::class, 'clearAll'])->name('notifications.clear-all');
 
     // UI Pages (Contextual) - Note: Admin is now managed in routes/admin.php
     Route::get('/user/notifications', function () {

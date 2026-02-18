@@ -15,7 +15,7 @@
 </style>
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
     {{-- Hero --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-800/90 to-slate-900/90 dark:from-slate-800/95 dark:to-slate-950/95 border border-slate-700/50 dark:border-slate-600/30 p-8 sm:p-12 shadow-xl backdrop-blur-xl">
+    <div class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-800/90 to-slate-900/90 dark:from-slate-800/95 dark:to-slate-950/95 border border-slate-700/50 dark:border-slate-600/30 p-8 sm:p-12 shadow-xl backdrop-blur-xl" data-tour="achievements-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-amber-500/20 dark:bg-amber-500/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-500/15 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -52,7 +52,7 @@
     </div>
 
     {{-- Medal grid --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-tour="achievements-list">
         @foreach($medals ?? [] as $medal)
             @php
                 $rarity = $medal['rarity'] ?? 'silver';
@@ -115,11 +115,11 @@
                     <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 {{ $rarityIconClass }}">
                         <x-icon name="{{ $medal['icon_name'] ?? 'medal' }}" style="duotone" class="w-10 h-10 {{ $unlocked ? '' : 'opacity-70' }}" />
                     </div>
-                    <h3 class="font-bold {{ $rarityTitleClass }} text-sm leading-tight">{{ $medal['title'] }}</h3>
+                    <h3 class="font-bold {{ $rarityTitleClass }} text-sm leading-tight">{{ replace_plan_name_in_text($medal['title'] ?? '') }}</h3>
                     @if($medal['description'] ?? null)
-                        <p class="text-xs {{ $rarityDescClass }} mt-1 line-clamp-2">{{ $medal['description'] }}</p>
+                        <p class="text-xs {{ $rarityDescClass }} mt-1 line-clamp-2">{{ replace_plan_name_in_text($medal['description']) }}</p>
                         <div x-show="showTooltip" x-transition class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-slate-100 text-xs max-w-xs shadow-xl z-20 border border-slate-700" x-cloak>
-                            {{ $medal['description'] }}
+                            {{ replace_plan_name_in_text($medal['description']) }}
                             <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900 dark:border-t-slate-800"></span>
                         </div>
                     @endif
@@ -150,4 +150,27 @@
         </div>
     @endif
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

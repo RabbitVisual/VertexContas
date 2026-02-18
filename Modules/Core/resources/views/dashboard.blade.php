@@ -19,7 +19,7 @@
 <x-paneluser::layouts.master :title="'Dashboard'">
     <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-12">
         {{-- Hero - Vertex CBAV style (card claro, blur orbs, breadcrumb) --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="dashboard-intro">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -31,7 +31,7 @@
                         <span class="text-gray-400 dark:text-gray-500">Dashboard</span>
                     </nav>
                     <div class="flex items-center gap-3 mb-3">
-                        <span class="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-200 dark:border-amber-500/30">Vertex PRO</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-200 dark:border-amber-500/30">{{ plan_pro_name() }}</span>
                     </div>
                     <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">
                         {{ $greeting }}, {{ $firstName }}!<br>
@@ -40,7 +40,10 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed mb-6">
                         Bem-vindo ao seu centro de controle financeiro. Aqui está o resumo das suas finanças.
                     </p>
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap gap-3" data-tour="dashboard-actions">
+                        @if(!empty($dashboardTourId) && count($dashboardTourSteps ?? []) > 0)
+                            <x-core::tour-guide :tour-id="$dashboardTourId" label="Ver tour desta página" />
+                        @endif
                         @if(!($inspectionReadOnly ?? false))
                             <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/20 transition-all">
                                 <x-icon name="plus" style="solid" class="w-5 h-5" />
@@ -57,7 +60,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0">
+                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0" data-tour="dashboard-balance">
                     <div class="flex items-center gap-4 text-left">
                         <div class="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                             <x-icon name="wallet" style="duotone" class="w-6 h-6" />
@@ -80,7 +83,7 @@
                 :score-text-class="$scoreTextClass"
                 :score-border-class="$scoreBorderClass"
             />
-            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6">
+            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-balance">
                 <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="wallet" style="duotone" class="w-6 h-6" />
                 </div>
@@ -88,7 +91,7 @@
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalBalance" /></h3>
             </div>
 
-            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6">
+            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-income">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 shrink-0">
                         <x-icon name="arrow-trend-up" style="duotone" class="w-6 h-6" />
@@ -106,11 +109,11 @@
                             Ver detalhe por fonte
                             <span class="inline-block transition-transform" :class="open ? 'rotate-180' : ''"><x-icon name="chevron-down" style="solid" class="w-3 h-3" /></span>
                         </button>
-                        <ul x-show="open" x-collapse class="mt-1.5 space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                        <ul x-show="open" x-collapse class="mt-1.5 space-y-3 text-xs text-gray-600 dark:text-gray-400">
                             @foreach($incomeBreakdown as $item)
-                                <li class="flex justify-between">
-                                    <span>{{ $item['description'] }}</span>
-                                    <span class="sensitive-value tabular-nums"><x-core::financial-value :value="$item['amount']" /></span>
+                                <li class="flex flex-col gap-0.5 py-1.5 border-b border-gray-100 dark:border-white/5 last:border-0">
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">{{ $item['description'] }}</span>
+                                    <span class="sensitive-value tabular-nums text-emerald-600 dark:text-emerald-400 font-semibold"><x-core::financial-value :value="$item['amount']" /></span>
                                 </li>
                             @endforeach
                         </ul>
@@ -191,6 +194,11 @@
                     <span class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300">
                         Taxa de poupança: {{ $projectionData['savings_rate'] ?? 0 }}%
                     </span>
+                    @if(isset($aiReportUsage) && $aiReportUsage['limit'] > 0)
+                        <span class="px-3 py-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
+                            Relatórios IA: {{ $aiReportUsage['count'] }} de {{ $aiReportUsage['limit'] }}/mês
+                        </span>
+                    @endif
                 </div>
                 <button
                     @click="analyze()"
@@ -505,4 +513,27 @@
         })();
     </script>
     @endpush
+
+    @if(!empty($dashboardTourId) && !empty($dashboardTourSteps))
+    @push('scripts')
+    <script>
+    (function() {
+        var tourId = @json($dashboardTourId);
+        var steps = @json($dashboardTourSteps);
+        function register() {
+            if (window.registerVertexTourSteps && steps && steps.length) {
+                window.registerVertexTourSteps(tourId, steps);
+                return;
+            }
+            setTimeout(register, 50);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', register);
+        } else {
+            register();
+        }
+    })();
+    </script>
+    @endpush
+    @endif
 </x-paneluser::layouts.master>

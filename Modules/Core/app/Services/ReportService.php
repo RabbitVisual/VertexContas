@@ -6,6 +6,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Models\Account;
+use Modules\Core\Models\Budget;
+use Modules\Core\Models\Goal;
 use Modules\Core\Models\Transaction;
 use Modules\Gamification\Models\UserMedal;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -758,9 +761,10 @@ class ReportService
 
     /**
      * Get consulting data for Premium Financial Report (PRO only).
-     * Aggregates budget analysis, financial score, recommendations (AI or static), and medals.
+     * Aggregates budget analysis, financial score, medals, accounts, projection, income sources.
+     * AI conclusion and projection are NOT generated here; controller uses AiConsultingReport or generates via Gemini.
      *
-     * @return array{budget_analysis: array, financial_score: int, recommendations: array, medals: \Illuminate\Support\Collection, period_label: string, generated_with_ai: bool}
+     * @return array{budget_analysis: array, financial_score: int, medals: \Illuminate\Support\Collection, period_label: string, accounts_summary: array, projection_data: array, income_sources: \Illuminate\Support\Collection, metrics: array}
      */
     public function getConsultingData(User $user): array
     {
@@ -769,44 +773,243 @@ class ReportService
 
         $budgetAnalysis = $financialHealth->getBudgetHealthAnalysis($user);
         $gamificationData = $gamification->analyzeUser($user);
+        $projectionData = $financialHealth->getProjectionData($user);
+        $incomeSources = $financialHealth->getIncomeSourcesForConsulting($user);
 
-        $recommendations = $this->buildRecommendations($budgetAnalysis);
-        $generatedWithAi = false;
+        $accountsSummary = Account::where('user_id', $user->id)
+            ->orderBy('name')
+            ->get(['name', 'balance'])
+            ->map(fn ($a) => ['name' => $a->name, 'balance' => (float) $a->balance])
+            ->values()
+            ->all();
 
-        $useGemini = (bool) ($this->settingService->get('gemini_enabled') ?? false) && $this->geminiService->isAvailable();
-        if ($useGemini) {
-            $contextData = [
-                'budget_analysis' => $budgetAnalysis,
-                'financial_score' => $gamificationData['financial_score'],
-                'metrics' => $gamificationData['metrics'] ?? [],
-            ];
-            $conclusion = $this->geminiService->generateConsultingConclusion($contextData);
-            if ($conclusion !== null && trim($conclusion) !== '') {
-                $recommendations = [trim($conclusion)];
-                $generatedWithAi = true;
-            }
-        }
-
+        // 2 conquistas mais importantes do mês = 2 mais recentes (unlocked_at). Sem campo priority no Medal; manter ordenação por data.
         $medals = UserMedal::where('user_id', $user->id)
             ->whereBetween('unlocked_at', [now()->startOfMonth(), now()->endOfMonth()])
             ->with('medal')
+            ->orderByDesc('unlocked_at')
             ->get()
+            ->take(2)
             ->map(fn ($um) => [
                 'title' => $um->medal?->title ?? '—',
                 'description' => $um->medal?->description ?? '',
-                'icon' => $um->medal?->icon_name ?? 'star',
-                'color' => $um->medal?->color ?? '#64748b',
+                'icon' => $um->medal?->icon_name ?? 'medal',
+                'color' => medal_color_hex($um->medal?->color ?? 'slate'),
                 'unlocked_at' => $um->unlocked_at,
             ]);
+
+        $goalsSummary = Goal::where('user_id', $user->id)
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn ($g) => [
+                'name' => $g->name,
+                'target_amount' => (float) $g->target_amount,
+                'current_amount' => (float) $g->current_amount,
+                'remaining_amount' => (float) $g->remaining_amount,
+                'progress_pct' => round($g->progress_percentage, 1),
+            ])
+            ->values()
+            ->all();
+
+        $budgetsSummary = Budget::where('user_id', $user->id)
+            ->with('category')
+            ->get()
+            ->map(fn ($b) => [
+                'category' => $b->category?->name ?? 'Orçamento',
+                'limit_amount' => (float) $b->limit_amount,
+                'spent_amount' => (float) $b->spent_amount,
+                'remaining_amount' => (float) $b->remaining_amount,
+                'usage_pct' => round($b->usage_percentage, 1),
+            ])
+            ->values()
+            ->all();
 
         return [
             'budget_analysis' => $budgetAnalysis,
             'financial_score' => $gamificationData['financial_score'],
-            'recommendations' => $recommendations,
             'medals' => $medals,
             'period_label' => now()->locale('pt_BR')->translatedFormat('F Y'),
-            'generated_with_ai' => $generatedWithAi,
+            'accounts_summary' => $accountsSummary,
+            'projection_data' => $projectionData,
+            'income_sources' => $incomeSources,
+            'metrics' => $gamificationData['metrics'] ?? [],
+            'goals_summary' => $goalsSummary,
+            'budgets_summary' => $budgetsSummary,
         ];
+    }
+
+    /**
+     * Build enriched context for consulting conclusion and tips prompts.
+     * Includes real values in R$ for AI to cite: accounts, pillars, savings goal, goals, budgets.
+     */
+    public function buildConsultingContextForAi(array $consultingData): array
+    {
+        $budget = $consultingData['budget_analysis'] ?? [];
+        $income = (float) ($budget['baseline_income'] ?? 0);
+        $expenses = (float) ($budget['total_expenses'] ?? 0);
+        $savingsPct = (float) ($budget['savings_pct'] ?? 0);
+        $pillars = $budget['pillars'] ?? [];
+        $projection = $consultingData['projection_data'] ?? [];
+        $balance = (float) ($projection['balance'] ?? 0);
+        $reserveMonths = (float) ($projection['reserve_months'] ?? 0);
+
+        $targetSavingsBrl = $income > 0 ? round($income * 0.20, 2) : 0.0;
+        $currentSavingsBrl = max(0, $income - $expenses);
+        $needToSaveBrl = max(0, $targetSavingsBrl - $currentSavingsBrl);
+
+        $pillarsBrl = [];
+        $labels = ['essential' => 'Essencial', 'lifestyle' => 'Estilo de Vida', 'financial' => 'Financeiro'];
+        $targets = ['essential' => 0.50, 'lifestyle' => 0.30, 'financial' => 0.20];
+        foreach (['essential', 'lifestyle', 'financial'] as $key) {
+            $p = $pillars[$key] ?? [];
+            $targetPct = $targets[$key];
+            $actualPct = (float) ($p['actual_pct'] ?? 0);
+            $pillarsBrl[$key] = [
+                'label' => $labels[$key],
+                'target_brl' => round($income * $targetPct, 2),
+                'actual_brl' => round($income * ($actualPct / 100), 2),
+                'status' => $p['status'] ?? 'ok',
+                'deviation_pct' => $p['deviation'] ?? 0,
+            ];
+        }
+
+        return [
+            'budget_analysis' => $budget,
+            'financial_score' => $consultingData['financial_score'] ?? 0,
+            'metrics' => $consultingData['metrics'] ?? [],
+            'accounts_summary' => $consultingData['accounts_summary'] ?? [],
+            'income_sources' => $consultingData['income_sources'] ?? collect(),
+            'projection_data' => $projection,
+            'goals_summary' => $consultingData['goals_summary'] ?? [],
+            'budgets_summary' => $consultingData['budgets_summary'] ?? [],
+            'rich_ai_context' => [
+                'income_brl' => $income,
+                'expenses_brl' => $expenses,
+                'balance_brl' => $balance,
+                'savings_pct' => $savingsPct,
+                'target_savings_brl' => $targetSavingsBrl,
+                'current_savings_brl' => $currentSavingsBrl,
+                'need_to_save_brl' => $needToSaveBrl,
+                'reserve_months' => $reserveMonths,
+                'pillars_brl' => $pillarsBrl,
+            ],
+        ];
+    }
+
+    /**
+     * Generate AI conclusion, projection and 6 tips for consulting report.
+     *
+     * @return array{conclusion: string|null, projection: string|null, ai_tips: array<int, string>}
+     */
+    public function generateConsultingAiContent(array $consultingData): array
+    {
+        $contextData = $this->buildConsultingContextForAi($consultingData);
+        $conclusion = $this->geminiService->generateConsultingConclusion($contextData);
+        $aiTips = $this->geminiService->generateConsultingTips($contextData);
+
+        if ($aiTips === null || empty($aiTips)) {
+            $aiTips = $this->buildPersonalizedTipsFromData($contextData);
+            while (count($aiTips) < 6) {
+                $aiTips[] = 'Use as metas e orçamentos da Vertex Contas para acompanhar seus gastos mensalmente.';
+            }
+            $aiTips = array_slice($aiTips, 0, 6);
+        }
+
+        $projectionData = $consultingData['projection_data'] ?? [];
+        $projectionContext = [
+            'reserve_months' => $projectionData['reserve_months'] ?? 0,
+            'savings_rate' => $projectionData['savings_rate'] ?? 0,
+            'balance' => $projectionData['balance'] ?? 0,
+            'monthly_income' => $projectionData['monthly_income'] ?? 0,
+            'monthly_expense' => $projectionData['monthly_expense'] ?? 0,
+        ];
+        $projection = $this->geminiService->generateOneYearProjection($projectionContext);
+
+        return [
+            'conclusion' => $conclusion !== null && trim($conclusion) !== '' ? trim($conclusion) : null,
+            'projection' => $projection !== null && trim($projection) !== '' ? trim($projection) : null,
+            'ai_tips' => array_values($aiTips),
+        ];
+    }
+
+    /**
+     * Build personalized tips with real values when Gemini fails.
+     * Uses rich_ai_context to cite accounts, amounts, savings goal, pillars, goals, budgets.
+     *
+     * @return array<int, string>
+     */
+    public function buildPersonalizedTipsFromData(array $contextData): array
+    {
+        $rich = $contextData['rich_ai_context'] ?? [];
+        $accountsSummary = $contextData['accounts_summary'] ?? [];
+        $goalsSummary = $contextData['goals_summary'] ?? [];
+        $budgetsSummary = $contextData['budgets_summary'] ?? [];
+
+        if (empty($rich)) {
+            return $this->buildRecommendations($contextData['budget_analysis'] ?? []);
+        }
+
+        $tips = [];
+        $fmt = fn (float $v) => 'R$ ' . number_format($v, 2, ',', '.');
+
+        $income = (float) ($rich['income_brl'] ?? 0);
+        $balance = (float) ($rich['balance_brl'] ?? 0);
+        $expenses = (float) ($rich['expenses_brl'] ?? 0);
+        $needToSave = (float) ($rich['need_to_save_brl'] ?? 0);
+        $reserveMonths = (float) ($rich['reserve_months'] ?? 0);
+        $savingsPct = (float) ($rich['savings_pct'] ?? 0);
+        $targetSavings = (float) ($rich['target_savings_brl'] ?? 0);
+        $currentSavings = (float) ($rich['current_savings_brl'] ?? 0);
+        $pillarsBrl = $rich['pillars_brl'] ?? [];
+
+        if (! empty($accountsSummary)) {
+            $firstAccount = $accountsSummary[0];
+            $name = $firstAccount['name'] ?? 'conta';
+            $bal = (float) ($firstAccount['balance'] ?? 0);
+            $tips[] = "Na sua conta {$name} você tem {$fmt($bal)}. Sua reserva cobre " . round($reserveMonths, 1) . " meses de despesas (meta: 3 a 6 meses, conforme recomenda o Banco Central).";
+        } elseif ($balance > 0) {
+            $tips[] = "Seu saldo total é {$fmt($balance)}, o que equivale a " . round($reserveMonths, 1) . " meses de despesas. A reserva de emergência recomendada é de 3 a 6 meses.";
+        }
+
+        if ($savingsPct < 20 && $income > 0) {
+            $tips[] = "Sua taxa de poupança está em " . round($savingsPct, 1) . "%. A Regra 50/30/20 recomenda 20% (meta {$fmt($targetSavings)}). Você economiza {$fmt($currentSavings)} — faltam {$fmt($needToSave)} por mês para atingir a meta.";
+        } elseif ($savingsPct >= 20) {
+            $tips[] = "Parabéns! Sua poupança de " . round($savingsPct, 1) . "% está na meta (economiza {$fmt($currentSavings)}/mês). Mantenha a disciplina.";
+        }
+
+        foreach ($pillarsBrl as $p) {
+            $label = $p['label'] ?? '';
+            $status = $p['status'] ?? 'ok';
+            $targetBrl = (float) ($p['target_brl'] ?? 0);
+            $actualBrl = (float) ($p['actual_brl'] ?? 0);
+            if ($status === 'over') {
+                $tips[] = "Pilar {$label}: sua meta é {$fmt($targetBrl)} (regra 50/30/20), mas você gastou {$fmt($actualBrl)}. Revise contratos fixos ou gastos variáveis nesta categoria.";
+            } elseif ($status === 'under' && $label === 'Financeiro') {
+                $tips[] = "Pilar Financeiro: meta {$fmt($targetBrl)}, gastou {$fmt($actualBrl)}. Aumente aportes em investimentos e reserva — use metas na Vertex Contas para acompanhar.";
+            }
+        }
+
+        foreach (array_slice($goalsSummary, 0, 2) as $g) {
+            $name = $g['name'] ?? 'Meta';
+            $rem = (float) ($g['remaining_amount'] ?? 0);
+            if ($rem > 0) {
+                $tips[] = "Na meta {$name} faltam {$fmt($rem)}. Defina um valor mensal fixo para aportar e acompanhe no painel de metas da Vertex Contas.";
+            }
+        }
+
+        foreach (array_slice($budgetsSummary, 0, 2) as $b) {
+            $cat = $b['category'] ?? 'Categoria';
+            $pct = $b['usage_pct'] ?? 0;
+            if ($pct >= 80) {
+                $tips[] = "O orçamento de {$cat} está em " . round($pct, 0) . "% de uso. Ajuste as próximas semanas ou revise o limite no painel da Vertex Contas.";
+            }
+        }
+
+        if (count($tips) < 3) {
+            $tips = array_merge($tips, $this->buildRecommendations($contextData['budget_analysis'] ?? []));
+        }
+
+        return $tips;
     }
 
     /**
@@ -814,7 +1017,7 @@ class ReportService
      *
      * @return array<int, string>
      */
-    protected function buildRecommendations(array $budgetAnalysis): array
+    public function buildRecommendations(array $budgetAnalysis): array
     {
         $recommendations = [];
         $pillars = $budgetAnalysis['pillars'] ?? [];

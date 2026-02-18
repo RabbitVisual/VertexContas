@@ -11,6 +11,7 @@ use Modules\Core\Models\Account;
 use Modules\Core\Models\Budget;
 use Modules\Core\Models\Category;
 use Modules\Core\Models\Transaction;
+use Modules\Core\Services\GeminiService;
 use Modules\Core\Services\SubscriptionLimitService;
 use Modules\Core\Services\TransferService;
 
@@ -58,7 +59,17 @@ class TransactionController extends Controller
             ->active()
             ->get();
 
-        return view('core::transactions.index', compact('transactions', 'recurringTransactions'));
+        $accounts = Auth::user()->isPro()
+            ? Account::where('user_id', Auth::id())->orderBy('name')->get()
+            : collect();
+        $importCategories = Auth::user()->isPro()
+            ? Category::forUser(Auth::user())->orderBy('type')->orderBy('name')->get(['id', 'name', 'type'])
+            : collect();
+        $importIncomeCategories = $importCategories->where('type', 'income')->values()->toArray();
+        $importExpenseCategories = $importCategories->where('type', 'expense')->values()->toArray();
+        $importCategorizeLimit = GeminiService::CATEGORIZE_MAX_ENTRIES;
+
+        return view('core::transactions.index', compact('transactions', 'recurringTransactions', 'accounts', 'importCategories', 'importIncomeCategories', 'importExpenseCategories', 'importCategorizeLimit'));
     }
 
     public function create(Request $request)

@@ -129,7 +129,7 @@
                                 {{ $userName }}
                                 @if($isPro)
                                     <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400">
-                                        <x-icon name="crown" style="solid" class="w-3 h-3" /> Vertex PRO
+                                        <x-icon name="crown" style="solid" class="w-3 h-3" /> {{ plan_pro_name() }}
                                     </span>
                                 @endif
                             </p>
@@ -171,6 +171,14 @@
                                     Segurança
                                 </a>
                             </li>
+                            @if($user && $user->hasRole('admin') && Route::has('admin.index'))
+                            <li>
+                                <a href="{{ route('admin.index') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <x-icon name="screwdriver-wrench" style="solid" class="w-4 h-4 text-gray-400" />
+                                    Administração
+                                </a>
+                            </li>
+                            @endif
                         </ul>
                         <div class="border-t border-gray-100 dark:border-gray-700 py-2">
                             <form method="POST" action="{{ route('logout') }}">

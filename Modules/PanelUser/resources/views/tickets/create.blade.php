@@ -4,7 +4,7 @@
 <x-paneluser::layouts.master :title="'Novo Chamado'">
     <div class="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-12">
         {{-- Hero CBAV --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="tickets-create-intro">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -22,6 +22,7 @@
                         Descreva seu problema para que nossa equipe técnica possa resolver o mais rápido possível.
                     @endif
                 </p>
+                <p class="mt-2 text-sm font-medium text-primary-600 dark:text-primary-400">{{ ticket_sla_message() }}</p>
             </div>
         </div>
 
@@ -31,7 +32,7 @@
                     <x-icon name="crown" style="duotone" class="w-6 h-6" />
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Vertex PRO oferece suporte prioritário</p>
+                    <p class="text-sm font-bold text-amber-800 dark:text-amber-300">{{ plan_pro_name() }} oferece suporte prioritário</p>
                     <p class="text-xs text-amber-700/80 dark:text-amber-400/80">Atendimento VIP e exportação do histórico.</p>
                 </div>
                 <a href="{{ route('user.subscription.index') }}" class="shrink-0 text-sm font-bold text-amber-600 dark:text-amber-400 hover:underline">
@@ -41,14 +42,14 @@
         @endif
 
         {{-- Formulário --}}
-        <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden" data-tour="tickets-create-form">
             <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-950/50">
                 <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <x-icon name="headset" style="duotone" class="w-5 h-5" />
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 dark:text-white">Abrir Solicitação</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Preencha os campos abaixo para iniciar o atendimento</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Preencha os campos abaixo para iniciar o atendimento. {{ ticket_sla_message() }}</p>
                 </div>
             </div>
 
@@ -105,7 +106,7 @@
                             class="w-full rounded-2xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-4 text-sm font-medium text-gray-900 dark:text-gray-200 placeholder:text-gray-400 focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
                             placeholder="Descreva o que aconteceu, passos para reproduzir e o que esperava..." required></textarea>
                         <div class="absolute bottom-4 right-4 text-gray-300 dark:text-gray-600 pointer-events-none">
-                            <x-icon name="pen-nib" style="solid" class="w-4 h-4" />
+                            <x-icon name="pen-nib" style="duotone" class="w-4 h-4" />
                         </div>
                     </div>
                 </div>
@@ -117,11 +118,34 @@
                     </a>
                     <button type="submit"
                         class="flex-1 w-full sm:max-w-sm flex items-center justify-center gap-3 py-3.5 px-6 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-all shadow-lg shadow-primary-500/20 hover:scale-[1.02] active:scale-95">
-                        <x-icon name="paper-plane-top" style="solid" class="w-5 h-5" />
+                        <x-icon name="paper-plane-top" style="duotone" class="w-5 h-5" />
                         Abrir Solicitação
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

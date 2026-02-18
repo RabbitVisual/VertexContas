@@ -2,7 +2,7 @@
     <div class="min-h-[calc(100vh-6rem)] bg-gray-50 dark:bg-slate-950 transition-colors duration-200 pb-12">
         <div class="max-w-7xl mx-auto space-y-8 px-6 pt-8">
             {{-- Dashboard Header --}}
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4" data-tour="profile-intro">
                 <div>
                     <nav class="flex mb-2" aria-label="Breadcrumb">
                         <ol class="flex items-center space-x-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
@@ -101,10 +101,10 @@
                                 <h2 class="text-4xl font-black text-gray-900 dark:text-white leading-none">{{ $user->full_name }}</h2>
                                 @if($user->hasRole('pro_user'))
                                     <span class="bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-amber-200 dark:border-amber-500/30 backdrop-blur-md flex items-center gap-1.5">
-                                        <x-icon name="crown" style="solid" class="w-3.5 h-3.5" /> Vertex PRO
+                                        <x-icon name="crown" style="solid" class="w-3.5 h-3.5" /> {{ plan_pro_name() }}
                                     </span>
                                 @else
-                                    <span class="bg-slate-100 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-slate-200 dark:border-slate-600/30">Vertex Grátis</span>
+                                    <span class="bg-slate-100 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full border border-slate-200 dark:border-slate-600/30">{{ plan_free_name() }}</span>
                                 @endif
                             </div>
                             <p class="text-primary/80 dark:text-primary-400/80 font-medium text-lg tracking-wide">{{ $user->email }}</p>
@@ -118,7 +118,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-gray-500 dark:text-white/40 font-black uppercase tracking-widest">Plano Atual</p>
-                                    <p class="text-gray-900 dark:text-white font-bold text-xl">{{ $user->hasRole('pro_user') ? 'Vertex PRO' : 'Vertex Grátis' }}</p>
+                                    <p class="text-gray-900 dark:text-white font-bold text-xl">{{ $user->hasRole('pro_user') ? plan_pro_name() : plan_free_name() }}</p>
                                 </div>
                             </div>
                             <div class="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
@@ -205,7 +205,7 @@
                             <div class="relative px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div>
                                     <h3 class="text-xl font-extrabold text-white sm:text-2xl mb-1">Leve seu controle financeiro para o próximo nível</h3>
-                                    <p class="text-slate-300 text-sm">Relatórios avançados, contas ilimitadas e suporte prioritário com o Vertex PRO.</p>
+                                    <p class="text-slate-300 text-sm">{{ pro_benefits_short_description('profile') }}</p>
                                 </div>
                                 <a href="{{ route('user.subscription.index') }}" class="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 border border-transparent text-base font-bold rounded-xl text-slate-900 bg-white hover:bg-gray-50 transition-all shadow-lg active:scale-95">
                                     <x-icon name="rocket" style="solid" class="w-5 h-5 text-primary" />
@@ -226,7 +226,7 @@
                                     <x-icon name="{{ $user->hasRole('pro_user') ? 'crown' : 'sparkles' }}" style="solid" class="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-gray-900 dark:text-white">{{ $user->hasRole('pro_user') ? 'Vertex PRO' : 'Vertex Grátis' }}</h3>
+                                    <h3 class="font-bold text-gray-900 dark:text-white">{{ $user->hasRole('pro_user') ? plan_pro_name() : plan_free_name() }}</h3>
                                     <p class="text-xs text-gray-500 dark:text-slate-400">{{ $user->hasRole('pro_user') ? 'Plano ativo' : 'Versão limitada' }}</p>
                                 </div>
                             </div>
@@ -236,7 +236,7 @@
                         </div>
                         <div class="p-6">
                             @if($user->hasRole('pro_user'))
-                                <p class="text-sm text-gray-600 dark:text-slate-400">Acesso ilimitado a todos os recursos. Aproveite!</p>
+                                <p class="text-sm text-gray-600 dark:text-slate-400">{{ pro_benefits_active_description() }}</p>
                             @else
                                 <p class="text-sm text-gray-600 dark:text-slate-400 mb-4">Desbloqueie todo o potencial do Vertex.</p>
                                 <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all text-sm w-full justify-center">
@@ -269,4 +269,27 @@
             </div>
         </div>
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

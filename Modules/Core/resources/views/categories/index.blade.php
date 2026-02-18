@@ -5,7 +5,7 @@
 <x-paneluser::layouts.master :title="'Categorias'">
     <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
         {{-- Hero CBAV --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="categories-intro">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-[100px]"></div>
 
@@ -20,6 +20,9 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Classifique receitas e despesas no Extrato, nos orçamentos e nos relatórios. O sistema já traz categorias padrão; assinantes Pro podem criar personalizadas.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
+                    @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                        <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                    @endif
                     @if($isPro && !($inspectionReadOnly ?? false))
                         <a href="{{ route('core.categories.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-500/20">
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
@@ -78,7 +81,7 @@
 
         {{-- Receitas --}}
         @if($categories->has('income'))
-            <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+            <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden" data-tour="categories-list">
                 <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex items-center gap-3 bg-emerald-500/5 dark:bg-emerald-500/10">
                     <div class="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                         <x-icon name="arrow-trend-up" style="duotone" class="w-5 h-5" />
@@ -201,4 +204,27 @@
             </div>
         @endif
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

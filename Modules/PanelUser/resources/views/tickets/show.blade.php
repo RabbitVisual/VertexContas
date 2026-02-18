@@ -12,7 +12,7 @@
 <x-paneluser::layouts.master :title="'Chamado #' . $ticket->id">
     <div class="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-12">
         {{-- Hero CBAV --}}
-        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+        <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="tickets-show-status">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
 
@@ -26,16 +26,17 @@
                     <h1 class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3 line-clamp-2">
                         {{ $ticket->subject }}
                     </h1>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">
                         Aberto em {{ $ticket->created_at->format('d/m/Y \à\s H:i') }}
                     </p>
+                    <p class="text-sm font-medium text-primary-600 dark:text-primary-400 mb-4">{{ ticket_sla_message() }}</p>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest {{ $config['bg'] }}">
                             {{ $config['text'] }}
                         </span>
                         @if($isPro)
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
-                                <x-icon name="crown" style="solid" class="w-3.5 h-3.5" /> Suporte VIP
+                                <x-icon name="crown" style="duotone" class="w-3.5 h-3.5" /> Suporte VIP
                             </span>
                         @endif
                     </div>
@@ -44,7 +45,7 @@
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
                     <a href="{{ route('user.tickets.index') }}"
                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 font-bold text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
-                        <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                        <x-icon name="arrow-left" style="duotone" class="w-4 h-4" />
                         Voltar
                     </a>
                     @if($isPro)
@@ -98,7 +99,7 @@
                 </div>
                 <a href="{{ route('paneluser.index') }}" target="_blank"
                     class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all">
-                    <x-icon name="up-right-from-square" style="solid" class="w-4 h-4" />
+                    <x-icon name="up-right-from-square" style="duotone" class="w-4 h-4" />
                     Abrir painel em tempo real
                 </a>
             </div>
@@ -110,7 +111,7 @@
                     <x-icon name="crown" style="duotone" class="w-6 h-6" />
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Suporte Prioritário com Vertex PRO</p>
+                    <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Suporte Prioritário com {{ plan_pro_name() }}</p>
                     <p class="text-xs text-amber-700/80 dark:text-amber-400/80">Respostas mais rápidas, agente dedicado e exportação do histórico.</p>
                 </div>
                 <a href="{{ route('user.subscription.index') }}" class="shrink-0 text-sm font-bold text-amber-600 dark:text-amber-400 hover:underline">
@@ -120,7 +121,7 @@
         @endif
 
         {{-- Chat Card --}}
-        <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+        <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden" data-tour="tickets-show-conversation">
             <div class="px-6 py-5 border-b border-gray-200 dark:border-white/5 flex items-center gap-3 bg-gray-50/50 dark:bg-gray-950/50">
                 <div class="w-10 h-10 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <x-icon name="comments" style="duotone" class="w-5 h-5" />
@@ -203,6 +204,28 @@
         </div>
     </div>
 
+    @if(!empty($pageTourId) && !empty($pageTourSteps))
+    @push('scripts')
+    <script>
+    (function() {
+        var tourId = @json($pageTourId);
+        var steps = @json($pageTourSteps);
+        function register() {
+            if (window.registerVertexTourSteps && steps && steps.length) {
+                window.registerVertexTourSteps(tourId, steps);
+                return;
+            }
+            setTimeout(register, 50);
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', register);
+        } else {
+            register();
+        }
+    })();
+    </script>
+    @endpush
+    @endif
     @push('scripts')
     @vite('resources/js/ticket-chat.js')
     @endpush

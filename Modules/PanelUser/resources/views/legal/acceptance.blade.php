@@ -12,7 +12,7 @@
         },
         canSubmit() { return this.scrolledToBottom && this.accepted; }
     }" x-init="checkScroll()">
-        <div class="text-center mb-8">
+        <div class="text-center mb-8" data-tour="legal-intro">
             <a href="{{ route('homepage') }}" class="inline-block mb-4">
                 <img src="{{ branding_logo_url('user', false) }}" alt="{{ config('app.name') }}" class="h-10 block dark:hidden" />
                 <img src="{{ branding_logo_url('user', true) }}" alt="{{ config('app.name') }}" class="h-10 hidden dark:block" />
@@ -22,10 +22,13 @@
         </div>
 
         @if($pendingDocuments->isEmpty())
+            @php
+                $dashboardRoute = auth()->user()->hasRole('admin') ? route('admin.index') : route('paneluser.index');
+            @endphp
             <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-700 text-center">
                 <x-icon name="shield-check" style="solid" class="w-16 h-16 text-emerald-500 mx-auto mb-4" />
                 <p class="text-slate-700 dark:text-slate-300 font-medium">Você já aceitou todos os termos necessários.</p>
-                <a href="{{ route('paneluser.index') }}" class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors">
+                <a href="{{ $dashboardRoute }}" class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors">
                     <x-icon name="arrow-right" />
                     Ir para o Painel
                 </a>
@@ -78,3 +81,26 @@
         @endif
     </div>
 @endsection
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif

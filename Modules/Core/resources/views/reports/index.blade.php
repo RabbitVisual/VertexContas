@@ -2,7 +2,7 @@
 @php $isPro = auth()->user()?->isPro() ?? false; @endphp
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ showConsultingModal: false }">
     {{-- Hero --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="reports-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]" aria-hidden="true"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-teal-600/5 dark:bg-teal-600/10 rounded-full blur-[100px]" aria-hidden="true"></div>
 
@@ -30,7 +30,11 @@
                 @endif
             </div>
 
-            <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0" role="region" aria-label="Resumo">
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                @endif
+                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0" role="region" aria-label="Resumo">
                 <div class="flex items-center gap-4 text-left">
                     <div class="w-12 h-12 rounded-2xl {{ $isPro ? 'bg-emerald-600/10 dark:bg-emerald-500/20' : 'bg-amber-500/10 dark:bg-amber-500/20' }} flex items-center justify-center {{ $isPro ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }} shrink-0">
                         <x-icon name="{{ $isPro ? 'chart-simple' : 'eye' }}" style="duotone" class="w-6 h-6" />
@@ -44,12 +48,13 @@
                         </p>
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- Report Cards --}}
-    <div class="grid grid-cols-1 gap-6">
+    <div class="grid grid-cols-1 gap-6" data-tour="reports-cards">
         {{-- Consultoria Mensal (PRO) - Destaque --}}
         @if($isPro)
         <div class="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-600 rounded-3xl border border-blue-500/20 dark:border-purple-500/20 shadow-lg hover:shadow-xl transition-all duration-500">
@@ -64,10 +69,13 @@
                     <h3 class="text-2xl font-black text-white group-hover:text-blue-100 transition-colors mb-2">Consultoria Mensal</h3>
                     <p class="text-blue-100 text-sm leading-relaxed">Análise 50/30/20, score financeiro, recomendações personalizadas e medalhas conquistadas. Imprima ou salve como PDF.</p>
                 </div>
-                <div class="lg:w-64 p-8 flex items-center justify-center bg-white/10 border-t lg:border-t-0 lg:border-l border-white/10">
-                    <a href="{{ route('core.reports.consultoria.view') }}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+                <div class="lg:w-64 p-8 flex flex-col items-center justify-center gap-3 bg-white/10 border-t lg:border-t-0 lg:border-l border-white/10">
+                    <a href="{{ route('core.reports.consultoria.view', ['nova' => 1]) }}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
                         Gerar Consultoria
                         <x-icon name="arrow-right" style="solid" class="w-4 h-4" />
+                    </a>
+                    <a href="{{ route('core.reports.consultoria.history') }}" class="text-xs font-medium text-blue-100 hover:text-white transition-colors">
+                        Ver histórico de relatórios
                     </a>
                 </div>
             </div>
@@ -224,7 +232,7 @@
                     <x-icon name="crown" style="solid" class="w-8 h-8" />
                 </div>
                 <h2 id="consulting-modal-title" class="text-xl font-black text-gray-900 dark:text-white mb-3">Consultoria Exclusiva {{ plan_pro_name() }}</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6">A análise 50/30/20 e o relatório de consultoria financeira são exclusivos do plano Vertex PRO. Faça upgrade para receber recomendações personalizadas, score financeiro e medalhas.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6">A análise 50/30/20 e o relatório de consultoria financeira são exclusivos do plano {{ plan_pro_name() }}. Faça upgrade para receber recomendações personalizadas, score financeiro e medalhas.</p>
                 <a href="{{ route('user.subscription.index') }}" class="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
                     <x-icon name="crown" style="solid" class="w-5 h-5" />
                     Fazer Upgrade
@@ -239,7 +247,7 @@
         <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 rounded-full bg-indigo-600/20 blur-3xl"></div>
         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-                <span class="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-black text-sm uppercase tracking-widest mb-2 block">Vertex Pro</span>
+                <span class="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-black text-sm uppercase tracking-widest mb-2 block">{{ plan_pro_name() }}</span>
                 <h3 class="text-2xl font-black text-white mb-2">Relatórios Avançados e Exportação</h3>
                 <p class="text-slate-400 max-w-xl">Desbloqueie exportação PDF/CSV, extrato bancário, filtros avançados e relatórios exclusivos.</p>
             </div>
@@ -251,4 +259,27 @@
     </div>
     @endif
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

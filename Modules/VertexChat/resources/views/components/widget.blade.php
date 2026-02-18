@@ -12,7 +12,7 @@
         {{-- PRO: Expandable chat widget with "Abrir Chat VIP" --}}
         <div class="transition-all duration-300 ease-out flex flex-col items-end gap-2"
              :class="expanded ? 'w-80 sm:w-96' : 'w-auto'">
-            <div x-show="expanded" x-collapse
+            <div x-show="expanded" x-collapse x-cloak
                  class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl shadow-xl overflow-hidden">
                 <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -47,7 +47,7 @@
     @else
         {{-- Free: Lock + CTA --}}
         <div class="flex flex-col items-end gap-2">
-            <div x-show="expanded" x-collapse
+            <div x-show="expanded" x-collapse x-cloak
                  class="w-80 sm:w-96 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl shadow-xl overflow-hidden">
                 <div class="p-4">
                     <div class="flex items-center gap-3 mb-3">

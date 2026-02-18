@@ -18,6 +18,7 @@ use Modules\Core\Models\Transaction;
 use Modules\Core\Services\FinancialHealthService;
 use Modules\Core\Services\InspectionGuard;
 use Modules\Core\Services\SubscriptionLimitService;
+use Modules\Core\Services\TemplateDocumentService;
 
 class CoreController extends Controller
 {
@@ -25,12 +26,15 @@ class CoreController extends Controller
 
     protected FinancialHealthService $financialHealthService;
 
-    public function __construct(SubscriptionLimitService $limitService, FinancialHealthService $financialHealthService)
+    protected TemplateDocumentService $templateService;
+
+    public function __construct(SubscriptionLimitService $limitService, FinancialHealthService $financialHealthService, TemplateDocumentService $templateService)
     {
         $this->middleware(['auth', 'verified']);
         $this->middleware('permission:core.view');
         $this->limitService = $limitService;
         $this->financialHealthService = $financialHealthService;
+        $this->templateService = $templateService;
     }
 
     /**
@@ -135,6 +139,7 @@ class CoreController extends Controller
 
         // Projection data for Vertex AI card (PRO)
         $projectionData = $this->financialHealthService->getProjectionData($user);
+        $aiReportUsage = $user->isPro() ? $this->templateService->getAiReportUsage($user) : null;
 
         return view('core::dashboard', compact(
             'accounts',
@@ -152,7 +157,8 @@ class CoreController extends Controller
             'recentTransactions',
             'monthlyCapacity',
             'incomeBreakdown',
-            'projectionData'
+            'projectionData',
+            'aiReportUsage'
         ));
     }
 

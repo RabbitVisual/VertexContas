@@ -6,9 +6,14 @@ namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\SupportAuditLog;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Account;
+use Modules\Core\Models\AiConsultingReport;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\ReportService;
 use Modules\Core\Services\SettingService;
@@ -26,6 +31,8 @@ class ReportsController extends Controller
             'extrato',
             'viewExtrato',
             'viewConsulting',
+            'downloadConsultingPdf',
+            'consultoriaHistory',
             'exportExtratoCsv',
             'exportExtratoXlsx',
             'exportCashFlowCsv',
@@ -38,7 +45,7 @@ class ReportsController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $transactionCount = Transaction::where('user_id', $user->id)->count();
 
         return view('core::reports.index', compact('transactionCount'));
@@ -51,7 +58,7 @@ class ReportsController extends Controller
     {
         $months = (int) $request->input('months', 6);
         $accountId = $request->filled('account_id') ? (int) $request->input('account_id') : null;
-        $user = auth()->user();
+        $user = Auth::user();
 
         $accounts = Account::where('user_id', $user->id)->orderBy('name')->get();
         $cashFlow = $this->reportService->getCashFlow($user, $months, $accountId);
@@ -76,7 +83,7 @@ class ReportsController extends Controller
      */
     public function categoryRanking(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->startOfMonth();
@@ -97,7 +104,7 @@ class ReportsController extends Controller
      */
     public function extrato(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->subMonths(5)->startOfMonth();
@@ -123,7 +130,7 @@ class ReportsController extends Controller
     {
         $months = (int) $request->input('months', 6);
         $accountId = $request->filled('account_id') ? (int) $request->input('account_id') : null;
-        $user = auth()->user();
+        $user = Auth::user();
 
         $cashFlow = $this->reportService->getCashFlow($user, $months, $accountId);
         $filename = 'fluxo-caixa-' . now()->format('Y-m-d-His');
@@ -147,7 +154,7 @@ class ReportsController extends Controller
     {
         $months = (int) $request->input('months', 6);
         $accountId = $request->filled('account_id') ? (int) $request->input('account_id') : null;
-        $user = auth()->user();
+        $user = Auth::user();
 
         $cashFlow = $this->reportService->getCashFlow($user, $months, $accountId);
         $byAccount = $this->reportService->getCashFlowByAccount($user, $months, $accountId);
@@ -163,7 +170,7 @@ class ReportsController extends Controller
             $byCategory,
             $detail,
             $filename,
-            'Vertex Pro',
+            plan_pro_name(),
             $periodLabel
         );
 
@@ -177,7 +184,7 @@ class ReportsController extends Controller
      */
     public function exportCategoryRankingCsv(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->startOfMonth();
@@ -206,7 +213,7 @@ class ReportsController extends Controller
      */
     public function exportExtratoCsv(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->subMonths(5)->startOfMonth();
@@ -238,7 +245,7 @@ class ReportsController extends Controller
      */
     public function exportExtratoXlsx(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->subMonths(5)->startOfMonth();
@@ -257,7 +264,7 @@ class ReportsController extends Controller
         $path = $this->reportService->exportBankStatementToXlsx(
             $statement,
             $filename,
-            'Vertex Pro',
+            plan_pro_name(),
             $periodLabel
         );
 
@@ -273,7 +280,7 @@ class ReportsController extends Controller
     {
         $months = (int) $request->input('months', 6);
         $accountId = $request->filled('account_id') ? (int) $request->input('account_id') : null;
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $this->templateService->canDownload(TemplateDocumentService::TYPE_CASHFLOW, $user)) {
             $limit = (int) $this->settingService->get('limit_download_report_per_day', 5);
@@ -306,7 +313,7 @@ class ReportsController extends Controller
      */
     public function viewCategoryRanking(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->startOfMonth();
@@ -339,48 +346,192 @@ class ReportsController extends Controller
     }
 
     /**
-     * View consulting report in HTML (new tab). 50/30/20 analysis, score, recommendations, medals. PRO only.
+     * View consulting report in HTML (new tab). 50/30/20, score, AI conclusion, AI projection, medals. PRO only.
+     * Uses AiConsultingReport when available; otherwise generates via Gemini (consumes 1 monthly quota).
      */
     public function viewConsulting(Request $request)
     {
-        $user = auth()->user();
+        $result = $this->getConsultingReportData($request);
+        if ($result instanceof Response || $result instanceof RedirectResponse) {
+            return $result;
+        }
+
+        return view('core::documents.consulting-report', $result);
+    }
+
+    /**
+     * Download consulting report as PDF. PRO only. Uses same data as viewConsulting; rendered via DomPDF.
+     */
+    public function downloadConsultingPdf(Request $request)
+    {
+        $result = $this->getConsultingReportData($request);
+        if ($result instanceof Response || $result instanceof RedirectResponse) {
+            return $result;
+        }
+
+        $period = $result['consultingData']['period'] ?? now()->format('Y-m');
+        $result['forPdf'] = true;
+
+        return Pdf::loadView('core::documents.consulting-report', $result)
+            ->setPaper('a4', 'portrait')
+            ->download('consultoria-' . $period . '.pdf');
+    }
+
+    /**
+     * Build consulting report data for view or PDF. Returns Response (redirect/429) or data array.
+     *
+     * @return array{consultingData: array, templateData: array, user: \App\Models\User, metrics: array, recommendations: array}|Response|RedirectResponse
+     */
+    private function getConsultingReportData(Request $request): array|Response|RedirectResponse
+    {
+        $user = Auth::user();
         if (! $user->isPro()) {
             return redirect()->route('core.reports.index')
                 ->with('error', 'Consultoria é exclusiva PRO.');
         }
 
-        if (! $this->templateService->canDownload(TemplateDocumentService::TYPE_CONSULTING, $user)) {
-            $limit = (int) $this->settingService->get('limit_download_report_per_day', 5);
-
-            return response()->view('core::documents.limit-exceeded', [
-                'message' => "Você abriu {$limit} relatórios de consultoria hoje. Esse limite é renovado diariamente.",
-            ], 429);
+        $period = $request->input('period', now()->format('Y-m'));
+        if (! preg_match('/^\d{4}-\d{2}$/', $period)) {
+            $period = now()->format('Y-m');
         }
 
-        $consultingData = $this->reportService->getConsultingData($user);
-        $this->templateService->logDownload(
-            $user,
-            TemplateDocumentService::TYPE_CONSULTING,
-            'consultoria-' . now()->format('Y-m'),
-            $request
-        );
+        $forcarNova = $request->boolean('nova');
+        $savedReport = $forcarNova ? null : AiConsultingReport::findForUserAndPeriod((int) $user->id, $period);
 
-        if (! empty($consultingData['generated_with_ai'])) {
-            SupportAuditLog::create([
-                'agent_id' => $user->id,
-                'user_id' => $user->id,
-                'action' => 'report.consulting.ai_generated',
-                'metadata' => [
-                    'period' => now()->format('Y-m'),
+        if ($savedReport !== null) {
+            $consultingData = $savedReport->snapshot ?? [];
+            $consultingData['medals'] = isset($consultingData['medals'])
+                ? collect($consultingData['medals'])
+                : collect();
+            $consultingData['recommendations'] = $savedReport->ai_conclusion
+                ? [trim($savedReport->ai_conclusion)]
+                : $this->reportService->buildRecommendations($consultingData['budget_analysis'] ?? []);
+            $consultingData['ai_projection'] = $savedReport->ai_projection;
+            $consultingData['ai_tips'] = $consultingData['ai_tips'] ?? $this->reportService->buildRecommendations($consultingData['budget_analysis'] ?? []);
+            $consultingData['generated_with_ai'] = (bool) $savedReport->ai_conclusion;
+        } else {
+            if (! $this->templateService->canDownloadAiReport($user)) {
+                $usage = $this->templateService->getAiReportUsage($user);
+
+                return response()->view('core::documents.limit-exceeded', [
+                    'message' => 'Você atingiu o limite de ' . $usage['limit'] . ' relatórios por IA este mês. Renova em ' . $usage['resets_at']->format('d/m') . '.',
+                    'resets_note' => 'Renova no início do próximo mês.',
+                ], 429);
+            }
+
+            $consultingData = $this->reportService->getConsultingData($user);
+            $useGemini = (bool) ($this->settingService->get('gemini_enabled') ?? false);
+
+            if ($useGemini) {
+                $aiContent = $this->reportService->generateConsultingAiContent($consultingData);
+                $aiConclusion = $aiContent['conclusion'];
+                $aiProjection = $aiContent['projection'];
+                $aiTips = $aiContent['ai_tips'] ?? [];
+
+                $consultingData['recommendations'] = $aiConclusion ? [trim($aiConclusion)] : $this->reportService->buildRecommendations($consultingData['budget_analysis'] ?? []);
+                $consultingData['ai_projection'] = $aiProjection;
+                $consultingData['ai_tips'] = $aiTips;
+                $consultingData['generated_with_ai'] = (bool) $aiConclusion;
+
+                $snapshot = [
+                    'budget_analysis' => $consultingData['budget_analysis'] ?? [],
                     'financial_score' => $consultingData['financial_score'] ?? 0,
-                ],
-                'ip_address' => $request->ip(),
-            ]);
+                    'medals' => $consultingData['medals']?->toArray() ?? [],
+                    'period_label' => $consultingData['period_label'] ?? now()->locale('pt_BR')->translatedFormat('F Y'),
+                    'accounts_summary' => $consultingData['accounts_summary'] ?? [],
+                    'projection_data' => $consultingData['projection_data'] ?? [],
+                    'income_sources' => $consultingData['income_sources']?->toArray() ?? [],
+                    'ai_tips' => $aiTips,
+                ];
+
+                AiConsultingReport::updateOrCreate(
+                    ['user_id' => $user->id, 'period' => $period],
+                    [
+                        'ai_conclusion' => $aiConclusion,
+                        'ai_projection' => $aiProjection,
+                        'snapshot' => $snapshot,
+                    ]
+                );
+
+                $this->templateService->logDownload(
+                    $user,
+                    TemplateDocumentService::TYPE_CONSULTING,
+                    'consultoria-' . $period,
+                    $request
+                );
+
+                if (! empty($consultingData['generated_with_ai'])) {
+                    SupportAuditLog::create([
+                        'agent_id' => $user->id,
+                        'user_id' => $user->id,
+                        'action' => 'report.consulting.ai_generated',
+                        'metadata' => [
+                            'period' => $period,
+                            'financial_score' => $consultingData['financial_score'] ?? 0,
+                        ],
+                        'ip_address' => $request->ip(),
+                    ]);
+                }
+            } else {
+                $contextData = $this->reportService->buildConsultingContextForAi($consultingData);
+                $fallbackTips = $this->reportService->buildPersonalizedTipsFromData($contextData);
+                $consultingData['recommendations'] = $this->reportService->buildRecommendations($consultingData['budget_analysis'] ?? []);
+                $consultingData['ai_projection'] = null;
+                $fallbackTips = array_values(array_unique(array_map('trim', $fallbackTips)));
+                if (count($fallbackTips) < 4) {
+                    $fallbackTips[] = 'Use as metas e orçamentos da Vertex Contas para acompanhar seus gastos mensalmente.';
+                }
+                $consultingData['ai_tips'] = array_slice($fallbackTips, 0, 4);
+                $consultingData['generated_with_ai'] = false;
+            }
         }
+
+        $medals = $consultingData['medals'] ?? collect();
+        if (is_array($medals)) {
+            $medals = collect($medals);
+        }
+        $placeholderMedalDesc = 'Exclusivo para assinantes Vertex PRO. Desbloqueie com o plano premium.';
+        $consultingData['medals'] = $medals->filter(function ($m) use ($placeholderMedalDesc) {
+            $desc = isset($m['description']) ? trim((string) $m['description']) : '';
+
+            return $desc !== $placeholderMedalDesc;
+        })->values();
+
+        $consultingData['ai_tips'] = array_slice(array_values(array_unique(array_map('trim', $consultingData['ai_tips'] ?? []))), 0, 4);
+
+        $contextForView = $this->reportService->buildConsultingContextForAi($consultingData);
+        $consultingData['pillars_brl'] = $contextForView['rich_ai_context']['pillars_brl'] ?? [];
+        $consultingData['period'] = $period;
 
         $templateData = $this->templateService->getTemplateData();
+        $budget = $consultingData['budget_analysis'] ?? [];
+        $metrics = [
+            'income' => (float) ($budget['baseline_income'] ?? 0),
+            'expense' => (float) ($budget['total_expenses'] ?? 0),
+            'account_balance' => (float) (($consultingData['metrics']['account_balance'] ?? 0) ?: (($budget['baseline_income'] ?? 0) - ($budget['total_expenses'] ?? 0))),
+        ];
+        $recommendations = $consultingData['recommendations'] ?? [];
 
-        return view('core::documents.consulting-report', compact('consultingData', 'templateData'));
+        return compact('consultingData', 'templateData', 'user', 'metrics', 'recommendations');
+    }
+
+    /**
+     * List saved consulting reports (Vertex Pro). Links to view each by period.
+     */
+    public function consultoriaHistory()
+    {
+        $user = Auth::user();
+        if (! $user->isPro()) {
+            return redirect()->route('core.reports.index')
+                ->with('error', 'Histórico de consultoria é exclusivo PRO.');
+        }
+
+        $reports = AiConsultingReport::where('user_id', $user->id)
+            ->orderByDesc('period')
+            ->take(24)
+            ->get();
+
+        return view('core::reports.consultoria-history', compact('reports'));
     }
 
     /**
@@ -388,7 +539,7 @@ class ReportsController extends Controller
      */
     public function viewExtrato(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->input('start_date'))->startOfDay()
             : now()->subMonths(5)->startOfMonth();

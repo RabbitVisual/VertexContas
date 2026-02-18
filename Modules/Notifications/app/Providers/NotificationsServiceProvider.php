@@ -43,7 +43,9 @@ class NotificationsServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            \Modules\Notifications\Console\Commands\PruneNotifications::class,
+        ]);
     }
 
     /**

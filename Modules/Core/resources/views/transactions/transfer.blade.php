@@ -31,7 +31,7 @@
     @endif
 
     {{-- Hero --}}
-    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none">
+    <div class="relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="transfer-intro">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
         <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-slate-600/5 dark:bg-slate-600/10 rounded-full blur-[100px]"></div>
 
@@ -46,20 +46,25 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Mova saldo de uma conta para outra. Não altera Minha Renda nem a capacidade mensal — apenas a liquidez em cada conta.</p>
             </div>
 
-            <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shrink-0">
-                <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
-                Voltar ao extrato
-            </a>
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
+                    <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
+                @endif
+                <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                    <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                    Voltar ao extrato
+                </a>
+            </div>
         </div>
     </div>
 
     <form action="{{ route('core.transactions.processTransfer') }}" method="POST">
         @csrf
 
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-300">
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-300" data-tour="transfer-form">
             <div class="p-8 sm:p-10 space-y-10">
                 {{-- Origem e Destino --}}
-                <div class="grid grid-cols-1 md:grid-cols-12 items-end gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-12 items-end gap-6" data-tour="transfer-origin-destiny">
                     <div class="md:col-span-5 space-y-3">
                         <label for="from_account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Conta de origem (de onde sai)</label>
                         <div class="relative">
@@ -102,7 +107,7 @@
                 </div>
 
                 {{-- Valor --}}
-                <div class="max-w-md">
+                <div class="max-w-md" data-tour="transfer-amount">
                     <label for="amount" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Valor da transferência (R$)</label>
                     <div class="relative">
                         <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xl font-bold">R$</span>
@@ -114,7 +119,7 @@
                 </div>
 
                 {{-- Data e descrição --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-tour="transfer-date-description">
                     <div>
                         <label for="date" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Data</label>
                         <div class="relative">
@@ -136,7 +141,7 @@
                 </div>
             </div>
 
-            <div class="px-8 sm:p-10 py-6 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-white/5 flex flex-wrap gap-3">
+            <div class="px-8 sm:p-10 py-6 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-white/5 flex flex-wrap gap-3" data-tour="transfer-actions">
                 <button type="submit" class="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
                     <x-icon name="right-left" style="solid" class="w-5 h-5" />
                     Confirmar transferência
@@ -150,7 +155,7 @@
     </form>
 
     {{-- Dica --}}
-    <div class="rounded-3xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-gray-950/50 p-6 sm:p-8">
+    <div class="rounded-3xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-gray-950/50 p-6 sm:p-8" data-tour="transfer-tip">
         <div class="flex items-start gap-4">
             <div class="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                 <x-icon name="circle-info" style="duotone" class="w-5 h-5" />
@@ -162,4 +167,27 @@
         </div>
     </div>
 </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

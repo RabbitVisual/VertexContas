@@ -10,6 +10,7 @@ use Modules\PanelUser\Http\Controllers\BlogController;
 use Modules\PanelUser\Http\Controllers\LegalAcceptanceController;
 use Modules\PanelUser\Http\Controllers\VertexBotController;
 use Modules\PanelUser\Http\Controllers\AchievementController;
+use Modules\Core\Http\Controllers\TourController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,9 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::get('/', [PanelUserController::class, 'index'])->name('paneluser.index');
     Route::post('/onboarding/complete', [PanelUserController::class, 'completeOnboarding'])->name('paneluser.onboarding.complete');
     Route::post('/cta-sidebar/dismiss', [PanelUserController::class, 'dismissSidebarCta'])->name('user.cta-sidebar.dismiss');
+    Route::get('/mentor/analise', [VertexBotController::class, 'showAnalysis'])->name('user.vertex-bot.analysis');
     Route::post('/vertex-bot/dismiss', [VertexBotController::class, 'dismissInsight'])->name('user.vertex-bot.dismiss');
+    Route::post('/tour/complete', [TourController::class, 'complete'])->name('user.tour.complete');
     Route::get('/conquistas', [AchievementController::class, 'index'])->name('user.achievements.index');
     Route::get('/conquistas/{medal}', [AchievementController::class, 'show'])->name('user.achievements.show');
 

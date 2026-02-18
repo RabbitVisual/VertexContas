@@ -8,7 +8,7 @@
     <div class="min-h-[calc(100vh-6rem)] bg-gray-50 dark:bg-slate-950 transition-colors duration-200 pb-12">
         <div class="max-w-7xl mx-auto space-y-8 px-6 pt-8">
             {{-- Dashboard Header --}}
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4" data-tour="security-intro">
                 <div>
                     <nav class="flex mb-2" aria-label="Breadcrumb">
                         <ol class="flex items-center space-x-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">
@@ -235,7 +235,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h4 class="font-bold text-white text-sm">Exporte seu histórico de acessos</h4>
-                                    <p class="text-slate-400 text-xs mt-0.5">Vertex PRO permite exportar o histórico completo em CSV para auditoria e controle.</p>
+                                    <p class="text-slate-400 text-xs mt-0.5">{{ plan_pro_name() }} permite exportar o histórico completo em CSV para auditoria e controle.</p>
                                 </div>
                                 <a href="{{ route('user.subscription.index') }}" class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl text-sm transition-all">
                                     <x-icon name="rocket" style="solid" class="w-4 h-4" />
@@ -248,4 +248,27 @@
             </div>
         </div>
     </div>
+
+@if(!empty($pageTourId) && !empty($pageTourSteps))
+@push('scripts')
+<script>
+(function() {
+    var tourId = @json($pageTourId);
+    var steps = @json($pageTourSteps);
+    function register() {
+        if (window.registerVertexTourSteps && steps && steps.length) {
+            window.registerVertexTourSteps(tourId, steps);
+            return;
+        }
+        setTimeout(register, 50);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', register);
+    } else {
+        register();
+    }
+})();
+</script>
+@endpush
+@endif
 </x-paneluser::layouts.master>

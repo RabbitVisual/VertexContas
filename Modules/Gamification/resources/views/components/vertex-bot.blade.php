@@ -3,6 +3,7 @@
     'financialScore' => 0,
     'insightKey' => null,
     'dismissUrl' => null,
+    'tourId' => null,
 ])
 
 @php
@@ -17,6 +18,10 @@
     $key = $insightKey ?? $insight['insight_key'] ?? null;
     $medalUnlocked = $insight['medal'] ?? null;
     $content = $insight['content'] ?? '';
+    // Um único link por vez: PRO com tour da página = "Ver tour"; caso contrário = "Ver análise detalhada"
+    $isPro = auth()->user()?->isPro() ?? false;
+    $showTourLink = $isPro && ! empty($tourId);
+    $showAnalysisLink = Route::has('user.vertex-bot.analysis') && ! $showTourLink;
 @endphp
 
 {{-- Vertex Bot: na área de conteúdo (à direita do sidebar), na zona entre cards e lista, sempre visível. z-50 acima do sidebar. --}}
@@ -76,15 +81,25 @@
             </div>
             <div class="flex-1 min-w-0">
                 <p class="text-[14px] font-medium leading-relaxed text-white dark:text-slate-100 min-h-[2.5rem]" x-text="displayedText"></p>
-                @php
-                    $analysisUrl = (auth()->user()?->isPro() ?? false) && Route::has('core.dashboard')
-                        ? route('core.dashboard')
-                        : route('paneluser.index');
-                @endphp
-                @if(Route::has('paneluser.index'))
-                    <a href="{{ $analysisUrl }}" class="mt-2 block text-xs font-bold text-indigo-300 dark:text-indigo-400 hover:underline">
+                @if($showAnalysisLink)
+                    <a href="{{ route('user.vertex-bot.analysis') }}" class="mt-2 block text-xs font-bold text-indigo-300 dark:text-indigo-400 hover:underline">
                         Ver análise detalhada
                     </a>
+                @endif
+                @if(!$isPro && $content !== '')
+                    <a href="{{ route('user.subscription.index') }}" class="mt-2 block text-xs font-bold text-amber-300 dark:text-amber-400 hover:underline">
+                        Conhecer PRO
+                    </a>
+                @endif
+                @if($showTourLink)
+                    @push('scripts')
+                        @vite('resources/js/tours.js')
+                    @endpush
+                    <button type="button"
+                            @click="if (window.startVertexTour) window.startVertexTour('{{ $tourId }}');"
+                            class="mt-2 block text-xs font-bold text-indigo-300 dark:text-indigo-400 hover:underline text-left">
+                        Ver tour desta página
+                    </button>
                 @endif
                 <button
                     @click="
@@ -109,13 +124,5 @@
                 </button>
             </div>
         </div>
-    </div>
-
-    {{-- Bot avatar: Vertex gradient, pulsing when analyzing --}}
-    <div
-        class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563eb] to-[#1e3a8a] flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/20 hover:shadow-indigo-500/35 transition-all duration-300 {{ $isSuccess ? 'ring-2 ring-emerald-400/50' : '' }}"
-        :class="{ 'animate-pulse': $data.isTyping }"
-    >
-        <x-icon name="robot" style="solid" class="w-7 h-7 text-white" />
     </div>
 </div>

@@ -13,8 +13,12 @@ class GatewayConfigController extends Controller
      */
     public function index()
     {
-        $gateways = Gateway::all();
-        return view('paneladmin::gateways.index', compact('gateways'));
+        $gateways = Gateway::orderBy('name')->get();
+        $totalCount = $gateways->count();
+        $activeCount = $gateways->where('is_active', true)->count();
+        $liveCount = $gateways->where('mode', 'live')->count();
+
+        return view('paneladmin::gateways.index', compact('gateways', 'totalCount', 'activeCount', 'liveCount'));
     }
 
     /**
@@ -30,12 +34,25 @@ class GatewayConfigController extends Controller
      */
     public function update(Request $request, Gateway $gateway)
     {
-        $data = $request->validate([
-            'api_key' => 'nullable|string',
-            'secret_key' => 'nullable|string',
-            'webhook_secret' => 'nullable|string',
+        $request->validate([
+            'api_key' => 'nullable|string|max:500',
+            'secret_key' => 'nullable|string|max:500',
+            'webhook_secret' => 'nullable|string|max:500',
             'mode' => 'required|in:sandbox,live',
         ]);
+
+        $data = ['mode' => $request->input('mode')];
+
+        // Only update key fields when a non-empty value was submitted (avoid overwriting with empty)
+        if ($request->filled('api_key')) {
+            $data['api_key'] = $request->input('api_key');
+        }
+        if ($request->filled('secret_key')) {
+            $data['secret_key'] = $request->input('secret_key');
+        }
+        if ($request->filled('webhook_secret')) {
+            $data['webhook_secret'] = $request->input('webhook_secret');
+        }
 
         $gateway->update($data);
 

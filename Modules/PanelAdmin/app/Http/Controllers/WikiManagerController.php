@@ -94,8 +94,10 @@ class WikiManagerController extends Controller
     public function articles()
     {
         $articles = WikiArticle::with(['category', 'author'])->latest()->paginate(15);
-        $categories = WikiCategory::orderBy('name')->get();
-        return view('paneladmin::wiki.articles.index', compact('articles', 'categories'));
+        $totalCount = WikiArticle::count();
+        $publishedCount = WikiArticle::where('is_published', true)->count();
+        $draftCount = WikiArticle::where('is_published', false)->count();
+        return view('paneladmin::wiki.articles.index', compact('articles', 'totalCount', 'publishedCount', 'draftCount'));
     }
 
     public function createArticle()

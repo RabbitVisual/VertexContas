@@ -6,14 +6,14 @@ namespace Modules\PanelUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Core\Services\SettingService;
+use Modules\Core\Models\Plan;
 use Modules\Gateways\Models\Gateway;
 use Modules\Gateways\Models\Subscription;
 use Modules\Gateways\Services\SubscriptionService;
 
 class SubscriptionController extends Controller
 {
-    public function index(SettingService $settingService)
+    public function index()
     {
         $user = auth()->user();
         $isPro = $user->isPro();
@@ -29,24 +29,43 @@ class SubscriptionController extends Controller
             ->orderBy('current_period_end', 'desc')
             ->first();
 
-        $limits = [
-            'account' => (int) $settingService->get('limit_free_account', 1),
-            'income' => (int) $settingService->get('limit_free_income', 5),
-            'expense' => (int) $settingService->get('limit_free_expense', 5),
-            'goal' => (int) $settingService->get('limit_free_goal', 1),
-            'budget' => (int) $settingService->get('limit_free_budget', 1),
-            'category' => (int) $settingService->get('limit_free_category', 0),
-        ];
+        $planFree = Plan::getDefaultFree();
+        $planPro = Plan::getDefaultPaid();
+        $paidPlans = Plan::where('is_free', false)->where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
 
-        $proHasLimits = (bool) $settingService->get('pro_has_limits', 0);
-        $limitsPro = [
-            'account' => (int) $settingService->get('limit_pro_account', -1),
-            'income' => (int) $settingService->get('limit_pro_income', -1),
-            'expense' => (int) $settingService->get('limit_pro_expense', -1),
-            'goal' => (int) $settingService->get('limit_pro_goal', -1),
-            'budget' => (int) $settingService->get('limit_pro_budget', -1),
-            'category' => (int) $settingService->get('limit_pro_category', -1),
+        $limits = [
+            'account' => 1,
+            'income' => 15,
+            'expense' => 15,
+            'goal' => 1,
+            'budget' => 1,
+            'category' => 0,
         ];
+        $limitsPro = [
+            'account' => -1,
+            'income' => -1,
+            'expense' => -1,
+            'goal' => -1,
+            'budget' => -1,
+            'category' => -1,
+        ];
+        $proHasLimits = false;
+
+        if ($planFree) {
+            foreach (Plan::limitEntities() as $entity) {
+                $val = $planFree->getLimit($entity);
+                $limits[$entity] = $val === 'unlimited' ? -1 : (int) $val;
+            }
+        }
+        if ($planPro) {
+            foreach (Plan::limitEntities() as $entity) {
+                $val = $planPro->getLimit($entity);
+                $limitsPro[$entity] = $val === 'unlimited' ? -1 : (int) $val;
+            }
+            $proHasLimits = collect($limitsPro)->contains(fn ($v) => $v >= 0);
+        }
+
+        $hasUsedTrial = $user->hasUsedTrial();
 
         return view('paneluser::subscription.index', compact(
             'gateways',
@@ -55,7 +74,11 @@ class SubscriptionController extends Controller
             'activeSubscription',
             'limits',
             'limitsPro',
-            'proHasLimits'
+            'proHasLimits',
+            'hasUsedTrial',
+            'planFree',
+            'planPro',
+            'paidPlans'
         ));
     }
 

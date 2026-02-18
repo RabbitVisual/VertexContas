@@ -23,7 +23,7 @@ class ProSubscriptionConfirmation extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Parabéns! Você agora é VIP - Vertex PRO',
+            subject: 'Parabéns! Você agora é VIP - ' . plan_pro_name(),
         );
     }
 

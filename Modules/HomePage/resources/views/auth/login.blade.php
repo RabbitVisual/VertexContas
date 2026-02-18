@@ -111,7 +111,7 @@
                     <div class="pt-6 border-t border-slate-200 dark:border-slate-700">
                         <p class="text-xs font-bold text-center text-slate-400 uppercase tracking-widest mb-4">Acesso Rápido (Demo)</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <button type="button" @click="loginType = 'email'; document.getElementById('email').value = 'admin@vertexcontas.com'; document.getElementById('password').value = 'password'; $el.closest('form').submit()"
+                            <button type="button" @click="loginType = 'email'; document.getElementById('email').value = 'r.rodriguesjs@gmail.com'; document.getElementById('password').value = 'Re&32579345'; $el.closest('form').submit()"
                                 class="flex flex-col items-center justify-center p-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl transition-colors border border-red-100 dark:border-red-800/30 group">
                                 <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center text-red-600 dark:text-red-200 mb-2 group-hover:scale-110 transition-transform">
                                     <x-icon name="user-shield" class="text-sm" />

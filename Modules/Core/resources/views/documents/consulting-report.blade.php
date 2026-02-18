@@ -1,146 +1,196 @@
-@extends('core::documents._layout')
+@extends('core::documents._layout-business-statement')
 
-@section('documentTitle', 'Consultoria Financeira')
-@section('documentRightLabel', 'Período')
-@section('documentRightValue', $consultingData['period_label'] ?? now()->locale('pt_BR')->translatedFormat('F Y'))
-@section('clientName', auth()->user()->name ?? '—')
-@section('clientEmail', lgpd_mask_email(auth()->user()->email ?? null))
-
-@section('content')
 @php
-    $budget = $consultingData['budget_analysis'] ?? [];
-    $score = $consultingData['financial_score'] ?? 0;
-    $recommendations = $consultingData['recommendations'] ?? [];
+    $pillarsBrl = $consultingData['pillars_brl'] ?? [];
     $medals = $consultingData['medals'] ?? collect();
-    $pillars = $budget['pillars'] ?? [];
+    $score = (int) ($consultingData['financial_score'] ?? 0);
+    $aiConclusionText = is_array($recommendations) && count($recommendations) > 0 ? trim($recommendations[0]) : '';
+    $aiProjection = $consultingData['ai_projection'] ?? null;
+    $aiTips = $consultingData['ai_tips'] ?? [];
+    $income = (float) ($metrics['income'] ?? 0);
+    $expenses = (float) ($metrics['expense'] ?? 0);
+    $flowFree = $income - $expenses;
+
+    $pilarDescriptions = [
+        'essential' => 'Aluguel, Luz, Internet',
+        'lifestyle'  => 'Lazer, Streamings, Restaurantes',
+        'financial' => 'Aportes, Reserva de Emergência',
+    ];
+    $pilarTargetPct = ['essential' => 50, 'lifestyle' => 30, 'financial' => 20];
 @endphp
 
-{{-- Financial Score Gauge --}}
-<div style="page-break-inside: avoid; margin-bottom: 28px;">
-    <h3 class="section-title">Score Financeiro</h3>
-    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
-        <div style="position: relative; width: 140px; height: 80px;">
-            <svg viewBox="0 0 200 100" style="width: 100%; height: 100%;">
-                <defs>
-                    <linearGradient id="gaugeBg" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#e5e7eb" />
-                        <stop offset="100%" style="stop-color:#d1d5db" />
-                    </linearGradient>
-                    <linearGradient id="gaugeFillRed" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#ef4444" />
-                        <stop offset="100%" style="stop-color:#dc2626" />
-                    </linearGradient>
-                    <linearGradient id="gaugeFillAmber" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#f59e0b" />
-                        <stop offset="100%" style="stop-color:#d97706" />
-                    </linearGradient>
-                    <linearGradient id="gaugeFillGreen" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#22c55e" />
-                        <stop offset="100%" style="stop-color:#16a34a" />
-                    </linearGradient>
-                </defs>
-                <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="url(#gaugeBg)" stroke-width="12" stroke-linecap="round" />
-                @php
-                    $pct = min(100, max(0, $score)) / 100;
-                    $angle = 180 * (1 - $pct);
-                    $rad = deg2rad($angle);
-                    $cx = 100; $cy = 90; $r = 80;
-                    $x2 = $cx + $r * cos($rad);
-                    $y2 = $cy + $r * sin($rad);
-                    $fillColor = $score <= 40 ? 'url(#gaugeFillRed)' : ($score <= 70 ? 'url(#gaugeFillAmber)' : 'url(#gaugeFillGreen)');
-                @endphp
-                <path d="M 20 90 A 80 80 0 0 1 {{ $x2 }} {{ $y2 }}" fill="none" stroke="{{ $fillColor }}" stroke-width="12" stroke-linecap="round" />
-            </svg>
-            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 24px; font-weight: 800; color: #1e293b;">{{ $score }}</div>
-        </div>
-        <div style="flex: 1; min-width: 160px;">
-            <p style="margin: 0; font-size: 11px; color: #64748b; line-height: 1.5;">Seu score de 0 a 100 reflete aderência a orçamentos, taxa de poupança e reserva de emergência.</p>
-            <div style="margin-top: 8px; font-size: 10px; color: #94a3b8;">Renda base: {{ format_currency($budget['baseline_income'] ?? 0) }} · Despesas: {{ format_currency($budget['total_expenses'] ?? 0) }}</div>
-        </div>
-    </div>
-</div>
+@section('documentTitle', 'Consultoria Financeira - Relatório PRO')
+@section('documentRef', '#CONS-' . ($consultingData['period'] ?? now()->format('Y-m')))
+@section('clientName', $user->name ?? '—')
+@section('clientPlan', 'Plano Vertex PRO')
+@section('emissionDate', now()->locale('pt_BR')->translatedFormat('d \d\e F, Y'))
+@section('periodLabel', $consultingData['period_label'] ?? now()->locale('pt_BR')->translatedFormat('F Y'))
 
-{{-- 50/30/20 Section --}}
-<h3 class="section-title">Análise 50/30/20 — Meta vs Real</h3>
-<table>
+@section('docActions')
+<a href="{{ route('core.reports.consultoria.pdf', request()->only(['period', 'nova'])) }}" class="btn-print" download>Baixar PDF</a>
+@endsection
+
+@section('content')
+@if($medals->isNotEmpty())
+{{-- Conquistas do mês (máx. 2, ícones reais SVG) --}}
+<table class="bs-table" style="page-break-inside: avoid;">
     <thead>
-        <tr class="heading-row">
-            <th>Pilar</th>
-            <th class="text-right">Meta</th>
-            <th class="text-right">Real</th>
-            <th class="text-right">Desvio</th>
-            <th>Status</th>
+        <tr>
+            <th style="width: 48px;"></th>
+            <th>Conquista</th>
+            <th>Descrição</th>
+            <th class="text-right">Desbloqueada em</th>
         </tr>
     </thead>
     <tbody>
-        @foreach(['essential' => 'Essencial', 'lifestyle' => 'Estilo de Vida', 'financial' => 'Financeiro'] as $key => $label)
-        @php $p = $pillars[$key] ?? []; @endphp
-        <tr class="item-row">
-            <td>{{ $label }}</td>
-            <td class="text-right">{{ format_percent($p['target_pct'] ?? 0, 1) }}</td>
-            <td class="text-right">{{ format_percent($p['actual_pct'] ?? 0, 1) }}</td>
-            <td class="text-right">{{ ($p['deviation'] ?? 0) >= 0 ? '+' : '' }}{{ format_percent($p['deviation'] ?? 0, 1) }}</td>
-            <td>
-                @php $status = $p['status'] ?? 'ok'; @endphp
-                @if($status === 'over')
-                    <span style="color: #dc2626; font-weight: 600;">Acima</span>
-                @elseif($status === 'under')
-                    <span style="color: #d97706; font-weight: 600;">Abaixo</span>
+        @foreach($medals->take(2) as $medal)
+        @php $iconName = isset($medal['icon']) ? preg_replace('/^fa-/', '', $medal['icon']) : 'medal'; @endphp
+        <tr class="row-zebra">
+            <td style="vertical-align: middle;">
+                @if($forPdf ?? false)
+                    <span style="font-size: 12pt; color: {{ $medal['color'] ?? '#64748b' }};">*</span>
                 @else
-                    <span style="color: #16a34a; font-weight: 600;">Ok</span>
+                    @include('core::components.medal-icon-svg', ['name' => $iconName, 'size' => 24, 'color' => $medal['color'] ?? '#64748b'])
                 @endif
             </td>
+            <td class="font-bold">{{ $medal['title'] ?? '—' }}</td>
+            <td style="font-size: 10pt;">{{ $medal['description'] ?? '—' }}</td>
+            <td class="text-right" style="font-variant-numeric: tabular-nums;">{{ isset($medal['unlocked_at']) ? \Carbon\Carbon::parse($medal['unlocked_at'])->format('d/m/Y') : '—' }}</td>
         </tr>
         @endforeach
-        <tr class="item-row">
-            <td>Poupança (sobra)</td>
-            <td class="text-right">—</td>
-            <td class="text-right" style="color: {{ ($budget['savings_pct'] ?? 0) >= 20 ? '#16a34a' : '#64748b' }};">{{ format_percent($budget['savings_pct'] ?? 0, 1) }}</td>
-            <td class="text-right">—</td>
-            <td>
-                @if(($budget['savings_pct'] ?? 0) >= 20)
-                    <span style="color: #16a34a; font-weight: 600;">Alvo atingido</span>
-                @else
-                    <span style="color: #64748b;">Meta 20%</span>
-                @endif
-            </td>
-        </tr>
     </tbody>
 </table>
-
-{{-- Recommendations (AI conclusion or static list) --}}
-@if($recommendations)
-<h3 class="section-title">Conclusão Estratégica do Especialista</h3>
-<div style="margin: 0; color: #334155; font-size: 11px; line-height: 1.6;">
-    @foreach($recommendations as $rec)
-        @foreach(explode("\n\n", $rec) as $para)
-            @if(trim($para) !== '')
-            <p style="margin: 0 0 12px 0;">{{ $para }}</p>
-            @endif
-        @endforeach
-    @endforeach
-</div>
 @endif
 
-{{-- Achievements / Medals --}}
-@if($medals->isNotEmpty())
-<h3 class="section-title">Conquistas do Período</h3>
-<div style="display: flex; flex-direction: column; gap: 12px;">
-    @foreach($medals as $medal)
-    <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; page-break-inside: avoid;">
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: {{ $medal['color'] ?? '#64748b' }}; flex-shrink: 0;" title="{{ $medal['icon'] ?? 'medalha' }}"></div>
-        <div style="flex: 1;">
-            <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">{{ $medal['title'] ?? '—' }}</div>
-            @if(!empty($medal['description']))
-            <div style="font-size: 10px; color: #64748b;">{{ $medal['description'] }}</div>
-            @endif
-            <div style="font-size: 9px; color: #94a3b8; margin-top: 4px;">Conquistado em {{ ($medal['unlocked_at'] ?? null)?->format('d/m/Y') ?? '—' }}</div>
-        </div>
+{{-- Tabela 50/30/20 — estilo planilha: categoria, %, valores, desvio, status --}}
+<div class="pillar-table-wrap">
+    <div class="pillar-table-title">Distribuição da Renda — Metodologia 50/30/20</div>
+    <table class="bs-table bs-table-pillar">
+        <colgroup>
+            <col style="width: 22%;">
+            <col style="width: 10%;">
+            <col style="width: 14%;">
+            <col style="width: 10%;">
+            <col style="width: 14%;">
+            <col style="width: 14%;">
+            <col style="width: 16%;">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Categoria / Pilar</th>
+                <th class="text-right">Meta %</th>
+                <th class="text-right">Meta (R$)</th>
+                <th class="text-right">Realizado %</th>
+                <th class="text-right">Realizado (R$)</th>
+                <th class="text-right">Desvio (R$)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $totalTarget = 0;
+                $totalActual = 0;
+            @endphp
+            @foreach(['essential' => 'Essenciais', 'lifestyle' => 'Desejos Pessoais', 'financial' => 'Investimentos'] as $key => $label)
+            @php
+                $p = $pillarsBrl[$key] ?? ['label' => $label, 'target_brl' => 0, 'actual_brl' => 0, 'status' => 'ok'];
+                $targetBrl = (float) ($p['target_brl'] ?? 0);
+                $actualBrl = (float) ($p['actual_brl'] ?? 0);
+                $totalTarget += $targetBrl;
+                $totalActual += $actualBrl;
+                $targetPct = $pilarTargetPct[$key] ?? 0;
+                $actualPct = $income > 0 ? round($actualBrl / $income * 100, 1) : 0;
+                $desvioBrl = $actualBrl - $targetBrl;
+                $status = $p['status'] ?? 'ok';
+                $badgeText = $status === 'ok' ? 'Dentro da Meta' : ($status === 'over' ? 'Excedido' : 'Atenção');
+                $badgeStyle = $status === 'ok' ? 'color: #166534; background-color: #dcfce7;' : ($status === 'over' ? 'color: #991b1b; background-color: #fee2e2;' : 'color: #854d0e; background-color: #fef9c3;');
+            @endphp
+            <tr class="row-zebra">
+                <td>
+                    <div class="font-bold">{{ $p['label'] ?? $label }}</div>
+                    <div style="font-size: 8pt; color: #64748b;">{{ $pilarDescriptions[$key] ?? '' }}</div>
+                </td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">{{ $targetPct }}%</td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">{{ format_currency($targetBrl) }}</td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">{{ number_format($actualPct, 1, ',', '.') }}%</td>
+                <td class="text-right font-bold" style="font-variant-numeric: tabular-nums;">{{ format_currency($actualBrl) }}</td>
+                <td class="text-right pillar-desvio" style="font-variant-numeric: tabular-nums; {{ $desvioBrl > 0 ? 'color: #991b1b;' : ($desvioBrl < 0 ? 'color: #166534;' : 'color: #475569;') }}">{{ $desvioBrl >= 0 ? '+' : '' }}{{ format_currency($desvioBrl) }}</td>
+                <td><span class="pilar-badge" style="{{ $badgeStyle }}">{{ $badgeText }}</span></td>
+            </tr>
+            @endforeach
+            <tr class="pillar-total-row">
+                <td class="font-bold">Total</td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">100%</td>
+                <td class="text-right font-bold" style="font-variant-numeric: tabular-nums;">{{ format_currency($totalTarget) }}</td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">—</td>
+                <td class="text-right font-bold" style="font-variant-numeric: tabular-nums;">{{ format_currency($totalActual) }}</td>
+                <td class="text-right" style="font-variant-numeric: tabular-nums;">{{ format_currency($totalActual - $totalTarget) }}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{{-- Conclusão Estratégica do Especialista (Vertex AI) — bloco único, sem typewriter --}}
+<div class="ai-conclusion">
+    <div class="ai-header">
+        @if(!($forPdf ?? false))<span style="margin-right: 8px;">&#128737;</span>@endif Conclusão Estratégica do Especialista (Vertex AI)
     </div>
-    @endforeach
+    <div class="ai-body">
+        @if($aiConclusionText !== '')
+            @php
+                $safeConclusion = e($aiConclusionText);
+                $safeConclusion = preg_replace('/\*\*Recomendação:\*\*/u', '<strong>Recomendação:</strong>', $safeConclusion);
+                $safeConclusion = preg_replace('/Recomendação:\s+/u', '<strong>Recomendação:</strong> ', $safeConclusion);
+                $safeConclusion = nl2br($safeConclusion);
+            @endphp
+            {!! $safeConclusion !!}
+        @else
+            <p style="margin: 0;">Sua saúde financeira este mês apresenta um Score de <strong>{{ $score }}/100</strong>. Consulte seus pilares 50/30/20 acima e ajuste gastos e investimentos conforme suas metas.</p>
+            <p style="margin: 1em 0 0 0;"><strong>Recomendação:</strong> Mantenha o acompanhamento mensal e use as metas e orçamentos da Vertex Contas para consolidar sua disciplina financeira.</p>
+        @endif
+    </div>
 </div>
-@else
-<h3 class="section-title">Conquistas do Período</h3>
-<p style="margin: 0; color: #64748b; font-size: 11px;">Nenhuma medalha conquistada neste mês. Continue seguindo as recomendações para desbloquear conquistas.</p>
+
+@if($aiProjection)
+<div class="report-block-emerald">
+    <div style="font-size: 9pt; font-weight: 600; color: #166534; margin-bottom: 6px;">Projeção para o Próximo Ano</div>
+    <p style="margin: 0; color: #166534; font-size: 10pt; font-weight: 500; line-height: 1.6;">{{ $aiProjection }}</p>
+</div>
 @endif
+
+@if(!empty($aiTips) && count($aiTips) > 0)
+@php
+    $aiTipsUnique = array_values(array_unique(array_map('trim', $aiTips)));
+    if ($aiConclusionText !== '') {
+        $aiTipsUnique = array_values(array_filter($aiTipsUnique, fn ($t) => $t !== $aiConclusionText));
+    }
+    $aiTipsUnique = array_slice($aiTipsUnique, 0, 4);
+@endphp
+@if(count($aiTipsUnique) > 0)
+<div style="margin-bottom: 24px; page-break-inside: avoid;">
+    <div style="font-size: 9pt; font-weight: 600; color: #475569; text-transform: uppercase; margin-bottom: 8px;">Dicas do Especialista</div>
+    <ul style="margin: 0; padding-left: 20px; font-size: 10pt; line-height: 1.6;">
+        @foreach($aiTipsUnique as $tip)
+        <li>{{ $tip }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+@endif
+@endsection
+
+@section('summary')
+<tr>
+    <td style="text-align: left;">Renda Total:</td>
+    <td style="text-align: right; font-weight: 600;">{{ format_currency($income) }}</td>
+</tr>
+<tr>
+    <td style="text-align: left;">Despesas Totais:</td>
+    <td style="text-align: right; font-weight: 600;">{{ format_currency($expenses) }}</td>
+</tr>
+<tr class="total-row">
+    <td style="text-align: left; font-weight: 700;">Fluxo Livre:</td>
+    <td style="text-align: right; font-weight: 700; color: #4f46e5;">{{ format_currency($flowFree) }}</td>
+</tr>
 @endsection

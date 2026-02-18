@@ -19,10 +19,14 @@ use Modules\Core\Models\RecurringTransaction;
 class IncomeController extends Controller
 {
     protected \Modules\Core\Services\FinancialHealthService $financialService;
+    protected \Modules\Core\Services\TourService $tourService;
 
-    public function __construct(\Modules\Core\Services\FinancialHealthService $financialService)
-    {
+    public function __construct(
+        \Modules\Core\Services\FinancialHealthService $financialService,
+        \Modules\Core\Services\TourService $tourService
+    ) {
         $this->financialService = $financialService;
+        $this->tourService = $tourService;
         $this->middleware(['auth', 'verified']);
     }
 
@@ -38,7 +42,10 @@ class IncomeController extends Controller
         $accounts = \Modules\Core\Models\Account::where('user_id', $user->id)->get();
         $categories = \Modules\Core\Models\Category::forUser($user)->get();
 
-        return view('core::income.index', compact('existingIncomes', 'existingExpenses', 'accounts', 'categories'));
+        $tourId = $this->tourService->getTourForRoute(request()->route()?->getName(), false);
+        $tourSteps = $tourId ? $this->tourService->getStepsForTour($tourId, $user->isPro()) : [];
+
+        return view('core::income.index', compact('existingIncomes', 'existingExpenses', 'accounts', 'categories', 'tourId', 'tourSteps'));
     }
 
     /**

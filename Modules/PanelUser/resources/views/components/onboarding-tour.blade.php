@@ -108,8 +108,8 @@
                     <x-icon name="crown" style="solid" class="w-6 h-6" />
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-2">Seja Vertex PRO</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Libere relatórios em PDF/CSV, contas ilimitadas e suporte VIP com o plano PRO.</p>
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-2">Seja {{ plan_pro_name() }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ pro_benefits_short_description('onboarding') }}</p>
                     <div class="flex justify-between items-center gap-2">
                         <span class="text-xs text-gray-400">Passo 4 de 4</span>
                         <div class="flex gap-2">
@@ -126,7 +126,7 @@
     <!-- Mobile Fallback for Step 4 -->
     <div x-show="step === 4" class="fixed inset-x-0 bottom-0 p-4 z-50 md:hidden">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 border-t-4 border-t-amber-500">
-             <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><x-icon name="crown" style="solid" class="text-amber-500"/> Vertex PRO</h3>
+             <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><x-icon name="crown" style="solid" class="text-amber-500"/> {{ plan_pro_name() }}</h3>
              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Libere todo o potencial com relatórios e suporte VIP.</p>
              <div class="flex gap-2">
                  <a href="{{ route('user.subscription.index') }}" class="flex-1 text-center bg-amber-500 text-white py-2 rounded-lg font-semibold hover:bg-amber-600 transition-colors">Ver Planos</a>

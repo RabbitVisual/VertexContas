@@ -72,6 +72,7 @@ class RuleEngineService
             if ($content === '') {
                 continue;
             }
+            $content = replace_plan_name_in_text($content);
 
             $this->recordAchievement($user, $achievementKey);
 
@@ -85,7 +86,7 @@ class RuleEngineService
                     ]);
                 }
                 $medalPayload = [
-                    'title' => $rule->medal->title,
+                    'title' => replace_plan_name_in_text($rule->medal->title),
                     'icon_name' => $rule->medal->icon_name,
                     'color' => $rule->medal->color,
                 ];

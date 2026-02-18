@@ -51,7 +51,7 @@
 
                     {{-- Gestão --}}
                     <a href="{{ route('admin.users.index') }}"
-                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.plans.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.payments.*') || request()->routeIs('admin.subscriptions.*') || request()->routeIs('admin.support.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
+                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.plans.*') || request()->routeIs('admin.plan.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.payments.*') || request()->routeIs('admin.subscriptions.*') || request()->routeIs('admin.support.*') || request()->routeIs('admin.chat.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
                         <x-icon name="users-gear" style="duotone" class="size-5 shrink-0" />
                         <span class="invisible absolute start-full top-1/2 z-50 ms-4 -translate-y-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:visible">
                             Gestão
@@ -150,12 +150,13 @@
                     <div class="mt-0.5 space-y-0.5">
                         <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.users.*') ? $linkActive : $linkInactive }}"><x-icon name="users" style="duotone" class="size-4 shrink-0" />Usuários</a>
                         <a href="{{ route('admin.plans.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.plans.*') ? $linkActive : $linkInactive }}"><x-icon name="sliders" style="duotone" class="size-4 shrink-0" />Planos & Limites</a>
+                        <a href="{{ route('admin.plan.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.plan.*') ? $linkActive : $linkInactive }}"><x-icon name="file-lines" style="duotone" class="size-4 shrink-0" />Página de Planos</a>
                         <a href="{{ route('admin.roles.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.roles.*') ? $linkActive : $linkInactive }}"><x-icon name="shield-keyhole" style="duotone" class="size-4 shrink-0" />Permissões</a>
                         <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.payments.*') ? $linkActive : $linkInactive }}"><x-icon name="receipt" style="duotone" class="size-4 shrink-0" />Pagamentos</a>
                         <a href="{{ route('admin.subscriptions.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.subscriptions.*') ? $linkActive : $linkInactive }}"><x-icon name="arrows-rotate" style="duotone" class="size-4 shrink-0" />Assinaturas</a>
                         <a href="{{ route('admin.support.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.support.*') ? $linkActive : $linkInactive }}"><x-icon name="headset" style="duotone" class="size-4 shrink-0" />Central de Suporte</a>
-                        @if(Route::has('support.chat.index'))
-                            <a href="{{ route('support.chat.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('support.chat.*') ? $linkActive : $linkInactive }}"><x-icon name="comments" style="duotone" class="size-4 shrink-0" />Chat VIP</a>
+                        @if(Route::has('admin.chat.index'))
+                            <a href="{{ route('admin.chat.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.chat.*') ? $linkActive : $linkInactive }}"><x-icon name="comments" style="duotone" class="size-4 shrink-0" />Chat VIP</a>
                         @endif
                     </div>
                 </div>
