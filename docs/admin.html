@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual do Administrador - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand">
+      <img src="public/logos/logo.svg" alt="Vertex Contas">
+    </a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </nav>
+
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Manual do Admin</li>
+          <li><a href="#visao-geral">Visão Geral</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+          <li><a href="#gemini">IA (Gemini)</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="#gateways">Gateways</a></li>
+          <li><a href="#usuarios">Usuários</a></li>
+          <li><a href="#medalhas">Medalhas e Regras</a></li>
+          <li><a href="#insights">Central de Insights</a></li>
+          <li><a href="#legal">Central Legal</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="doc-content">
+      <h1>Manual do Administrador</h1>
+      <p>Este manual descreve as funcionalidades disponíveis no painel administrativo (PanelAdmin) do Vertex Contas. Acesso restrito à role <code>admin</code>.</p>
+
+      <section id="visao-geral">
+        <h2>Visão Geral</h2>
+        <p>O painel admin concentra configurações do sistema, gestão de usuários, planos, gateways de pagamento, blog, Wiki, gamificação e documentos legais.</p>
+      </section>
+
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>Em <strong>Admin → Configurações</strong> você encontra abas para:</p>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Aba</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Geral</td><td>Nome do sistema, fuso horário e configurações base.</td></tr>
+            <tr><td>Marca</td><td>Logo, nome do plano PRO e branding.</td></tr>
+            <tr><td>E-mail</td><td>Driver SMTP, SES ou outro. Teste de envio.</td></tr>
+            <tr><td>Blog</td><td>Configurações do módulo Blog.</td></tr>
+            <tr><td>Documentos</td><td>Templates de documentos oficiais.</td></tr>
+            <tr><td>Segurança</td><td>Políticas de senha e limpeza de logs de auditoria.</td></tr>
+            <tr><td>Funcionalidades</td><td>Habilitar/desabilitar módulos.</td></tr>
+            <tr><td>Pusher</td><td>Configuração de WebSockets para Chat VIP.</td></tr>
+            <tr><td>Homepage</td><td>Conteúdo da landing page.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="gemini">
+        <h2>IA (Gemini)</h2>
+        <p>Na aba <strong>IA / Gemini</strong> configure a integração com a API do Google Gemini para:</p>
+        <ul>
+          <li>Vertex Bot: dicas personalizadas no dashboard</li>
+          <li>Consultoria PRO: conclusão estratégica e projeções em PDF</li>
+          <li>Categorização de extratos na importação CSV</li>
+        </ul>
+        <div class="doc-callout doc-callout-warning">
+          <div class="doc-callout-title">Chave da API</div>
+          <p>A chave pode ser definida no Admin ou via variável <code>GEMINI_API_KEY</code> no arquivo <code>.env</code>. Mantenha a chave em sigilo.</p>
+        </div>
+      </section>
+
+      <section id="planos">
+        <h2>Planos</h2>
+        <p>Gerencie os planos Free e PRO: limites de transações, recursos habilitados e preços. O conteúdo da página pública <strong>/planos</strong> pode ser editado em <strong>Plan → Editar conteúdo</strong>.</p>
+      </section>
+
+      <section id="gateways">
+        <h2>Gateways de Pagamento</h2>
+        <p>Configure integrações com Stripe, Mercado Pago e correlatos. Habilite ou desabilite gateways individualmente. As assinaturas PRO são processadas pelos gateways configurados.</p>
+      </section>
+
+      <section id="usuarios">
+        <h2>Gestão de Usuários</h2>
+        <p>Liste, edite, suspenda ou ative usuários. Gerencie roles e permissões. Visualize pagamentos e assinaturas por usuário.</p>
+      </section>
+
+      <section id="medalhas">
+        <h2>Medalhas e Regras de Conquistas</h2>
+        <p>Em <strong>Gamificação → Medalhas</strong> cadastre medalhas com título, descrição, ícone e raridade. Em <strong>Regras de Conquistas</strong> defina as condições para desbloquear cada medalha (ex.: atingir meta de poupança, orçamento respeitado).</p>
+      </section>
+
+      <section id="insights">
+        <h2>Central de Insights</h2>
+        <p>Gerencie os insights didáticos exibidos pelo Vertex Bot. Cada insight está vinculado a um evento (ex.: page_reports, page_budgets) e nível (info, warning). Quando a IA está desabilitada, esses insights servem de fallback.</p>
+      </section>
+
+      <section id="legal">
+        <h2>Central Legal</h2>
+        <p>Edite os textos de Termos de Uso, Política de Privacidade (LGPD), Termos de Assinatura e Política de Cookies. Alterações são aplicadas imediatamente no sistema.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo">
+        <img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions">
+      </div>
+      <div class="doc-footer-credits">
+        <a href="index.html">Voltar ao início</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

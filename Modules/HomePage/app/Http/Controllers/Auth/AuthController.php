@@ -61,7 +61,7 @@ class AuthController extends Controller
             return back()->with('status', 'Enviamos um link de recuperação para o seu e-mail.');
         }
 
-        return back()->withErrors(['email' => __($status)]);
+        return back()->withErrors(['email' => $this->passwordStatusMessage($status)]);
     }
 
     /**
@@ -99,7 +99,7 @@ class AuthController extends Controller
             return redirect()->route('login')->with('status', 'Sua senha foi alterada. Faça login com a nova senha.');
         }
 
-        return back()->withErrors(['email' => __($status)]);
+        return back()->withErrors(['email' => $this->passwordStatusMessage($status)]);
     }
 
     /**
@@ -211,11 +211,31 @@ class AuthController extends Controller
             'phone' => $validated['phone'],
         ]);
 
+        $user->assignRole('free_user');
+
         \Illuminate\Support\Facades\Mail::to($user->email)->queue(new \App\Mail\WelcomeEmail($user));
 
         Auth::login($user);
 
-        return redirect()->intended('/');
+        return redirect()->intended(route('paneluser.index'));
+    }
+
+    /**
+     * Mensagem amigável para status do broker de senha (evita exibir chave de tradução).
+     */
+    protected function passwordStatusMessage(string $status): string
+    {
+        $message = __($status);
+        if ($message !== $status) {
+            return $message;
+        }
+        $messages = [
+            'passwords.throttled' => 'Muitas tentativas. Aguarde alguns minutos antes de solicitar um novo link.',
+            'passwords.user' => 'Não encontramos um usuário com este e-mail.',
+            'passwords.token' => 'Este link de redefinição é inválido ou expirou. Solicite um novo.',
+        ];
+
+        return $messages[$status] ?? 'Ocorreu um erro. Tente novamente em alguns minutos.';
     }
 
     /**

@@ -20,6 +20,8 @@ class CoreDatabaseSeeder extends Seeder
         $this->call([
             SettingSeeder::class,
             LegalDocumentSeeder::class,
+            CategorySeeder::class,
+            EmailTemplatesSeeder::class,
         ]);
     }
 }

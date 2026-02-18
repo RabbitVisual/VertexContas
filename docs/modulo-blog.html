@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo Blog - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo Blog</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#modelos">Modelos</a></li>
+          <li><a href="#controllers">Controllers e Rotas</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-newspaper" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo Blog</h1>
+      <p>Gestão de conteúdo para SEO e engajamento. Artigos públicos e premium, categorias, comentários, likes e salvos.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O módulo Blog oferece um sistema completo de publicação de artigos para educação financeira, SEO e engajamento dos usuários. Suporta conteúdo público e premium (exclusivo para assinantes PRO).</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Posts com título, slug, conteúdo, imagem destacada e meta description</li>
+          <li>Categorias de artigos (BlogCategory)</li>
+          <li>Comentários com aprovação e moderação</li>
+          <li>Likes (PostLike) e salvos (SavedPost) por usuário</li>
+          <li>Artigos premium (is_premium) restritos a assinantes PRO</li>
+          <li>Contagem de visualizações</li>
+        </ul>
+      </section>
+      <section id="modelos">
+        <h2>Modelos / Entidades</h2>
+        <table class="doc-table">
+          <thead><tr><th>Model</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Post</td><td>Artigo do blog (autor, categoria, status, is_premium, views)</td></tr>
+            <tr><td>BlogCategory</td><td>Categorias de posts</td></tr>
+            <tr><td>Comment</td><td>Comentários com aprovação e suporte a respostas (parent_id)</td></tr>
+            <tr><td>PostLike</td><td>Likes por usuário e post</td></tr>
+            <tr><td>SavedPost</td><td>Posts salvos pelo usuário para leitura posterior</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="controllers">
+        <h2>Controllers e Rotas</h2>
+        <ul>
+          <li><strong>Blog\BlogController</strong> — Listagem e leitura pública de posts</li>
+          <li><strong>PanelAdmin\AdminBlogController</strong> — CRUD de posts, categorias e aprovação de comentários</li>
+          <li><strong>PanelSuporte\BlogManagerController</strong> — Gestão do blog para agentes de suporte</li>
+          <li><strong>PanelUser\BlogController</strong> — Leitura, comentários, likes e salvos no painel do usuário</li>
+        </ul>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>PanelUser</strong> — Usuários leem artigos, comentam, curtem e salvam</li>
+          <li><strong>PanelAdmin</strong> — Admin cria e edita posts, categorias e aprova comentários</li>
+          <li><strong>PanelSuporte</strong> — Suporte pode gerenciar blog (BlogManagerController)</li>
+          <li><strong>Gateways</strong> — Artigos premium verificam assinatura PRO</li>
+        </ul>
+      </section>
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>Configurações do Blog em <strong>Admin → Configurações → Blog</strong>. Conteúdo editável conforme settings do sistema.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-core.html">Módulo Core</a></div>
+    </div>
+  </footer>
+</body>
+</html>

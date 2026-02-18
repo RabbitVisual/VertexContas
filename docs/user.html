@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual do Usuário - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand">
+      <img src="public/logos/logo.svg" alt="Vertex Contas">
+    </a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </nav>
+
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Manual do Usuário</li>
+          <li><a href="#visao-geral">Visão Geral</a></li>
+          <li><a href="#transacoes">Transações</a></li>
+          <li><a href="#contas">Contas</a></li>
+          <li><a href="#categorias">Categorias e Orçamentos</a></li>
+          <li><a href="#metas">Metas Financeiras</a></li>
+          <li><a href="#consultoria">Consultoria PRO</a></li>
+          <li><a href="#vertex-bot">Vertex Bot (IA)</a></li>
+          <li><a href="#conquistas">Conquistas</a></li>
+          <li><a href="#tickets">Tickets de Suporte</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="doc-content">
+      <h1>Manual do Usuário</h1>
+      <p>Este manual descreve as funcionalidades disponíveis no painel do cliente (PanelUser) do Vertex Contas.</p>
+
+      <section id="visao-geral">
+        <h2>Visão Geral</h2>
+        <p>Após o login, você tem acesso ao dashboard com visão geral financeira, gráficos de fluxo de caixa e categorias, além do Vertex Bot para dicas contextuais. O sistema suporta planos Free e PRO.</p>
+      </section>
+
+      <section id="transacoes">
+        <h2>Transações</h2>
+        <p>Registre receitas e despesas manualmente ou importe extratos em CSV. Cada transação pode ser vinculada a uma conta, categoria e, para despesas, ao pilar 50/30/20 (Essencial, Estilo de Vida ou Financeiro). Use transferências para mover saldo entre contas sem afetar o total.</p>
+        <div class="doc-callout doc-callout-note">
+          <div class="doc-callout-title">Importação de Extratos</div>
+          <p>Assinantes PRO podem importar CSV com categorização assistida por IA (Gemini). O sistema sugere categoria e pilar para cada linha do extrato.</p>
+        </div>
+      </section>
+
+      <section id="contas">
+        <h2>Contas</h2>
+        <p>Cadastre contas bancárias, carteiras e investimentos. O saldo total é calculado automaticamente. Transferências entre contas não alteram o total — apenas a distribuição do saldo.</p>
+      </section>
+
+      <section id="categorias">
+        <h2>Categorias e Orçamentos</h2>
+        <p>Categorize receitas e despesas. Para despesas, defina o tipo de grupo: <strong>Essencial</strong> (50%), <strong>Estilo de Vida</strong> (30%) ou <strong>Financeiro</strong> (20%). Configure orçamentos por categoria para acompanhar gastos e receber alertas quando ultrapassar o limite.</p>
+      </section>
+
+      <section id="metas">
+        <h2>Metas Financeiras</h2>
+        <p>Cadastre metas com valor alvo e prazo. Acompanhe o progresso visualmente e mantenha foco nos 20% de poupança recomendados pela regra 50/30/20.</p>
+      </section>
+
+      <section id="consultoria">
+        <h2>Consultoria PRO</h2>
+        <p>Exclusivo para assinantes PRO. Gere relatórios mensais em PDF com:</p>
+        <ul>
+          <li>Análise 50/30/20 com score financeiro</li>
+          <li>Conclusão estratégica gerada por IA (Gemini)</li>
+          <li>Projeção de 1 ano</li>
+          <li>Recomendações personalizadas</li>
+          <li>Medalhas conquistadas no período</li>
+        </ul>
+        <p>Acesse em <strong>Relatórios → Consultoria Mensal</strong>. O histórico de consultorias fica disponível na mesma seção.</p>
+      </section>
+
+      <section id="vertex-bot">
+        <h2>Vertex Bot (Mentor IA)</h2>
+        <p>O Vertex Bot exibe dicas contextuais no dashboard com base em eventos como saldo baixo, orçamento próximo do limite, marcos de poupança ou dica do dia. Quando a IA (Gemini) está habilitada no sistema, as dicas são personalizadas com base nos seus dados reais. Você pode optar por esconder o assistente nas configurações.</p>
+      </section>
+
+      <section id="conquistas">
+        <h2>Conquistas</h2>
+        <p>O sistema de gamificação concede medalhas ao atingir metas financeiras. Acesse <strong>Conquistas</strong> no menu para ver suas medalhas desbloqueadas e compartilhar.</p>
+      </section>
+
+      <section id="tickets">
+        <h2>Tickets de Suporte</h2>
+        <p>Abra chamados em <strong>Seus Chamados</strong> e acompanhe o histórico de mensagens. Assinantes PRO têm acesso ao Chat VIP em tempo real com a equipe de suporte.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo">
+        <img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions">
+      </div>
+      <div class="doc-footer-credits">
+        <a href="index.html">Voltar ao início</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

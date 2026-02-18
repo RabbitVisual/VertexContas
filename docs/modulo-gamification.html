@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo Gamification - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo Gamification</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#modelos">Modelos</a></li>
+          <li><a href="#controllers">Controllers</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-medal" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo Gamification</h1>
+      <p>Engajamento via medalhas, conquistas, insights didáticos e Vertex Bot. Score financeiro e regras de coaching.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O módulo Gamification aumenta o engajamento dos usuários através de medalhas, conquistas e insights contextuais exibidos pelo Vertex Bot. A lógica principal está no <strong>GamificationService</strong> (Core), que consome os models deste módulo e fornece dados para o Vertex Bot.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Medalhas ( título, descrição, ícone, raridade, cor)</li>
+          <li>UserMedal — medalhas desbloqueadas por usuário</li>
+          <li>Achievement — registro de conquistas (achievement_key, metadata)</li>
+          <li>CoachingRule — regras que definem quando uma medalha é desbloqueada</li>
+          <li>PageContextInsights — insights didáticos por página/evento (fallback quando IA desabilitada)</li>
+          <li>Triggers: saldo baixo, orçamento próximo do limite, marco de poupança, dica do dia</li>
+        </ul>
+      </section>
+      <section id="modelos">
+        <h2>Modelos / Entidades</h2>
+        <table class="doc-table">
+          <thead><tr><th>Model</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Medal</td><td>Definição da medalha (title, description, icon_name, rarity, color)</td></tr>
+            <tr><td>UserMedal</td><td>Medalha desbloqueada por usuário (user_id, medal_id, unlocked_at)</td></tr>
+            <tr><td>Achievement</td><td>Registro de conquista (user_id, achievement_key, metadata)</td></tr>
+            <tr><td>CoachingRule</td><td>Condições para desbloquear medalha</td></tr>
+            <tr><td>Insight</td><td>Insights contextuais (trigger_event, content, level, is_active)</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="controllers">
+        <h2>Controllers</h2>
+        <ul>
+          <li><strong>Gamification\GamificationController</strong> — Interface do módulo</li>
+          <li><strong>PanelUser\AchievementController</strong> — Página de conquistas do usuário (/user/conquistas)</li>
+          <li><strong>PanelAdmin\MedalAdminController</strong> — CRUD de medalhas (admin/gamification/medals)</li>
+          <li><strong>PanelAdmin\CoachingRuleAdminController</strong> — CRUD de regras (admin/gamification/rules)</li>
+          <li><strong>PanelAdmin\InsightAdminController</strong> — CRUD de insights (admin/insights)</li>
+        </ul>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>Core (GamificationService)</strong> — Lógica de geração de insights e conquistas; usa dados 50/30/20 e FinancialHealthService</li>
+          <li><strong>Core (GeminiService)</strong> — Quando IA habilitada, insights podem ser gerados por Gemini</li>
+          <li><strong>PanelUser</strong> — Vertex Bot exibe insights; página Conquistas lista medalhas</li>
+          <li><strong>Core (ReportService)</strong> — Relatório de consultoria inclui medalhas do mês</li>
+        </ul>
+      </section>
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>Medalhas e regras são gerenciadas em <strong>Admin → Gamificação</strong>. Insights em <strong>Admin → Central de Insights</strong>. A ativação de IA (Gemini) em Admin → Configurações → IA influencia se os insights são gerados por IA ou pelo banco local (PageContextInsights).</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-gateways.html">Módulo Gateways</a></div>
+    </div>
+  </footer>
+</body>
+</html>

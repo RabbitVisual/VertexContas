@@ -41,15 +41,27 @@ class AdminProfileController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
+            'cpf' => 'nullable|string|max:20',
+            'birth_date' => 'nullable|date_format:d/m/Y',
+            'show_assistant' => 'nullable|boolean',
             'current_password' => 'nullable|required_with:new_password|current_password',
             'new_password' => 'nullable|min:8|confirmed',
         ]);
+
+        $birthDate = null;
+        if ($request->filled('birth_date')) {
+            $parsed = \Carbon\Carbon::createFromFormat('d/m/Y', $request->birth_date);
+            $birthDate = $parsed->format('Y-m-d');
+        }
 
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
             'phone' => lgpd_clean_phone($request->phone) ?: null,
+            'cpf' => lgpd_clean_cpf($request->cpf ?? null) ?: null,
+            'birth_date' => $birthDate,
+            'show_assistant' => $request->has('show_assistant') ? $request->boolean('show_assistant') : ($user->show_assistant ?? true),
         ]);
 
         if ($request->filled('new_password')) {

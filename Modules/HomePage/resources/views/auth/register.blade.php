@@ -170,15 +170,26 @@
                     <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}" async defer></script>
                     <script>
                         document.getElementById('register-form')?.addEventListener('submit', function(e) {
-                            const input = document.getElementById('g-recaptcha-response');
-                            if (input && input.value) return;
                             e.preventDefault();
                             const form = this;
+                            const input = document.getElementById('g-recaptcha-response');
+                            const btn = form.querySelector('button[type="submit"]');
+                            if (!input || typeof grecaptcha === 'undefined') {
+                                form.submit();
+                                return;
+                            }
+                            if (btn) { btn.disabled = true; btn.innerHTML = 'Aguarde...'; }
+                            input.value = '';
                             grecaptcha.ready(function() {
-                                grecaptcha.execute('{{ $recaptchaSiteKey }}', { action: 'register' }).then(function(token) {
-                                    input.value = token;
-                                    form.submit();
-                                });
+                                grecaptcha.execute('{{ $recaptchaSiteKey }}', { action: 'register' })
+                                    .then(function(token) {
+                                        input.value = token;
+                                        form.submit();
+                                    })
+                                    .catch(function() {
+                                        if (btn) { btn.disabled = false; btn.innerHTML = 'Criar Minha Conta <i class="fa-solid fa-user-plus"></i>'; }
+                                        alert('Não foi possível verificar a segurança. Desative bloqueadores de anúncios ou tente novamente.');
+                                    });
                             });
                         });
                     </script>

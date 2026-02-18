@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Redireciona todas as requisições para a pasta public/ (Laravel)
+    # Use quando o DocumentRoot nao puder apontar para public/ (ex: shared hosting)
+    RewriteRule ^(.*)$ public/$1 [L]
+    RewriteRule ^$ public/ [L]
+</IfModule>

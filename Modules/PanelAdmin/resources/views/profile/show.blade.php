@@ -1,121 +1,178 @@
 <x-paneladmin::layouts.master>
     <x-slot name="navbarTitle">Meu Perfil</x-slot>
 
-    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="space-y-6">
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Meu Perfil</h1>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Gerencie suas informações e credenciais de administrador.</p>
+            </div>
+            <a href="{{ route('admin.profile.edit') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <x-icon name="pen" style="duotone" class="w-4 h-4" />
+                Editar Perfil
+            </a>
+        </div>
 
-        <!-- Profile Header Card -->
-        <div class="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-white/5 mb-8">
-            <!-- Decorative Background -->
-            <div class="absolute inset-0 bg-gradient-to-br from-[#11C76F]/20 to-transparent opacity-50"></div>
-            <div class="absolute top-0 right-0 w-64 h-64 bg-[#11C76F]/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+        {{-- Alerts Flowbite --}}
+        @if(session('success'))
+            <div class="flex items-center p-4 mb-4 text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                <x-icon name="circle-check" style="duotone" class="w-5 h-5 shrink-0 text-green-500 dark:text-green-400" />
+                <span class="sr-only">Info</span>
+                <div class="ms-3 text-sm font-medium">{{ session('success') }}</div>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5 shrink-0 text-red-500 dark:text-red-400" />
+                <span class="sr-only">Info</span>
+                <div class="ms-3 text-sm font-medium">{{ session('error') }}</div>
+            </div>
+        @endif
 
-            <div class="relative p-10 flex flex-col md:flex-row items-center gap-10">
-                <!-- Profile Photo with Upload Trigger -->
-                <div class="relative group cursor-pointer" onclick="document.getElementById('photo-upload').click()">
-                    @if($user->photo)
-                        <img src="{{ Storage::url($user->photo) }}" class="w-40 h-40 rounded-[3rem] object-cover shadow-2xl border-4 border-white dark:border-slate-800 transition-transform group-hover:scale-105 duration-500">
-                    @else
-                        <div class="w-40 h-40 rounded-[3rem] bg-[#11C76F]/10 text-[#11C76F] flex items-center justify-center font-black text-6xl border-4 border-[#11C76F]/5 transition-transform group-hover:scale-105 duration-500">
-                            {{ substr($user->first_name, 0, 1) }}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Card Avatar + Identificação - Flowbite User Profile Card --}}
+            <div class="space-y-6">
+                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div class="flex flex-col items-center pb-10">
+                        <form action="{{ route('admin.profile.update-photo') }}" method="POST" enctype="multipart/form-data" class="contents">
+                            @csrf
+                            <label for="photo-upload" class="relative block cursor-pointer group">
+                                @if($user->photo)
+                                    <img class="w-24 h-24 mb-3 rounded-full shadow-lg object-cover ring-4 ring-gray-200 dark:ring-gray-600 group-hover:ring-primary-500 transition-all" src="{{ $user->photo_url }}" alt="{{ $user->first_name }}">
+                                @else
+                                    <div class="w-24 h-24 mb-3 rounded-full shadow-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-900/50 transition-colors">
+                                        <span class="text-3xl font-bold">{{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name ?? '', 0, 1) }}</span>
+                                    </div>
+                                @endif
+                                <div class="absolute inset-0 flex items-center justify-center rounded-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <x-icon name="camera" style="duotone" class="w-6 h-6 text-white" />
+                                </div>
+                                <input type="file" name="photo" id="photo-upload" accept="image/*" class="sr-only" onchange="this.form.submit()">
+                            </label>
+                        </form>
+                        <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{ $user->first_name }} {{ $user->last_name }}</h5>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</span>
+                        <div class="flex mt-4 space-x-3">
+                            <span class="inline-flex items-center px-3 py-1 text-sm font-medium text-primary-800 bg-primary-100 rounded-full dark:bg-primary-900/30 dark:text-primary-400">
+                                <x-icon name="shield-keyhole" style="duotone" class="w-3.5 h-3.5 me-1.5 shrink-0" />
+                                Administrador Master
+                            </span>
                         </div>
-                    @endif
-
-                    <div class="absolute inset-0 bg-black/40 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
-                        <x-icon name="camera" style="duotone" class="text-white text-3xl" />
                     </div>
-
-                    <div class="absolute -bottom-2 -right-2 bg-white dark:bg-[#111111] p-3 rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 group-hover:rotate-12 transition-transform">
-                        <x-icon name="pen" style="duotone" class="text-[#11C76F] text-lg" />
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-4 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <x-icon name="fingerprint" style="duotone" class="w-4 h-4 text-gray-400" /> ID
+                            </span>
+                            <span class="font-medium text-gray-900 dark:text-white tabular-nums">{{ $user->id }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <x-icon name="calendar-plus" style="duotone" class="w-4 h-4 text-gray-400" /> Cadastro
+                            </span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $user->created_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <x-icon name="clock-rotate-left" style="duotone" class="w-4 h-4 text-gray-400" /> Último login
+                            </span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $user->last_login_at ? $user->last_login_at->format('d/m/Y H:i') : '—' }}</span>
+                        </div>
+                        @if($user->last_login_ip)
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                    <x-icon name="network-wired" style="duotone" class="w-4 h-4 text-gray-400" /> IP
+                                </span>
+                                <span class="font-mono text-xs text-gray-700 dark:text-gray-300">{{ $user->last_login_ip }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="flex-1 text-center md:text-left space-y-4">
-                    <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-[#11C76F]/10 text-[#11C76F] text-[10px] font-black uppercase tracking-widest border border-[#11C76F]/20">
-                        Administrador Master
-                    </div>
-                    <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
-                        {{ $user->first_name }} {{ $user->last_name }}
-                    </h1>
-                    <p class="text-lg text-slate-500 dark:text-slate-400 font-medium">
-                        {{ $user->email }}
-                    </p>
+                {{-- Vertex Solutions Branding --}}
+                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 text-center">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Desenvolvido por</p>
+                    <p class="mt-1 text-sm font-bold text-gray-900 dark:text-white">Vertex Solutions LTDA</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">© 2026 · Reinan Rodrigues</p>
+                </div>
+            </div>
 
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
-                        <a href="{{ route('admin.profile.edit') }}" class="px-8 py-4 bg-[#11C76F] text-white font-black rounded-2xl shadow-xl shadow-[#11C76F]/30 hover:bg-[#0EA85A] hover:-translate-y-1 active:scale-95 transition-all text-xs uppercase tracking-widest">
-                            Editar Perfil
+            {{-- Coluna direita: Informações + Segurança --}}
+            <div class="lg:col-span-2 space-y-6">
+                {{-- Card Informações Pessoais --}}
+                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                            <x-icon name="user" style="duotone" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Informações Pessoais</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Dados fundamentais da sua conta administrativa</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nome Completo</label>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->first_name }} {{ $user->last_name }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">E-mail</label>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white break-all">{{ $user->email }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">CPF</label>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white font-mono">{{ lgpd_format_cpf($user->cpf ?? null) ?: '—' }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Data de Nascimento</label>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->birth_date?->format('d/m/Y') ?: '—' }}</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 sm:col-span-2">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Telefone</label>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ lgpd_format_phone($user->phone ?? null) ?: '—' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card Segurança & Acesso --}}
+                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                            <x-icon name="shield-check" style="duotone" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Segurança & Acesso</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Status da conta e credenciais</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse shrink-0" aria-hidden="true"></span>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</label>
+                                <p class="text-sm font-semibold text-green-600 dark:text-green-400">Ativo & Verificado</p>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nível de Permissão</label>
+                            <p class="text-sm font-semibold text-amber-600 dark:text-amber-400">Super Admin</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 sm:col-span-2">
+                            <label class="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Assistente Vertex Bot</label>
+                            <p class="text-sm font-semibold {{ ($user->show_assistant ?? true) ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400' }}">
+                                {{ ($user->show_assistant ?? true) ? 'Ativado' : 'Desativado' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                        <a href="{{ route('admin.profile.edit') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 focus:ring-4 focus:ring-amber-200 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-900/30 dark:focus:ring-amber-800">
+                            <x-icon name="lock" style="duotone" class="w-4 h-4" />
+                            Alterar senha
                         </a>
                     </div>
                 </div>
             </div>
-
-            <!-- Hidden Photo Upload Form -->
-            <form id="photo-form" action="{{ route('admin.profile.update-photo') }}" method="POST" enctype="multipart/form-data" class="hidden">
-                @csrf
-                <input type="file" name="photo" id="photo-upload" accept="image/*" onchange="this.form.submit()">
-            </form>
         </div>
-
-        <!-- Information Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Pessoal -->
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl space-y-6">
-                <div class="flex items-center gap-4 mb-2">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                        <x-icon name="user" style="duotone" class="text-xl" />
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">Informações Pessoais</h3>
-                        <p class="text-xs text-slate-500 font-medium">Dados fundamentais da conta</p>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nome Completo</span>
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ $user->first_name }} {{ $user->last_name }}</span>
-                    </div>
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">E-mail</span>
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ $user->email }}</span>
-                    </div>
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Telefone</span>
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ lgpd_format_phone($user->phone ?? null) }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segurança & Acesso -->
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl space-y-6">
-                <div class="flex items-center gap-4 mb-2">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                        <x-icon name="shield-check" style="duotone" class="text-xl" />
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">Segurança & Acesso</h3>
-                        <p class="text-xs text-slate-500 font-medium">Mantenha sua conta protegida</p>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status da Conta</span>
-                        <div class="flex items-center gap-2 mt-1">
-                            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span class="text-sm font-black text-emerald-500 uppercase tracking-widest">Ativo & Verificado</span>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nível de Permissão</span>
-                        <span class="text-sm font-black text-amber-500 uppercase tracking-widest">Super Admin</span>
-                    </div>
-                    <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-2xl border border-gray-100 dark:border-white/5">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Último Login</span>
-                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ now()->format('d/m/Y - H:i') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </x-paneladmin::layouts.master>

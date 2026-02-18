@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo VertexChat - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo VertexChat</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#modelos">Modelos</a></li>
+          <li><a href="#controllers">Controllers</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-comments" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo VertexChat</h1>
+      <p>Chat VIP em tempo real para assinantes PRO e equipe de suporte.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O VertexChat fornece suporte em tempo real via chat para assinantes do plano PRO. Cada conversa é vinculada a um usuário e pode ser atribuída a um agente. Utiliza Pusher (Laravel Echo) para mensagens em tempo real, digitação (typing) e atualização da lista de conversas.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Conversas (Conversation) vinculadas ao usuário PRO</li>
+          <li>Mensagens em tempo real via Pusher</li>
+          <li>Atribuição de agente (assigned_agent_id)</li>
+          <li>Transferência de conversa entre agentes</li>
+          <li>Indicador de digitação (typing)</li>
+          <li>Solicitação de inspeção a partir do chat</li>
+        </ul>
+      </section>
+      <section id="modelos">
+        <h2>Modelos / Entidades</h2>
+        <table class="doc-table">
+          <thead><tr><th>Model</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Conversation</td><td>Conversa (user_id, assigned_agent_id, sector, status)</td></tr>
+            <tr><td>Message</td><td>Mensagem (conversation_id, user_id, body, etc.)</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="controllers">
+        <h2>Controllers</h2>
+        <table class="doc-table">
+          <thead><tr><th>Controller</th><th>Contexto</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>VertexChatController</td><td>PanelUser</td><td>Interface do chat para o cliente PRO</td></tr>
+            <tr><td>ChatController</td><td>VertexChat</td><td>Rotas base do módulo</td></tr>
+            <tr><td>VertexChatCommandCenterController</td><td>PanelSuporte</td><td>Central de atendimento do chat</td></tr>
+            <tr><td>AdminVertexChatController</td><td>PanelAdmin</td><td>Central de comando admin, transferência</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>PanelUser</strong> — Cliente PRO acessa o chat</li>
+          <li><strong>PanelSuporte</strong> — Agentes atendem via VertexChatCommandCenterController</li>
+          <li><strong>PanelAdmin</strong> — AdminVertexChatController para gestão e transferência</li>
+          <li><strong>PanelSuporte (InspectionController)</strong> — Solicitação de inspeção a partir do chat</li>
+          <li><strong>Pusher</strong> — Configurado em Admin → Configurações → Pusher</li>
+        </ul>
+      </section>
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>O VertexChat depende do Pusher para mensagens em tempo real. Configure em <strong>Admin → Configurações → Pusher</strong> (app_id, key, secret, cluster). Variáveis de ambiente: <code>PUSHER_APP_ID</code>, <code>PUSHER_APP_KEY</code>, <code>PUSHER_APP_SECRET</code>, <code>PUSHER_APP_CLUSTER</code>.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-blog.html">Módulo Blog</a></div>
+    </div>
+  </footer>
+</body>
+</html>

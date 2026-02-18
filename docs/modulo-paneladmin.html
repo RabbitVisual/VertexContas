@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo PanelAdmin - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo PanelAdmin</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#controllers">Controllers</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#rotas">Rotas Principais</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-shield-halved" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo PanelAdmin</h1>
+      <p>Painel administrativo completo. Acesso restrito à role <code>admin</code>.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O PanelAdmin é o painel de comando do Vertex Contas. Concentra todas as configurações do sistema, gestão de usuários, planos, gateways de pagamento, suporte global, Chat VIP, Blog, Wiki, gamificação (medalhas e insights) e documentos legais.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Dashboard administrativo</li>
+          <li>Configurações: Geral, Marca, E-mail, Blog, Documentos, Segurança, Funcionalidades, Pusher, Homepage, IA (Gemini)</li>
+          <li>Gateways de pagamento (CRUD, toggle)</li>
+          <li>Planos (CRUD) e edição da página pública /planos</li>
+          <li>Gestão de usuários (CRUD, suspender, ativar)</li>
+          <li>Roles e permissões</li>
+          <li>Pagamentos e assinaturas (visão global)</li>
+          <li>Suporte global (tickets, atribuição, takeover)</li>
+          <li>Chat VIP — Central de Comando (conversas, transferência, solicitação de inspeção)</li>
+          <li>Blog (posts, categorias, comentários)</li>
+          <li>Wiki (categorias, artigos, sugestões)</li>
+          <li>Gamificação: medalhas e regras de conquistas</li>
+          <li>Central de Insights (Vertex Bot)</li>
+          <li>Central Legal (termos, privacidade, cookies)</li>
+          <li>Notificações (envio em massa)</li>
+          <li>Perfil do admin</li>
+        </ul>
+      </section>
+      <section id="controllers">
+        <h2>Controllers</h2>
+        <table class="doc-table">
+          <thead><tr><th>Controller</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>PanelAdminController</td><td>Dashboard</td></tr>
+            <tr><td>SettingsController</td><td>Todas as abas de configurações</td></tr>
+            <tr><td>GatewayConfigController</td><td>Gateways</td></tr>
+            <tr><td>PlanController, PlanPageSettingsController</td><td>Planos</td></tr>
+            <tr><td>AdminUserController</td><td>Usuários</td></tr>
+            <tr><td>RoleController</td><td>Roles</td></tr>
+            <tr><td>AdminSupportController</td><td>Suporte global</td></tr>
+            <tr><td>AdminVertexChatController</td><td>Chat VIP</td></tr>
+            <tr><td>AdminBlogController</td><td>Blog</td></tr>
+            <tr><td>WikiManagerController</td><td>Wiki</td></tr>
+            <tr><td>MedalAdminController, CoachingRuleAdminController</td><td>Gamificação</td></tr>
+            <tr><td>InsightAdminController</td><td>Insights</td></tr>
+            <tr><td>LegalManagerController</td><td>Central Legal</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <p>O PanelAdmin orquestra todos os demais módulos. Consome Core (Settings, Plan, etc.), Gateways, Blog, Gamification, Notifications, VertexChat, PanelSuporte (InspectionController para solicitação de inspeção a partir do Chat VIP).</p>
+      </section>
+      <section id="rotas">
+        <h2>Rotas Principais</h2>
+        <p>Prefix <code>/admin</code>. Rotas principais: <code>/admin</code>, <code>/admin/settings</code>, <code>/admin/gateways</code>, <code>/admin/plans</code>, <code>/admin/users</code>, <code>/admin/support</code>, <code>/admin/chat-vip</code>, <code>/admin/blog</code>, <code>/admin/wiki</code>, <code>/admin/gamification/medals</code>, <code>/admin/gamification/rules</code>, <code>/admin/insights</code>, <code>/admin/legal</code>.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-panelsuporte.html">Módulo PanelSuporte</a></div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -39,6 +39,7 @@
         </div>
     </div>
 
+    @if($accounts->isNotEmpty())
     @php
         $planningByCategory = $recurringTransactions->groupBy('category_id')->map(fn($g) => (float) $g->sum('amount'))->toArray();
     @endphp
@@ -113,7 +114,7 @@
                 {{-- Conta e Categoria --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3" x-text="type === 'income' ? 'Conta (onde entra o valor)' : 'Conta (de onde sai o valor)'"></label>
+                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta (onde o dinheiro entra/sai — banco, carteira, etc.)</label>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
                                 <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
@@ -223,6 +224,27 @@
             </div>
         </div>
     </form>
+    @else
+    {{-- CTA: Sem contas --}}
+    <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm p-8 sm:p-12">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[80px]"></div>
+        <div class="relative z-10 flex flex-col items-center text-center max-w-lg mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6">
+                <x-icon name="building-columns" style="duotone" class="w-8 h-8" />
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Você ainda não tem nenhuma conta</h2>
+            <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-8">Para registrar receitas e despesas, você precisa de pelo menos uma conta. Crie sua conta (ex: Conta corrente, Carteira) para começar.</p>
+            <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                Criar minha primeira conta
+            </a>
+            <a href="{{ route('core.transactions.index') }}" class="mt-4 inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium">
+                <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                Voltar ao extrato
+            </a>
+        </div>
+    </div>
+    @endif
 
     {{-- Dica: Como funciona no Vertex Contas --}}
     <div class="rounded-3xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-gray-950/50 p-6 sm:p-8">
@@ -232,7 +254,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funciona no Vertex Contas</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada transação altera o <strong>saldo da conta</strong> que você escolher: receitas somam e despesas subtraem. O valor da sua <strong>capacidade mensal</strong> vem do planejamento (Minha Renda), não da soma das transações. Use categorias para organizar e, se for {{ plan_pro_name() }}, marque &quot;Repetir&quot; para agendar o mesmo lançamento todo mês.</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada transação altera o <strong>saldo da conta</strong> escolhida. Sua <strong>capacidade mensal</strong> vem do planejamento em Minha Renda. Use categorias para organizar e, se for {{ plan_pro_name() }}, marque &quot;Repetir&quot; para agendar o mesmo lançamento todo mês.</p>
             </div>
         </div>
     </div>

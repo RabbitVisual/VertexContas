@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo Gateways - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo Gateways</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#modelos">Modelos</a></li>
+          <li><a href="#rotas">Rotas</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-credit-card" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo Gateways</h1>
+      <p>Integrações de pagamento: Stripe, Mercado Pago, webhooks e processamento de assinaturas PRO.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O módulo Gateways abstrai as integrações com provedores de pagamento (Stripe, Mercado Pago) para processar assinaturas do plano PRO. Gerencia webhooks para confirmação de pagamentos, renovação e cancelamento, além do fluxo de checkout.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Suporte a múltiplos gateways (Stripe, Mercado Pago)</li>
+          <li>Webhooks públicos (excluídos de CSRF) para receber eventos dos provedores</li>
+          <li>Checkout autenticado para upgrade PRO</li>
+          <li>Criptografia de api_key, secret_key e webhook_secret no banco</li>
+          <li>Modos sandbox e live por gateway</li>
+          <li>Registro de assinaturas e logs de pagamento</li>
+        </ul>
+      </section>
+      <section id="modelos">
+        <h2>Modelos / Entidades</h2>
+        <table class="doc-table">
+          <thead><tr><th>Model</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Gateway</td><td>Configuração do gateway (name, slug, api_key, secret_key, webhook_secret, mode, is_active). Chaves criptografadas via Attribute.</td></tr>
+            <tr><td>Subscription</td><td>Assinaturas ativas vinculadas ao usuário e gateway</td></tr>
+            <tr><td>PaymentLog</td><td>Registro de transações de pagamento</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="rotas">
+        <h2>Rotas</h2>
+        <table class="doc-table">
+          <thead><tr><th>Rota</th><th>Método</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><code>/webhooks/stripe</code></td><td>POST</td><td>Webhook do Stripe (excluído de CSRF)</td></tr>
+            <tr><td><code>/webhooks/mercadopago</code></td><td>GET/POST</td><td>Webhook do Mercado Pago (excluído de CSRF)</td></tr>
+            <tr><td><code>/checkout/{gateway}</code></td><td>GET</td><td>Inicia checkout (requer auth)</td></tr>
+          </tbody>
+        </table>
+        <div class="doc-callout doc-callout-warning">
+          <div class="doc-callout-title">Webhooks</div>
+          <p>As rotas de webhook devem ser configuradas no painel do Stripe e Mercado Pago apontando para a URL pública do seu domínio (ex: https://vertexcontas.com.br/webhooks/stripe).</p>
+        </div>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>PanelAdmin</strong> — GatewayConfigController: CRUD e toggle de gateways em Admin → Gateways</li>
+          <li><strong>PanelUser</strong> — SubscriptionController: exibe assinatura e fluxo de upgrade</li>
+          <li><strong>Core</strong> — SubscriptionLimitService verifica plano PRO para habilitar recursos</li>
+        </ul>
+      </section>
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>Configure os gateways em <strong>Admin → Gateways</strong>. Insira api_key, secret_key e webhook_secret para cada provedor. Habilite/desabilite com o toggle. Os dados sensíveis são criptografados no banco. Para webhooks, use a URL completa do seu domínio nas configurações do Stripe e Mercado Pago.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-homepage.html">Módulo HomePage</a></div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -584,6 +584,19 @@ class FinancialHealthService
             foreach ($expenses as $item) {
                 $this->createRecurringFromBaseline($user, $item, 'expense');
             }
+
+            // 4. Auto-create first account when user has 0 accounts (FREE flow)
+            if (Account::where('user_id', $user->id)->count() === 0) {
+                $limitService = app(SubscriptionLimitService::class);
+                if ($limitService->canCreate($user, 'account')) {
+                    Account::create([
+                        'user_id' => $user->id,
+                        'name' => 'Minha conta',
+                        'type' => 'checking',
+                        'balance' => 0,
+                    ]);
+                }
+            }
         });
     }
 

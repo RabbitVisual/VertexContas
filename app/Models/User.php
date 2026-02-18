@@ -143,7 +143,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Send the password reset notification using Vertex custom template.
+     * Send the password reset notification using Vertex dynamic template (sync for immediate delivery).
+     * Logs failures to email_logs and rethrows so Laravel can show the generic error.
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -152,7 +153,19 @@ class User extends Authenticatable
             'email' => $this->getEmailForPasswordReset(),
         ]));
 
-        \Illuminate\Support\Facades\Mail::to($this->email)
-            ->queue(new \App\Mail\ResetPasswordEmail($this->email, $url));
+        try {
+            \Illuminate\Support\Facades\Mail::to($this->email)
+                ->sendNow(new \App\Mail\ResetPasswordEmail($this, $url));
+        } catch (\Throwable $e) {
+            \Modules\Core\Models\EmailLog::create([
+                'user_id' => $this->id,
+                'recipient_email' => $this->email,
+                'template_key' => 'password_reset',
+                'status' => 'failed',
+                'error_details' => $e->getMessage(),
+                'sent_at' => null,
+            ]);
+            throw $e;
+        }
     }
 }

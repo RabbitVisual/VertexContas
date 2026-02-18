@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo PanelSuporte - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo PanelSuporte</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#controllers">Controllers</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#rotas">Rotas Principais</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-headset" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo PanelSuporte</h1>
+      <p>Central de atendimento. Acesso para roles <code>admin</code> e <code>support</code>.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O PanelSuporte é a área de trabalho dos agentes de suporte. Permite gerenciar tickets, atender via Chat VIP, solicitar e executar inspeção remota, consultar a Wiki interna e gerenciar usuários (quando o acesso de suporte foi concedido pelo titular). Todas as ações são registradas no SupportAuditLog.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Dashboard do agente</li>
+          <li>Tickets: listagem, mensagens, resposta, fechamento, solicitação de inspeção</li>
+          <li>Chat VIP: atendimento em tempo real, transferência entre agentes</li>
+          <li>Modo Inspeção: solicitar, entrar, encerrar — com InspectionGuard para privacidade</li>
+          <li>Wiki: artigos de conhecimento e referência legal</li>
+          <li>Gestão de usuários: visualizar, editar, reset de senha, logout forçado (quando acesso concedido)</li>
+          <li>Manual interno e relatórios</li>
+          <li>Perfil do agente</li>
+        </ul>
+      </section>
+      <section id="controllers">
+        <h2>Controllers</h2>
+        <table class="doc-table">
+          <thead><tr><th>Controller</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>SupportAgentController</td><td>Dashboard e tickets</td></tr>
+            <tr><td>VertexChatCommandCenterController</td><td>Chat VIP para suporte</td></tr>
+            <tr><td>InspectionController</td><td>Solicitação, entrada e saída da inspeção</td></tr>
+            <tr><td>WikiController</td><td>Artigos e sugestões</td></tr>
+            <tr><td>LegalReferenceController</td><td>Referência legal</td></tr>
+            <tr><td>UserManagementController</td><td>Gestão de usuários com acesso concedido</td></tr>
+            <tr><td>BlogManagerController</td><td>Gestão do blog (suporte)</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>Core</strong> — InspectionGuard, SupportAuditLog, Ticket, Inspection</li>
+          <li><strong>VertexChat</strong> — Conversas e mensagens em tempo real</li>
+          <li><strong>PanelUser</strong> — Usuário concede/revoga acesso de suporte; aceita/rejeita inspeção</li>
+        </ul>
+      </section>
+      <section id="rotas">
+        <h2>Rotas Principais</h2>
+        <p>Prefix <code>/support</code>. Rotas: <code>/support</code>, <code>/support/tickets</code>, <code>/support/chat</code>, <code>/support/wiki</code>, <code>/support/users/{user}</code>, <code>/support/inspection/{id}/enter</code>, <code>/support/inspection/{id}/stop</code>.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-paneluser.html">Módulo PanelUser</a></div>
+    </div>
+  </footer>
+</body>
+</html>

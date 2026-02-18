@@ -5,33 +5,15 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
+use Modules\Core\Mail\VertexDynamicMail;
 
-class WelcomeEmail extends Mailable implements ShouldQueue
+class WelcomeEmail extends VertexDynamicMail
 {
-    use Queueable, SerializesModels;
-
-    public function __construct(
-        public User $user
-    ) {}
-
-    public function envelope(): Envelope
+    public function __construct(User $user)
     {
-        return new Envelope(
-            subject: 'Bem-vindo ao Vertex Contas',
-            replyTo: [setting('mail_from_address', config('mail.from.address'))],
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.welcome',
-        );
+        parent::__construct('welcome_user', [
+            'name' => $user->name,
+            'app_url' => config('app.url'),
+        ], $user->email);
     }
 }

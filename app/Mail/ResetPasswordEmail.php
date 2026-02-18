@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use Modules\Core\Mail\VertexDynamicMail;
 
-class ResetPasswordEmail extends Mailable implements ShouldQueue
+/**
+ * Password reset e-mail. Sent synchronously (no queue) for immediate delivery.
+ * Uses Core VertexDynamicMail with key password_reset.
+ */
+class ResetPasswordEmail extends VertexDynamicMail
 {
-    use Queueable, SerializesModels;
-
-    public function __construct(
-        public string $email,
-        public string $resetUrl
-    ) {}
-
-    public function envelope(): Envelope
+    public function __construct(User $user, string $resetUrl)
     {
-        return new Envelope(
-            subject: 'Redefinir sua senha - Vertex Contas',
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.reset-password',
-        );
+        parent::__construct('password_reset', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'reset_link' => $resetUrl,
+            'app_url' => config('app.url'),
+        ], $user->email);
     }
 }

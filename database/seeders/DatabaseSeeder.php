@@ -26,10 +26,13 @@ class DatabaseSeeder extends Seeder
         // 4. Gateways (Stripe e Mercado Pago inativos; configurar em Admin > Gateways)
         $this->call(\Modules\Gateways\Database\Seeders\GatewaysDatabaseSeeder::class);
 
-        // 5. Blog (categorias e posts; dependem de BlogCategory e do admin)
+        // 5. Gamificação (insights do Vertex Bot, medalhas, regras de coaching)
+        $this->call(\Modules\Gamification\Database\Seeders\GamificationDatabaseSeeder::class);
+
+        // 6. Blog (categorias e posts; dependem de BlogCategory e do admin)
         $this->call(\Modules\Blog\Database\Seeders\BlogDatabaseSeeder::class);
 
-        // 6. Wiki (categorias primeiro, depois artigos que referenciam o admin)
+        // 7. Wiki (categorias primeiro, depois artigos que referenciam o admin)
         $this->call(WikiCategorySeeder::class);
         $this->call(WikiArticleSeeder::class);
     }

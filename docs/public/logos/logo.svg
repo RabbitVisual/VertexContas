@@ -1,0 +1,27 @@
+<svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon / Symbol (Left) -->
+  <g transform="translate(10, 15)">
+    <rect width="120" height="120" rx="30" fill="url(#g)"/>
+    <path d="M35 55 L60 90 L95 35" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="95" cy="35" r="7" fill="#60a5fa"/>
+  </g>
+
+  <!-- Vertical Separator (Optional, subtle) -->
+  <line x1="150" y1="25" x2="150" y2="125" stroke="#e2e8f0" stroke-width="2" />
+
+  <!-- Text Group (Right, Stacked) -->
+  <g font-family="'Poppins', sans-serif">
+    <!-- Vertex (Top) -->
+    <text x="170" y="75" font-weight="800" font-size="60" fill="#1e293b" letter-spacing="-1">Vertex</text>
+
+    <!-- Contas (Bottom) -->
+    <text x="170" y="120" font-weight="600" font-size="45" fill="#2563eb" letter-spacing="1">CONTAS</text>
+  </g>
+</svg>

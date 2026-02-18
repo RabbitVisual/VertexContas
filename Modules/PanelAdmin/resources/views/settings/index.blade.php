@@ -82,6 +82,12 @@
         </div>
     @endif
 
+    @if(session('warning'))
+        <div class="bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-xl" role="alert">
+            <span class="block sm:inline">{{ session('warning') }}</span>
+        </div>
+    @endif
+
     <!-- General Settings -->
     <div x-show="activeTab === 'general'" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
         <form action="{{ route('admin.settings.general') }}" method="POST">
@@ -596,20 +602,21 @@
                 </div>
 
                 <div class="col-span-1 md:col-span-2 flex flex-wrap gap-4 justify-between items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
-                    <form action="{{ route('admin.settings.mail.test') }}" method="POST" class="flex items-center gap-2">
-                        @csrf
-                        <input type="hidden" name="tab" value="mail">
-                        <input type="email" name="email" placeholder="E-mail para teste" required class="rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm py-2 px-3 focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] w-48">
-                        <button type="submit" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium text-sm transition-colors flex items-center gap-2">
-                            <x-icon name="envelope" style="solid" class="size-4" />
-                            Enviar E-mail de Teste
-                        </button>
-                    </form>
                     <button type="submit" class="bg-[#11C76F] hover:bg-[#0EA85A] text-white font-bold py-2 px-4 rounded-xl transition-colors flex items-center">
                         <x-icon name="save" style="solid" class="mr-2" /> Salvar Configurações de E-mail
                     </button>
                 </div>
             </div>
+        </form>
+        <form action="{{ route('admin.settings.mail.test') }}" method="POST" class="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+            @csrf
+            <input type="hidden" name="tab" value="mail">
+            <input type="email" name="email" placeholder="E-mail para teste" required class="rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm py-2 px-3 focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] w-48" value="{{ old('email', $mail->get('mail_from_address')) }}">
+            <button type="submit" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium text-sm transition-colors flex items-center gap-2">
+                <x-icon name="envelope" style="solid" class="size-4" />
+                Enviar E-mail de Teste
+            </button>
+            <p class="text-xs text-slate-500 dark:text-slate-400 self-center">Salve as configurações antes. Hostinger: porta 465 + SSL. Confira a pasta de spam.</p>
         </form>
     </div>
 

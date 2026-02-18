@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo Core - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo Core</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#modelos">Modelos</a></li>
+          <li><a href="#controllers">Controllers e Rotas</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+          <li><a href="#configuracoes">Configurações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-wallet" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo Core</h1>
+      <p>Núcleo financeiro do sistema: contas, transações, categorias, orçamentos, metas, relatórios, consultoria PDF e integração com IA (Gemini).</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O Core é o módulo central do Vertex Contas. Contém toda a lógica de gestão financeira: contas, transações, categorias 50/30/20, orçamentos, metas, Minha Renda, relatórios (fluxo de caixa, categorias, extrato), consultoria em PDF com IA, importação CSV assistida por IA, projeções e faturas. Inclui ainda o InspectionGuard para privacidade durante inspeção de suporte.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Contas bancárias e carteiras (CRUD)</li>
+          <li>Transações (receitas/despesas) com categorias e pilares 50/30/20</li>
+          <li>Transferências entre contas</li>
+          <li>Categorias com type_group (essential, lifestyle, financial)</li>
+          <li>Orçamentos por categoria</li>
+          <li>Metas financeiras com prazo</li>
+          <li>Minha Renda (fontes de receita recorrente)</li>
+          <li>Relatórios: fluxo de caixa, ranking de categorias, extrato, consultoria PDF (PRO)</li>
+          <li>Importação de extratos CSV com categorização assistida por IA (PRO)</li>
+          <li>Projeções financeiras interativas</li>
+          <li>Faturas PRO</li>
+          <li>InspectionGuard (mascaramento de dados financeiros durante inspeção)</li>
+          <li>Documentos legais (LegalDocument), Wiki, Settings</li>
+        </ul>
+      </section>
+      <section id="services">
+        <h2>Services Principais</h2>
+        <table class="doc-table">
+          <thead><tr><th>Service</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>ReportService</td><td>Relatórios, consultoria, 50/30/20, score financeiro</td></tr>
+            <tr><td>GeminiService</td><td>Integração Google Gemini: insights, conclusão PDF, projeção, categorização CSV</td></tr>
+            <tr><td>GamificationService</td><td>Insights do Vertex Bot, medalhas, conquistas</td></tr>
+            <tr><td>FinancialHealthService</td><td>Cálculo de saúde financeira e 50/30/20</td></tr>
+            <tr><td>InspectionGuard</td><td>Mascaramento de dados quando inspeção ativa e show_financial_data = false</td></tr>
+            <tr><td>TransferService</td><td>Transferências entre contas</td></tr>
+            <tr><td>SettingService</td><td>Configurações do sistema</td></tr>
+            <tr><td>SubscriptionLimitService</td><td>Verificação de limites do plano</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="modelos">
+        <h2>Modelos / Entidades</h2>
+        <table class="doc-table">
+          <thead><tr><th>Model</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>Account</td><td>Contas bancárias/carteiras</td></tr>
+            <tr><td>Transaction</td><td>Receitas e despesas</td></tr>
+            <tr><td>Category</td><td>Categorias (type_group: essential, lifestyle, financial)</td></tr>
+            <tr><td>Budget</td><td>Orçamentos por categoria</td></tr>
+            <tr><td>Goal</td><td>Metas financeiras</td></tr>
+            <tr><td>Inspection</td><td>Sessão de inspeção remota (suporte)</td></tr>
+            <tr><td>LegalDocument</td><td>Termos, privacidade, cookies</td></tr>
+            <tr><td>Setting</td><td>Configurações do sistema</td></tr>
+            <tr><td>AiConsultingReport</td><td>Histórico de consultorias geradas</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="controllers">
+        <h2>Controllers e Rotas Principais</h2>
+        <p>Prefixos: <code>/dashboard</code>, <code>/accounts</code>, <code>/transactions</code>, <code>/goals</code>, <code>/categories</code>, <code>/budgets</code>, <code>/minha-renda</code>, <code>/reports</code>, <code>/invoices</code>. Rotas de consultoria e extrato exigem middleware <code>pro</code>.</p>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>PanelUser</strong> — Interface do usuário para todas as operações financeiras</li>
+          <li><strong>Gamification</strong> — GamificationService usa dados do Core para insights e medalhas</li>
+          <li><strong>PanelSuporte</strong> — InspectionGuard mascara dados durante inspeção</li>
+          <li><strong>PanelAdmin</strong> — SettingsService, gestão de planos e limites</li>
+        </ul>
+      </section>
+      <section id="configuracoes">
+        <h2>Configurações</h2>
+        <p>O Core utiliza <code>SettingService</code> para configurações dinâmicas. Integração com Gemini via Admin → Configurações → IA ou variável <code>GEMINI_API_KEY</code> no <code>.env</code>.</p>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-gamification.html">Módulo Gamification</a></div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vertex Contas - Documentação Oficial</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand">
+      <img src="public/logos/logo.svg" alt="Vertex Contas">
+    </a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="dev.html">Vertex Solutions</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </nav>
+
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Navegação</li>
+          <li><a href="#apresentacao">Apresentação</a></li>
+          <li><a href="#503020">Regra 50/30/20</a></li>
+          <li><a href="#manuais">Manuais</a></li>
+          <li><a href="#modulos">Documentação dos Módulos</a></li>
+          <li><a href="#creditos">Créditos</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="doc-content">
+      <h1>Documentação Oficial Vertex Contas</h1>
+
+      <section id="apresentacao">
+        <h2>Apresentação</h2>
+        <p>O <strong>Vertex Contas</strong> é uma plataforma financeira modular de alta performance, desenvolvida com arquitetura moderna para escalabilidade e robustez. Permite o controle completo de receitas, despesas, contas, metas e orçamentos, com suporte à metodologia 50/30/20 e recursos avançados de inteligência artificial.</p>
+        <p>O sistema oferece planos <strong>Free</strong> e <strong>PRO</strong>. O plano PRO inclui consultoria financeira em PDF, Vertex Bot (mentor IA), relatórios avançados, importação de extratos com categorização assistida por IA e suporte VIP via chat em tempo real.</p>
+      </section>
+
+      <section id="503020">
+        <h2>A Regra 50/30/20</h2>
+        <p>A metodologia 50/30/20, popularizada por Elizabeth Warren, divide a renda líquida em três pilares fundamentais para uma vida financeira equilibrada:</p>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Pilar</th>
+              <th>Percentual</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Necessidades (Essenciais)</strong></td>
+              <td>50%</td>
+              <td>Aluguel, luz, internet, alimentação, saúde, transporte e demais gastos fixos essenciais.</td>
+            </tr>
+            <tr>
+              <td><strong>Desejos (Estilo de Vida)</strong></td>
+              <td>30%</td>
+              <td>Lazer, streamings, restaurantes, assinaturas e compras não essenciais.</td>
+            </tr>
+            <tr>
+              <td><strong>Investimentos e Poupança</strong></td>
+              <td>20%</td>
+              <td>Reserva de emergência, aportes em investimentos e metas financeiras.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="doc-callout doc-callout-note">
+          <div class="doc-callout-title"><i class="fa-solid fa-lightbulb"></i> No Vertex Contas</div>
+          <p>O sistema categoriza automaticamente suas transações nos pilares Essencial, Estilo de Vida e Financeiro, gerando relatórios e análises comparativas com as metas da regra 50/30/20. Assinantes PRO recebem consultoria mensal em PDF com conclusão estratégica gerada por IA.</p>
+        </div>
+      </section>
+
+      <section id="manuais">
+        <h2>Manuais de Uso</h2>
+        <p>Selecione o manual adequado ao seu perfil:</p>
+        <div class="doc-cards">
+          <a href="user.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-user"></i></div>
+            <h3>Manual do Usuário</h3>
+            <p>Transações, metas, consultoria PRO, Vertex Bot, conquistas e tickets de suporte.</p>
+          </a>
+          <a href="admin.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-gear"></i></div>
+            <h3>Manual do Administrador</h3>
+            <p>Configurações, planos, gateways, IA, medalhas e gestão do sistema.</p>
+          </a>
+          <a href="suporte.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-headset"></i></div>
+            <h3>Manual do Suporte</h3>
+            <p>Tickets, modo inspeção, Wiki, Chat VIP e auditoria.</p>
+          </a>
+          <a href="legal.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h3>Documentação Legal</h3>
+            <p>Termos de Uso, Privacidade (LGPD), Assinatura e Cookies.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="modulos">
+        <h2>Documentação dos Módulos</h2>
+        <p>Documentação técnica de cada módulo da arquitetura modular do Vertex Contas:</p>
+        <div class="doc-cards">
+          <a href="modulo-blog.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-newspaper"></i></div>
+            <h3>Blog</h3>
+            <p>Gestão de conteúdo, artigos, categorias e comentários.</p>
+          </a>
+          <a href="modulo-core.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-wallet"></i></div>
+            <h3>Core</h3>
+            <p>Núcleo financeiro: contas, transações, metas, relatórios e IA.</p>
+          </a>
+          <a href="modulo-gamification.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-medal"></i></div>
+            <h3>Gamification</h3>
+            <p>Medalhas, conquistas e insights do Vertex Bot.</p>
+          </a>
+          <a href="modulo-gateways.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-credit-card"></i></div>
+            <h3>Gateways</h3>
+            <p>Stripe, Mercado Pago, webhooks e checkout PRO.</p>
+          </a>
+          <a href="modulo-homepage.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-home"></i></div>
+            <h3>HomePage</h3>
+            <p>Landing, login, registro, planos e documentos legais.</p>
+          </a>
+          <a href="modulo-notifications.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-bell"></i></div>
+            <h3>Notifications</h3>
+            <p>Notificações in-app e centro de notificações.</p>
+          </a>
+          <a href="modulo-paneladmin.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3>PanelAdmin</h3>
+            <p>Painel administrativo completo.</p>
+          </a>
+          <a href="modulo-panelsuporte.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-headset"></i></div>
+            <h3>PanelSuporte</h3>
+            <p>Central de atendimento.</p>
+          </a>
+          <a href="modulo-paneluser.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-user"></i></div>
+            <h3>PanelUser</h3>
+            <p>Painel do cliente.</p>
+          </a>
+          <a href="modulo-vertexchat.html" class="doc-card">
+            <div class="doc-card-icon"><i class="fa-solid fa-comments"></i></div>
+            <h3>VertexChat</h3>
+            <p>Chat VIP em tempo real para PRO.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="creditos">
+        <h2>Créditos</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; margin-top: 1rem;">
+          <div>
+            <a href="dev.html"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions" width="200" style="margin-bottom: 1rem;"></a>
+            <p><strong><a href="dev.html">Vertex Solutions LTDA</a></strong> — Desenvolvimento e manutenção do Vertex Contas.</p>
+          </div>
+          <div>
+            <img src="public/business/ReinanRodrigues.png" alt="Reinan Rodrigues" width="120" style="border-radius: 12px; border: 2px solid #4f46e5; object-fit: cover; margin-bottom: 0.5rem;">
+            <p><strong>Reinan Rodrigues</strong><br>CEO / Lead Architect</p>
+          </div>
+        </div>
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--doc-slate-500);">© 2026 Vertex Solutions LTDA • Todos os direitos reservados.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo">
+        <img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions">
+      </div>
+      <div class="doc-footer-credits">
+        Documentação oficial do Vertex Contas. Hosted at doc.vertexcontas.com.br
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

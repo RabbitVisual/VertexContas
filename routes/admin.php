@@ -16,6 +16,8 @@ use Modules\PanelAdmin\Http\Controllers\LegalManagerController;
 use Modules\PanelAdmin\Http\Controllers\MedalAdminController;
 use Modules\PanelAdmin\Http\Controllers\CoachingRuleAdminController;
 use Modules\PanelAdmin\Http\Controllers\SettingsController;
+use Modules\PanelAdmin\Http\Controllers\EmailTemplateController;
+use Modules\PanelAdmin\Http\Controllers\EmailLogController;
 use Modules\PanelAdmin\Http\Controllers\AdminVertexChatController;
 use Modules\PanelSuporte\Http\Controllers\InspectionController;
 
@@ -56,6 +58,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/settings/homepage', [SettingsController::class, 'updateHomepage'])->name('settings.homepage');
     Route::post('/settings/gemini', [SettingsController::class, 'updateGemini'])->name('settings.gemini');
 
+    // Mail Central
+    Route::prefix('mail')->name('mail.')->group(function () {
+        Route::get('/templates', [EmailTemplateController::class, 'index'])->name('templates.index');
+        Route::get('/templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('templates.edit');
+        Route::put('/templates/{template}', [EmailTemplateController::class, 'update'])->name('templates.update');
+        Route::get('/logs', [EmailLogController::class, 'index'])->name('logs.index');
+        Route::get('/logs/{log}/body', [EmailLogController::class, 'showBody'])->name('logs.body');
+        Route::post('/logs/{log}/resend', [EmailLogController::class, 'resend'])->name('logs.resend');
+    });
+
     // Notifications Center
     Route::get('/notifications', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/create', [\Modules\Notifications\Http\Controllers\AdminNotificationController::class, 'create'])->name('notifications.create');
@@ -82,7 +94,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/plan', [\Modules\PanelAdmin\Http\Controllers\PlanPageSettingsController::class, 'update'])->name('plan.update');
 
     // User Management
-    Route::resource('users', AdminUserController::class);
+    Route::get('/users/view/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}', [AdminUserController::class, 'show']); // GET /admin/users/3 (compatibilidade)
+    Route::post('/users/{user}', [AdminUserController::class, 'update'])->name('users.update-role'); // POST para formulário "Gerenciar função"
+    Route::resource('users', AdminUserController::class)->except(['show']);
     Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
     Route::post('/users/{user}/activate', [AdminUserController::class, 'activate'])->name('users.activate');
 

@@ -74,10 +74,11 @@ class MercadoPagoDriver implements PaymentGatewayInterface
 
     /**
      * Verify webhook signature.
+     * @see https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks#validar-origem-da-notificacao
+     * Template oficial: id:[data.id];request-id:[x-request-id];ts:[ts];
      */
     public function verifyWebhook(Request $request): bool
     {
-        // Mercado Pago signature verification logic
         $xSignature = $request->header('x-signature');
         $xRequestId = $request->header('x-request-id');
 
@@ -85,18 +86,31 @@ class MercadoPagoDriver implements PaymentGatewayInterface
             return false;
         }
 
-        // Split signature
+        $webhookSecret = $this->gateway->webhook_secret;
+        if (! $webhookSecret || trim((string) $webhookSecret) === '') {
+            return false;
+        }
+
+        // data.id: do body (POST JSON) ou query string; doc: se alfanumérico, usar minúsculas
+        $dataId = $request->input('data.id') ?? $request->query('data.id') ?? $request->input('id') ?? '';
+        $dataId = is_string($dataId) ? $dataId : (string) $dataId;
+        if (ctype_alnum($dataId)) {
+            $dataId = strtolower($dataId);
+        }
+
         $parts = explode(',', $xSignature);
         $ts = null;
         $hash = null;
 
         foreach ($parts as $part) {
-            $keyValue = explode('=', $part);
-            if (count($keyValue) == 2) {
-                if (trim($keyValue[0]) === 'ts') {
-                    $ts = trim($keyValue[1]);
-                } elseif (trim($keyValue[0]) === 'v1') {
-                    $hash = trim($keyValue[1]);
+            $keyValue = explode('=', $part, 2);
+            if (count($keyValue) === 2) {
+                $key = trim($keyValue[0]);
+                $value = trim($keyValue[1]);
+                if ($key === 'ts') {
+                    $ts = $value;
+                } elseif ($key === 'v1') {
+                    $hash = $value;
                 }
             }
         }
@@ -105,8 +119,9 @@ class MercadoPagoDriver implements PaymentGatewayInterface
             return false;
         }
 
-        $manifest = "id:$xRequestId;request-timestamp:$ts;requestId:$xRequestId;signed_header_list:;signed_header_value:";
-        $hmac = hash_hmac('sha256', $manifest, $this->gateway->webhook_secret);
+        // Formato oficial Mercado Pago
+        $manifest = "id:{$dataId};request-id:{$xRequestId};ts:{$ts};";
+        $hmac = hash_hmac('sha256', $manifest, $webhookSecret);
 
         return hash_equals($hmac, $hash);
     }

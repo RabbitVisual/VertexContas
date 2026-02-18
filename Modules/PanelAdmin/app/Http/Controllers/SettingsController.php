@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SupportAuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Modules\Core\Services\SettingService;
 use Modules\Core\Services\TourService;
 
@@ -139,31 +141,70 @@ class SettingsController extends Controller
             'email' => 'required|email',
         ]);
 
+        $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
+        $mailer = $this->settingService->get('mail_mailer', 'smtp');
+
+        if ($mailer === 'log') {
+            return redirect()->route('admin.settings.index', ['tab' => $tab])
+                ->with('warning', 'Driver atual é "Log": a mensagem foi registrada no log, mas nenhum e-mail real é enviado. Altere o driver para SMTP e salve as configurações para enviar para a caixa de entrada.');
+        }
+
+        if ($mailer === 'smtp') {
+            $host = $this->settingService->get('mail_host');
+            $fromAddress = $this->settingService->get('mail_from_address');
+            if (empty($host) || empty($fromAddress)) {
+                return redirect()->route('admin.settings.index', ['tab' => $tab])
+                    ->with('error', 'Salve as configurações de e-mail (Host SMTP e E-mail Remetente) antes de enviar o teste.');
+            }
+        }
+
         try {
-            // Force config for this request
+            $encryption = $this->settingService->get('mail_encryption');
+            if ($encryption === 'null' || $encryption === '') {
+                $encryption = null;
+            }
+
+            $smtpPassword = $this->settingService->get('mail_password');
+            if ($mailer === 'smtp' && empty($smtpPassword)) {
+                return redirect()->route('admin.settings.index', ['tab' => $tab])
+                    ->with('error', 'A senha SMTP não está salva. Informe a senha no campo "Senha SMTP" e clique em "Salvar Configurações de E-mail" antes de enviar o teste.');
+            }
+
             config([
-                'mail.default' => $this->settingService->get('mail_mailer', 'smtp'),
+                'mail.default' => $mailer,
                 'mail.mailers.smtp.host' => $this->settingService->get('mail_host'),
-                'mail.mailers.smtp.port' => $this->settingService->get('mail_port'),
+                'mail.mailers.smtp.port' => (int) $this->settingService->get('mail_port', 587),
                 'mail.mailers.smtp.username' => $this->settingService->get('mail_username'),
-                'mail.mailers.smtp.password' => $this->settingService->get('mail_password'),
-                'mail.mailers.smtp.encryption' => $this->settingService->get('mail_encryption'),
+                'mail.mailers.smtp.password' => $smtpPassword,
+                'mail.mailers.smtp.encryption' => $encryption,
+                'mail.mailers.smtp.timeout' => 15,
                 'mail.from.address' => $this->settingService->get('mail_from_address'),
-                'mail.from.name' => $this->settingService->get('mail_from_name'),
+                'mail.from.name' => $this->settingService->get('mail_from_name') ?: 'Vertex Contas',
             ]);
 
-            \Illuminate\Support\Facades\Mail::raw('Este é um e-mail de teste do VertexContas.', function ($message) use ($request) {
+            Mail::purge($mailer);
+
+            Mail::raw('Este é um e-mail de teste do Vertex Contas. Se você recebeu esta mensagem, a configuração SMTP está correta.', function ($message) use ($request) {
                 $message->to($request->email)
-                    ->subject('Teste de Configuração SMTP');
+                    ->subject('Teste de Configuração SMTP - Vertex Contas');
             });
 
-            $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
-
-            return redirect()->route('admin.settings.index', ['tab' => $tab])->with('success', 'E-mail de teste enviado com sucesso para '.$request->email);
-        } catch (\Exception $e) {
-            $tab = in_array($request->get('tab'), self::ALLOWED_TABS, true) ? $request->get('tab') : 'mail';
-
-            return redirect()->route('admin.settings.index', ['tab' => $tab])->with('error', 'Erro ao enviar e-mail: '.$e->getMessage());
+            return redirect()->route('admin.settings.index', ['tab' => $tab])
+                ->with('success', 'E-mail de teste enviado com sucesso para '.$request->email.'. Verifique a caixa de entrada e a pasta de spam.');
+        } catch (\Throwable $e) {
+            Log::error('Admin test mail failed', [
+                'to' => $request->email,
+                'mailer' => $mailer,
+                'host' => $mailer === 'smtp' ? $this->settingService->get('mail_host') : null,
+                'message' => $e->getMessage(),
+                'exception' => (string) $e,
+            ]);
+            $userMessage = $e->getMessage();
+            if (str_contains($userMessage, 'Connection timed out') || str_contains($userMessage, 'stream_socket_client')) {
+                $userMessage = 'Não foi possível conectar ao servidor SMTP. Verifique Host, Porta (465 para SSL), firewall do servidor e se a Hostinger permite SMTP. Detalhe: '.$userMessage;
+            }
+            return redirect()->route('admin.settings.index', ['tab' => $tab])
+                ->with('error', 'Erro ao enviar e-mail: '.$userMessage);
         }
     }
 

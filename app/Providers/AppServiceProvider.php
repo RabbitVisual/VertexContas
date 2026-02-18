@@ -6,7 +6,9 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
@@ -32,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::bind('conversation', fn (string $value) => Conversation::findOrFail($value));
+
+        Event::listen(MessageSent::class, \App\Listeners\LogEmailSentListener::class);
 
         Password::defaults(function () {
             $minChars = (int) setting('security_password_min_chars', 8);

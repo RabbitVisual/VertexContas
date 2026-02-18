@@ -150,14 +150,20 @@ class CoreServiceProvider extends ServiceProvider
             date_default_timezone_set($timezone);
             \Carbon\Carbon::setLocale($locale);
 
-            // Override mail configs
+            // Override mail configs (Admin > Configurações > E-mail). Encryption "null" = none.
+            // All app emails use this config: WelcomeEmail, ResetPasswordEmail, ProSubscriptionConfirmation,
+            // test mail (Settings), and Logs re-send. Queue workers load the same config on boot.
+            $mailEncryption = $settings->get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
+            if ($mailEncryption === 'null' || $mailEncryption === '') {
+                $mailEncryption = null;
+            }
             config([
                 'mail.default' => $settings->get('mail_mailer', env('MAIL_MAILER', 'log')),
                 'mail.mailers.smtp.host' => $settings->get('mail_host', env('MAIL_HOST', '127.0.0.1')),
-                'mail.mailers.smtp.port' => $settings->get('mail_port', env('MAIL_PORT', 2525)),
+                'mail.mailers.smtp.port' => (int) $settings->get('mail_port', env('MAIL_PORT', 587)),
                 'mail.mailers.smtp.username' => $settings->get('mail_username', env('MAIL_USERNAME')),
                 'mail.mailers.smtp.password' => $settings->get('mail_password', env('MAIL_PASSWORD')),
-                'mail.mailers.smtp.encryption' => $settings->get('mail_encryption', env('MAIL_ENCRYPTION', 'tls')),
+                'mail.mailers.smtp.encryption' => $mailEncryption,
                 'mail.from.address' => $settings->get('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
                 'mail.from.name' => $settings->get('mail_from_name', env('MAIL_FROM_NAME', env('APP_NAME', 'Vertex Contas'))),
             ]);

@@ -25,16 +25,23 @@
                         <td align="center" style="padding: 32px 24px 24px;">
                             <a href="{{ config('app.url') }}" target="_blank" rel="noopener">
                                 @php
-                                    $logoUrl = branding_logo_url('default');
-                                    $logoFallback = url('/images/placeholder-vertex.svg');
+                                    $baseUrl = rtrim(config('app.url'), '/');
+                                    $logoSrc = branding_logo_base64('default');
+                                    if ($logoSrc === '') {
+                                        $logoSrc = branding_logo_url('default');
+                                        if (!str_starts_with($logoSrc, 'http')) {
+                                            $logoSrc = $baseUrl . (str_starts_with($logoSrc, '/') ? $logoSrc : '/' . ltrim($logoSrc, '/'));
+                                        }
+                                    }
+                                    $logoFallback = $baseUrl . '/images/placeholder-vertex.svg';
                                 @endphp
-                                <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" width="160" height="48" style="display: block; max-width: 160px; height: auto;" onerror="this.onerror=null;this.src='{{ $logoFallback }}';" />
+                                <img src="{{ $logoSrc }}" alt="{{ config('app.name') }}" width="160" height="48" style="display: block; max-width: 160px; height: auto;" onerror="this.onerror=null;this.src='{{ $logoFallback }}';" />
                             </a>
                         </td>
                     </tr>
-                    {{-- Content --}}
+                    {{-- Content (max-width 600px container for editable body) --}}
                     <tr>
-                        <td style="padding: 0 32px 24px; color: #374151; font-size: 16px; line-height: 1.6;">
+                        <td style="padding: 0 32px 24px; color: #374151; font-size: 16px; line-height: 1.6; max-width: 600px;">
                             @yield('content')
                         </td>
                     </tr>

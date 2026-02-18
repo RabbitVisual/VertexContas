@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentação Legal - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand">
+      <img src="public/logos/logo.svg" alt="Vertex Contas">
+    </a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </nav>
+
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Documentação Legal</li>
+          <li><a href="#termos-uso">Termos de Uso</a></li>
+          <li><a href="#privacidade">Política de Privacidade (LGPD)</a></li>
+          <li><a href="#termos-assinatura">Termos de Assinatura</a></li>
+          <li><a href="#cookies">Política de Cookies</a></li>
+          <li><a href="#compliance">Compliance</a></li>
+          <li><a href="#stack">Stack Técnica</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="doc-content">
+      <h1>Documentação Legal e Compliance</h1>
+      <p>Este documento apresenta um sumário dos termos legais e aspectos de compliance do Vertex Contas. Os textos completos e atualizados ficam disponíveis na plataforma oficial, em conformidade com o CDC, LGPD e Marco Civil da Internet.</p>
+
+      <section id="termos-uso">
+        <h2>Termos de Uso</h2>
+        <p>Regem o acesso e utilização do Vertex Contas, operado pela <strong>Vertex Solutions LTDA</strong>. O usuário declara aceitar os Termos e a Política de Privacidade ao utilizar a plataforma. Incluem:</p>
+        <ul>
+          <li>Objeto e aceite do serviço</li>
+          <li>Funcionalidades do sistema (Free e PRO)</li>
+          <li>Uso de inteligência artificial (IA) e responsabilidades</li>
+          <li>Cadastro e responsabilidade do usuário</li>
+          <li>Propriedade intelectual</li>
+          <li>Limitação de responsabilidade</li>
+          <li>Indisponibilidade e manutenção</li>
+          <li>Alterações dos Termos</li>
+          <li>Vigência e rescisão</li>
+          <li>Lei aplicável e foro (Brasil)</li>
+        </ul>
+        <p>Consulte o documento completo no painel da plataforma ou na página de termos oficiais.</p>
+      </section>
+
+      <section id="privacidade">
+        <h2>Política de Privacidade (LGPD)</h2>
+        <p>A Vertex Solutions LTDA trata os dados pessoais em conformidade com a Lei nº 13.709/2018 (LGPD). Principais pontos:</p>
+        <ul>
+          <li><strong>Controlador:</strong> Vertex Solutions LTDA</li>
+          <li><strong>Dados coletados:</strong> cadastro (nome, e-mail, CPF, telefone), uso da plataforma (transações, contas, metas), assinatura e pagamento (via gateways), dados técnicos (IP, sessão, logs)</li>
+          <li><strong>Finalidades:</strong> prestação do serviço, assinatura e cobrança, relatórios e consultoria com IA, suporte (incluindo inspeção remota quando autorizada), segurança e cumprimento legal</li>
+          <li><strong>Base legal:</strong> execução de contrato, cumprimento legal, legítimo interesse, consentimento</li>
+          <li><strong>Direitos do titular:</strong> acesso, correção, eliminação, portabilidade, revogação de consentimento — via canais indicados no site</li>
+        </ul>
+      </section>
+
+      <section id="termos-assinatura">
+        <h2>Termos de Assinatura</h2>
+        <p>Regulam o plano PRO e recursos adicionais: consultoria com IA, relatórios avançados, Chat VIP, importação de extratos, entre outros. Limites e funcionalidades podem ser alterados com aviso prévio, sem prejuízo do período já pago.</p>
+      </section>
+
+      <section id="cookies">
+        <h2>Política de Cookies</h2>
+        <p>Descreve o uso de cookies essenciais e não essenciais, com registro de consentimento em banco de dados para auditoria e conformidade à LGPD. Validade padrão de 90 dias quando aplicável.</p>
+      </section>
+
+      <section id="compliance">
+        <h2>Compliance e Segurança</h2>
+        <ul>
+          <li><strong>Criptografia:</strong> Dados sensíveis são protegidos em trânsito e em repouso conforme melhores práticas.</li>
+          <li><strong>Audit Log:</strong> O SupportAuditLog registra ações dos agentes de suporte para rastreabilidade e auditoria.</li>
+          <li><strong>InspectionGuard:</strong> Garante que dados financeiros não sejam expostos ao suporte quando o usuário opta por privacidade durante inspeção.</li>
+          <li><strong>Máscaras LGPD:</strong> Helpers <code>lgpd_mask_cpf</code>, <code>lgpd_mask_phone</code> etc. protegem dados em contextos de terceiros.</li>
+        </ul>
+      </section>
+
+      <section id="stack">
+        <h2>Stack Técnica</h2>
+        <p>Referência da arquitetura documentada para fins técnicos e de integração:</p>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Camada</th>
+              <th>Tecnologia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Backend</td><td>Laravel 12.x, PHP 8.2+</td></tr>
+            <tr><td>Frontend</td><td>Blade, Tailwind v4.1, Alpine.js, Vite 7</td></tr>
+            <tr><td>Banco de dados</td><td>SQLite (dev), MySQL 8 (prod)</td></tr>
+            <tr><td>IA</td><td>Google Gemini API</td></tr>
+            <tr><td>Realtime</td><td>Pusher (Chat VIP)</td></tr>
+            <tr><td>Controle de acesso</td><td>Spatie Permissions (admin, suporte, user)</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo">
+        <img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions">
+      </div>
+      <div class="doc-footer-credits">
+        <a href="index.html">Voltar ao início</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

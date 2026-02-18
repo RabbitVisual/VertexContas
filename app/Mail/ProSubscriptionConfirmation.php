@@ -5,32 +5,15 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
+use Modules\Core\Mail\VertexDynamicMail;
 
-class ProSubscriptionConfirmation extends Mailable implements ShouldQueue
+class ProSubscriptionConfirmation extends VertexDynamicMail
 {
-    use Queueable, SerializesModels;
-
-    public function __construct(
-        public User $user
-    ) {}
-
-    public function envelope(): Envelope
+    public function __construct(User $user)
     {
-        return new Envelope(
-            subject: 'Parabéns! Você agora é VIP - ' . plan_pro_name(),
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.pro-subscription-confirmation',
-        );
+        parent::__construct('pro_activated', [
+            'name' => $user->name,
+            'app_url' => config('app.url'),
+        ], $user->email);
     }
 }

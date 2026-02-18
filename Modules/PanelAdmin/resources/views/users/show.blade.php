@@ -97,7 +97,7 @@
 
                 <x-paneladmin::card title="Gerenciar função" subtitle="Altere o papel do usuário no sistema.">
                     <div class="p-6">
-                        <form action="{{ route('admin.users.update', $user) }}" method="POST">
+                        <form action="{{ route('admin.users.update-role', $user) }}" method="POST">
                             @csrf
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Função</label>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo Notifications - Vertex Contas</title>
+  <link rel="icon" type="image/svg+xml" href="public/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/doc.css">
+</head>
+<body>
+  <nav class="doc-navbar">
+    <a href="index.html" class="doc-navbar-brand"><img src="public/logos/logo.svg" alt="Vertex Contas"></a>
+    <div class="doc-navbar-links">
+      <a href="index.html">Início</a>
+      <a href="user.html">Usuário</a>
+      <a href="admin.html">Administrador</a>
+      <a href="suporte.html">Suporte</a>
+      <a href="legal.html">Legal</a>
+    </div>
+    <button class="doc-navbar-toggle" type="button" aria-label="Abrir menu" onclick="document.querySelector('.doc-sidebar').classList.toggle('open'); document.querySelector('.doc-overlay').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+  <div class="doc-overlay" onclick="document.querySelector('.doc-sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav>
+        <ul class="doc-sidebar-nav">
+          <li class="doc-nav-section">Módulo Notifications</li>
+          <li><a href="#proposito">Propósito</a></li>
+          <li><a href="#recursos">Principais Recursos</a></li>
+          <li><a href="#controllers">Controllers</a></li>
+          <li><a href="#integracoes">Integrações</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="doc-content">
+      <h1><i class="fa-solid fa-bell" style="color: var(--doc-primary); margin-right: 0.5rem;"></i> Módulo Notifications</h1>
+      <p>Notificações in-app e canais centralizados. Polling para unread, marcação de leitura e envio em massa pelo Admin.</p>
+      <section id="proposito">
+        <h2>Propósito</h2>
+        <p>O módulo Notifications centraliza o sistema de notificações da aplicação. Utiliza o Laravel Notification com canal Database para armazenar notificações. Oferece API para buscar não lidas, marcar como lidas e, no painel Admin, envio em massa para usuários.</p>
+      </section>
+      <section id="recursos">
+        <h2>Principais Recursos</h2>
+        <ul>
+          <li>Notificações in-app via canal Database</li>
+          <li>Endpoint de fetch de não lidas (AJAX/JSON) — últimas 5 com contagem</li>
+          <li>Marcação de notificação individual como lida</li>
+          <li>Centro de notificações no Admin com envio em massa</li>
+          <li>Dados estruturados: title, message, type, icon, color, action_url</li>
+        </ul>
+      </section>
+      <section id="controllers">
+        <h2>Controllers</h2>
+        <table class="doc-table">
+          <thead><tr><th>Controller</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td>NotificationController</td><td>fetchUnread, markAsRead — usado por polling no layout</td></tr>
+            <tr><td>AdminNotificationController</td><td>CRUD de notificações, envio em massa, busca de usuário (admin/notifications)</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section id="integracoes">
+        <h2>Integrações</h2>
+        <ul>
+          <li><strong>Todos os módulos</strong> — Qualquer módulo pode disparar notificações via <code>$user->notify(new AlgumaNotificacao($data))</code></li>
+          <li><strong>PanelUser, PanelAdmin, PanelSuporte</strong> — Exibem sino de notificações e redirecionam conforme role</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <footer class="doc-footer">
+    <div class="doc-footer-grid">
+      <div class="doc-footer-logo"><img src="public/business/vertex_logo_responsive.svg" alt="Vertex Solutions"></div>
+      <div class="doc-footer-credits"><a href="index.html">Voltar ao início</a> | <a href="modulo-paneladmin.html">Módulo PanelAdmin</a></div>
+    </div>
+  </footer>
+</body>
+</html>
