@@ -21,6 +21,7 @@
 /storage/pail
 /vendor
 Homestead.json
+vertex-contas-producao*.zip
 Homestead.yaml
 Thumbs.db
 Modules/PanelUser/node_modules
