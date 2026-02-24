@@ -56,13 +56,17 @@
 
                 <div>
                     <label for="type" class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Tipo *</label>
-                    <select name="type" id="type" required
-                            class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-3 focus:border-emerald-500 outline-none transition-colors @error('type') border-red-500 @enderror">
-                        <option value="">Selecione</option>
-                        <option value="checking" {{ old('type') === 'checking' ? 'selected' : '' }}>Conta corrente</option>
-                        <option value="savings" {{ old('type') === 'savings' ? 'selected' : '' }}>Poupança</option>
-                        <option value="cash" {{ old('type') === 'cash' ? 'selected' : '' }}>Dinheiro em espécie</option>
-                    </select>
+                    <div class="relative">
+                        <select name="type" id="type" required
+                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;"
+                                class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-3 pr-10 focus:border-emerald-500 outline-none transition-colors appearance-none [&::-ms-expand]:hidden @error('type') border-red-500 @enderror">
+                            <option value="">Selecione</option>
+                            <option value="checking" {{ old('type') === 'checking' ? 'selected' : '' }}>Conta corrente</option>
+                            <option value="savings" {{ old('type') === 'savings' ? 'selected' : '' }}>Poupança</option>
+                            <option value="cash" {{ old('type') === 'cash' ? 'selected' : '' }}>Dinheiro em espécie</option>
+                        </select>
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                    </div>
                     @error('type')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"><x-icon name="circle-exclamation" style="solid" class="w-4 h-4" /> {{ $message }}</p>
                     @enderror

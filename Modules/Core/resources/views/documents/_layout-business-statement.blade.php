@@ -2,6 +2,7 @@
     Vertex Business Statement (A4 Optimized) - Layout oficial do relatório de consultoria.
     Estrutura 100% em <table> HTML com table-layout: fixed para PDF estável (DomPDF/Hostinger).
     Todo o CSS está embutido em <style>; logo em Base64 para evitar falhas de SSL/path.
+    Na tela: layout responsivo com container legível; no PDF: A4 portrait.
 --}}
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -20,6 +21,8 @@
         @media print {
             body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .no-print { display: none !important; }
+            .doc-screen-only { display: none !important; }
+            .doc-viewport { max-width: none !important; padding: 0 !important; box-shadow: none !important; }
         }
 
         body {
@@ -30,6 +33,27 @@
             padding: 0;
             line-height: 1.5;
             width: 100%;
+            background-color: #f1f5f9;
+        }
+        body.doc-pdf {
+            background-color: #fff !important;
+        }
+
+        .doc-viewport {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        @media (min-width: 768px) {
+            .doc-viewport {
+                padding: 32px 24px 64px;
+                box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+                margin-top: 24px;
+                margin-bottom: 24px;
+            }
         }
 
         .page-wrapper {
@@ -42,6 +66,18 @@
         .content-cell {
             width: 100%;
             padding: 0;
+        }
+
+        .table-scroll-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-left: -12px;
+            margin-right: -12px;
+            padding: 0 12px;
+        }
+        .table-scroll-wrap .bs-table-pillar { min-width: 560px; }
+        @media (min-width: 640px) {
+            .table-scroll-wrap { margin-left: 0; margin-right: 0; padding: 0; }
         }
 
         .layout-table {
@@ -189,15 +225,16 @@
         }
     </style>
 </head>
-<body>
+<body @if(!empty($forPdf)) class="doc-pdf" @endif>
     @if(empty($forPdf))
         @hasSection('docActions')
-        <div class="no-print doc-actions">
+        <div class="no-print doc-screen-only doc-actions">
             @yield('docActions')
         </div>
         @endif
     @endif
 
+    @if(empty($forPdf))<div class="doc-viewport">@endif
     <table class="page-wrapper layout-table" role="presentation">
         <tr>
             <td class="content-cell">
@@ -254,5 +291,6 @@
             </td>
         </tr>
     </table>
+    @if(empty($forPdf))</div>@endif
 </body>
 </html>

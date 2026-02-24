@@ -8,5 +8,6 @@
     "Gateways": true,
     "Notifications": true,
     "Gamification": true,
-    "VertexChat": true
+    "VertexChat": true,
+    "PWA": true
 }

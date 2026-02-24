@@ -325,19 +325,24 @@ class GamificationService
         $actualIncome = (float) $summary['income'];
         $actualExpense = (float) $summary['expense'];
 
+        // Dados insuficientes: sem transações no mês (e sem renda planejada) → score 0 ("Em análise")
+        if ($actualIncome + $actualExpense == 0 && $income == 0) {
+            return 0;
+        }
+
         // 1. Savings rate score (0–35)
         $savingsRate = $actualIncome > 0 ? (($actualIncome - $actualExpense) / $actualIncome) * 100 : 0;
         $savingsScore = min(35, max(0, ($savingsRate / 100) * 35));
 
-        // 2. Budget adherence (0–25)
+        // 2. Budget adherence (0–25): sem orçamentos = 0 (não premiar ausência de dado)
         $budgets = Budget::where('user_id', $user->id)->get();
         $budgetScore = $budgets->isEmpty()
-            ? 25.0
+            ? 0.0
             : (float) $budgets->avg(fn (Budget $b) => max(0, 25 - ($b->usage_percentage / 100) * 25));
 
-        // 3. Reserve ratio (0–25): 6 months of reserve = 100%
-        $reserveMonths = $expense > 0 ? $balance / $expense : 6.0;
-        $reserveScore = min(25.0, ($reserveMonths / 6) * 25);
+        // 3. Reserve ratio (0–25): 6 months of reserve = 100%. Sem despesa = indefinido → 0
+        $reserveMonths = $expense > 0 ? $balance / $expense : 0.0;
+        $reserveScore = $expense > 0 ? min(25.0, ($reserveMonths / 6) * 25) : 0.0;
 
         // 4. Consistency (0–15): unique days with transactions in last 30 days
         $daysWithTx = (int) Transaction::where('user_id', $user->id)

@@ -17,6 +17,7 @@ class RecurringTransaction extends Model
         'user_id',
         'category_id',
         'account_id',
+        'goal_id',
         'type',
         'amount',
         'frequency',
@@ -62,6 +63,14 @@ class RecurringTransaction extends Model
     }
 
     /**
+     * Get the goal this recurring contribution is for.
+     */
+    public function goal(): BelongsTo
+    {
+        return $this->belongsTo(Goal::class);
+    }
+
+    /**
      * Check if this recurring transaction should be processed.
      */
     public function shouldProcess(): bool
@@ -79,14 +88,19 @@ class RecurringTransaction extends Model
             throw new \InvalidArgumentException('RecurringTransaction cannot be processed without account_id and category_id (baseline-only record).');
         }
 
+        $description = $this->goal_id
+            ? ($this->description ?? 'Contribuição automática')
+            : $this->description . ' (Recorrente)';
+
         $transaction = Transaction::create([
             'user_id' => $this->user_id,
             'account_id' => $this->account_id,
             'category_id' => $this->category_id,
+            'goal_id' => $this->goal_id,
             'type' => $this->type,
             'amount' => $this->amount,
             'date' => now(),
-            'description' => $this->description . ' (Recorrente)',
+            'description' => $description,
             'status' => 'completed',
         ]);
 

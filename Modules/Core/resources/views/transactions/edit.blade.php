@@ -1,8 +1,10 @@
 @php
     $isPro = auth()->user()?->isPro() ?? false;
     $planningByCategory = $recurringTransactions->groupBy('category_id')->map(fn($g) => (float) $g->sum('amount'))->toArray();
+    $categoryIdsWithBudget = $categoryIdsWithBudget ?? [];
 @endphp
 <script type="application/json" id="planning-data-edit">@json($planningByCategory)</script>
+<script type="application/json" id="budgets-data-edit">@json($budgetsByCategory ?? [])</script>
 
 <x-paneluser::layouts.master :title="'Editar Transação'">
 <div class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -11,9 +13,12 @@
          amount: '{{ format_number($transaction->amount, 2) }}',
          categoryId: '{{ $transaction->category_id }}',
          planning: {},
+         budgetsByCategory: {},
          init() {
              var el = document.getElementById('planning-data-edit');
              if (el) this.planning = JSON.parse(el.textContent || '{}');
+             var bel = document.getElementById('budgets-data-edit');
+             if (bel) this.budgetsByCategory = JSON.parse(bel.textContent || '{}');
          },
          formatCurrency() {
              var value = String(this.amount || '').replace(/\D/g, '');
@@ -26,6 +31,15 @@
                  return 'Valor planejado para esta categoria: R$ ' + parseFloat(this.planning[this.categoryId]).toLocaleString('pt-BR', {minimumFractionDigits: 2});
              }
              return null;
+         },
+         budgetInfo() {
+             if (this.type !== 'expense' || !this.categoryId) return null;
+             var b = this.budgetsByCategory[this.categoryId];
+             if (!b) return null;
+             var spent = parseFloat(b.spent_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+             var limit = parseFloat(b.limit_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+             var pct = b.usage_percent != null ? b.usage_percent : 0;
+             return 'Orçamento desta categoria: R$ ' + spent + ' de R$ ' + limit + ' (' + pct + '% utilizado).';
          }
      }"
      x-init="init()">
@@ -93,12 +107,13 @@
                 {{-- Conta e Categoria --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta</label>
+                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta (onde o dinheiro entra ou sai)</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ex.: conta corrente, carteira.</p>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                                 <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="account_id" id="account_id" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="account_id" id="account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('account_id', $transaction->account_id) == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
                                 @endforeach
@@ -111,13 +126,14 @@
                     </div>
                     <div>
                         <label for="category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Categoria</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ajuda a ver para onde vai seu dinheiro (relatórios e orçamentos).</p>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                                 <x-icon name="tag" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="category_id" id="category_id" x-model="categoryId" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="category_id" id="category_id" x-model="categoryId" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 @foreach($categories->where('type', $transaction->type) as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('category_id', $transaction->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    <option value="{{ $cat->id }}" {{ old('category_id', $transaction->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}{{ $transaction->type === 'expense' && in_array($cat->id, $categoryIdsWithBudget) ? ' (tem orçamento)' : '' }}</option>
                                 @endforeach
                             </select>
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -127,9 +143,28 @@
                         <p x-show="recurringInfo()" x-text="recurringInfo()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                             <x-icon name="lightbulb" style="duotone" class="w-3.5 h-3.5 shrink-0" />
                         </p>
+                        <p x-show="budgetInfo()" x-text="budgetInfo()" class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                            <x-icon name="chart-pie" style="duotone" class="w-3.5 h-3.5 shrink-0" />
+                        </p>
                         @error('category_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
                     </div>
                 </div>
+
+                @if(isset($activeGoals) && $transaction->type === 'expense')
+                <div class="space-y-2">
+                    <label for="goal_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Vincular à meta (opcional)</label>
+                    <div class="relative">
+                        <select name="goal_id" id="goal_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden">
+                            <option value="">Nenhuma</option>
+                            @foreach($activeGoals as $g)
+                                <option value="{{ $g->id }}" {{ old('goal_id', $transaction->goal_id) == $g->id ? 'selected' : '' }}>{{ $g->name }} — {{ format_currency($g->current_amount) }} / {{ format_currency($g->target_amount) }}</option>
+                            @endforeach
+                        </select>
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">O valor desta despesa será somado ao progresso da meta. Opcional.</p>
+                </div>
+                @endif
 
                 {{-- Data, Status, Descrição --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -144,15 +179,18 @@
                     </div>
                     <div>
                         <label for="status" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Status</label>
-                        <select name="status" id="status" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium">
-                            <option value="completed" {{ old('status', $transaction->status) == 'completed' ? 'selected' : '' }}>Concluída</option>
-                            <option value="pending" {{ old('status', $transaction->status) == 'pending' ? 'selected' : '' }}>Pendente</option>
-                        </select>
+                        <div class="relative">
+                            <select name="status" id="status" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full px-4 py-3 pr-10 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium appearance-none [&::-ms-expand]:hidden">
+                                <option value="completed" {{ old('status', $transaction->status) == 'completed' ? 'selected' : '' }}>Concluída</option>
+                                <option value="pending" {{ old('status', $transaction->status) == 'pending' ? 'selected' : '' }}>Pendente</option>
+                            </select>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label for="description" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Descrição (opcional)</label>
-                    <textarea name="description" id="description" rows="2" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium placeholder-gray-400" placeholder="Ex: Pagamento mercado">{{ old('description', $transaction->description) }}</textarea>
+                    <textarea name="description" id="description" rows="2" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium placeholder-gray-400" placeholder="{{ $transaction->type === 'income' ? 'Ex.: Salário, freelance, aluguel recebido' : 'Ex.: Supermercado, conta de luz, combustível' }}">{{ old('description', $transaction->description) }}</textarea>
                 </div>
 
                 @if($isPro)
@@ -183,8 +221,8 @@
                 <x-icon name="circle-info" style="duotone" class="w-5 h-5" />
             </div>
             <div>
-                <h3 class="font-bold text-gray-900 dark:text-white mb-1">Edição no Vertex Contas</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Ao salvar, o saldo da conta selecionada é atualizado de acordo com o novo valor. O tipo (receita ou despesa) não pode ser alterado para evitar inconsistências no histórico.</p>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funciona no Vertex Contas</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Ao salvar, o saldo da conta selecionada é atualizado de acordo com o novo valor. O tipo (receita ou despesa) não pode ser alterado para evitar inconsistências no histórico. Categorizar ajuda a ver para onde vai seu dinheiro; vincular a uma meta soma o valor ao progresso da meta.</p>
             </div>
         </div>
     </div>

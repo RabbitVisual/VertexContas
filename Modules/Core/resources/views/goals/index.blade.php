@@ -89,6 +89,54 @@
         @endif
     </div>
 
+    <x-core::guided-navigation :steps="[
+        ['label' => 'Vincular despesas no Extrato à meta', 'url' => route('core.transactions.create', ['type' => 'expense'])],
+        ['label' => 'Ver contribuições no Extrato', 'url' => route('core.transactions.index')],
+    ]" />
+
+    {{-- Como funcionam as metas (dicas didáticas) --}}
+    <div class="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/30 p-6 sm:p-8">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-teal-500/20 dark:bg-teal-500/30 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+                <x-icon name="book-open" style="duotone" class="w-6 h-6" />
+            </div>
+            <div class="min-w-0">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Como usar as metas no Vertex Contas</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Metas são objetivos financeiros com valor alvo e prazo. Você acompanha o progresso e pode automatizar uma parte da economia.</p>
+                <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="bullseye" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Crie uma meta</strong> com nome, valor total que deseja juntar e, se quiser, quanto já tem e o prazo. Ex.: &quot;Moto R$ 25.000&quot;, já tenho R$ 0, prazo em 4 anos.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="arrows-rotate" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Contribuição automática:</strong> na meta, ative e defina um valor mensal, a conta de onde sai o dinheiro e o dia do mês. Todo mês o sistema gera uma despesa no extrato e soma esse valor ao progresso da meta. Assim você &quot;reserva&quot; parte da sua renda para a meta sem esquecer.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="receipt" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Vincule despesas à meta:</strong> ao registrar uma despesa no Extrato, escolha &quot;Vincular à meta&quot;. O valor entra no progresso da meta e fica rastreável (filtros e relatórios por meta).</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="chart-line" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Capacidade mensal:</strong> no dashboard, a capacidade já desconta o que você comprometeu com contribuições automáticas. Assim você vê quanto realmente sobra para gastar.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="trophy" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Meta concluída:</strong> quando o valor acumulado atingir o alvo, a meta é marcada como concluída, a contribuição automática é desativada e você recebe uma notificação.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="piggy-bank" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Reserva de emergência:</strong> uma meta clássica é juntar o equivalente a 3 a 6 meses de despesas para segurança contra imprevistos. Crie uma meta com esse nome e valor alvo.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-teal-500 mt-0.5 shrink-0"><x-icon name="chart-pie" style="solid" class="w-4 h-4" /></span>
+                        <span><strong>Regra 50/30/20:</strong> parte do 20% de poupança pode ir para reserva de emergência e metas; 50% para necessidades e 30% para desejos.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     @if(session('success'))
         <div x-data="{ show: true }" x-show="show" x-transition class="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/10 p-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -179,7 +227,18 @@
                                 <x-icon name="{{ $percentage >= 100 ? 'trophy' : 'bullseye' }}" style="duotone" class="w-6 h-6" />
                             </div>
                             <div class="min-w-0">
-                                <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ $goal->name }}</h3>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ $goal->name }}</h3>
+                                    @if($goal->is_completed || $goal->completed_at)
+                                        <span class="shrink-0 px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Concluída</span>
+                                    @endif
+                                    @if($goal->hasAutomatedContribution())
+                                        <span class="shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 text-[10px] font-bold uppercase tracking-wider" title="Contribuição automática ativa">
+                                            <x-icon name="arrows-rotate" style="duotone" class="w-3.5 h-3.5" />
+                                            <x-core::financial-value :value="$goal->monthly_contribution" prefix="" />/mês
+                                        </span>
+                                    @endif
+                                </div>
                                 @if($goal->deadline)
                                     <div class="flex items-center gap-1.5 mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         <x-icon name="clock" style="duotone" class="w-3.5 h-3.5" />
@@ -218,6 +277,10 @@
                                 </span>
                             @endif
                         </div>
+                        <a href="{{ route('core.transactions.index', ['goal_id' => $goal->id]) }}" class="mt-4 inline-flex items-center gap-2 text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-wider">
+                            <x-icon name="receipt" style="duotone" class="w-3.5 h-3.5" />
+                            Ver contribuições no Extrato
+                        </a>
                     </div>
 
                     @if(!($inspectionReadOnly ?? false))
@@ -243,7 +306,7 @@
                     <x-icon name="bullseye" style="duotone" class="w-10 h-10" />
                 </div>
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem metas ativas</h3>
-                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Planeje seu futuro. Adicione sua primeira meta financeira para começar a poupar.</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Planeje seu futuro: crie metas com valor alvo e prazo. Você pode usar <strong>contribuição automática</strong> (valor mensal debitado no Extrato) ou <strong>vincular despesas</strong> ao registrar no Extrato. Uma meta clássica é a <strong>Reserva de emergência</strong> (3 a 6 meses de despesas).</p>
                 @can('create', \Modules\Core\Models\Goal::class)
                     @if(!($inspectionReadOnly ?? false))
                         <a href="{{ route('core.goals.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">

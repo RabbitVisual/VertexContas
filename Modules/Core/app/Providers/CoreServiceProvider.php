@@ -4,8 +4,11 @@ namespace Modules\Core\Providers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Modules\Core\Events\GoalCompleted;
+use Modules\Core\Listeners\NotifyUserGoalCompleted;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -32,6 +35,8 @@ class CoreServiceProvider extends ServiceProvider
 
         // Register observers
         \Modules\Core\Models\Transaction::observe(\Modules\Core\Observers\TransactionObserver::class);
+
+        Event::listen(GoalCompleted::class, NotifyUserGoalCompleted::class);
 
         // Limit Observers
         \Modules\Core\Models\Account::observe(\Modules\Core\Observers\LimitObserver::class);

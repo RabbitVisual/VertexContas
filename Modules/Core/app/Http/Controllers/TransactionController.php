@@ -10,6 +10,7 @@ use Modules\Core\Http\Requests\UpdateTransactionRequest;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\Budget;
 use Modules\Core\Models\Category;
+use Modules\Core\Models\Goal;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\GeminiService;
 use Modules\Core\Services\SubscriptionLimitService;
@@ -50,8 +51,17 @@ class TransactionController extends Controller
         if ($request->filled('min_amount') && is_numeric($request->min_amount)) {
             $query->where('amount', '>=', (float) $request->min_amount);
         }
+        if ($request->filled('goal_id')) {
+            $query->where('goal_id', $request->goal_id);
+        }
+        if ($request->filled('account_id')) {
+            $query->where('account_id', $request->account_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
-        $transactions = $query->orderBy('date', 'desc')->paginate(20);
+        $transactions = $query->with('goal')->orderBy('date', 'desc')->paginate(20)->withQueryString();
 
         // Apenas baseline (Planejamento) para o widget de comparação
         $recurringTransactions = \Modules\Core\Models\RecurringTransaction::where('user_id', Auth::id())
@@ -62,6 +72,8 @@ class TransactionController extends Controller
         $accounts = Auth::user()->isPro()
             ? Account::where('user_id', Auth::id())->orderBy('name')->get()
             : collect();
+        $filterAccounts = Account::where('user_id', Auth::id())->orderBy('name')->get();
+        $filterCategories = Category::forUser(Auth::user())->orderBy('type')->orderBy('name')->get();
         $importCategories = Auth::user()->isPro()
             ? Category::forUser(Auth::user())->orderBy('type')->orderBy('name')->get(['id', 'name', 'type'])
             : collect();
@@ -69,7 +81,9 @@ class TransactionController extends Controller
         $importExpenseCategories = $importCategories->where('type', 'expense')->values()->toArray();
         $importCategorizeLimit = GeminiService::CATEGORIZE_MAX_ENTRIES;
 
-        return view('core::transactions.index', compact('transactions', 'recurringTransactions', 'accounts', 'importCategories', 'importIncomeCategories', 'importExpenseCategories', 'importCategorizeLimit'));
+        $activeGoals = Goal::where('user_id', Auth::id())->whereNull('completed_at')->orderBy('name')->get(['id', 'name']);
+
+        return view('core::transactions.index', compact('transactions', 'recurringTransactions', 'accounts', 'importCategories', 'importIncomeCategories', 'importExpenseCategories', 'importCategorizeLimit', 'activeGoals', 'filterAccounts', 'filterCategories'));
     }
 
     public function create(Request $request)
@@ -83,8 +97,17 @@ class TransactionController extends Controller
             ->where('is_baseline', true)
             ->active()
             ->get();
+        $activeGoals = Goal::where('user_id', Auth::id())->whereNull('completed_at')->orderBy('name')->get(['id', 'name', 'current_amount', 'target_amount']);
 
-        return view('core::transactions.create', compact('accounts', 'categories', 'type', 'recurringTransactions'));
+        $budgets = Budget::where('user_id', Auth::id())->get();
+        $budgetsByCategory = $budgets->keyBy('category_id')->map(fn ($b) => [
+            'limit_amount' => (float) $b->limit_amount,
+            'spent_amount' => $b->spent_amount,
+            'usage_percent' => round($b->usage_percentage, 1),
+        ])->toArray();
+        $categoryIdsWithBudget = $budgets->pluck('category_id')->toArray();
+
+        return view('core::transactions.create', compact('accounts', 'categories', 'type', 'recurringTransactions', 'activeGoals', 'budgetsByCategory', 'categoryIdsWithBudget'));
     }
 
     public function store(StoreTransactionRequest $request)
@@ -117,6 +140,7 @@ class TransactionController extends Controller
             'user_id' => Auth::id(),
             'account_id' => $request->account_id,
             'category_id' => $request->category_id,
+            'goal_id' => $request->type === 'expense' ? $request->goal_id : null,
             'type' => $request->type,
             'amount' => $request->amount,
             'date' => $request->date,
@@ -165,7 +189,17 @@ class TransactionController extends Controller
             ->active()
             ->get();
 
-        return view('core::transactions.edit', compact('transaction', 'accounts', 'categories', 'recurringTransactions'));
+        $activeGoals = Goal::where('user_id', Auth::id())->whereNull('completed_at')->orderBy('name')->get(['id', 'name', 'current_amount', 'target_amount']);
+
+        $budgets = Budget::where('user_id', Auth::id())->get();
+        $budgetsByCategory = $budgets->keyBy('category_id')->map(fn ($b) => [
+            'limit_amount' => (float) $b->limit_amount,
+            'spent_amount' => $b->spent_amount,
+            'usage_percent' => round($b->usage_percentage, 1),
+        ])->toArray();
+        $categoryIdsWithBudget = $budgets->pluck('category_id')->toArray();
+
+        return view('core::transactions.edit', compact('transaction', 'accounts', 'categories', 'recurringTransactions', 'activeGoals', 'budgetsByCategory', 'categoryIdsWithBudget'));
     }
 
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
@@ -193,6 +227,7 @@ class TransactionController extends Controller
         $transaction->update([
             'account_id' => $request->account_id,
             'category_id' => $request->category_id,
+            'goal_id' => $request->type === 'expense' ? $request->goal_id : null,
             'type' => $request->type,
             'amount' => $request->amount,
             'date' => $request->date,

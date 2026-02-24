@@ -19,7 +19,7 @@
             <x-slot name="header">
                 <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                     <div class="relative min-w-[160px]">
-                        <select name="role" class="users-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <select name="role" class="users-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                             <option value="">Todas as funções</option>
                             <option value="free_user" {{ request('role') == 'free_user' ? 'selected' : '' }}>Free User</option>
                             <option value="pro_user" {{ request('role') == 'pro_user' ? 'selected' : '' }}>Pro User</option>

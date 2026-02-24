@@ -22,9 +22,17 @@
         })();
     </script>
 
-    <title>{{ $title ?? branding_panel_name('user') . ' - ' . config('app.name') }}</title>
+    <title>{{ (config('pwa.app_name') ?? config('app.name')) . ' - ' . ($title ?? 'Início') }}</title>
 
     <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
+
+    @if(config('pwa.enabled', true))
+    <link rel="manifest" href="{{ url(config('pwa.manifest_url', '/manifest.webmanifest')) }}">
+    <meta name="theme-color" content="{{ config('pwa.theme_color', '#11C76F') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="pwa-version" content="{{ config('pwa.cache_version', 'v1') }}">
+    @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if(request()->routeIs('core.dashboard') || request()->routeIs('core.reports.*') || request()->routeIs('user.index'))
@@ -70,6 +78,31 @@
 
     <x-vertexchat::widget />
 
+    @if(config('pwa.enabled', true))
+    {{-- Banner "Instalar app" (escondido se já instalado ou se usuário dispensou) --}}
+    <div id="pwa-install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg safe-area-bottom md:left-64" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));" role="region" aria-label="Instalar aplicativo">
+        <div class="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto">
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#11C76F]/10 text-[#11C76F] shrink-0">
+                    <i class="fa-pro fa-solid fa-mobile-screen"></i>
+                </span>
+                <div class="min-w-0">
+                    <p class="font-semibold text-slate-900 dark:text-white text-sm">Instalar {{ config('pwa.short_name', 'Vertex') }}</p>
+                    <p id="pwa-install-hint" class="text-xs text-slate-500 dark:text-slate-400">Use como app no celular: atalho na tela inicial.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" id="pwa-install-btn" class="hidden px-4 py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors text-sm">
+                    Instalar
+                </button>
+                <button type="button" id="pwa-install-dismiss" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors" aria-label="Dispensar">
+                    <i class="fa-pro fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Tour completion: envia para o backend para analytics e gamificação --}}
     @auth
     <script>
@@ -95,6 +128,120 @@
     @endauth
 
     @stack('scripts')
+
+    @if(config('pwa.enabled', true) && config('pwa.sw_registration', true))
+    <script>
+    (function() {
+        var swUrl = '{{ url(config("pwa.sw_url", "/sw.js")) }}';
+        var versionUrl = '{{ url("/api/pwa/version") }}';
+        var installedUrl = '{{ url("/api/pwa/installed") }}';
+        var currentVersion = document.querySelector('meta[name="pwa-version"]') && document.querySelector('meta[name="pwa-version"]').getAttribute('content') || 'v1';
+        var csrf = document.querySelector('meta[name="csrf-token"]') && document.querySelector('meta[name="csrf-token"]').content;
+
+        function getFingerprint() {
+            var s = (navigator.userAgent || '') + (screen.width + 'x' + screen.height) + (new Date().getTimezoneOffset());
+            var h = 0;
+            for (var i = 0; i < s.length; i++) {
+                h = ((h << 5) - h) + s.charCodeAt(i) | 0;
+            }
+            return 'fp_' + Math.abs(h).toString(36);
+        }
+
+        function recordInstall() {
+            fetch(installedUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    app_version: currentVersion,
+                    device_fingerprint: getFingerprint(),
+                    platform: /Android/i.test(navigator.userAgent) ? 'android' : (/iPad|iPhone|iPod/i.test(navigator.userAgent) ? 'ios' : 'web')
+                })
+            }).catch(function() {});
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swUrl).then(function() {
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                    window.location.reload();
+                });
+            }).catch(function() {});
+        }
+
+        window.addEventListener('appinstalled', recordInstall);
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            recordInstall();
+        }
+
+        fetch(versionUrl, { headers: { 'Accept': 'application/json' } })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data && data.is_force_update && data.version && data.version !== currentVersion) {
+                    if (window.confirm('Uma nova versão do app está disponível. Recarregar agora?')) {
+                        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                            navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                        } else {
+                            window.location.reload();
+                        }
+                    }
+                }
+            })
+            .catch(function() {});
+
+        var installBanner = document.getElementById('pwa-install-banner');
+        var installBtn = document.getElementById('pwa-install-btn');
+        var installHint = document.getElementById('pwa-install-hint');
+        var dismissBtn = document.getElementById('pwa-install-dismiss');
+        var deferredPrompt = null;
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        var dismissed = localStorage.getItem('pwa-install-dismissed') === '1';
+
+        function showInstallBanner() {
+            if (!installBanner || isStandalone || dismissed) return;
+            installBanner.classList.remove('hidden');
+        }
+
+        function hideInstallBanner() {
+            if (installBanner) installBanner.classList.add('hidden');
+            localStorage.setItem('pwa-install-dismissed', '1');
+        }
+
+        if (installBanner && dismissBtn) {
+            dismissBtn.addEventListener('click', function() { hideInstallBanner(); });
+        }
+
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+                if (installHint) installHint.textContent = 'Adicione à tela inicial para abrir como app.';
+            }
+            showInstallBanner();
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', function() {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choice) {
+                    if (choice.outcome === 'accepted') hideInstallBanner();
+                    deferredPrompt = null;
+                });
+            });
+        }
+
+        if (/iPad|iPhone|iPod/i.test(navigator.userAgent) && !isStandalone && !dismissed) {
+            if (installHint) installHint.innerHTML = 'Toque em <strong>Compartilhar</strong> <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i> e depois em <strong>Adicionar à Tela de Início</strong>.';
+            showInstallBanner();
+        }
+    })();
+    </script>
+    @endif
 
     @if($inspectionSyncActive ?? false)
     {{-- Real-time sync: segue a mesma tela que o agente está visualizando --}}

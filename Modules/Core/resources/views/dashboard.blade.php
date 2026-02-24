@@ -66,7 +66,7 @@
                             <x-icon name="wallet" style="duotone" class="w-6 h-6" />
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Saldo Total</p>
+                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Saldo total</p>
                             <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white leading-tight"><x-core::financial-value :value="$totalBalance" /></p>
                         </div>
                     </div>
@@ -74,23 +74,16 @@
             </div>
         </div>
 
-        {{-- Stats Grid - CBAV style (rounded-3xl, border, ícones duotone) --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {{-- Stats Grid - CBAV style (Score, Receitas, Despesas, Capacidade mensal; Saldo só no hero) --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {{-- Score Financeiro (Gauge) --}}
             <x-core::financial-score-card
                 :score="$financialScore"
                 :label="$scoreLabel"
                 :score-text-class="$scoreTextClass"
                 :score-border-class="$scoreBorderClass"
+                :is-pro="auth()->user()?->isPro() ?? false"
             />
-            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-balance">
-                <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
-                    <x-icon name="wallet" style="duotone" class="w-6 h-6" />
-                </div>
-                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Saldo Total</p>
-                <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalBalance" /></h3>
-            </div>
-
             <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-income">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 shrink-0">
@@ -98,11 +91,19 @@
                     </div>
                     <span class="flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg">+{{ format_percent($incomeTrendPercentage, 1) }}</span>
                 </div>
-                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Receitas do Mês</p>
+                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Receitas do mês</p>
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyIncome" /></h3>
-                @if(isset($monthlyCapacity) && $monthlyCapacity > 0)
+                <div>
+                @if(isset($monthlyCapacity))
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Capacidade mensal (recorrente): <span class="sensitive-value font-semibold text-gray-700 dark:text-gray-300"><x-core::financial-value :value="$monthlyCapacity" /></span></p>
                 @endif
+                @if(isset($monthlyGoalContributions) && $monthlyGoalContributions > 0)
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Comprometido com metas: <span class="sensitive-value font-semibold text-teal-600 dark:text-teal-400"><x-core::financial-value :value="$monthlyGoalContributions" /></span>/mês</p>
+                @endif
+                @if(isset($amountToGoalsThisMonth) && $amountToGoalsThisMonth > 0)
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Destinado a metas este mês: <span class="sensitive-value font-semibold text-teal-600 dark:text-teal-400"><x-core::financial-value :value="$amountToGoalsThisMonth" /></span></p>
+                @endif
+                </div>
                 @if($user->isPro() && isset($incomeBreakdown) && $incomeBreakdown->count() > 1)
                     <div class="mt-2" x-data="{ open: false }">
                         <button type="button" @click="open = !open" class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium flex items-center gap-1">
@@ -128,18 +129,61 @@
                     </div>
                     <span class="flex items-center text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 px-2.5 py-1 rounded-lg">{{ format_percent($expenseTrendPercentage, 1) }}</span>
                 </div>
-                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Despesas do Mês</p>
+                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Despesas do mês</p>
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyExpenses" /></h3>
             </div>
 
-            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6">
-                <div class="w-12 h-12 rounded-2xl {{ $monthlyBalance >= 0 ? 'bg-emerald-500/10 dark:bg-emerald-500/20' : 'bg-rose-500/10 dark:bg-rose-500/20' }} flex items-center justify-center {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
+            {{-- Capacidade mensal (GFP); Balanço mensal como linha secundária --}}
+            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-capacity">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="chart-line" style="duotone" class="w-6 h-6" />
                 </div>
-                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Balanço Mensal</p>
-                <h3 class="sensitive-value text-2xl lg:text-3xl font-black mt-1 tabular-nums {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}"><x-core::financial-value :value="$monthlyBalance" /></h3>
+                <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Capacidade mensal</p>
+                <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyCapacity" /></h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Balanço do mês (receitas − despesas): <span class="sensitive-value font-semibold tabular-nums {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}"><x-core::financial-value :value="$monthlyBalance" /></span></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">Dica: na regra 50/30/20, parte do 20% de poupança pode ir para reserva de emergência e metas.</p>
             </div>
         </div>
+
+        {{-- Por onde começar (fluxo GFP para novos ou poucos dados) --}}
+        @if(!empty($showOnboardingFlow) && $showOnboardingFlow)
+        <div class="rounded-3xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/50 dark:bg-emerald-950/30 p-6 lg:p-8">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 dark:bg-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <x-icon name="route" style="duotone" class="w-5 h-5" />
+                </div>
+                Por onde começar
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Siga a ordem abaixo para organizar suas finanças no Vertex Contas.</p>
+            <ol class="space-y-3">
+                <li class="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5">
+                    <span class="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold">1</span>
+                    <a href="{{ route('core.accounts.index') }}" class="flex-1 font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Cadastre suas contas</a>
+                    <x-icon name="chevron-right" style="solid" class="w-4 h-4 text-gray-400" />
+                </li>
+                <li class="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5">
+                    <span class="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold">2</span>
+                    <a href="{{ route('core.income.index') }}" class="flex-1 font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Configure Minha Renda</a>
+                    <x-icon name="chevron-right" style="solid" class="w-4 h-4 text-gray-400" />
+                </li>
+                <li class="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5">
+                    <span class="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold">3</span>
+                    <a href="{{ route('core.transactions.index') }}" class="flex-1 font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Registre receitas e despesas no Extrato</a>
+                    <x-icon name="chevron-right" style="solid" class="w-4 h-4 text-gray-400" />
+                </li>
+                <li class="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5">
+                    <span class="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold">4</span>
+                    <a href="{{ route('core.budgets.index') }}" class="flex-1 font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Defina orçamentos por categoria</a>
+                    <x-icon name="chevron-right" style="solid" class="w-4 h-4 text-gray-400" />
+                </li>
+                <li class="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5">
+                    <span class="flex w-8 h-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-sm font-bold">5</span>
+                    <a href="{{ route('core.goals.index') }}" class="flex-1 font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Crie metas</a>
+                    <x-icon name="chevron-right" style="solid" class="w-4 h-4 text-gray-400" />
+                </li>
+            </ol>
+        </div>
+        @endif
 
         {{-- Projeção Vertex AI - Card interativo --}}
         <div

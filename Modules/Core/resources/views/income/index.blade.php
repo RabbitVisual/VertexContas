@@ -85,7 +85,7 @@
                         <div class="flex items-center gap-2 mb-1">
                             <h3 class="font-bold text-gray-900 dark:text-white">Como funciona no Vertex Contas</h3>
                             <x-core::help-tooltip
-                                content="Minha Renda é o planejamento: o que você espera receber e comprometer. A capacidade mensal (no dashboard) é receitas menos despesas fixas. Planejamento (sem conta) é só para o cálculo da capacidade; para registrar transações no Extrato, crie pelo menos uma conta em Financeiro &gt; Contas."
+                                content="Minha Renda é o planejamento: o que você espera receber e comprometer. A capacidade mensal (no dashboard) é receitas menos despesas fixas. Planejamento (sem conta) é só para o cálculo da capacidade; para registrar transações no Extrato, crie pelo menos uma conta em Financeiro › Contas."
                                 tour-trigger="income"
                                 position="bottom"
                             />
@@ -151,9 +151,8 @@
                                 <input type="number" :name="'incomes['+index+'][day]'" x-model="row.day" min="1" max="31" class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-sm font-medium px-2 py-2.5 focus:border-emerald-500 outline-none tabular-nums" placeholder="1" title="Dia do mês (1-31)">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="flex items-center gap-2 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                                    Conta
-                                    <x-core::help-tooltip content="Planejamento não vincula a uma conta real; é só para o cálculo da capacidade mensal. Para registrar transações no Extrato, escolha uma conta ou crie uma em Financeiro &gt; Contas." position="bottom" />
+                                <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                    <span class="inline-flex items-center gap-1.5">Conta <x-core::help-tooltip content="Planejamento não vincula a uma conta real; é só para o cálculo da capacidade mensal. Para registrar transações no Extrato, escolha uma conta ou crie uma em Financeiro › Contas." position="bottom" /></span>
                                 </label>
                                 <select :name="'incomes['+index+'][account_id]'" x-model="row.account_id" class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-sm font-medium px-3 py-2.5 outline-none focus:border-emerald-500">
                                     <option value="">Planejamento</option>

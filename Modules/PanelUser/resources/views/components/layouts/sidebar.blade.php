@@ -7,6 +7,22 @@
     $goalCount = $limitSvc ? $limitSvc->getCurrentCount($user, 'goal') : 0;
     $budgetCount = $limitSvc ? $limitSvc->getCurrentCount($user, 'budget') : 0;
 
+    $accountLimit = $limitSvc ? $limitSvc->getLimit($user, 'account') : 1;
+    $incomeLimit = $limitSvc ? $limitSvc->getLimit($user, 'income') : 5;
+    $expenseLimit = $limitSvc ? $limitSvc->getLimit($user, 'expense') : 5;
+    $transactionLimitDisplay = '∞';
+    if ($limitSvc) {
+        $li = $limitSvc->getLimit($user, 'income');
+        $le = $limitSvc->getLimit($user, 'expense');
+        if ($li !== 'unlimited' && $le !== 'unlimited') {
+            $transactionLimitDisplay = (int) $li + (int) $le;
+        }
+    }
+    $goalLimit = $limitSvc ? $limitSvc->getLimit($user, 'goal') : 1;
+    $budgetLimit = $limitSvc ? $limitSvc->getLimit($user, 'budget') : 1;
+
+    $formatLimit = fn ($l) => $l === 'unlimited' ? '∞' : (string) $l;
+
     // PRO: design VertexCBAV-inspired com amber, duotone, animações
     // FREE: design padrão
     $proNavBase = 'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-150 group';
@@ -25,8 +41,8 @@
         {{-- Bloco da logo no topo (estilo Vertex CBAV) --}}
         <div class="h-16 shrink-0 flex items-center justify-center px-6 border-b border-gray-200 dark:border-amber-500/10">
             <div class="relative">
-                <img src="{{ branding_logo_url('user', false) }}" alt="{{ branding_panel_name('user') }}" class="h-9 block dark:hidden" />
-                <img src="{{ branding_logo_url('user', true) }}" alt="{{ branding_panel_name('user') }}" class="h-9 hidden dark:block" />
+                <img src="{{ branding_logo_url('user', false) }}" alt="{{ branding_panel_name('user') }}" class="h-9 block dark:hidden" loading="eager" />
+                <img src="{{ branding_logo_url('user', true) }}" alt="{{ branding_panel_name('user') }}" class="h-9 hidden dark:block" loading="eager" />
                 <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-white dark:ring-slate-900" title="{{ plan_pro_name() }}">
                     <x-icon name="crown" style="solid" class="w-2.5 h-2.5 text-white" />
                 </span>
@@ -225,7 +241,7 @@
                         <a href="{{ route('core.accounts.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.accounts.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="building-columns" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.accounts.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Contas</span>
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $accountCount }}/1</span>
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $accountCount }}/{{ $formatLimit($accountLimit) }}</span>
                         </a>
                     </li>
                     @endif
@@ -235,7 +251,7 @@
                         <a href="{{ route('core.transactions.index') }}" class="{{ $navItemClass }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.edit')) ? $navItemActiveClass : '' }}">
                             <x-icon name="receipt" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ (request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer') && !request()->routeIs('core.transactions.create')) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Extrato</span>
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded" title="Receitas/Despesas">{{ $transactionCount }}/10</span>
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded" title="Receitas/Despesas">{{ $transactionCount }}/{{ $transactionLimitDisplay }}</span>
                         </a>
                     </li>
                     @endif
@@ -262,7 +278,7 @@
                         <a href="{{ route('core.goals.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.goals.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="bullseye" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.goals.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Metas</span>
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $goalCount }}/1</span>
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $goalCount }}/{{ $formatLimit($goalLimit) }}</span>
                         </a>
                     </li>
                     @endif
@@ -271,7 +287,7 @@
                         <a href="{{ route('core.budgets.index') }}" class="{{ $navItemClass }} {{ request()->routeIs('core.budgets.*') ? $navItemActiveClass : '' }}">
                             <x-icon name="chart-pie" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ request()->routeIs('core.budgets.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Orçamentos</span>
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $budgetCount }}/1</span>
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{{ $budgetCount }}/{{ $formatLimit($budgetLimit) }}</span>
                         </a>
                     </li>
                     @endif

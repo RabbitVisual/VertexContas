@@ -25,7 +25,7 @@
                     <span class="text-gray-400 dark:text-gray-500">Orçamentos</span>
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">Meus <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Orçamentos</span></h1>
-                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina limites por categoria e acompanhe o consumo. Edite quando quiser sem avisos de limite.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Defina limites por categoria e acompanhe o consumo. Os gastos são contabilizados pelas transações do <strong>Extrato</strong> na mesma categoria. Edite quando quiser.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 shrink-0">
                 @if(!empty($pageTourId) && count($pageTourSteps ?? []) > 0)
@@ -93,6 +93,11 @@
             </div>
         @endif
     </div>
+
+    <x-core::guided-navigation :steps="[
+        ['label' => 'Registrar despesas no Extrato', 'url' => route('core.transactions.create', ['type' => 'expense'])],
+        ['label' => 'Ver Extrato por categoria', 'url' => route('core.transactions.index')],
+    ]" />
 
     @if(session('success'))
         <div x-data="{ show: true }" x-show="show" x-transition class="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/10 p-4 flex items-center justify-between">
@@ -223,6 +228,10 @@
                                 <span class="text-rose-600 dark:text-rose-400"><x-core::financial-value :value="abs($remaining)" /> acima</span>
                             @endif
                         </div>
+                        <a href="{{ route('core.transactions.index', ['category_id' => $budget->category_id, 'month' => now()->month, 'year' => now()->year]) }}" class="mt-4 inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline uppercase tracking-wider">
+                            <x-icon name="receipt" style="duotone" class="w-3.5 h-3.5" />
+                            Ver gastos no Extrato
+                        </a>
                     </div>
                 </div>
             </div>
@@ -232,13 +241,19 @@
                     <x-icon name="chart-pie" style="duotone" class="w-10 h-10" />
                 </div>
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem orçamentos</h3>
-                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Defina limites por categoria para controlar seus gastos.</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-4">Defina limites por categoria para controlar seus gastos. Os gastos são contabilizados pelas transações do <a href="{{ route('core.transactions.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Extrato</a> na mesma categoria.</p>
                 @can('create', \Modules\Core\Models\Budget::class)
                     @if(!($inspectionReadOnly ?? false))
-                        <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
-                            <x-icon name="plus" style="solid" class="w-5 h-5" />
-                            Criar meu primeiro orçamento
-                        </a>
+                        <div class="flex flex-wrap items-center justify-center gap-3">
+                            <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                                <x-icon name="receipt" style="duotone" class="w-4 h-4" />
+                                Ver Extrato
+                            </a>
+                            <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+                                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                                Criar meu primeiro orçamento
+                            </a>
+                        </div>
                     @endif
                 @endcan
             </div>

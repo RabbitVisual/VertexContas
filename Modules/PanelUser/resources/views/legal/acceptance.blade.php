@@ -14,8 +14,8 @@
     }" x-init="checkScroll()">
         <div class="text-center mb-8" data-tour="legal-intro">
             <a href="{{ route('homepage') }}" class="inline-block mb-4">
-                <img src="{{ branding_logo_url('user', false) }}" alt="{{ config('app.name') }}" class="h-10 block dark:hidden" />
-                <img src="{{ branding_logo_url('user', true) }}" alt="{{ config('app.name') }}" class="h-10 hidden dark:block" />
+                <img src="{{ branding_logo_url('user', false) }}" alt="{{ config('app.name') }}" class="h-10 block dark:hidden" loading="eager" />
+                <img src="{{ branding_logo_url('user', true) }}" alt="{{ config('app.name') }}" class="h-10 hidden dark:block" loading="eager" />
             </a>
             <h1 class="text-xl font-black text-slate-800 dark:text-white">{{ branding_company_legal_name() }}</h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Aceite os termos para continuar</p>

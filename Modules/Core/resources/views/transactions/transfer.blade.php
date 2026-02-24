@@ -71,7 +71,7 @@
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                                 <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="from_account_id" id="from_account_id" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-rose-500 font-medium text-gray-800 dark:text-gray-200 appearance-none bg-[image:none] [&::-ms-expand]:hidden" required>
+                            <select name="from_account_id" id="from_account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-rose-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione</option>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('from_account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
@@ -94,7 +94,7 @@
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                                 <x-icon name="wallet" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="to_account_id" id="to_account_id" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none bg-[image:none] [&::-ms-expand]:hidden" required>
+                            <select name="to_account_id" id="to_account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="transfer-select w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione</option>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('to_account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>

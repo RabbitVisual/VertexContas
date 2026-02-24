@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Models\Account;
+use Modules\Core\Models\Goal;
 use Modules\Core\Models\RecurringTransaction;
 use Modules\Core\Models\Ticket;
 use Modules\Core\Models\Transaction;
@@ -114,7 +115,7 @@ class FinancialHealthService
     }
 
     /**
-     * Sum of monthly capacity (Income - Recurring Expenses).
+     * Sum of monthly capacity (Income - Recurring Expenses - Monthly goal contributions).
      * For frequency = 'monthly', amount is used as-is.
      */
     public function calculateMonthlyCapacity(User $user): float
@@ -133,7 +134,23 @@ class FinancialHealthService
             return $this->getNormalizedMonthlyAmount($rt);
         });
 
-        return (float) ($income - $expenses);
+        $goalContributions = $this->getMonthlyGoalContributions($user);
+
+        return (float) ($income - $expenses - $goalContributions);
+    }
+
+    /**
+     * Sum of monthly_contribution for all active, non-completed goals with automated contribution.
+     */
+    public function getMonthlyGoalContributions(User $user): float
+    {
+        return (float) Goal::query()
+            ->where('user_id', $user->id)
+            ->whereNull('completed_at')
+            ->where('monthly_contribution', '>', 0)
+            ->whereNotNull('contribution_account_id')
+            ->whereNotNull('contribution_category_id')
+            ->sum('monthly_contribution');
     }
 
     /**

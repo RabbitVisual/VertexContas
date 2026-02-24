@@ -848,11 +848,12 @@
                     <div class="p-4 grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Meta Description</label>
-                            <textarea name="homepage_meta_description" rows="2" placeholder="Descrição exibida nos resultados de busca" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('homepage_meta_description', $homepage->get('homepage_meta_description')) }}</textarea>
+                            <textarea name="homepage_meta_description" rows="2" placeholder="Ex.: Gerencie suas finanças com inteligência. Gestão financeira pessoal, regra 50/30/20, metas e relatórios. Comece grátis!" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">{{ old('homepage_meta_description', $homepage->get('homepage_meta_description')) }}</textarea>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Recomendado: citar gestão financeira pessoal (GFP), regra 50/30/20 e benefícios principais.</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Meta Keywords</label>
-                            <input type="text" name="homepage_meta_keywords" value="{{ old('homepage_meta_keywords', $homepage->get('homepage_meta_keywords')) }}" placeholder="finanças, controle financeiro, orçamento" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                            <input type="text" name="homepage_meta_keywords" value="{{ old('homepage_meta_keywords', $homepage->get('homepage_meta_keywords')) }}" placeholder="gestão financeira pessoal, regra 50/30/20, finanças pessoais, orçamento, metas, fluxo de caixa" class="w-full rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
                         </div>
                     </div>
                 </div>

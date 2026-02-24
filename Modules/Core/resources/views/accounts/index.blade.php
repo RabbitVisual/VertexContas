@@ -94,10 +94,15 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funcionam as contas no Vertex Contas</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada <strong>conta</strong> (corrente, poupança ou dinheiro em espécie) tem um saldo. Ao registrar uma <strong>transação</strong> no Extrato, você escolhe a conta de origem ou destino; o saldo é atualizado automaticamente. Use contas para separar dinheiro do dia a dia, reservas e gastos por finalidade.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada <strong>conta</strong> (corrente, poupança ou dinheiro em espécie) tem um saldo. Ao registrar uma <strong>transação</strong> no <strong>Extrato</strong>, você escolhe a conta de origem ou destino; o saldo é atualizado automaticamente. A <strong>capacidade mensal</strong> vem do planejamento em <strong>Minha Renda</strong>, não da soma dos saldos. Use contas para separar dinheiro do dia a dia, reservas e gastos por finalidade.</p>
                 </div>
             </div>
         </div>
+
+        <x-core::guided-navigation :steps="[
+            ['label' => 'Configurar Minha Renda', 'url' => route('core.income.index')],
+            ['label' => 'Registrar transação no Extrato', 'url' => route('core.transactions.create')],
+        ]" />
 
         {{-- Pro: Resumo por tipo (sempre exibir bloco para PRO para o tour ter alvo) --}}
         @if($isPro)
@@ -194,6 +199,9 @@
                             </div>
 
                             <div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20 rounded-3xl">
+                                <a href="{{ route('core.transactions.index', ['account_id' => $account->id]) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Ver movimentações no Extrato">
+                                    <x-icon name="receipt" style="solid" class="w-5 h-5" />
+                                </a>
                                 <a href="{{ route('core.accounts.show', $account) }}" class="p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors" title="Ver">
                                     <x-icon name="eye" style="solid" class="w-5 h-5" />
                                 </a>

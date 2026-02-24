@@ -16,6 +16,7 @@ use Modules\Core\Models\Budget;
 use Modules\Core\Models\Goal;
 use Modules\Core\Models\Transaction;
 use Modules\Core\Services\FinancialHealthService;
+use Modules\Core\Services\GamificationService;
 use Modules\Core\Services\InspectionGuard;
 use Modules\Core\Services\SubscriptionLimitService;
 use Modules\Core\Services\TemplateDocumentService;
@@ -133,13 +134,30 @@ class CoreController extends Controller
             ->take(10)
             ->get();
 
-        // Monthly capacity from recurring income (baseline) + income breakdown for Pro
+        // Monthly capacity (already subtracts goal contributions)
         $monthlyCapacity = $this->financialHealthService->calculateMonthlyCapacity($user);
         $incomeBreakdown = $this->financialHealthService->getIncomeBreakdown($user);
+        $monthlyGoalContributions = $this->financialHealthService->getMonthlyGoalContributions($user);
+
+        // Destinado a metas este mês (sum of expense transactions with goal_id in current month)
+        $amountToGoalsThisMonth = (float) Transaction::where('user_id', $user->id)
+            ->where('type', 'expense')
+            ->where('status', 'completed')
+            ->whereNotNull('goal_id')
+            ->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
+            ->sum('amount');
 
         // Projection data for Vertex AI card (PRO)
         $projectionData = $this->financialHealthService->getProjectionData($user);
         $aiReportUsage = $user->isPro() ? $this->templateService->getAiReportUsage($user) : null;
+
+        // Show "Por onde começar" when user has few data (no recent transactions or single account with no budgets/goals)
+        $showOnboardingFlow = $recentTransactions->isEmpty()
+            || ($accounts->count() <= 1 && $budgets->isEmpty() && $goals->isEmpty());
+
+        // Vertex Bot: insight + financial score (single source of truth for dashboard score)
+        $gamification = app(GamificationService::class);
+        $vertexBot = $gamification->analyzeUser($user, 'core.dashboard');
 
         return view('core::dashboard', compact(
             'accounts',
@@ -157,8 +175,12 @@ class CoreController extends Controller
             'recentTransactions',
             'monthlyCapacity',
             'incomeBreakdown',
+            'monthlyGoalContributions',
+            'amountToGoalsThisMonth',
             'projectionData',
-            'aiReportUsage'
+            'aiReportUsage',
+            'showOnboardingFlow',
+            'vertexBot',
         ));
     }
 

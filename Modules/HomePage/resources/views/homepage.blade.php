@@ -438,6 +438,7 @@
                 <div class="text-center max-w-3xl mx-auto mb-20 space-y-4">
                     <h2 class="text-4xl font-black text-slate-800 dark:text-white">O que torna o Vertex único</h2>
                     <p class="text-lg text-slate-500 dark:text-slate-400">Recursos que diferenciam o Vertex Contas de qualquer outro sistema de gestão financeira.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Registro e categorização, fluxo de caixa (saldo, receitas e despesas), metas, orçamentos, relatórios e foco em reserva de emergência: os pilares da gestão financeira pessoal em um só lugar.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">

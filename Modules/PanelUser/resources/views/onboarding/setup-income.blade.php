@@ -51,7 +51,7 @@
                     @endif
                 </h1>
                 <p class="mt-2 text-slate-600 dark:text-slate-400">
-                    Cadastre suas fontes de receita recorrente (salário, pensão, bônus, vale-refeição). Assim calculamos sua capacidade mensal.
+                    Cadastre suas fontes de receita recorrente (salário, pensão, bônus, vale-refeição). Assim calculamos sua capacidade mensal. Assim você sabe quanto pode destinar a metas e gastos variáveis (dica: a regra 50/30/20 sugere 20% para poupança e metas).
                 </p>
             </div>
 

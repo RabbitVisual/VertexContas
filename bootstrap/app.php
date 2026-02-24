@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'pro' => \Modules\Core\Http\Middleware\EnsureUserIsPro::class,
             'financial.setup' => \Modules\PanelUser\Http\Middleware\EnsureFinancialSetup::class,
+            'wizard.complete' => \Modules\PanelUser\Http\Middleware\EnsureWizardComplete::class,
             'legal.acceptance' => \Modules\PanelUser\Http\Middleware\EnsureLegalAcceptance::class,
             'chat.access' => \Modules\VertexChat\Http\Middleware\EnsureChatAccess::class,
             'lockout' => \Modules\Core\Http\Middleware\EnsureNotLockedOut::class,

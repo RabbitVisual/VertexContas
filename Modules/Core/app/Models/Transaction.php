@@ -17,6 +17,7 @@ class Transaction extends Model
         'account_id',
         'destination_account_id',
         'category_id',
+        'goal_id',
         'type',
         'amount',
         'date',
@@ -54,6 +55,22 @@ class Transaction extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the goal this transaction contributes to (when type is expense).
+     */
+    public function goal(): BelongsTo
+    {
+        return $this->belongsTo(Goal::class);
+    }
+
+    /**
+     * Scope a query to only include transactions for a specific goal.
+     */
+    public function scopeForGoal($query, $goalId)
+    {
+        return $query->where('goal_id', $goalId);
     }
 
     /**

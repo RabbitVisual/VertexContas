@@ -15,8 +15,8 @@
             {{-- Logo --}}
             <div class="inline-flex size-16 items-center justify-center shrink-0 border-b border-gray-100 dark:border-white/5">
                 <a href="{{ route('admin.index') }}" class="flex size-full items-center justify-center overflow-hidden px-2 transition-opacity hover:opacity-90" title="{{ $panelName }}">
-                    <img src="{{ $logoLight }}" alt="{{ $panelName }}" class="h-9 w-auto max-w-full object-contain dark:hidden" />
-                    <img src="{{ $logoDark }}" alt="{{ $panelName }}" class="hidden h-9 w-auto max-w-full object-contain dark:block" />
+                    <img src="{{ $logoLight }}" alt="{{ $panelName }}" class="h-9 w-auto max-w-full object-contain dark:hidden" loading="eager" />
+                    <img src="{{ $logoDark }}" alt="{{ $panelName }}" class="hidden h-9 w-auto max-w-full object-contain dark:block" loading="eager" />
                 </a>
             </div>
 
@@ -102,6 +102,17 @@
                             Configuração
                         </span>
                     </a>
+
+                    @if(Route::has('admin.pwa.dashboard'))
+                    {{-- PWA --}}
+                    <a href="{{ route('admin.pwa.dashboard') }}"
+                        class="group relative flex justify-center rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('admin.pwa.*') ? 'bg-[#11C76F]/10 text-[#11C76F] dark:bg-[#11C76F]/15' : 'text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-[#11C76F]' }}">
+                        <x-icon name="mobile-screen" style="duotone" class="size-5 shrink-0" />
+                        <span class="invisible absolute start-full top-1/2 z-50 ms-4 -translate-y-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:visible">
+                            PWA
+                        </span>
+                    </a>
+                    @endif
                 </div>
             </div>
 
@@ -221,6 +232,21 @@
                         <a href="{{ route('admin.mail.logs.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.mail.logs.*') ? $linkActive : $linkInactive }}"><x-icon name="inbox" style="duotone" class="size-4 shrink-0" />Logs de Mensageria</a>
                     </div>
                 </div>
+
+                @if(Route::has('admin.pwa.dashboard'))
+                {{-- Categoria: PWA --}}
+                <div class="mt-5">
+                    <div class="flex items-center gap-2 px-3 py-2">
+                        <x-icon name="mobile-screen" style="duotone" class="size-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">PWA</span>
+                    </div>
+                    <div class="mt-0.5 space-y-0.5">
+                        <a href="{{ route('admin.pwa.dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.pwa.dashboard') ? $linkActive : $linkInactive }}"><x-icon name="gauge" style="duotone" class="size-4 shrink-0" />Dashboard</a>
+                        <a href="{{ route('admin.pwa.installs') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.pwa.installs') ? $linkActive : $linkInactive }}"><x-icon name="mobile-screen" style="duotone" class="size-4 shrink-0" />Instalações</a>
+                        <a href="{{ route('admin.pwa.versions.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2 pl-5 text-sm font-medium transition-colors {{ request()->routeIs('admin.pwa.versions.*') ? $linkActive : $linkInactive }}"><x-icon name="code-branch" style="duotone" class="size-4 shrink-0" />Versões</a>
+                    </div>
+                </div>
+                @endif
 
                 {{-- Categoria: Configuração --}}
                 <div class="mt-5">

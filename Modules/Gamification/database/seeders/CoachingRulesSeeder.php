@@ -57,7 +57,7 @@ class CoachingRulesSeeder extends Seeder
                 'level' => 'success',
                 'medal_id' => $medals['rule_reserve_3']?->id,
                 'priority' => 95,
-                'message_override' => 'Reserva emergencial conquistada! Seu saldo cobre 3 meses de despesas.',
+                'message_override' => 'Reserva de emergência conquistada! Seu saldo cobre 3 meses de despesas.',
             ],
             [
                 'trigger_key' => 'rule_reserve_solid',

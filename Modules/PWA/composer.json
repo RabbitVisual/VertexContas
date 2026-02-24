@@ -1,0 +1,33 @@
+{
+    "name": "vertex/pwa",
+    "version": "1.0.0",
+    "description": "Module pwa - © Vertex Solutions LTDA - 2026 - VS.1.0",
+    "authors": [
+        {
+            "name": "Reinan Rodrigues",
+            "email": "r.rodriguesjs@gmail.com",
+            "homepage": "https://vertexsolutions.com.br",
+            "role": "Developer"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PWA\\": "app/",
+            "Modules\\PWA\\Database\\Factories\\": "database/factories/",
+            "Modules\\PWA\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PWA\\Tests\\": "tests/"
+        }
+    }
+}

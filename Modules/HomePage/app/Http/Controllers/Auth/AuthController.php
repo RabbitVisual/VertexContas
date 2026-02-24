@@ -199,7 +199,7 @@ class AuthController extends Controller
             'cpf' => ['nullable', 'string', 'size:11', 'unique:users'],
             'birth_date' => ['nullable', 'date'],
             'phone' => ['nullable', 'string', 'max:15'],
-        ]);
+        ], $this->registrationValidationMessages(), $this->registrationValidationAttributes());
 
         $user = \App\Models\User::create([
             'first_name' => $validated['first_name'],
@@ -218,6 +218,53 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->intended(route('paneluser.index'));
+    }
+
+    /**
+     * Mensagens de validação amigáveis para o registro (produção, sempre em pt-BR).
+     */
+    protected function registrationValidationMessages(): array
+    {
+        return [
+            'first_name.required' => 'O nome é obrigatório.',
+            'first_name.max' => 'O nome não pode ter mais de 255 caracteres.',
+            'last_name.required' => 'O sobrenome é obrigatório.',
+            'last_name.max' => 'O sobrenome não pode ter mais de 255 caracteres.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'Informe um e-mail válido.',
+            'email.max' => 'O e-mail não pode ter mais de 255 caracteres.',
+            'email.unique' => 'Este e-mail já está cadastrado. Use outro ou faça login.',
+            'password.required' => 'A senha é obrigatória.',
+            'password.confirmed' => 'A confirmação da senha não confere. Digite a mesma senha nos dois campos.',
+            'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
+            'password.letters' => 'A senha deve conter pelo menos uma letra.',
+            'password.mixed' => 'A senha deve conter letras maiúsculas e minúsculas.',
+            'password.numbers' => 'A senha deve conter pelo menos um número.',
+            'password.symbols' => 'A senha deve conter pelo menos um caractere especial (ex.: @ # $ % & *).',
+            'password.uncompromised' => 'Esta senha foi exposta em um vazamento. Escolha outra senha.',
+            'cpf.size' => 'O CPF deve ter 11 dígitos.',
+            'cpf.unique' => 'Este CPF já está cadastrado.',
+            'birth_date.date' => 'Informe uma data de nascimento válida.',
+            'phone.max' => 'O telefone não pode ter mais de 15 caracteres.',
+            'g-recaptcha-response.required' => 'Complete a verificação de segurança antes de continuar.',
+        ];
+    }
+
+    /**
+     * Atributos para substituição nas mensagens de validação.
+     */
+    protected function registrationValidationAttributes(): array
+    {
+        return [
+            'first_name' => 'nome',
+            'last_name' => 'sobrenome',
+            'email' => 'e-mail',
+            'password' => 'senha',
+            'password_confirmation' => 'confirmação da senha',
+            'cpf' => 'CPF',
+            'birth_date' => 'data de nascimento',
+            'phone' => 'telefone',
+        ];
     }
 
     /**

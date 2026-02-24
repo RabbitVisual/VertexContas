@@ -68,7 +68,7 @@
             <x-slot name="header">
                 <form action="{{ route('admin.subscriptions.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
                     <div class="relative inline-block">
-                        <select name="gateway" class="subscriptions-select pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] min-w-[160px]" style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                        <select name="gateway" class="subscriptions-select pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] min-w-[160px] appearance-none [&::-ms-expand]:hidden">
                             <option value="">Todos os gateways</option>
                             <option value="stripe" {{ request('gateway') == 'stripe' ? 'selected' : '' }}>Stripe</option>
                             <option value="mercadopago" {{ request('gateway') == 'mercadopago' ? 'selected' : '' }}>Mercado Pago</option>
@@ -78,7 +78,7 @@
                         </span>
                     </div>
                     <div class="relative inline-block">
-                        <select name="status" class="subscriptions-select pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] min-w-[160px]" style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                        <select name="status" class="subscriptions-select pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] min-w-[160px] appearance-none [&::-ms-expand]:hidden">
                             <option value="">Todos os status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Ativa</option>
                             <option value="past_due" {{ request('status') == 'past_due' ? 'selected' : '' }}>Pagamento pendente</option>

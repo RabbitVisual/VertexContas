@@ -63,7 +63,7 @@
                         <div class="space-y-2">
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoria</label>
                             <div class="relative">
-                                <select name="category_id" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                <select name="category_id" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ old('category_id', $post->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
@@ -76,7 +76,7 @@
                         <div class="space-y-2">
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</label>
                             <div class="relative">
-                                <select name="status" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                <select name="status" required class="blog-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                                     <option value="draft" {{ old('status', $post->status) == 'draft' ? 'selected' : '' }}>Rascunho</option>
                                     <option value="pending_review" {{ old('status', $post->status) == 'pending_review' ? 'selected' : '' }}>Revisão Pendente</option>
                                     <option value="published" {{ old('status', $post->status) == 'published' ? 'selected' : '' }}>Publicado</option>

@@ -60,5 +60,9 @@
                 <x-icon name="trophy" style="duotone" class="w-3.5 h-3.5" /> Meta alcançada!
             </p>
         @endif
+        <a href="{{ route('core.transactions.index', ['goal_id' => $goal->id]) }}" class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline">
+            <x-icon name="receipt" style="duotone" class="w-3.5 h-3.5" />
+            Ver contribuições no Extrato
+        </a>
     </div>
 </div>

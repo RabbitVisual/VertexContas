@@ -8,6 +8,10 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
                 <nav class="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-4" aria-label="Navegação">
+                    @if(!empty($returnUrl))
+                        <a href="{{ $returnUrl }}" class="hover:underline">Voltar à configuração</a>
+                        <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800" aria-hidden="true"></span>
+                    @endif
                     <a href="{{ route('paneluser.index') }}" class="hover:underline">Painel</a>
                     <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800" aria-hidden="true"></span>
                     <span class="text-gray-400 dark:text-gray-500">Planos e Assinatura</span>
@@ -290,7 +294,8 @@
                             </button>
                             <div x-show="open" x-collapse class="mt-4 space-y-3">
                                 @forelse($gateways as $gateway)
-                                    <a href="{{ route('checkout.init', $gateway->slug) }}?plan={{ urlencode($plan->slug) }}" class="flex items-center justify-center w-full py-3 px-4 rounded-2xl border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white transition-colors gap-2 text-sm font-bold">
+                                    @php $checkoutUrl = route('checkout.init', $gateway->slug) . '?plan=' . urlencode($plan->slug); if (!empty($returnUrl)) { $checkoutUrl .= '&return=' . urlencode($returnUrl); } @endphp
+                                    <a href="{{ $checkoutUrl }}" class="flex items-center justify-center w-full py-3 px-4 rounded-2xl border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white transition-colors gap-2 text-sm font-bold">
                                         @if($gateway->slug === 'stripe')
                                             <x-icon name="stripe" style="brands" class="w-5 h-5" /> Stripe
                                         @elseif($gateway->slug === 'mercadopago')

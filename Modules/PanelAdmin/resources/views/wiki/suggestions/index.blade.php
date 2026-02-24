@@ -139,7 +139,7 @@
                             <div class="space-y-2">
                                 <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</label>
                                 <div class="relative">
-                                    <select name="status" x-model="status" required class="wiki-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                                    <select name="status" x-model="status" required class="wiki-select w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                                         <option value="pending">Pendente (Novo)</option>
                                         <option value="reviewed">Revisado</option>
                                         <option value="implementing">Em Escrita</option>

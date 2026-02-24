@@ -19,6 +19,9 @@
     if (request()->filled('account_id')) {
         $extratoQueryParams['account_id'] = request('account_id');
     }
+    if (request()->filled('category_id')) {
+        $extratoQueryParams['category_id'] = request('category_id');
+    }
     $incomeTotal = $transactions->where('type', 'income')->sum('amount');
     $expenseTotal = $transactions->where('type', 'expense')->sum('amount');
     $balance = $incomeTotal - $expenseTotal;
@@ -249,6 +252,12 @@
                                                 <x-icon name="building-columns" style="duotone" class="w-3 h-3" />
                                                 {{ $transaction->account->name }}
                                             </span>
+                                            @if($transaction->goal_id && $transaction->goal)
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 text-[10px] font-bold uppercase tracking-wider" title="Meta">
+                                                    <x-icon name="bullseye" style="duotone" class="w-3.5 h-3.5" />
+                                                    {{ $transaction->goal->name }}
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -281,12 +290,19 @@
                         <x-icon name="receipt" style="duotone" class="w-12 h-12 opacity-50" />
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nenhuma movimentação</h3>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-8">Não há transações no período ou filtros selecionados. Registre uma receita ou despesa para começar.</p>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-4">Registre receitas e despesas aqui; sua <strong>capacidade mensal</strong> vem do planejamento em <a href="{{ route('core.income.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Minha Renda</a>, não da soma do Extrato.</p>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-8">Não há transações no período ou filtros selecionados.</p>
                     @if(!($inspectionReadOnly ?? false))
-                        <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20">
-                            <x-icon name="plus" style="solid" class="w-5 h-5" />
-                            Nova transação
-                        </a>
+                        <div class="flex flex-wrap items-center justify-center gap-3">
+                            <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                                <x-icon name="wallet" style="duotone" class="w-4 h-4" />
+                                Configurar Minha Renda
+                            </a>
+                            <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20">
+                                <x-icon name="plus" style="solid" class="w-5 h-5" />
+                                Nova transação
+                            </a>
+                        </div>
                     @endif
                 </div>
             @endforelse
@@ -311,6 +327,12 @@
             </div>
         </div>
     </div>
+
+    <x-core::guided-navigation :steps="[
+        ['label' => 'Configurar Minha Renda', 'url' => route('core.income.index')],
+        ['label' => 'Definir orçamentos', 'url' => route('core.budgets.index')],
+        ['label' => 'Criar meta', 'url' => route('core.goals.index')],
+    ]" />
 </div>
 
 {{-- Modal Importar Extrato (CSV) — PRO --}}
@@ -484,6 +506,49 @@
                             </select>
                         </div>
                     </div>
+
+                    {{-- Conta --}}
+                    @if(isset($filterAccounts) && $filterAccounts->isNotEmpty())
+                    <div class="space-y-2">
+                        <label for="filter-account" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Conta</label>
+                        <select id="filter-account" name="account_id" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm">
+                            <option value="" {{ !request('account_id') ? 'selected' : '' }}>Todas</option>
+                            @foreach($filterAccounts as $acc)
+                                <option value="{{ $acc->id }}" {{ request('account_id') == $acc->id ? 'selected' : '' }}>{{ $acc->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+
+                    {{-- Categoria --}}
+                    @if(isset($filterCategories) && $filterCategories->isNotEmpty())
+                    <div class="space-y-2">
+                        <label for="filter-category" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoria</label>
+                        <select id="filter-category" name="category_id" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm">
+                            <option value="" {{ !request('category_id') ? 'selected' : '' }}>Todas</option>
+                            @foreach($filterCategories->groupBy('type') as $type => $cats)
+                                <optgroup label="{{ $type === 'income' ? 'Receitas' : 'Despesas' }}">
+                                    @foreach($cats as $cat)
+                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+
+                    {{-- Meta --}}
+                    @if(isset($activeGoals) && $activeGoals->isNotEmpty())
+                    <div class="space-y-2">
+                        <label for="filter-goal" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Meta</label>
+                        <select id="filter-goal" name="goal_id" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm">
+                            <option value="" {{ !request('goal_id') ? 'selected' : '' }}>Todas</option>
+                            @foreach($activeGoals as $g)
+                                <option value="{{ $g->id }}" {{ request('goal_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
 
                     {{-- Tipo: coluna em mobile, linha em desktop --}}
                     <div class="space-y-3">

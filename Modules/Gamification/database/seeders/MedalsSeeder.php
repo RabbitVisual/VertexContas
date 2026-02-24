@@ -28,9 +28,9 @@ class MedalsSeeder extends Seeder
             [
                 'title' => 'Reserva Inicial',
                 'description' => 'Saldo equivalente a 1 ou mais mês de despesas.',
-                'explanation' => 'Ter pelo menos 1 mês de despesas guardado é o primeiro degrau da reserva emergencial.',
+                'explanation' => 'Ter pelo menos 1 mês de despesas guardado é o primeiro degrau da reserva de emergência.',
                 'tips' => 'Você deu o primeiro passo para se proteger de imprevistos.',
-                'incentive_message' => 'Ótimo! O objetivo é chegar a 3 meses e conquistar a Reserva Emergencial.',
+                'incentive_message' => 'Ótimo! O objetivo é chegar a 3 meses e conquistar a Reserva de Emergência.',
                 'icon_name' => 'piggy-bank',
                 'trigger_key' => 'rule_reserve_1',
                 'color' => 'emerald',
@@ -41,7 +41,7 @@ class MedalsSeeder extends Seeder
             [
                 'title' => 'Alerta 50/30/20',
                 'description' => 'Seus gastos essenciais ultrapassam 50% da renda. Revise sua distribuição.',
-                'explanation' => 'O método 50/30/20 recomenda que no máximo 50% da sua renda vá para gastos essenciais. Quando esse percentual passa de 50%, fica difícil poupar.',
+                'explanation' => 'O método 50/30/20 recomenda que no máximo 50% da sua renda (Minha Renda) vá para gastos essenciais. Quando esse percentual passa de 50%, fica difícil poupar.',
                 'tips' => 'Essa conquista indica que é hora de revisar seus gastos fixos.',
                 'incentive_message' => 'Não desanime! Ajustar os essenciais é o primeiro passo.',
                 'icon_name' => 'chart-pie',
@@ -65,9 +65,9 @@ class MedalsSeeder extends Seeder
                 'is_pro_only' => false,
             ],
             [
-                'title' => 'Bonus de Consistência',
+                'title' => 'Bônus de Consistência',
                 'description' => '5 ou mais dias seguidos lançando transações.',
-                'explanation' => 'A consistência no controle financeiro é fundamental. Registrar transações diariamente ajuda a ter visão real do fluxo de caixa.',
+                'explanation' => 'A consistência no controle financeiro é fundamental. Registrar transações diariamente no Extrato ajuda a ter visão real do fluxo de caixa.',
                 'tips' => 'Você criou o hábito de registrar gastos e receitas.',
                 'incentive_message' => 'Continue assim! 10 dias seguidos desbloqueia a medalha Mestre da Consistência.',
                 'icon_name' => 'graduation-cap',

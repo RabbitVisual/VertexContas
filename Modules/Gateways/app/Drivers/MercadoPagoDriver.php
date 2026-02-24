@@ -44,7 +44,7 @@ class MercadoPagoDriver implements PaymentGatewayInterface
         }
 
         $userId = $metadata['user_id'] ?? 'unknown';
-        $backUrl = route('paneluser.index');
+        $backUrl = ! empty($metadata['return_url']) ? $metadata['return_url'] : route('paneluser.index');
 
         $notificationUrl = route('webhooks.mercadopago') . '?source_news=webhooks';
 

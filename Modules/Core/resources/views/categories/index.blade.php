@@ -77,6 +77,11 @@
             </div>
         </div>
 
+        <x-core::guided-navigation :steps="[
+            ['label' => 'Definir orçamentos por categoria', 'url' => route('core.budgets.index')],
+            ['label' => 'Registrar transações no Extrato', 'url' => route('core.transactions.index')],
+        ]" />
+
         <x-core::limit-status entity="category" label="Categorias personalizadas" />
 
         {{-- Receitas --}}
@@ -104,6 +109,10 @@
                                     <x-icon name="{{ $category->icon }}" style="duotone" class="w-6 h-6" />
                                 </div>
                                 <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $category->name }}</p>
+                                <a href="{{ route('core.transactions.index', ['category_id' => $category->id]) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    <x-icon name="receipt" style="duotone" class="w-3 h-3" />
+                                    Ver no Extrato
+                                </a>
                                 @if(!is_null($category->user_id))
                                     @if(!($inspectionReadOnly ?? false))
                                         <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">
@@ -152,6 +161,10 @@
                                     <x-icon name="{{ $category->icon }}" style="duotone" class="w-6 h-6" />
                                 </div>
                                 <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $category->name }}</p>
+                                <a href="{{ route('core.transactions.index', ['category_id' => $category->id]) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    <x-icon name="receipt" style="duotone" class="w-3 h-3" />
+                                    Ver no Extrato
+                                </a>
                                 @if(!is_null($category->user_id))
                                     @if(!($inspectionReadOnly ?? false))
                                         <form action="{{ route('core.categories.destroy', $category) }}" method="POST" class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Excluir esta categoria?');">

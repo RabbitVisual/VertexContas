@@ -49,8 +49,8 @@
                     </div>
                 @else
                     <a href="{{ ($user && $user->isPro() && Route::has('core.dashboard')) ? route('core.dashboard') : route('paneluser.index') }}" class="flex items-center gap-2.5 group">
-                        <img src="{{ branding_logo_url('user', false) }}" class="h-8 dark:hidden transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" />
-                        <img src="{{ branding_logo_url('user', true) }}" class="h-8 hidden dark:block transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" />
+                        <img src="{{ branding_logo_url('user', false) }}" class="h-8 dark:hidden transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" loading="eager" />
+                        <img src="{{ branding_logo_url('user', true) }}" class="h-8 hidden dark:block transition-transform group-hover:scale-105" alt="{{ branding_panel_name('user') }}" loading="eager" />
                         <span class="self-center text-lg font-bold whitespace-nowrap text-gray-900 dark:text-white hidden sm:inline">{{ branding_panel_name('user') }}</span>
                     </a>
                 @endif
@@ -88,7 +88,7 @@
                                 @if($hasPhoto)
                                     <img src="{{ $photoUrl }}" alt="{{ $userName }}"
                                         class="w-full h-full object-cover"
-                                        loading="lazy">
+                                        loading="eager">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-sm font-bold {{ $isPro ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white' : 'bg-primary-600 text-white' }}">
                                         {{ strtoupper(mb_substr($userName, 0, 1)) }}

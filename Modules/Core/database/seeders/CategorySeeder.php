@@ -33,6 +33,7 @@ class CategorySeeder extends Seeder
             ['name' => 'Investimentos', 'type' => 'expense', 'icon' => 'chart-line', 'color' => '#10b981', 'type_group' => 'financial'],
             ['name' => 'Reserva de Emergência', 'type' => 'expense', 'icon' => 'piggy-bank', 'color' => '#059669', 'type_group' => 'financial'],
             ['name' => 'Pagamento de Dívidas', 'type' => 'expense', 'icon' => 'credit-card', 'color' => '#dc2626', 'type_group' => 'financial'],
+            ['name' => 'Economia para Meta', 'type' => 'expense', 'icon' => 'bullseye', 'color' => '#10b981', 'type_group' => 'financial'],
 
             // Income Categories (type_group ignored)
             ['name' => 'Salário', 'type' => 'income', 'icon' => 'money-bill-wave', 'color' => '#10b981', 'type_group' => null],

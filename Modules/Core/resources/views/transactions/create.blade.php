@@ -42,8 +42,10 @@
     @if($accounts->isNotEmpty())
     @php
         $planningByCategory = $recurringTransactions->groupBy('category_id')->map(fn($g) => (float) $g->sum('amount'))->toArray();
+        $categoryIdsWithBudget = $categoryIdsWithBudget ?? [];
     @endphp
     <script type="application/json" id="planning-data-create">@json($planningByCategory)</script>
+    <script type="application/json" id="budgets-data-create">@json($budgetsByCategory ?? [])</script>
 
     {{-- Formulário --}}
     <form action="{{ route('core.transactions.store') }}" method="POST" class="space-y-8"
@@ -53,10 +55,14 @@
               isRecurring: false,
               categoryId: '',
               planning: {},
+              budgetsByCategory: {},
               init() {
                   var el = document.getElementById('planning-data-create');
                   if (el) this.planning = JSON.parse(el.textContent || '{}');
+                  var bel = document.getElementById('budgets-data-create');
+                  if (bel) this.budgetsByCategory = JSON.parse(bel.textContent || '{}');
               },
+              setType(t) { this.type = t; this.categoryId = ''; },
               formatCurrency() {
                   var value = String(this.amount || '').replace(/\D/g, '');
                   if (value === '') { this.amount = ''; return; }
@@ -68,6 +74,18 @@
                       return 'Valor planejado para esta categoria: R$ ' + parseFloat(this.planning[this.categoryId]).toLocaleString('pt-BR', {minimumFractionDigits: 2});
                   }
                   return null;
+              },
+              budgetInfo() {
+                  if (this.type !== 'expense' || !this.categoryId) return null;
+                  var b = this.budgetsByCategory[this.categoryId];
+                  if (!b) return null;
+                  var spent = parseFloat(b.spent_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                  var limit = parseFloat(b.limit_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                  var pct = b.usage_percent != null ? b.usage_percent : 0;
+                  return 'Orçamento desta categoria: R$ ' + spent + ' de R$ ' + limit + ' (' + pct + '% utilizado).';
+              },
+              descriptionPlaceholder() {
+                  return this.type === 'income' ? 'Ex.: Salário, freelance, aluguel recebido' : 'Ex.: Supermercado, conta de luz, combustível';
               }
           }"
           x-init="init()">
@@ -79,7 +97,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-4">Tipo de movimentação</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <button type="button" @click="type = 'income'"
+                        <button type="button" @click="setType('income')"
                                 :class="type === 'income' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-emerald-500/50'"
                                 class="flex items-center gap-4 p-6 rounded-2xl border-2 transition-all">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" :class="type === 'income' ? 'bg-white/20' : 'bg-emerald-500/10'">
@@ -87,7 +105,7 @@
                             </div>
                             <span class="font-bold text-sm uppercase tracking-wide">Receita</span>
                         </button>
-                        <button type="button" @click="type = 'expense'"
+                        <button type="button" @click="setType('expense')"
                                 :class="type === 'expense' ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-500/20' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-rose-500/50'"
                                 class="flex items-center gap-4 p-6 rounded-2xl border-2 transition-all">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" :class="type === 'expense' ? 'bg-white/20' : 'bg-rose-500/10'">
@@ -96,6 +114,7 @@
                             <span class="font-bold text-sm uppercase tracking-wide">Despesa</span>
                         </button>
                     </div>
+                    <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Receita = dinheiro que entra. Despesa = dinheiro que sai.</p>
                     <input type="hidden" name="type" :value="type">
                 </div>
 
@@ -114,12 +133,13 @@
                 {{-- Conta e Categoria --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta (onde o dinheiro entra/sai — banco, carteira, etc.)</label>
+                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta (onde o dinheiro entra ou sai)</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ex.: conta corrente, carteira.</p>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
                                 <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="account_id" id="account_id" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="account_id" id="account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione a conta</option>
                                 @foreach($accounts as $account)
                                     <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
@@ -133,11 +153,12 @@
                     </div>
                     <div>
                         <label for="category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Categoria</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ajuda a ver para onde vai seu dinheiro (relatórios e orçamentos).</p>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none z-10">
                                 <x-icon name="tag" style="duotone" class="w-5 h-5" />
                             </div>
-                            <select name="category_id" id="category_id" x-model="categoryId" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none" required>
+                            <select name="category_id" id="category_id" x-model="categoryId" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
                                 <option value="">Selecione</option>
                                 <template x-if="type === 'income'">
                                     <optgroup label="Receitas">
@@ -149,7 +170,7 @@
                                 <template x-if="type === 'expense'">
                                     <optgroup label="Despesas">
                                         @foreach($categories->where('type', 'expense') as $cat)
-                                            <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                            <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}{{ in_array($cat->id, $categoryIdsWithBudget) ? ' (tem orçamento)' : '' }}</option>
                                         @endforeach
                                     </optgroup>
                                 </template>
@@ -161,9 +182,29 @@
                         <p x-show="recurringInfo()" x-text="recurringInfo()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                             <x-icon name="lightbulb" style="duotone" class="w-3.5 h-3.5 shrink-0" />
                         </p>
+                        <p x-show="budgetInfo()" x-text="budgetInfo()" class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                            <x-icon name="chart-pie" style="duotone" class="w-3.5 h-3.5 shrink-0" />
+                        </p>
                         @error('category_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
                     </div>
                 </div>
+
+                {{-- Vincular à meta (só despesa) --}}
+                @if(isset($activeGoals) && $activeGoals->isNotEmpty())
+                <div x-show="type === 'expense'" class="space-y-2">
+                    <label for="goal_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Vincular à meta (opcional)</label>
+                    <div class="relative">
+                        <select name="goal_id" id="goal_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden">
+                            <option value="">Nenhuma</option>
+                            @foreach($activeGoals as $g)
+                                <option value="{{ $g->id }}" {{ old('goal_id') == $g->id ? 'selected' : '' }}>{{ $g->name }} — {{ format_currency($g->current_amount) }} / {{ format_currency($g->target_amount) }}</option>
+                            @endforeach
+                        </select>
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">O valor desta despesa será somado ao progresso da meta. Opcional.</p>
+                </div>
+                @endif
 
                 {{-- Data, Status, Descrição --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -178,15 +219,18 @@
                     </div>
                     <div>
                         <label for="status" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Status</label>
-                        <select name="status" id="status" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium">
-                            <option value="completed" {{ old('status', 'completed') == 'completed' ? 'selected' : '' }}>Concluída</option>
-                            <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
-                        </select>
+                        <div class="relative">
+                            <select name="status" id="status" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full px-4 py-3 pr-10 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium appearance-none [&::-ms-expand]:hidden">
+                                <option value="completed" {{ old('status', 'completed') == 'completed' ? 'selected' : '' }}>Concluída</option>
+                                <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
+                            </select>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label for="description" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Descrição (opcional)</label>
-                    <textarea name="description" id="description" rows="2" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium placeholder-gray-400" placeholder="Ex: Pagamento mercado, Salário">{{ old('description') }}</textarea>
+                    <textarea name="description" id="description" rows="2" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium placeholder-gray-400" :placeholder="descriptionPlaceholder()">{{ old('description') }}</textarea>
                 </div>
 
                 @if($isPro)
@@ -254,7 +298,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-gray-900 dark:text-white mb-1">Como funciona no Vertex Contas</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Cada transação altera o <strong>saldo da conta</strong> escolhida. Sua <strong>capacidade mensal</strong> vem do planejamento em Minha Renda. Use categorias para organizar e, se for {{ plan_pro_name() }}, marque &quot;Repetir&quot; para agendar o mesmo lançamento todo mês.</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">Categorizar cada lançamento ajuda a ver para onde vai seu dinheiro. Se vincular uma despesa a uma meta, o valor entra no progresso da meta. Orçamentos acompanham o gasto por categoria. Sua <strong>capacidade mensal</strong> vem do planejamento em <a href="{{ route('core.income.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Minha Renda</a>. @if($isPro) Como {{ plan_pro_name() }}, você pode marcar &quot;Repetir&quot; para agendar o mesmo lançamento todo mês. @endif</p>
             </div>
         </div>
     </div>

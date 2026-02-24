@@ -65,6 +65,14 @@ class StripeDriver implements PaymentGatewayInterface
             $subscriptionData['trial_period_days'] = 7;
         }
 
+        $returnUrl = $metadata['return_url'] ?? null;
+        $successUrl = $returnUrl
+            ? $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'payment=success&session_id={CHECKOUT_SESSION_ID}'
+            : route('paneluser.index') . '?payment=success&session_id={CHECKOUT_SESSION_ID}';
+        $cancelUrl = $returnUrl
+            ? $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'payment=cancelled'
+            : route('user.subscription.index') . '?payment=cancelled';
+
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[
@@ -84,8 +92,8 @@ class StripeDriver implements PaymentGatewayInterface
             'mode' => 'subscription',
             'subscription_data' => $subscriptionData,
             'customer_email' => $metadata['email'] ?? null,
-            'success_url' => route('paneluser.index') . '?payment=success&session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('user.subscription.index') . '?payment=cancelled',
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
             'metadata' => $metadata,
         ]);
 

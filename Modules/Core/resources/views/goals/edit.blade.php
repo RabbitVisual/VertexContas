@@ -35,6 +35,16 @@
         </div>
     </div>
 
+    {{-- Dica rápida ao editar --}}
+    <div class="rounded-2xl border border-amber-200/60 dark:border-amber-800/40 bg-amber-50/40 dark:bg-amber-950/20 p-4 sm:p-5 flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+            <x-icon name="lightbulb" style="duotone" class="w-5 h-5" />
+        </div>
+        <div class="min-w-0 text-sm text-gray-700 dark:text-gray-300">
+            <strong class="text-amber-800 dark:text-amber-200">Lembrete:</strong> ao alterar o &quot;Valor acumulado&quot;, você está ajustando manualmente o progresso. Ao mudar a <strong>contribuição automática</strong> (valor, conta, categoria ou dia), o sistema atualiza o agendamento: no próximo dia configurado, a despesa será gerada e somada à meta. Desative a contribuição se não quiser mais débitos automáticos.
+        </div>
+    </div>
+
     <div class="rounded-3xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
         <form action="{{ route('core.goals.update', $goal) }}" method="POST">
             @csrf
@@ -99,6 +109,76 @@
                     @error('deadline')
                         <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- Contribuição mensal automática --}}
+                @php $hasContribution = (float)($goal->monthly_contribution ?? 0) > 0 || old('monthly_contribution'); @endphp
+                <div class="pt-6 border-t border-gray-200 dark:border-white/5 space-y-4" x-data="{ enableContribution: {{ $hasContribution ? 'true' : 'false' }} }">
+                    <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <x-icon name="arrows-rotate" style="duotone" class="w-4 h-4" />
+                        Contribuição mensal automática
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Dedico todo mês um valor para esta meta. O valor será debitado da conta e registrado no extrato.</p>
+                    <label class="relative inline-flex items-center cursor-pointer gap-3">
+                        <input type="checkbox" x-model="enableContribution" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Ativar contribuição automática</span>
+                    </label>
+                    <div x-show="enableContribution" x-collapse class="space-y-4 rounded-2xl bg-gray-50 dark:bg-gray-950/50 border border-gray-200 dark:border-white/10 p-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="monthly_contribution" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Valor mensal (R$)</label>
+                                <input type="number" id="monthly_contribution" name="monthly_contribution" value="{{ old('monthly_contribution', $goal->monthly_contribution) }}" step="0.01" min="0"
+                                       class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-2.5 font-medium tabular-nums">
+                                @error('monthly_contribution')
+                                    <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="contribution_recurrence_day" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Dia do mês (1–31)</label>
+                                <div class="relative">
+                                    <select name="contribution_recurrence_day" id="contribution_recurrence_day" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-2.5 pr-10 font-medium appearance-none [&::-ms-expand]:hidden">
+                                        @foreach(range(1, 31) as $d)
+                                            <option value="{{ $d }}" {{ old('contribution_recurrence_day', $goal->contribution_recurrence_day ?? 1) == $d ? 'selected' : '' }}>{{ $d }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="contribution_account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Conta</label>
+                                <div class="relative">
+                                    <select name="contribution_account_id" id="contribution_account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-2.5 pr-10 font-medium appearance-none [&::-ms-expand]:hidden">
+                                        <option value="">Selecione</option>
+                                        @foreach($accounts as $acc)
+                                            <option value="{{ $acc->id }}" {{ old('contribution_account_id', $goal->contribution_account_id) == $acc->id ? 'selected' : '' }}>{{ $acc->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                                </div>
+                                @error('contribution_account_id')
+                                    <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="contribution_category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Categoria</label>
+                                <div class="relative">
+                                    <select name="contribution_category_id" id="contribution_category_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-2.5 pr-10 font-medium appearance-none [&::-ms-expand]:hidden">
+                                        <option value="">Selecione</option>
+                                        @foreach($expenseCategories as $cat)
+                                            <option value="{{ $cat->id }}" {{ old('contribution_category_id', $goal->contribution_category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                                </div>
+                                @error('contribution_category_id')
+                                    <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Recursos Pro (ocultos para free) --}}

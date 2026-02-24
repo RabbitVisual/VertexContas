@@ -13,10 +13,24 @@ use Modules\Gateways\Services\SubscriptionService;
 
 class SubscriptionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $isPro = $user->isPro();
+
+        $returnUrl = $request->query('return');
+        if ($returnUrl !== null && $returnUrl !== '') {
+            $returnUrl = (string) $returnUrl;
+            if (str_starts_with($returnUrl, '/')) {
+                $returnUrl = url($returnUrl);
+            } elseif (! str_starts_with($returnUrl, config('app.url'))
+                && ! str_starts_with($returnUrl, 'http://')
+                && ! str_starts_with($returnUrl, 'https://')) {
+                $returnUrl = null;
+            }
+        } else {
+            $returnUrl = null;
+        }
 
         $gateways = Gateway::where('is_active', true)->get();
         $payments = \Modules\Gateways\Models\PaymentLog::where('user_id', $user->id)
@@ -78,7 +92,8 @@ class SubscriptionController extends Controller
             'hasUsedTrial',
             'planFree',
             'planPro',
-            'paidPlans'
+            'paidPlans',
+            'returnUrl'
         ));
     }
 

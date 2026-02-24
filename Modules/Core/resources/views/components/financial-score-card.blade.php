@@ -3,7 +3,9 @@
     'label' => 'Em análise',
     'scoreTextClass' => 'text-slate-500 dark:text-slate-400',
     'scoreBorderClass' => 'hover:border-slate-400/30',
-    'description' => '0-100: poupança, reserva e consistência',
+    'description' => 'Baseado em poupança, orçamento, reserva de emergência e consistência de registro (GFP).',
+    'showHelp' => true,
+    'isPro' => false,
 ])
 
 @php
@@ -17,13 +19,72 @@
 @endphp
 
 <div {{ $attributes->merge([
-    'class' => "group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 {$scoreBorderClass} shadow-sm hover:shadow-xl",
+    'class' => "group relative overflow-visible bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 rounded-3xl border border-gray-200 dark:border-white/5 {$scoreBorderClass} shadow-sm hover:shadow-xl",
 ]) }}>
     <div class="relative p-6 flex flex-col">
-        {{-- Header: SCORE FINANCEIRO --}}
-        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 whitespace-nowrap">
-            Score Financeiro
-        </p>
+        {{-- Header: SCORE FINANCEIRO + dica de cálculo --}}
+        <div class="flex items-center justify-between gap-2 mb-4">
+            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest whitespace-nowrap">
+                Score Financeiro
+            </p>
+            @if($showHelp)
+                <span class="relative inline-flex shrink-0"
+                      x-data="{
+                          open: false,
+                          popoverStyle: '',
+                          closeTimer: null,
+                          positionPopover() {
+                              if (!this.$refs.trigger || !this.$refs.popover) return;
+                              const tr = this.$refs.trigger.getBoundingClientRect();
+                              const pop = this.$refs.popover;
+                              const gap = 8;
+                              const margin = 12;
+                              let left = tr.left + (tr.width / 2) - (pop.offsetWidth / 2);
+                              let top = tr.top - pop.offsetHeight - gap;
+                              left = Math.max(margin, Math.min(document.documentElement.clientWidth - pop.offsetWidth - margin, left));
+                              top = Math.max(margin, Math.min(document.documentElement.clientHeight - pop.offsetHeight - margin, top));
+                              this.popoverStyle = 'left:'.concat(left, 'px;top:', top, 'px;');
+                          },
+                          scheduleClose() {
+                              clearTimeout(this.closeTimer);
+                              this.closeTimer = setTimeout(() => { this.open = false }, 200);
+                          },
+                          cancelClose() {
+                              clearTimeout(this.closeTimer);
+                              this.closeTimer = null;
+                          }
+                      }"
+                      @mouseenter="cancelClose(); open = true; $nextTick(() => positionPopover())"
+                      @mouseleave="scheduleClose()">
+                    <button type="button" x-ref="trigger" aria-label="Como o score é calculado" class="inline-flex items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-primary dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <i class="fa-pro fa-solid fa-circle-question text-sm" aria-hidden="true"></i>
+                    </button>
+                    <template x-teleport="body">
+                        <div x-show="open"
+                             x-ref="popover"
+                             x-cloak
+                             x-transition
+                             @mouseenter="cancelClose()"
+                             @mouseleave="open = false"
+                             :style="'position:fixed;z-index:9999;'.concat(popoverStyle)"
+                             class="w-72 min-w-0 max-w-[calc(100vw-1.5rem)] p-4 text-sm rounded-xl shadow-xl border bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700">
+                            <p class="font-bold text-gray-900 dark:text-white mb-2">Como o score é calculado</p>
+                            <p class="text-gray-700 dark:text-gray-300 mb-2">O score (0–100) mede sua saúde financeira com base em quatro pilares das melhores práticas de GFP:</p>
+                            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1 mb-2 text-xs break-words">
+                                <li><strong>Taxa de poupança</strong> (até 35 pts): o que sobra das receitas após as despesas do mês.</li>
+                                <li><strong>Respeito ao orçamento</strong> (até 25 pts): gastos por categoria dentro dos limites.</li>
+                                <li><strong>Reserva de emergência</strong> (até 25 pts): saldo equivalente a meses de despesas (meta: 6 meses).</li>
+                                <li><strong>Consistência</strong> (até 15 pts): registrar lançamentos com frequência no Extrato.</li>
+                            </ul>
+                            <p class="text-gray-600 dark:text-gray-400 text-xs break-words">A regra <strong>50/30/20</strong> (50% necessidades, 30% desejos, 20% poupança e metas) ajuda a melhorar o score. Com poucos lançamentos ou sem orçamento, o score aparece como &quot;Em análise&quot;.</p>
+                            @if($isPro)
+                                <p class="text-primary-600 dark:text-primary-400 text-xs mt-2 font-medium">No plano Pro você acompanha o detalhamento 50/30/20 no Vertex Bot.</p>
+                            @endif
+                        </div>
+                    </template>
+                </span>
+            @endif
+        </div>
 
         {{-- Center: Gauge + Number + Status --}}
         <div class="flex flex-col items-center justify-center">
@@ -41,9 +102,9 @@
             <p class="text-sm font-bold {{ $scoreTextClass }} mt-2">{{ $label }}</p>
         </div>
 
-        {{-- Description: Section at bottom --}}
+        {{-- Description: Section at bottom (GFP) --}}
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
-            <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ $description }}</p>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ $score === 0 ? 'Com mais lançamentos no Extrato e orçamentos definidos, seu score passa a ser calculado.' : $description }}</p>
         </div>
     </div>
 </div>

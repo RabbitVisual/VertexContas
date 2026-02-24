@@ -194,7 +194,7 @@ class TourService
             [
                 'element' => '[data-tour="dashboard-intro"]',
                 'title' => 'Painel Financeiro',
-                'description' => 'Bem-vindo ao seu centro de controle. Aqui você vê o resumo das finanças: saldo total das contas, renda planejada e atalhos para Nova Transação, Transferir e Relatórios. Use os cards abaixo para acessar contas, extrato, metas e orçamentos.',
+                'description' => 'Bem-vindo ao seu centro de controle. Aqui você vê o resumo das finanças: saldo total das contas, receitas e despesas do mês e capacidade mensal. Use os cards abaixo e os atalhos para Extrato, metas e orçamentos.',
                 'side' => 'bottom',
             ],
             [
@@ -205,8 +205,14 @@ class TourService
             ],
             [
                 'element' => '[data-tour="dashboard-income"]',
-                'title' => 'Renda mensal',
-                'description' => 'Total da sua renda planejada (Minha Renda). É a base para calcular sua capacidade de gastos e comparar com o que de fato entrou no Extrato.',
+                'title' => 'Receitas do mês',
+                'description' => 'Total da sua renda planejada (Minha Renda). A capacidade mensal é receitas menos despesas fixas' . ($isPro ? '; no Pro já descontamos o comprometido com metas' : '') . '. Compare com o que de fato entrou no Extrato.',
+                'side' => 'bottom',
+            ],
+            [
+                'element' => '[data-tour="dashboard-capacity"]',
+                'title' => 'Capacidade mensal',
+                'description' => 'O que sobra para gastar após receitas e despesas fixas (Minha Renda).' . ($isPro ? ' No Vertex Pro, já descontamos o valor comprometido com metas; assim você vê quanto realmente sobra.' : ' Planeje em Minha Renda para manter esse número atualizado.') . '',
                 'side' => 'bottom',
             ],
             [

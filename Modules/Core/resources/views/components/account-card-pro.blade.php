@@ -59,6 +59,9 @@
 
     @if($showActions)
         <div class="absolute inset-0 rounded-[1rem] bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3 z-20 pointer-events-none">
+            <a href="{{ route('core.transactions.index', ['account_id' => $account->id]) }}" class="pointer-events-auto p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Ver movimentações no Extrato">
+                <x-icon name="receipt" style="solid" class="w-5 h-5" />
+            </a>
             <a href="{{ route('core.accounts.show', $account) }}" class="pointer-events-auto p-3 bg-white/25 hover:bg-white/35 rounded-xl text-white transition-colors inline-flex" title="Ver">
                 <x-icon name="eye" style="solid" class="w-5 h-5" />
             </a>

@@ -22,7 +22,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status do Chamado</label>
                     <div class="relative">
-                        <select name="status" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <select name="status" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                             <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Todos os Status</option>
                             <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Aberto</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
@@ -38,7 +38,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nível de Prioridade</label>
                     <div class="relative">
-                        <select name="priority" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <select name="priority" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                             <option value="all" {{ request('priority') == 'all' ? 'selected' : '' }}>Todas as Prioridades</option>
                             <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Baixa</option>
                             <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Média</option>
@@ -53,7 +53,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Responsável</label>
                     <div class="relative">
-                        <select name="agent" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F]">
+                        <select name="agent" class="support-select w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-sm font-medium focus:ring-2 focus:ring-[#11C76F]/20 focus:border-[#11C76F] appearance-none [&::-ms-expand]:hidden">
                             <option value="all" {{ request('agent') == 'all' ? 'selected' : '' }}>Qualquer Agente</option>
                             <option value="unassigned" {{ request('agent') == 'unassigned' ? 'selected' : '' }}>Sem Atribuição</option>
                             @foreach($agents as $agent)

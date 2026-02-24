@@ -11,6 +11,7 @@ namespace Modules\PanelUser\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Core\Services\FinancialHealthService;
+use Modules\Core\Services\GamificationService;
 use Modules\Core\Services\TourService;
 
 class PanelUserController extends Controller
@@ -117,10 +118,16 @@ class PanelUserController extends Controller
         $dashboardTourId = $tourService->getTourForRoute('paneluser.index', false);
         $dashboardTourSteps = $dashboardTourId ? $tourService->getStepsForTour($dashboardTourId, false) : [];
 
+        // 9. Vertex Bot: insight + financial score (sincronizado com core.dashboard)
+        $gamification = app(GamificationService::class);
+        $vertexBot = $gamification->analyzeUser($user, 'paneluser.index');
+
         return view('paneluser::index', [
             'stockBalance' => $totalBalance,
+            'totalBalance' => $totalBalance,
             'monthlyIncome' => $monthlyIncome,
             'monthlyExpense' => $monthlyExpense,
+            'monthlyExpenses' => $monthlyExpense,
             'accounts' => $accounts,
             'goals' => $goals,
             'user' => $user,
@@ -130,9 +137,11 @@ class PanelUserController extends Controller
             'spendingByCategory' => $spendingByCategory,
             'recentTransactions' => $recentTransactions,
             'flowCapacity' => $monthlyCapacity,
+            'monthlyCapacity' => $monthlyCapacity,
             'incomeBreakdown' => $incomeBreakdown,
             'dashboardTourId' => $dashboardTourId,
             'dashboardTourSteps' => $dashboardTourSteps,
+            'vertexBot' => $vertexBot,
         ]);
     }
 

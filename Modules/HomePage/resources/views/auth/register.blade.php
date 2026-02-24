@@ -20,15 +20,25 @@
                     <p class="text-slate-500 dark:text-slate-400 font-medium">Inicie sua jornada financeira local hoje</p>
                 </div>
 
-                <!-- Error Messages -->
+                <!-- Error Messages (sempre amigáveis; nunca exibir chaves de tradução) -->
                 @if($errors->any())
-                    <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 rounded-2xl flex items-center gap-3 animate-shake">
-                        <x-icon name="circle-exclamation" class="text-red-500 text-xl" />
-                        <ul class="text-sm text-red-600 dark:text-red-400 font-bold list-none">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-start gap-3" role="alert" aria-live="polite">
+                        <x-icon name="circle-exclamation" class="text-red-500 dark:text-red-400 text-xl shrink-0 mt-0.5" />
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold text-red-800 dark:text-red-200 mb-2">Corrija os erros abaixo antes de continuar:</p>
+                            <ul class="text-sm text-red-700 dark:text-red-300 space-y-1 list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    @php
+                                        $translated = __($error);
+                                        $msg = ($translated !== $error) ? $translated : $error;
+                                        if (\Illuminate\Support\Str::contains($msg, 'validation.') || \Illuminate\Support\Str::contains($msg, 'password.')) {
+                                            $msg = 'Verifique os dados e as regras de senha (letras, números e caractere especial).';
+                                        }
+                                    @endphp
+                                    <li>{{ $msg }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 @endif
 
@@ -47,9 +57,12 @@
                                     <x-icon name="user" />
                                 </div>
                                 <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="João" required autofocus>
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('first_name') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="João" required autofocus aria-invalid="{{ $errors->has('first_name') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('first_name') ? 'first_name_error' : '' }}">
                             </div>
+                            @error('first_name')
+                                <p id="first_name_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Last Name -->
@@ -60,9 +73,12 @@
                                     <x-icon name="user" />
                                 </div>
                                 <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="Silva" required>
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('last_name') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="Silva" required aria-invalid="{{ $errors->has('last_name') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('last_name') ? 'last_name_error' : '' }}">
                             </div>
+                            @error('last_name')
+                                <p id="last_name_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -75,9 +91,12 @@
                                     <x-icon name="envelope" />
                                 </div>
                                 <input type="email" name="email" id="email" value="{{ old('email') }}"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="joao@exemplo.com" required>
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('email') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="joao@exemplo.com" required aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('email') ? 'email_error' : '' }}">
                             </div>
+                            @error('email')
+                                <p id="email_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- CPF -->
@@ -88,9 +107,12 @@
                                     <x-icon name="id-card" />
                                 </div>
                                 <input type="text" name="cpf" id="cpf" value="{{ old('cpf') }}"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="000.000.000-00" x-mask="'cpf'">
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('cpf') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="000.000.000-00" x-mask="'cpf'" aria-invalid="{{ $errors->has('cpf') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('cpf') ? 'cpf_error' : '' }}">
                             </div>
+                            @error('cpf')
+                                <p id="cpf_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -104,8 +126,12 @@
                                 </div>
                                 <input type="text" name="birth_date" id="birth_date" value="{{ old('birth_date') }}"
                                     x-mask="'date'" placeholder="dd/mm/aaaa"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 transition-all font-medium">
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('birth_date') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    aria-invalid="{{ $errors->has('birth_date') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('birth_date') ? 'birth_date_error' : '' }}">
                             </div>
+                            @error('birth_date')
+                                <p id="birth_date_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Phone -->
@@ -116,9 +142,12 @@
                                     <x-icon name="phone" />
                                 </div>
                                 <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="(00) 00000-0000" x-mask="'phone'">
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('phone') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="(00) 00000-0000" x-mask="'phone'" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('phone') ? 'phone_error' : '' }}">
                             </div>
+                            @error('phone')
+                                <p id="phone_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -131,9 +160,13 @@
                                     <x-icon name="lock" />
                                 </div>
                                 <input type="password" name="password" id="password"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="••••••••" required>
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('password') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="••••••••" required aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('password') ? 'password_error' : '' }}">
                             </div>
+                            @error('password')
+                                <p id="password_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Mínimo 8 caracteres, com letras, números e um caractere especial.</p>
                         </div>
 
                         <!-- Confirm Password -->
@@ -144,9 +177,12 @@
                                     <x-icon name="lock-keyhole" />
                                 </div>
                                 <input type="password" name="password_confirmation" id="password_confirmation"
-                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium"
-                                    placeholder="••••••••" required>
+                                    class="block w-full pl-12 pr-5 py-4 bg-slate-100 dark:bg-slate-900 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-primary/50 transition-all font-medium {{ $errors->has('password_confirmation') ? 'ring-2 ring-red-500 dark:ring-red-500 border-2 border-red-500 dark:border-red-500' : 'border-none' }}"
+                                    placeholder="••••••••" required aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}" aria-describedby="{{ $errors->has('password_confirmation') ? 'password_confirmation_error' : '' }}">
                             </div>
+                            @error('password_confirmation')
+                                <p id="password_confirmation_error" class="text-sm text-red-600 dark:text-red-400 font-medium" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

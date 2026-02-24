@@ -10,6 +10,7 @@ use Modules\PanelUser\Http\Controllers\BlogController;
 use Modules\PanelUser\Http\Controllers\LegalAcceptanceController;
 use Modules\PanelUser\Http\Controllers\VertexBotController;
 use Modules\PanelUser\Http\Controllers\AchievementController;
+use Modules\PanelUser\Http\Controllers\WizardController;
 use Modules\Core\Http\Controllers\TourController;
 
 /*
@@ -17,15 +18,25 @@ use Modules\Core\Http\Controllers\TourController;
 | User Routes
 |--------------------------------------------------------------------------
 |
-| Access: Auth, Verified, Role:User
+| Access: Auth, Verified, Role:User. Legal first, then Wizard (config inicial).
 |
 */
 
-Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|admin', 'financial.setup', 'legal.acceptance'])->group(function () {
+Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|admin', 'legal.acceptance'])->group(function () {
 
     // Legal Acceptance (Compliance Wall)
     Route::get('/legal/aceitar', [LegalAcceptanceController::class, 'index'])->name('paneluser.legal.acceptance');
     Route::post('/legal/aceitar', [LegalAcceptanceController::class, 'store'])->name('paneluser.legal.store');
+
+    // Wizard Inicial (configuração obrigatória: renda + conta)
+    Route::get('/configuracao-inicial', [WizardController::class, 'show'])->name('paneluser.wizard.show');
+    Route::post('/configuracao-inicial/renda', [WizardController::class, 'storeIncome'])->name('paneluser.wizard.income.store');
+    Route::post('/configuracao-inicial/conta', [WizardController::class, 'storeAccount'])->name('paneluser.wizard.account.store');
+    Route::post('/configuracao-inicial/pular-orcamento', [WizardController::class, 'skipBudget'])->name('paneluser.wizard.skip-budget');
+    Route::post('/configuracao-inicial/concluir', [WizardController::class, 'complete'])->name('paneluser.wizard.complete');
+
+    // Rest of panel: require wizard complete (income + at least one account)
+    Route::middleware('wizard.complete')->group(function () {
 
     // Panel Dashboard
     Route::get('/', [PanelUserController::class, 'index'])->name('paneluser.index');
@@ -84,4 +95,5 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::post('/inspection/{inspection}/reject', [\Modules\PanelUser\Http\Controllers\InspectionController::class, 'reject'])->name('user.inspection.reject');
     Route::get('/inspection/sync-url', [\Modules\PanelUser\Http\Controllers\InspectionController::class, 'syncUrl'])->name('user.inspection.sync');
 
+    }); // wizard.complete
 });

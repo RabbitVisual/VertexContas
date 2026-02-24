@@ -27,6 +27,10 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">Detalhes e últimas transações desta conta.</p>
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0">
+                    <a href="{{ route('core.transactions.index', ['account_id' => $account->id]) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                        <x-icon name="receipt" style="duotone" class="w-4 h-4" />
+                        Ver movimentações no Extrato
+                    </a>
                     <a href="{{ route('core.accounts.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
                         Voltar

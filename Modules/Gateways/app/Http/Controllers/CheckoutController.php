@@ -63,6 +63,15 @@ class CheckoutController extends Controller
             if ($user->hasUsedTrial()) {
                 $metadata['no_trial'] = true;
             }
+            $returnUrl = $request->query('return');
+            if ($returnUrl !== null && $returnUrl !== '') {
+                if (str_starts_with($returnUrl, '/')) {
+                    $returnUrl = url($returnUrl);
+                }
+                if (str_starts_with($returnUrl, [config('app.url'), 'http://', 'https://'])) {
+                    $metadata['return_url'] = $returnUrl;
+                }
+            }
 
             $redirectUrl = $driver->createCheckoutSession($amount, $metadata);
 

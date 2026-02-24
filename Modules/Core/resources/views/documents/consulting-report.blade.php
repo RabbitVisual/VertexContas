@@ -65,6 +65,7 @@
 {{-- Tabela 50/30/20 — estilo planilha: categoria, %, valores, desvio, status --}}
 <div class="pillar-table-wrap">
     <div class="pillar-table-title">Distribuição da Renda — Metodologia 50/30/20</div>
+    @if(empty($forPdf))<div class="table-scroll-wrap">@endif
     <table class="bs-table bs-table-pillar">
         <colgroup>
             <col style="width: 22%;">
@@ -129,6 +130,7 @@
             </tr>
         </tbody>
     </table>
+    @if(empty($forPdf))</div>@endif
 </div>
 
 {{-- Conclusão Estratégica do Especialista (Vertex AI) — bloco único, sem typewriter --}}

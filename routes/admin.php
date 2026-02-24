@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Nwidart\Modules\Facades\Module;
 use Modules\PanelAdmin\Http\Controllers\AdminBlogController;
+use Modules\PanelAdmin\Http\Controllers\PwaAdminController;
 use Modules\PanelAdmin\Http\Controllers\AdminProfileController;
 use Modules\PanelAdmin\Http\Controllers\AdminSupportController;
 use Modules\PanelAdmin\Http\Controllers\AdminUserController;
@@ -191,6 +193,20 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::get('/{document}/edit', [LegalManagerController::class, 'edit'])->name('edit');
         Route::put('/{document}', [LegalManagerController::class, 'update'])->name('update');
     });
+
+    // PWA (instalações e versões)
+    if (Module::find('PWA')?->isEnabled()) {
+        Route::prefix('pwa')->name('pwa.')->group(function () {
+            Route::get('/', [PwaAdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/installs', [PwaAdminController::class, 'installs'])->name('installs');
+            Route::get('/versions', [PwaAdminController::class, 'versions'])->name('versions.index');
+            Route::get('/versions/create', [PwaAdminController::class, 'createVersion'])->name('versions.create');
+            Route::post('/versions', [PwaAdminController::class, 'storeVersion'])->name('versions.store');
+            Route::get('/versions/{version}/edit', [PwaAdminController::class, 'editVersion'])->name('versions.edit');
+            Route::put('/versions/{version}', [PwaAdminController::class, 'updateVersion'])->name('versions.update');
+            Route::delete('/versions/{version}', [PwaAdminController::class, 'destroyVersion'])->name('versions.destroy');
+        });
+    }
 
     // User Management Extensions
     Route::post('users/{user}/update-photo', [AdminSupportController::class, 'updateUserPhoto'])->name('users.update-photo');
