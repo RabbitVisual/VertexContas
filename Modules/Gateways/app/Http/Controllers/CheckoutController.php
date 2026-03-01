@@ -65,10 +65,14 @@ class CheckoutController extends Controller
             }
             $returnUrl = $request->query('return');
             if ($returnUrl !== null && $returnUrl !== '') {
+                $returnUrl = is_string($returnUrl) ? $returnUrl : (string) $returnUrl;
                 if (str_starts_with($returnUrl, '/')) {
                     $returnUrl = url($returnUrl);
                 }
-                if (str_starts_with($returnUrl, [config('app.url'), 'http://', 'https://'])) {
+                $appUrl = config('app.url');
+                if (str_starts_with($returnUrl, (string) $appUrl)
+                    || str_starts_with($returnUrl, 'http://')
+                    || str_starts_with($returnUrl, 'https://')) {
                     $metadata['return_url'] = $returnUrl;
                 }
             }

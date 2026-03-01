@@ -6,6 +6,7 @@ namespace Modules\PanelUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Plan;
 use Modules\Gateways\Models\Gateway;
 use Modules\Gateways\Models\Subscription;
@@ -15,7 +16,7 @@ class SubscriptionController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $isPro = $user->isPro();
 
         $returnUrl = $request->query('return');
