@@ -13,15 +13,15 @@
         <ul class="text-left max-w-sm mx-auto space-y-2 text-gray-700 dark:text-gray-300 font-medium mb-8" role="list">
             <li class="flex items-center gap-2">
                 <x-icon name="circle-check" style="solid" class="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
-                <span>Renda cadastrada</span>
+                <span>Objetivo definido</span>
             </li>
             <li class="flex items-center gap-2">
                 <x-icon name="circle-check" style="solid" class="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
-                <span>Primeira conta cadastrada</span>
+                <span>Conta &quot;Minha Conta&quot; com saldo cadastrada</span>
             </li>
-            <li class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                <x-icon name="chart-pie" style="solid" class="w-5 h-5 shrink-0" />
-                <span>Orçamentos (opcional, em Financeiro)</span>
+            <li class="flex items-center gap-2">
+                <x-icon name="circle-check" style="solid" class="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                <span>Renda principal cadastrada</span>
             </li>
         </ul>
         <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
@@ -42,7 +42,7 @@
             @endif
         @elseif(Route::has('user.subscription.index'))
             {{-- Oferta guiada: assinar agora (com retorno ao wizard) ou continuar com plano gratuito --}}
-            @php $wizardReturnUrl = route('paneluser.wizard.show', ['step' => 4]); @endphp
+            @php $wizardReturnUrl = route('paneluser.wizard.show', ['step' => 3]); @endphp
             <div class="max-w-md mx-auto mb-8 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/30 dark:bg-amber-950/20 p-6 text-left">
                 <p class="text-sm font-bold text-gray-900 dark:text-white mb-2">Quer mais recursos?</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -63,10 +63,18 @@
                     </form>
                 </div>
             </div>
+        @else
+            <form action="{{ route('paneluser.wizard.complete') }}" method="POST" class="inline" x-data="{ loading: false }" @submit="loading = true">
+                @csrf
+                <button type="submit" :disabled="loading" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm transition-colors disabled:opacity-70">
+                    <span x-show="!loading">Ir ao painel</span>
+                    <span x-show="loading" x-cloak class="inline-flex items-center gap-2"><span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Redirecionando...</span>
+                </button>
+            </form>
         @endif
     </div>
 
-    @if(!isset($isPro) || $isPro)
+    @if(isset($isPro) && $isPro)
     <form action="{{ route('paneluser.wizard.complete') }}" method="POST" class="inline" x-data="{ loading: false }" @submit="loading = true">
         @csrf
         <button type="submit" :disabled="loading" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-bold text-lg shadow-lg shadow-primary-500/25 transition-all focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-70 disabled:pointer-events-none">

@@ -145,8 +145,13 @@
             <div class="w-24 h-24 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-500 mb-6">
                 <x-icon name="medal" style="duotone" class="w-12 h-12 opacity-50" />
             </div>
-            <h3 class="text-2xl font-black text-slate-200 dark:text-white mb-2 leading-tight">Nenhuma medalha cadastrada</h3>
-            <p class="text-slate-400 max-w-sm mx-auto">As medalhas serão exibidas aqui assim que forem configuradas pelo administrador.</p>
+            @if(!empty($hasMedalsInSystem))
+                <h3 class="text-2xl font-black text-slate-200 dark:text-white mb-2 leading-tight">Você ainda não desbloqueou nenhuma medalha</h3>
+                <p class="text-slate-400 max-w-sm mx-auto">Continue lançando transações, cuidando do seu orçamento e seguindo as dicas do Mentor para conquistá-las!</p>
+            @else
+                <h3 class="text-2xl font-black text-slate-200 dark:text-white mb-2 leading-tight">Nenhuma medalha cadastrada</h3>
+                <p class="text-slate-400 max-w-sm mx-auto">Execute <code class="text-amber-400 bg-slate-700/50 px-1.5 py-0.5 rounded">php artisan db:seed</code> para popular o catálogo padrão de medalhas.</p>
+            @endif
         </div>
     @endif
 </div>

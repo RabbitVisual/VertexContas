@@ -7,6 +7,7 @@
     limitAmount: '',
     alertThreshold: 80,
     allowExceed: true,
+    isRecurring: '{{ old("is_recurring", "1") }}',
     formatCurrency() {
         let value = String(this.limitAmount || '').replace(/\D/g, '');
         if (value === '') { this.limitAmount = ''; return; }
@@ -71,6 +72,57 @@
                         <input type="hidden" name="limit_amount" :value="(typeof limitAmount === 'string' ? limitAmount : '').replace(/\./g, '').replace(',', '.')">
                     </div>
                     @error('limit_amount')
+                        <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Recorrência: Repetir todo mês vs Apenas este mês --}}
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Isso é um limite para este mês ou se repete todo mês?</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="is_recurring" value="1" class="peer sr-only" {{ old('is_recurring', '1') == '1' ? 'checked' : '' }} x-model="isRecurring">
+                            <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/5 transition-all group-hover:bg-gray-100 dark:group-hover:bg-white/5">
+                                <x-icon name="arrows-rotate" style="duotone" class="w-6 h-6 text-gray-400 peer-checked:text-emerald-600 mb-2" />
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 peer-checked:text-emerald-600">Repetir todo mês</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-500 mt-1">Planejado recorrente</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="is_recurring" value="0" class="peer sr-only" {{ old('is_recurring') === '0' ? 'checked' : '' }} x-model="isRecurring">
+                            <div class="p-4 flex flex-col items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/5 transition-all group-hover:bg-gray-100 dark:group-hover:bg-white/5">
+                                <x-icon name="calendar-day" style="duotone" class="w-6 h-6 text-gray-400 peer-checked:text-emerald-600 mb-2" />
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 peer-checked:text-emerald-600">Apenas este mês</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-500 mt-1">Limite pontual</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div x-show="isRecurring === '0' || isRecurring === 0" x-cloak class="mt-4">
+                        <label for="period_start" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Para qual mês?</label>
+                        <input type="month" name="period_start" id="period_start" value="{{ old('period_start', date('Y-m')) }}"
+                               class="w-full max-w-xs px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 outline-none font-medium text-gray-900 dark:text-white">
+                        @error('period_start')
+                            <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Conta: de qual conta/cartão sai o dinheiro --}}
+                <div>
+                    <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Esse dinheiro vai sair de qual conta ou cartão?</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <x-icon name="wallet" style="duotone" class="w-5 h-5" />
+                        </div>
+                        <select name="account_id" id="account_id"
+                                class="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none font-medium text-gray-900 dark:text-white appearance-none">
+                            <option value="">Qualquer conta</option>
+                            @foreach($accounts as $account)
+                                <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('account_id')
                         <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
                     @enderror
                 </div>

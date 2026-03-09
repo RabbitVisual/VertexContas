@@ -83,7 +83,7 @@ class GoalContributionService
         return $next->copy()->addDays($nextSafeDay - 1);
     }
 
-    protected function deactivateRecurringForGoal(int $goalId): void
+    public function deactivateRecurringForGoal(int $goalId): void
     {
         RecurringTransaction::where('goal_id', $goalId)->update(['is_active' => false]);
     }

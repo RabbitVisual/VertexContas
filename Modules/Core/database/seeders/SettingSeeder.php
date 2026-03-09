@@ -282,6 +282,27 @@ class SettingSeeder extends Seeder
                 'is_encrypted' => false,
             ],
             [
+                'key' => 'security_login_max_attempts',
+                'value' => 5,
+                'group' => 'security',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'security_password_min_chars',
+                'value' => 8,
+                'group' => 'security',
+                'type' => 'integer',
+                'is_encrypted' => false,
+            ],
+            [
+                'key' => 'security_password_require_special',
+                'value' => true,
+                'group' => 'security',
+                'type' => 'boolean',
+                'is_encrypted' => false,
+            ],
+            [
                 'key' => 'session_lifetime',
                 'value' => 120,
                 'group' => 'security',

@@ -74,6 +74,108 @@
             </div>
         </div>
 
+        {{-- Distribuição 50/30/20 - Mentor Financeiro --}}
+        @php
+            $pillars503020 = $distribution503020['pillars'] ?? [];
+            $income503020 = $distribution503020['income'] ?? 0;
+        @endphp
+        <div
+            x-data="{
+                loaded: false,
+                init() {
+                    requestAnimationFrame(() => { this.loaded = true; });
+                }
+            }"
+            class="rounded-3xl border border-emerald-200/70 dark:border-emerald-700/60 bg-emerald-50/60 dark:bg-emerald-950/40 px-6 py-6 sm:px-8 sm:py-7 flex flex-col gap-5"
+        >
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-black text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                            <x-icon name="scale-balanced" style="duotone" class="w-4 h-4" />
+                        </span>
+                        Regra 50/30/20 aplicada à sua renda
+                    </h2>
+                    <p class="mt-1 text-sm text-emerald-900/80 dark:text-emerald-100/80 max-w-2xl">
+                        Estes três blocos mostram como sua renda do mês está sendo distribuída entre <span class="font-semibold">Necessidades</span>, <span class="font-semibold">Desejos</span> e <span class="font-semibold">Futuro e Metas</span>.
+                        Não é sobre cortar tudo, e sim ajustar aos poucos.
+                    </p>
+                </div>
+                <div class="text-xs text-emerald-900/70 dark:text-emerald-100/80 space-y-1">
+                    <p>Renda considerada: <span class="sensitive-value font-semibold"><x-core::financial-value :value="$income503020" /></span></p>
+                    <p>Objetivo saudável: <span class="font-semibold">50%</span> Necessidades · <span class="font-semibold">30%</span> Desejos · <span class="font-semibold">20%</span> Futuro</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @php
+                    $pillarOrder = [
+                        'necessities' => ['label' => 'Necessidades', 'color' => 'emerald'],
+                        'wants' => ['label' => 'Desejos', 'color' => 'amber'],
+                        'future' => ['label' => 'Futuro e Metas', 'color' => 'indigo'],
+                    ];
+                @endphp
+                @foreach($pillarOrder as $key => $meta)
+                    @php
+                        $pillar = $pillars503020[$key] ?? ['percentage' => 0, 'target' => $key === 'necessities' ? 50 : ($key === 'wants' ? 30 : 20), 'amount' => 0, 'status' => 'ok'];
+                        $pct = (float) ($pillar['percentage'] ?? 0);
+                        $target = (int) ($pillar['target'] ?? 0);
+                        $status = $pillar['status'] ?? 'ok';
+                        $barBase = [
+                            'emerald' => 'bg-emerald-500',
+                            'amber' => 'bg-amber-500',
+                            'indigo' => 'bg-indigo-500',
+                        ][$meta['color']];
+                        $barColor = $status === 'danger'
+                            ? 'bg-rose-500'
+                            : ($status === 'warning'
+                                ? 'bg-amber-500'
+                                : $barBase);
+                        $statusLabel = $status === 'danger'
+                            ? 'Atenção extra'
+                            : ($status === 'warning' ? 'Ajuste gentil recomendado' : 'Dentro da zona saudável');
+                    @endphp
+                    <div class="rounded-2xl bg-white/80 dark:bg-gray-950/40 border border-emerald-100/80 dark:border-emerald-800/60 px-4 py-4 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <div>
+                                <p class="text-xs font-semibold text-emerald-900/90 dark:text-emerald-50 uppercase tracking-wider">{{ $meta['label'] }}</p>
+                                <p class="text-[11px] text-emerald-900/70 dark:text-emerald-100/80">
+                                    Alvo: <span class="font-semibold">{{ $target }}%</span>
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-emerald-900 dark:text-emerald-100 tabular-nums">
+                                    {{ number_format($pct, 1, ',', '.') }}%
+                                </p>
+                                <p class="text-[10px] text-emerald-900/70 dark:text-emerald-100/70">{{ $statusLabel }}</p>
+                            </div>
+                        </div>
+                        <div class="w-full h-2.5 rounded-full bg-emerald-100/70 dark:bg-emerald-900/60 overflow-hidden">
+                            <div
+                                class="{{ $barColor }} h-2.5 rounded-full transition-all duration-700"
+                                :style="loaded ? 'width: {{ max(0, min(100, $pct)) }}%' : 'width: 0%'"
+                            ></div>
+                        </div>
+                        <p class="text-[11px] text-emerald-900/80 dark:text-emerald-100/80">
+                            Valor estimado: <span class="sensitive-value font-semibold"><x-core::financial-value :value="$pillar['amount'] ?? 0" /></span>
+                        </p>
+                        @if($key === 'necessities')
+                            <p class="text-[11px] text-emerald-900/80 dark:text-emerald-100/80">
+                                Inclui moradia, alimentação, contas essenciais e transporte. Se este bloco estiver muito alto, vamos olhar com carinho para as despesas fixas.
+                            </p>
+                        @elseif($key === 'wants')
+                            <p class="text-[11px] text-emerald-900/80 dark:text-emerald-100/80">
+                                Aqui entram lazer, presentes e confortos do dia a dia. A ideia não é cortar tudo, mas escolher com mais intenção o que faz sentido manter.
+                            </p>
+                        @else
+                            <p class="text-[11px] text-emerald-900/80 dark:text-emerald-100/80">
+                                Espaço reservado para reserva de emergência e metas. Mesmo um valor pequeno e constante já te coloca em movimento na direção certa.
+                            </p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
         {{-- Stats Grid - CBAV style (Score, Receitas, Despesas, Capacidade mensal; Saldo só no hero) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {{-- Score Financeiro (Gauge) --}}
@@ -134,13 +236,20 @@
             </div>
 
             {{-- Capacidade mensal (GFP); Balanço mensal como linha secundária --}}
-            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-capacity">
+            <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-capacity" @if(isset($availableToPlan)) data-available-to-plan="{{ $availableToPlan['available'] }}" @endif>
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
                     <x-icon name="chart-line" style="duotone" class="w-6 h-6" />
                 </div>
                 <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Capacidade mensal</p>
                 <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$monthlyCapacity" /></h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Balanço do mês (receitas − despesas): <span class="sensitive-value font-semibold tabular-nums {{ $monthlyBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}"><x-core::financial-value :value="$monthlyBalance" /></span></p>
+                @if(isset($availableToPlan))
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 pt-2 border-t border-gray-100 dark:border-white/5">
+                        <span class="font-semibold text-gray-700 dark:text-gray-300">Dinheiro livre para planejar:</span>
+                        <span class="sensitive-value font-bold tabular-nums text-emerald-600 dark:text-emerald-400"><x-core::financial-value :value="$availableToPlan['available']" /></span>
+                        <span class="block mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">Renda prevista menos orçamentos fixos e metas automáticas.</span>
+                    </p>
+                @endif
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">Dica: na regra 50/30/20, parte do 20% de poupança pode ir para reserva de emergência e metas.</p>
             </div>
         </div>
@@ -461,13 +570,83 @@
         </div>
 
         {{-- Dicas PRO / Ações Rápidas - CBAV style --}}
-        <div class="rounded-3xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 p-6 lg:p-8">
+        <div class="rounded-3xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 p-6 lg:p-8 space-y-6">
             <h4 class="font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2.5">
                 <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
                     <x-icon name="lightbulb" style="duotone" class="w-5 h-5" />
                 </div>
                 Dicas PRO
             </h4>
+            {{-- Consultoria IA & Projeções - Paywall visual --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 relative rounded-2xl border border-indigo-200 dark:border-indigo-800/60 bg-white dark:bg-gray-900/60 p-5 overflow-hidden">
+                    @php $isProUser = auth()->user()?->isPro() ?? false; @endphp
+                    @if(!$isProUser)
+                        <div class="absolute inset-0 bg-white/60 dark:bg-gray-900/70 backdrop-blur-sm pointer-events-none"></div>
+                    @endif
+                    <div class="relative z-10 flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                <x-icon name="sparkles" style="solid" class="w-4 h-4" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">Consultoria IA & Projeções</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Um mentor financeiro ao seu lado, usando seus números reais para sugerir próximos passos inteligentes.
+                                </p>
+                            </div>
+                        </div>
+                        @if($isProUser && ($proInsights['available'] ?? false))
+                            <ul class="mt-1 space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+                                @foreach(($proInsights['highlights'] ?? []) as $highlight)
+                                    <li class="flex items-start gap-2">
+                                        <span class="mt-0.5 h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+                                        <span>{{ $highlight }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            @if(!empty($proInsights['actions']))
+                                <p class="mt-2 text-xs font-semibold text-gray-900 dark:text-white">Próximos passos sugeridos:</p>
+                                <ul class="mt-1 space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+                                    @foreach($proInsights['actions'] as $action)
+                                        <li class="flex items-start gap-2">
+                                            <x-icon name="circle-check" style="duotone" class="w-3.5 h-3.5 text-emerald-500 mt-0.5" />
+                                            <span>{{ $action }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                            <p class="mt-3 text-[11px] text-gray-500 dark:text-gray-400">
+                                {{ $proInsights['message'] ?? '' }}
+                            </p>
+                        @else
+                            <p class="mt-2 text-xs text-gray-600 dark:text-gray-300">
+                                No plano Grátis você já tem a visão 50/30/20. No Vertex Pro, o sistema analisa seus dados todos os meses e sugere
+                                pequenos ajustes práticos, sem julgamentos, para você avançar no seu ritmo.
+                            </p>
+                        @endif
+                    </div>
+                    @if(!$isProUser)
+                        <div class="relative z-20 mt-4 flex justify-end">
+                            <a href="{{ route('user.subscription.index') }}"
+                               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/30 transition-colors">
+                                <x-icon name="crown" style="solid" class="w-3.5 h-3.5" />
+                                Desbloquear com Pro
+                            </a>
+                        </div>
+                    @endif
+                </div>
+                <div class="space-y-4">
+                    <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white/90 dark:bg-gray-900/60 p-4 text-xs text-gray-700 dark:text-gray-300">
+                        <p class="font-semibold text-gray-900 dark:text-white mb-1">Como usar este painel</p>
+                        <p>
+                            Use o 50/30/20 como bússola, não como regra rígida. Escolha um único ajuste por vez e acompanhe por 1 mês.
+                            Assim você cria progresso sem peso ou culpa.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <a href="{{ route('core.reports.index') }}" class="group flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-white/5 hover:border-primary-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <div class="w-12 h-12 rounded-xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">

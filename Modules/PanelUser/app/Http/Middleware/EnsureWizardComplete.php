@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Modules\Core\Models\Account;
+use Modules\Core\Models\Goal;
 use Modules\Core\Models\RecurringTransaction;
 
 class EnsureWizardComplete
@@ -19,9 +20,9 @@ class EnsureWizardComplete
         'paneluser.legal.acceptance',
         'paneluser.legal.store',
         'paneluser.wizard.show',
+        'paneluser.wizard.purpose.store',
         'paneluser.wizard.income.store',
         'paneluser.wizard.account.store',
-        'paneluser.wizard.skip-budget',
         'paneluser.wizard.complete',
         'paneluser.onboarding.complete',
         'login',
@@ -51,13 +52,13 @@ class EnsureWizardComplete
 
         $userId = $request->user()->id;
 
+        $hasGoal = Goal::where('user_id', $userId)->exists();
+        $hasAccount = Account::where('user_id', $userId)->exists();
         $hasIncome = RecurringTransaction::where('user_id', $userId)
             ->where('type', 'income')
             ->exists();
 
-        $hasAccount = Account::where('user_id', $userId)->exists();
-
-        if (! $hasIncome || ! $hasAccount) {
+        if (! $hasGoal || ! $hasAccount || ! $hasIncome) {
             return redirect()->route('paneluser.wizard.show')
                 ->with('info', 'Complete a configuração inicial para acessar o painel.');
         }

@@ -25,7 +25,7 @@
     $routeName = request()->route()?->getName() ?? '';
     $breadcrumbCurrent = $breadcrumbLabels[$routeName] ?? ($breadcrumb ?? 'Painel');
 @endphp
-<nav class="{{ $isPro ? 'sticky top-0 z-50 w-full bg-white dark:bg-gray-900 border-b-2 border-amber-400/20 dark:border-amber-500/20 shadow-sm' : 'fixed top-0 left-0 right-0 z-50 w-full bg-white/98 dark:bg-gray-900/98 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 shadow-sm' }}">
+<nav class="sticky top-0 z-50 w-full shrink-0 {{ $isPro ? 'bg-white dark:bg-gray-900 border-b-2 border-amber-400/20 dark:border-amber-500/20 shadow-sm' : 'bg-white/98 dark:bg-gray-900/98 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 shadow-sm' }}" style="padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
     <div class="px-4 py-3 lg:px-6">
         <div class="flex items-center justify-between">
             {{-- PRO: Toggle + Breadcrumb | FREE: Logo + Toggle --}}

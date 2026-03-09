@@ -28,11 +28,11 @@ Route::prefix('user')->middleware(['auth', 'verified', 'role:free_user|pro_user|
     Route::get('/legal/aceitar', [LegalAcceptanceController::class, 'index'])->name('paneluser.legal.acceptance');
     Route::post('/legal/aceitar', [LegalAcceptanceController::class, 'store'])->name('paneluser.legal.store');
 
-    // Wizard Inicial (configuração obrigatória: renda + conta)
+    // Wizard Inicial (configuração obrigatória: propósito + conta + renda)
     Route::get('/configuracao-inicial', [WizardController::class, 'show'])->name('paneluser.wizard.show');
-    Route::post('/configuracao-inicial/renda', [WizardController::class, 'storeIncome'])->name('paneluser.wizard.income.store');
+    Route::post('/configuracao-inicial/proposito', [WizardController::class, 'storePurpose'])->name('paneluser.wizard.purpose.store');
     Route::post('/configuracao-inicial/conta', [WizardController::class, 'storeAccount'])->name('paneluser.wizard.account.store');
-    Route::post('/configuracao-inicial/pular-orcamento', [WizardController::class, 'skipBudget'])->name('paneluser.wizard.skip-budget');
+    Route::post('/configuracao-inicial/renda', [WizardController::class, 'storeIncome'])->name('paneluser.wizard.income.store');
     Route::post('/configuracao-inicial/concluir', [WizardController::class, 'complete'])->name('paneluser.wizard.complete');
 
     // Rest of panel: require wizard complete (income + at least one account)

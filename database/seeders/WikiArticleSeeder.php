@@ -38,15 +38,20 @@ class WikiArticleSeeder extends Seeder
             }
 
             $slug = Str::slug($data['title']);
-            if (WikiArticle::where('slug', $slug)->exists()) {
-                $slug = $slug . '-' . substr(uniqid(), -5);
+            $uniqueSlug = $slug;
+            $n = 0;
+            while (WikiArticle::where('slug', $uniqueSlug)->exists()) {
+                $n++;
+                $uniqueSlug = $slug . '-' . $n;
             }
 
             WikiArticle::firstOrCreate(
-                ['slug' => $slug],
                 [
                     'category_id' => $category->id,
                     'title' => $data['title'],
+                ],
+                [
+                    'slug' => $uniqueSlug,
                     'content' => $data['content'],
                     'is_published' => true,
                     'views' => 0,

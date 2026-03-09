@@ -138,6 +138,12 @@ class CoreController extends Controller
         $monthlyCapacity = $this->financialHealthService->calculateMonthlyCapacity($user);
         $incomeBreakdown = $this->financialHealthService->getIncomeBreakdown($user);
         $monthlyGoalContributions = $this->financialHealthService->getMonthlyGoalContributions($user);
+        $availableToPlan = $this->financialHealthService->calculateAvailableToPlan($user);
+
+        // 50/30/20 distribution for Mentor Financeiro component
+        $now = now();
+        $distribution503020 = $this->financialHealthService->calculate503020Distribution($user->id, (int) $now->month, (int) $now->year);
+        $proInsights = $this->financialHealthService->getProInsights($user->id);
 
         // Destinado a metas este mês (sum of expense transactions with goal_id in current month)
         $amountToGoalsThisMonth = (float) Transaction::where('user_id', $user->id)
@@ -177,6 +183,9 @@ class CoreController extends Controller
             'incomeBreakdown',
             'monthlyGoalContributions',
             'amountToGoalsThisMonth',
+            'availableToPlan',
+            'distribution503020',
+            'proInsights',
             'projectionData',
             'aiReportUsage',
             'showOnboardingFlow',

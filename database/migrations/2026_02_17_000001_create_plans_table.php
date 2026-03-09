@@ -68,44 +68,48 @@ return new class extends Migration
             }
         }
 
-        \Illuminate\Support\Facades\DB::table('plans')->insert([
+        $now = now();
+        foreach (
             [
-                'name' => $freeName,
-                'slug' => 'free',
-                'billing_interval' => 'monthly',
-                'is_free' => true,
-                'limit_account' => $freeLimits['limit_account'],
-                'limit_income' => $freeLimits['limit_income'],
-                'limit_expense' => $freeLimits['limit_expense'],
-                'limit_goal' => $freeLimits['limit_goal'],
-                'limit_budget' => $freeLimits['limit_budget'],
-                'limit_category' => $freeLimits['limit_category'],
-                'sort_order' => 0,
-                'is_active' => true,
-                'amount' => null,
-                'currency' => 'BRL',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => $proName,
-                'slug' => 'pro',
-                'billing_interval' => 'monthly',
-                'is_free' => false,
-                'limit_account' => $proLimits['limit_account'],
-                'limit_income' => $proLimits['limit_income'],
-                'limit_expense' => $proLimits['limit_expense'],
-                'limit_goal' => $proLimits['limit_goal'],
-                'limit_budget' => $proLimits['limit_budget'],
-                'limit_category' => $proLimits['limit_category'],
-                'sort_order' => 1,
-                'is_active' => true,
-                'amount' => 29.90,
-                'currency' => 'BRL',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+                [
+                    'slug' => 'free',
+                    'name' => $freeName,
+                    'billing_interval' => 'monthly',
+                    'is_free' => true,
+                    'limit_account' => $freeLimits['limit_account'],
+                    'limit_income' => $freeLimits['limit_income'],
+                    'limit_expense' => $freeLimits['limit_expense'],
+                    'limit_goal' => $freeLimits['limit_goal'],
+                    'limit_budget' => $freeLimits['limit_budget'],
+                    'limit_category' => $freeLimits['limit_category'],
+                    'sort_order' => 0,
+                    'is_active' => true,
+                    'amount' => null,
+                    'currency' => 'BRL',
+                ],
+                [
+                    'slug' => 'pro',
+                    'name' => $proName,
+                    'billing_interval' => 'monthly',
+                    'is_free' => false,
+                    'limit_account' => $proLimits['limit_account'],
+                    'limit_income' => $proLimits['limit_income'],
+                    'limit_expense' => $proLimits['limit_expense'],
+                    'limit_goal' => $proLimits['limit_goal'],
+                    'limit_budget' => $proLimits['limit_budget'],
+                    'limit_category' => $proLimits['limit_category'],
+                    'sort_order' => 1,
+                    'is_active' => true,
+                    'amount' => 29.90,
+                    'currency' => 'BRL',
+                ],
+            ] as $row
+        ) {
+            \Illuminate\Support\Facades\DB::table('plans')->updateOrInsert(
+                ['slug' => $row['slug']],
+                array_merge($row, ['created_at' => $now, 'updated_at' => $now])
+            );
+        }
     }
 
     public function down(): void

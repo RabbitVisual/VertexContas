@@ -20,121 +20,62 @@
     $firstName = auth()->user()->first_name ?? 'Membro';
 @endphp
 <x-paneluser::layouts.master :title="'Dashboard'">
-<div class="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-16">
-    {{-- Hero - Vertex CBAV style (mb = espaçamento fixo por seção, evita colapso com tour/outros) --}}
-    <div class="relative overflow-hidden rounded-[2rem] mb-8 bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-12 shadow-sm dark:shadow-none" data-tour="dashboard-intro">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px]"></div>
+<div class="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 pb-24 sm:pb-28">
+    {{-- Layout leigo: Saudação + Card gigante Saldo + Card Entrou/Saiu --}}
+    <nav class="flex items-center gap-2 text-xs font-bold text-primary-600 dark:text-primary-500 uppercase tracking-widest mb-4" aria-label="Navegação">
+        <a href="{{ route('paneluser.index') }}" class="hover:underline">Painel</a>
+        <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800" aria-hidden="true"></span>
+        <span class="text-gray-400 dark:text-gray-500">Visão Geral</span>
+    </nav>
+    <h1 class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-6">
+        {{ $greeting }}, {{ $firstName }}!
+    </h1>
 
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex-1 min-w-0">
-                <nav class="flex items-center gap-2 text-xs font-bold text-primary-600 dark:text-primary-500 uppercase tracking-widest mb-4" aria-label="Navegação">
-                    <a href="{{ route('paneluser.index') }}" class="hover:underline">Painel</a>
-                    <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-800" aria-hidden="true"></span>
-                    <span class="text-gray-400 dark:text-gray-500">Visão Geral</span>
-                </nav>
-                <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">
-                    {{ $greeting }}, {{ $firstName }}!<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-emerald-600 dark:from-primary-400 dark:to-emerald-400">Suas Finanças</span>
-                </h1>
-                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed mb-6">Aqui está o resumo das suas finanças e sua capacidade mensal.</p>
-                    <div class="flex flex-wrap gap-3" data-tour="dashboard-actions">
-                        @if(!empty($dashboardTourId) && count($dashboardTourSteps ?? []) > 0)
-                            <x-core::tour-guide :tour-id="$dashboardTourId" label="Ver tour desta página" />
-                        @endif
-                        @if(!($inspectionReadOnly ?? false))
-                            <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm shadow-lg shadow-primary-500/20 transition-all">
-                                <x-icon name="plus" style="solid" class="w-5 h-5" />
-                                Nova Transação
-                            </a>
-                            @if(Route::has('core.transactions.transfer'))
-                                <a href="{{ route('core.transactions.transfer') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
-                                    <x-icon name="right-left" style="duotone" class="w-5 h-5 text-emerald-500" />
-                                    Transferir
-                                </a>
-                            @endif
-                            @if(Route::has('core.income.index'))
-                                <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
-                                    <x-icon name="money-bill-trend-up" style="duotone" class="w-5 h-5 text-emerald-500" />
-                                    Minha Renda
-                                </a>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-                <div class="bg-gray-50 dark:bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5 shadow-xl shrink-0" data-tour="dashboard-balance">
-                    <div class="flex items-center gap-4 text-left">
-                        <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
-                            <x-icon name="wallet" style="duotone" class="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Saldo total</p>
-                            <p class="sensitive-value text-2xl font-black text-gray-900 dark:text-white leading-tight"><x-core::financial-value :value="$stockBalance" /></p>
-                        </div>
-                    </div>
-                </div>
+    {{-- Card gigante: Seu saldo hoje --}}
+    <div class="relative overflow-hidden rounded-[2rem] mb-6 bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-10 shadow-sm dark:shadow-none" data-tour="dashboard-balance">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-[80px]"></div>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-14 h-14 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
+                <x-icon name="wallet" style="duotone" class="w-7 h-7" />
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-0.5">Seu saldo hoje</p>
+                <p class="sensitive-value text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tabular-nums leading-tight"><x-core::financial-value :value="$stockBalance" /></p>
             </div>
         </div>
     </div>
 
-    {{-- Stats Grid - CBAV style (alinhado ao Pro: rounded-3xl, border, ícones duotone) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        {{-- Score Financeiro (Gauge) --}}
-        <x-core::financial-score-card
-            :score="$financialScore"
-            :label="$scoreLabel"
-            :score-text-class="$scoreTextClass"
-            :score-border-class="$scoreBorderClass"
-            :is-pro="auth()->user()?->isPro() ?? false"
-        />
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-primary-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-balance">
-            <div class="w-12 h-12 rounded-2xl bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center text-primary-600 dark:text-primary-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
-                <x-icon name="wallet" style="duotone" class="w-6 h-6" />
-            </div>
-            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Saldo total</p>
-            <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$stockBalance" /></h3>
-        </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-income">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
-                <x-icon name="arrow-trend-up" style="duotone" class="w-6 h-6" />
-            </div>
-            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Receitas do mês</p>
-            <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalIncome" /></h3>
-        </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-rose-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6">
-            <div class="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
-                <x-icon name="arrow-trend-down" style="duotone" class="w-6 h-6" />
-            </div>
-            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Despesas do mês</p>
-            <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$totalExpense" /></h3>
-        </div>
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl transition-all duration-500 p-6" data-tour="dashboard-capacity">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 ring-1 ring-black/5 dark:ring-white/10 mb-4 shrink-0">
-                <x-icon name="chart-line" style="duotone" class="w-6 h-6" />
-            </div>
-            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Capacidade mensal</p>
-            <h3 class="sensitive-value text-2xl lg:text-3xl font-black text-gray-900 dark:text-white mt-1 tabular-nums"><x-core::financial-value :value="$flowCapacity" /></h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">O que sobra após receitas e despesas fixas. Planeje em Minha Renda.</p>
-            @if($flowCapacity > 0 && $incomeBreakdown->count() > 0)
-                <div class="mt-3" x-data="{ open: false }">
-                    <button type="button" @click="open = !open" class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium flex items-center gap-1">
-                        Ver fontes
-                        <span class="inline-block transition-transform" x-bind:class="open ? 'rotate-180' : ''">
-                            <x-icon name="chevron-down" style="solid" class="w-3 h-3" />
-                        </span>
-                    </button>
-                    <ul x-show="open" x-collapse class="mt-2 space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
-                        @foreach($incomeBreakdown as $item)
-                            <li class="flex justify-between py-1 border-b border-gray-100 dark:border-white/5 last:border-0">
-                                <span>{{ $item['description'] }}</span>
-                                <span class="sensitive-value tabular-nums font-semibold"><x-core::financial-value :value="$item['amount']" /></span>
-                            </li>
-                        @endforeach
-                    </ul>
+    {{-- Card: O que entrou vs O que saiu --}}
+    <div class="grid grid-cols-2 gap-4 mb-8" data-tour="dashboard-income">
+        <div class="rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-gray-950 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <x-icon name="arrow-trend-up" style="duotone" class="w-5 h-5" />
                 </div>
-            @endif
+                <span class="text-sm font-bold text-gray-600 dark:text-gray-400">Entrou</span>
+            </div>
+            <p class="sensitive-value text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums"><x-core::financial-value :value="$totalIncome" /></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Receitas do mês</p>
+        </div>
+        <div class="rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-gray-950 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    <x-icon name="arrow-trend-down" style="duotone" class="w-5 h-5" />
+                </div>
+                <span class="text-sm font-bold text-gray-600 dark:text-gray-400">Saiu</span>
+            </div>
+            <p class="sensitive-value text-2xl font-black text-rose-600 dark:text-rose-400 tabular-nums"><x-core::financial-value :value="$totalExpense" /></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Despesas do mês</p>
         </div>
     </div>
+
+    {{-- FAB: Nova Transação (fixo canto inferior direito) --}}
+    @if(!($inspectionReadOnly ?? false))
+    <a href="{{ route('core.transactions.create') }}" class="fixed bottom-6 right-6 z-40 flex items-center gap-3 px-6 py-4 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-base shadow-xl shadow-primary-500/30 hover:scale-105 active:scale-100 transition-all focus:ring-4 focus:ring-primary-500/30" aria-label="Nova transação">
+        <x-icon name="plus" style="solid" class="w-6 h-6" />
+        <span class="hidden sm:inline">Nova Transação</span>
+    </a>
+    @endif
 
     {{-- Minhas Contas + Transações - grid 1/3 + 2/3 (estilo VertexCBAV) --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-8">
@@ -271,6 +212,16 @@
     </div>
 
     @if(!$isPro)
+        {{-- CTA sutil VertexBot (Pro): análise personalizada --}}
+        <div class="rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-gray-950/50 p-5 mb-6">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Quer uma análise personalizada dos seus gastos? O <strong>Vertex Bot</strong> ({{ plan_pro_name() }}) te ajuda a entender para onde vai seu dinheiro e como melhorar.
+            </p>
+            <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline">
+                Conhecer {{ plan_pro_name() }}
+                <x-icon name="arrow-right" style="solid" class="w-4 h-4" />
+            </a>
+        </div>
         {{-- CTA único para assinatura PRO (estilo VertexCBAV: card hero + botão destaque) --}}
         <div class="relative overflow-hidden rounded-3xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-white/5 p-8 sm:p-10 shadow-sm dark:shadow-none hover:shadow-xl hover:border-amber-500/30 transition-all duration-300">
             <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-[80px]"></div>

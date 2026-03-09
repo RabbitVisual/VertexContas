@@ -61,6 +61,9 @@ class GamificationService
 
         $coachingStats = $this->financialHealth->get503020Breakdown($user, $startOfMonth, $endOfMonth);
 
+        // Avalia regras específicas da 50/30/20 e concede medalhas quando os pilares estão saudáveis.
+        $this->ruleEngine->evaluate503020Rules($user, (int) now()->month, (int) now()->year);
+
         $insight = $this->ruleEngine->evaluate($user);
         if ($insight === null) {
             $insight = $this->resolveInsight($user, $snapshot, $summary, $income, $expense, $balance, $monthlyExpenses, $financialScore, $metrics, $coachingStats, $routeName);

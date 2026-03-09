@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Modules\Core\Services\FinancialHealthService;
 use Modules\Gamification\Models\Achievement;
 use Modules\Gamification\Models\CoachingRule;
+use Modules\Gamification\Models\Medal;
 use Modules\Gamification\Models\UserMedal;
 
 class RuleEngineService
@@ -220,5 +221,64 @@ class RuleEngineService
             'triggered_at' => now(),
             'metadata' => $metadata ?: null,
         ]);
+    }
+
+    /**
+     * Evaluate 50/30/20 pillars and award specific medals when user está dentro da zona saudável.
+     *
+     * @return array<int, array{trigger_key: string, medal_id: int, title: string}>
+     */
+    public function evaluate503020Rules(User $user, int $month, int $year): array
+    {
+        $results = [];
+
+        $distribution = $this->financialHealth->calculate503020Distribution($user->id, $month, $year);
+        $pillars = $distribution['pillars'] ?? [];
+        $income = (float) ($distribution['income'] ?? 0);
+
+        if ($income <= 0 || empty($pillars)) {
+            return $results;
+        }
+
+        $map = [
+            'necessities' => 'rule_503020_equilibrista',
+            'wants' => 'rule_503020_wants_master',
+            'future' => 'rule_503020_visionario',
+        ];
+
+        foreach ($map as $pillarKey => $triggerKey) {
+            $pillar = $pillars[$pillarKey] ?? null;
+            if (! $pillar) {
+                continue;
+            }
+
+            $status = $pillar['status'] ?? 'ok';
+            if ($status !== 'ok') {
+                continue;
+            }
+
+            $medal = Medal::where('trigger_key', $triggerKey)->where('is_active', true)->first();
+            if (! $medal) {
+                continue;
+            }
+
+            if (UserMedal::hasUnlocked($user, (int) $medal->id)) {
+                continue;
+            }
+
+            UserMedal::create([
+                'user_id' => $user->id,
+                'medal_id' => $medal->id,
+                'unlocked_at' => now(),
+            ]);
+
+            $results[] = [
+                'trigger_key' => $triggerKey,
+                'medal_id' => (int) $medal->id,
+                'title' => $medal->title,
+            ];
+        }
+
+        return $results;
     }
 }

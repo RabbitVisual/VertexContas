@@ -15,8 +15,11 @@ class Budget extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'account_id',
         'limit_amount',
         'period',
+        'is_recurring',
+        'period_start',
         'alert_threshold',
         'allow_exceed',
     ];
@@ -24,6 +27,8 @@ class Budget extends Model
     protected $casts = [
         'limit_amount' => 'decimal:2',
         'period' => 'string',
+        'is_recurring' => 'boolean',
+        'period_start' => 'date',
         'alert_threshold' => 'integer',
         'allow_exceed' => 'boolean',
     ];
@@ -45,20 +50,44 @@ class Budget extends Model
     }
 
     /**
+     * Get the account this budget draws from (optional).
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    /**
      * Get spent amount for current period.
+     * When account_id is set, only transactions from that account count.
+     * When is_recurring is false, period is determined by period_start.
      */
     public function getSpentAmountAttribute(): float
     {
-        $startDate = $this->period === 'monthly'
-            ? now()->startOfMonth()
-            : now()->startOfYear();
+        if ($this->is_recurring) {
+            $startDate = $this->period === 'monthly'
+                ? now()->startOfMonth()
+                : now()->startOfYear();
+            $endDate = $this->period === 'monthly'
+                ? now()->endOfMonth()
+                : now()->endOfYear();
+        } else {
+            $periodStart = $this->period_start ?? now();
+            $startDate = \Carbon\Carbon::parse($periodStart)->startOfMonth();
+            $endDate = \Carbon\Carbon::parse($periodStart)->endOfMonth();
+        }
 
-        return Transaction::where('user_id', $this->user_id)
+        $query = Transaction::where('user_id', $this->user_id)
             ->where('category_id', $this->category_id)
             ->where('type', 'expense')
             ->where('status', 'completed')
-            ->where('date', '>=', $startDate)
-            ->sum('amount');
+            ->whereBetween('date', [$startDate, $endDate]);
+
+        if ($this->account_id !== null) {
+            $query->where('account_id', $this->account_id);
+        }
+
+        return (float) $query->sum('amount');
     }
 
     /**
@@ -92,20 +121,22 @@ class Budget extends Model
     /**
      * Check if adding an expense would exceed a budget that has allow_exceed = false.
      * Returns the Budget that would be exceeded, or null.
+     * When budget has account_id, only transactions on that account (or transaction's account_id) apply.
      *
      * @param  int  $userId
      * @param  int  $categoryId
      * @param  float  $amount
      * @param  string  $date  (Y-m-d)
      * @param  int|null  $excludeTransactionId  For update: exclude this transaction from spent sum
-     * @return Budget|null
+     * @param  int|null  $transactionAccountId  Account of the transaction; budgets with account_id must match this or be null
      */
     public static function getBlockingBudgetIfExceeded(
         int $userId,
         int $categoryId,
         float $amount,
         string $date,
-        ?int $excludeTransactionId = null
+        ?int $excludeTransactionId = null,
+        ?int $transactionAccountId = null
     ): ?Budget {
         $dateObj = \Carbon\Carbon::parse($date);
 
@@ -115,22 +146,34 @@ class Budget extends Model
             ->get();
 
         foreach ($budgets as $budget) {
-            $startDate = $budget->period === 'monthly'
-                ? $dateObj->copy()->startOfMonth()
-                : $dateObj->copy()->startOfYear();
+            if ($budget->account_id !== null && $transactionAccountId !== null && (int) $budget->account_id !== (int) $transactionAccountId) {
+                continue;
+            }
+
+            if ($budget->is_recurring) {
+                $startDate = $budget->period === 'monthly'
+                    ? $dateObj->copy()->startOfMonth()
+                    : $dateObj->copy()->startOfYear();
+                $endDate = $budget->period === 'monthly'
+                    ? $dateObj->copy()->endOfMonth()
+                    : $dateObj->copy()->endOfYear();
+            } else {
+                $periodStart = $budget->period_start ?? $dateObj;
+                $startDate = \Carbon\Carbon::parse($periodStart)->startOfMonth();
+                $endDate = \Carbon\Carbon::parse($periodStart)->endOfMonth();
+                if ($dateObj->lt($startDate) || $dateObj->gt($endDate)) {
+                    continue;
+                }
+            }
 
             $spentQuery = Transaction::where('user_id', $userId)
                 ->where('category_id', $categoryId)
                 ->where('type', 'expense')
                 ->where('status', 'completed')
-                ->where('date', '>=', $startDate);
+                ->whereBetween('date', [$startDate, $endDate]);
 
-            if ($budget->period === 'monthly') {
-                $endDate = $dateObj->copy()->endOfMonth();
-                $spentQuery->where('date', '<=', $endDate);
-            } else {
-                $endDate = $dateObj->copy()->endOfYear();
-                $spentQuery->where('date', '<=', $endDate);
+            if ($budget->account_id !== null) {
+                $spentQuery->where('account_id', $budget->account_id);
             }
 
             if ($excludeTransactionId !== null) {

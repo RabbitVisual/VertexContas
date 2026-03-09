@@ -1,30 +1,24 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="{{ config('pwa.theme_color', '#11C76F') }}">
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ $title ?? (config('pwa.short_name', 'Vertex') . ' — PWA') }}</title>
+    <meta name="description" content="{{ $description ?? 'Vertex Contas: aplicativo progressivo para gestão financeira.' }}">
+    <meta name="keywords" content="{{ $keywords ?? 'finanças, orçamento, metas, PWA' }}">
+    <meta name="author" content="{{ $author ?? config('app.name') }}">
 
-        <title>PWA Module - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ branding_favicon_url() }}">
 
-        <meta name="description" content="{{ $description ?? '' }}">
-        <meta name="keywords" content="{{ $keywords ?? '' }}">
-        <meta name="author" content="{{ $author ?? '' }}">
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        {{-- Vite CSS --}}
-        {{-- {{ module_vite('build-pwa', 'resources/assets/sass/app.scss') }} --}}
-    </head>
-
-    <body>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="min-h-full bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased" style="padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom);">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {{ $slot }}
-
-        {{-- Vite JS --}}
-        {{-- {{ module_vite('build-pwa', 'resources/assets/js/app.js') }} --}}
-    </body>
+    </div>
+</body>
 </html>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\PWA\Http\Controllers\ManifestController;
+use Modules\PWA\Http\Controllers\OfflineController;
 use Modules\PWA\Http\Controllers\PwaApiController;
 use Modules\PWA\Http\Controllers\PWAController;
 use Modules\PWA\Http\Controllers\ServiceWorkerController;
@@ -11,6 +12,9 @@ Route::get('/manifest.webmanifest', [ManifestController::class, 'show'])->name('
 
 // Public: Service Worker
 Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
+
+// Public: Offline fallback page (cached by SW)
+Route::get('/pwa/offline', OfflineController::class)->name('pwa.offline');
 
 // API: version (public), install + ping (throttled)
 Route::prefix('api')->middleware(['throttle:60,1'])->group(function () {

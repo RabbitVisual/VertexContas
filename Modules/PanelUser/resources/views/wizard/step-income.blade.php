@@ -31,7 +31,7 @@
     }
 }' x-init="rows = rows.map(r => ({ ...r, day: r.day || '1' }))">
     <div class="text-center mb-8">
-        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Sua renda</h1>
+        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Qual sua renda principal prevista para este mês?</h1>
         <p class="text-gray-600 dark:text-gray-400">Assim calculamos sua <strong>capacidade mensal</strong> (o que sobra para gastar após receitas e despesas fixas).</p>
     </div>
 
@@ -105,7 +105,7 @@
             </div>
         @endif
         <div class="mt-6 flex flex-wrap gap-4">
-            <a href="{{ route('paneluser.wizard.show', ['step' => 0]) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+            <a href="{{ route('paneluser.wizard.show', ['step' => 1]) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
                 <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
                 Voltar
             </a>

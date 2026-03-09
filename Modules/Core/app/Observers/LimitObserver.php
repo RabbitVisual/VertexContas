@@ -3,6 +3,7 @@
 namespace Modules\Core\Observers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Services\SubscriptionLimitService;
 
@@ -16,12 +17,41 @@ class LimitObserver
     }
 
     /**
+     * Handle the Model "creating" event.
+     * When limit is reached, redirect user to upgrade screen instead of breaking the flow.
+     */
+    public function creating(Model $model): void
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return;
+        }
+
+        $entity = $this->getEntityName($model);
+        if (! $entity) {
+            return;
+        }
+
+        $result = $this->limitService->checkLimit($user, $entity);
+        if (! $result['can_proceed']) {
+            $redirect = redirect()
+                ->route('paneluser.limits.reached', ['resource' => $entity])
+                ->with('limit_resource', $entity)
+                ->with('limit_usage', $result['current_usage'])
+                ->with('limit_max', $result['limit'])
+                ->with('limit_message', $result['upsell_message'] ?: $this->limitService->getLimitReachedMessage($user, $entity));
+
+            throw new HttpResponseException($redirect);
+        }
+    }
+
+    /**
      * Handle the Model "created" event.
      */
     public function created(Model $model): void
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return;
         }
 

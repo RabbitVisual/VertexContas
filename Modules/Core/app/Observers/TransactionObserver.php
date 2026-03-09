@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Observers;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Events\GoalCompleted;
 use Modules\Core\Models\Goal;
 use Modules\Core\Models\RecurringTransaction;
@@ -13,37 +14,50 @@ class TransactionObserver
 {
     public function created(Transaction $transaction): void
     {
-        if ($transaction->status === 'completed') {
-            $this->updateAccountBalance($transaction, 'add');
-        }
+        DB::transaction(function () use ($transaction) {
+            if ($transaction->status === 'completed') {
+                $this->updateAccountBalance($transaction, 'add');
+            }
 
-        $this->syncGoalOnCreated($transaction);
+            $this->syncGoalOnCreated($transaction);
+        });
     }
 
     public function updated(Transaction $transaction): void
     {
-        if ($transaction->isDirty(['amount', 'type', 'status', 'account_id'])) {
-            $original = $transaction->getOriginal();
-            if (($original['status'] ?? null) === 'completed') {
-                $this->reverseTransaction($original);
-            }
-            if ($transaction->status === 'completed') {
-                $this->updateAccountBalance($transaction, 'add');
-            }
+        $runBalance = $transaction->wasChanged(['amount', 'type', 'status', 'account_id']);
+        $runGoal = $transaction->wasChanged(['goal_id', 'amount', 'type', 'status']);
+
+        if (! $runBalance && ! $runGoal) {
+            return;
         }
 
-        if ($transaction->isDirty(['goal_id', 'amount', 'type', 'status'])) {
-            $this->syncGoalOnUpdated($transaction);
-        }
+        DB::transaction(function () use ($transaction, $runBalance, $runGoal) {
+            if ($runBalance) {
+                $original = $transaction->getOriginal();
+                if (($original['status'] ?? null) === 'completed') {
+                    $this->reverseTransaction($original);
+                }
+                if ($transaction->status === 'completed') {
+                    $this->updateAccountBalance($transaction, 'add');
+                }
+            }
+
+            if ($runGoal) {
+                $this->syncGoalOnUpdated($transaction);
+            }
+        });
     }
 
     public function deleted(Transaction $transaction): void
     {
-        if ($transaction->status === 'completed') {
-            $this->updateAccountBalance($transaction, 'subtract');
-        }
+        DB::transaction(function () use ($transaction) {
+            if ($transaction->status === 'completed') {
+                $this->updateAccountBalance($transaction, 'subtract');
+            }
 
-        $this->syncGoalOnDeleted($transaction);
+            $this->syncGoalOnDeleted($transaction);
+        });
     }
 
     protected function updateAccountBalance(Transaction $transaction, string $operation): void

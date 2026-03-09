@@ -107,7 +107,17 @@ class TransactionController extends Controller
         ])->toArray();
         $categoryIdsWithBudget = $budgets->pluck('category_id')->toArray();
 
-        return view('core::transactions.create', compact('accounts', 'categories', 'type', 'recurringTransactions', 'activeGoals', 'budgetsByCategory', 'categoryIdsWithBudget'));
+        $defaultAccount = $accounts->first();
+        $incomeCategories = $categories->where('type', 'income');
+        $expenseCategories = $categories->where('type', 'expense');
+        $defaultCategoryIncome = $incomeCategories->first();
+        $defaultCategoryExpense = $expenseCategories->first();
+
+        return view('core::transactions.create', compact(
+            'accounts', 'categories', 'type', 'recurringTransactions', 'activeGoals',
+            'budgetsByCategory', 'categoryIdsWithBudget',
+            'defaultAccount', 'defaultCategoryIncome', 'defaultCategoryExpense'
+        ));
     }
 
     public function store(StoreTransactionRequest $request)
@@ -124,7 +134,9 @@ class TransactionController extends Controller
                 (int) Auth::id(),
                 (int) $request->category_id,
                 (float) $request->amount,
-                $request->date
+                $request->date,
+                null,
+                $request->account_id ? (int) $request->account_id : null
             );
             if ($blocking !== null) {
                 $categoryName = $blocking->category?->name ?? 'Categoria';
@@ -212,7 +224,8 @@ class TransactionController extends Controller
                 (int) $request->category_id,
                 (float) $request->amount,
                 $request->date,
-                $transaction->id
+                $transaction->id,
+                $request->account_id ? (int) $request->account_id : null
             );
             if ($blocking !== null) {
                 $categoryName = $blocking->category?->name ?? 'Categoria';

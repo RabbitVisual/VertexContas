@@ -35,6 +35,7 @@ class CoreServiceProvider extends ServiceProvider
 
         // Register observers
         \Modules\Core\Models\Transaction::observe(\Modules\Core\Observers\TransactionObserver::class);
+        \Modules\Core\Models\Goal::observe(\Modules\Core\Observers\GoalObserver::class);
 
         Event::listen(GoalCompleted::class, NotifyUserGoalCompleted::class);
 

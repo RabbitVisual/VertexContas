@@ -47,222 +47,158 @@
     <script type="application/json" id="planning-data-create">@json($planningByCategory)</script>
     <script type="application/json" id="budgets-data-create">@json($budgetsByCategory ?? [])</script>
 
-    {{-- Formulário --}}
-    <form action="{{ route('core.transactions.store') }}" method="POST" class="space-y-8"
+    @php
+        $defaultAccountId = old('account_id', $defaultAccount->id ?? null);
+        $defaultCategoryId = old('category_id', ($type ?? 'expense') === 'income' ? ($defaultCategoryIncome->id ?? null) : ($defaultCategoryExpense->id ?? null));
+    @endphp
+    {{-- Formulário frictionless: 4 campos visíveis + Avançado --}}
+    <form action="{{ route('core.transactions.store') }}" method="POST" class="space-y-6"
           x-data="{
               type: '{{ $type ?? 'expense' }}',
               amount: '',
               isRecurring: false,
-              categoryId: '',
-              planning: {},
-              budgetsByCategory: {},
-              init() {
-                  var el = document.getElementById('planning-data-create');
-                  if (el) this.planning = JSON.parse(el.textContent || '{}');
-                  var bel = document.getElementById('budgets-data-create');
-                  if (bel) this.budgetsByCategory = JSON.parse(bel.textContent || '{}');
+              categoryId: '{{ $defaultCategoryId }}',
+              advancedOpen: false,
+              defaultCategoryIncome: '{{ $defaultCategoryIncome->id ?? '' }}',
+              defaultCategoryExpense: '{{ $defaultCategoryExpense->id ?? '' }}',
+              setType(t) {
+                  this.type = t;
+                  this.categoryId = t === 'income' ? this.defaultCategoryIncome : this.defaultCategoryExpense;
               },
-              setType(t) { this.type = t; this.categoryId = ''; },
               formatCurrency() {
                   var value = String(this.amount || '').replace(/\D/g, '');
                   if (value === '') { this.amount = ''; return; }
                   value = (parseInt(value) / 100).toFixed(2);
                   this.amount = value.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-              },
-              recurringInfo() {
-                  if (this.categoryId && this.planning[this.categoryId]) {
-                      return 'Valor planejado para esta categoria: R$ ' + parseFloat(this.planning[this.categoryId]).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                  }
-                  return null;
-              },
-              budgetInfo() {
-                  if (this.type !== 'expense' || !this.categoryId) return null;
-                  var b = this.budgetsByCategory[this.categoryId];
-                  if (!b) return null;
-                  var spent = parseFloat(b.spent_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                  var limit = parseFloat(b.limit_amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                  var pct = b.usage_percent != null ? b.usage_percent : 0;
-                  return 'Orçamento desta categoria: R$ ' + spent + ' de R$ ' + limit + ' (' + pct + '% utilizado).';
-              },
-              descriptionPlaceholder() {
-                  return this.type === 'income' ? 'Ex.: Salário, freelance, aluguel recebido' : 'Ex.: Supermercado, conta de luz, combustível';
               }
           }"
-          x-init="init()">
+          x-init="if (type === 'income') categoryId = defaultCategoryIncome; else categoryId = defaultCategoryExpense;">
         @csrf
 
-        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-300">
-            <div class="p-8 sm:p-10 space-y-8">
-                {{-- Tipo --}}
+        <div class="bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+            <div class="p-6 sm:p-8 space-y-6">
+                {{-- 1. Toggle Entrou / Saiu (grande) --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-4">Tipo de movimentação</label>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">O que entrou ou saiu?</label>
                     <div class="grid grid-cols-2 gap-4">
                         <button type="button" @click="setType('income')"
-                                :class="type === 'income' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-emerald-500/50'"
-                                class="flex items-center gap-4 p-6 rounded-2xl border-2 transition-all">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" :class="type === 'income' ? 'bg-white/20' : 'bg-emerald-500/10'">
-                                <x-icon name="arrow-up" style="solid" class="w-6 h-6" />
-                            </div>
-                            <span class="font-bold text-sm uppercase tracking-wide">Receita</span>
+                                :class="type === 'income' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400'"
+                                class="flex items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all font-bold text-base">
+                            <x-icon name="arrow-up" style="solid" class="w-6 h-6" />
+                            Entrou dinheiro
                         </button>
                         <button type="button" @click="setType('expense')"
-                                :class="type === 'expense' ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-500/20' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-rose-500/50'"
-                                class="flex items-center gap-4 p-6 rounded-2xl border-2 transition-all">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" :class="type === 'expense' ? 'bg-white/20' : 'bg-rose-500/10'">
-                                <x-icon name="arrow-down" style="solid" class="w-6 h-6" />
-                            </div>
-                            <span class="font-bold text-sm uppercase tracking-wide">Despesa</span>
+                                :class="type === 'expense' ? 'bg-rose-600 border-rose-600 text-white shadow-lg' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400'"
+                                class="flex items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all font-bold text-base">
+                            <x-icon name="arrow-down" style="solid" class="w-6 h-6" />
+                            Saiu dinheiro
                         </button>
                     </div>
-                    <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Receita = dinheiro que entra. Despesa = dinheiro que sai.</p>
                     <input type="hidden" name="type" :value="type">
                 </div>
 
-                {{-- Valor --}}
+                {{-- 2. Valor --}}
                 <div>
-                    <label for="amount" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Valor (R$)</label>
+                    <label for="amount" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Quanto?</label>
                     <div class="relative max-w-xs">
-                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xl font-bold">R$</span>
-                        <input type="text" id="amount" x-model="amount" @input="formatCurrency()" placeholder="0,00"
-                               class="w-full pl-14 pr-5 py-4 text-2xl font-black rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-gray-900 dark:text-white tabular-nums" required>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg font-bold">R$</span>
+                        <input type="text" id="amount" x-model="amount" @input="formatCurrency()" placeholder="0,00" required
+                               class="w-full pl-12 pr-4 py-4 text-2xl font-black rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none text-gray-900 dark:text-white tabular-nums">
                         <input type="hidden" name="amount" :value="(typeof amount === 'string' ? amount : '').replace(/\./g, '').replace(',', '.')">
                     </div>
-                    @error('amount')<p class="mt-2 text-sm text-rose-500 font-medium">{{ $message }}</p>@enderror
+                    @error('amount')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Conta e Categoria --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Conta (onde o dinheiro entra ou sai)</label>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ex.: conta corrente, carteira.</p>
-                        <div class="relative">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
-                                <x-icon name="building-columns" style="duotone" class="w-5 h-5" />
-                            </div>
-                            <select name="account_id" id="account_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
-                                <option value="">Selecione a conta</option>
+                {{-- 3. Título (descrição) --}}
+                <div>
+                    <label for="description" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Título</label>
+                    <input type="text" name="description" id="description" value="{{ old('description') }}" placeholder="Ex: Padaria" required maxlength="500"
+                           class="w-full px-4 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-900 dark:text-white placeholder-gray-400">
+                    @error('description')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- 4. Data --}}
+                <div>
+                    <label for="date" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Data</label>
+                    <input type="date" name="date" id="date" value="{{ old('date', now()->format('Y-m-d')) }}" required
+                           class="w-full px-4 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-900 dark:text-white">
+                    @error('date')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- Categoria enviada sempre (Alpine); conta e status vêm do select/hidden em Avançado --}}
+                <input type="hidden" name="category_id" x-model="categoryId">
+
+                {{-- Aba Avançado --}}
+                <div class="pt-4 border-t border-gray-200 dark:border-white/10">
+                    <button type="button" @click="advancedOpen = !advancedOpen" class="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                        <span class="inline-block transition-transform" :class="advancedOpen ? 'rotate-180' : ''"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
+                        Avançado (conta, categoria, status)
+                    </button>
+                    <div x-show="advancedOpen" x-collapse class="space-y-4 mt-4">
+                        @if($accounts->count() > 1)
+                        <div>
+                            <label for="account_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Conta</label>
+                            <select name="account_id" id="account_id" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-800 dark:text-gray-200" required>
                                 @foreach($accounts as $account)
-                                    <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
+                                    <option value="{{ $account->id }}" {{ $defaultAccountId == $account->id ? 'selected' : '' }}>{{ $account->name }} — {{ format_currency($account->balance) }}</option>
                                 @endforeach
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <x-icon name="chevron-down" style="solid" class="w-4 h-4" />
-                            </div>
                         </div>
-                        @error('account_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label for="category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Categoria</label>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Ajuda a ver para onde vai seu dinheiro (relatórios e orçamentos).</p>
-                        <div class="relative">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none z-10">
-                                <x-icon name="tag" style="duotone" class="w-5 h-5" />
-                            </div>
-                            <select name="category_id" id="category_id" x-model="categoryId" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden" required>
-                                <option value="">Selecione</option>
-                                <template x-if="type === 'income'">
-                                    <optgroup label="Receitas">
-                                        @foreach($categories->where('type', 'income') as $cat)
-                                            <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                </template>
-                                <template x-if="type === 'expense'">
-                                    <optgroup label="Despesas">
-                                        @foreach($categories->where('type', 'expense') as $cat)
-                                            <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}{{ in_array($cat->id, $categoryIdsWithBudget) ? ' (tem orçamento)' : '' }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                </template>
+                        @else
+                            <input type="hidden" name="account_id" value="{{ $defaultAccountId }}">
+                        @endif
+                        <div>
+                            <label for="category_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Categoria</label>
+                            <select id="category_id" x-model="categoryId" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-800 dark:text-gray-200" required>
+                                <optgroup label="Receitas">
+                                    @foreach($categories->where('type', 'income') as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                                <optgroup label="Despesas">
+                                    @foreach($categories->where('type', 'expense') as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </optgroup>
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <x-icon name="chevron-down" style="solid" class="w-4 h-4" />
-                            </div>
                         </div>
-                        <p x-show="recurringInfo()" x-text="recurringInfo()" class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                            <x-icon name="lightbulb" style="duotone" class="w-3.5 h-3.5 shrink-0" />
-                        </p>
-                        <p x-show="budgetInfo()" x-text="budgetInfo()" class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                            <x-icon name="chart-pie" style="duotone" class="w-3.5 h-3.5 shrink-0" />
-                        </p>
-                        @error('category_id')<p class="mt-1 text-sm text-rose-500">{{ $message }}</p>@enderror
-                    </div>
-                </div>
-
-                {{-- Vincular à meta (só despesa) --}}
-                @if(isset($activeGoals) && $activeGoals->isNotEmpty())
-                <div x-show="type === 'expense'" class="space-y-2">
-                    <label for="goal_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Vincular à meta (opcional)</label>
-                    <div class="relative">
-                        <select name="goal_id" id="goal_id" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium text-gray-800 dark:text-gray-200 appearance-none [&::-ms-expand]:hidden">
-                            <option value="">Nenhuma</option>
-                            @foreach($activeGoals as $g)
-                                <option value="{{ $g->id }}" {{ old('goal_id') == $g->id ? 'selected' : '' }}>{{ $g->name }} — {{ format_currency($g->current_amount) }} / {{ format_currency($g->target_amount) }}</option>
-                            @endforeach
-                        </select>
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
-                    </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">O valor desta despesa será somado ao progresso da meta. Opcional.</p>
-                </div>
-                @endif
-
-                {{-- Data, Status, Descrição --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="date" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Data</label>
-                        <div class="relative">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <x-icon name="calendar" style="duotone" class="w-5 h-5" />
-                            </div>
-                            <input type="date" name="date" id="date" value="{{ old('date', now()->format('Y-m-d')) }}" class="w-full pl-12 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium" required>
-                        </div>
-                    </div>
-                    <div>
-                        <label for="status" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Status</label>
-                        <div class="relative">
-                            <select name="status" id="status" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" class="w-full px-4 py-3 pr-10 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium appearance-none [&::-ms-expand]:hidden">
+                        <div>
+                            <label for="status" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Status</label>
+                            <select name="status" id="status" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-800 dark:text-gray-200">
                                 <option value="completed" {{ old('status', 'completed') == 'completed' ? 'selected' : '' }}>Concluída</option>
                                 <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pendente</option>
                             </select>
-                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"><x-icon name="chevron-down" style="solid" class="w-4 h-4" /></span>
                         </div>
-                    </div>
-                </div>
-                <div>
-                    <label for="description" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Descrição (opcional)</label>
-                    <textarea name="description" id="description" rows="2" class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-950 border-2 border-gray-200 dark:border-white/10 focus:border-emerald-500 font-medium placeholder-gray-400" :placeholder="descriptionPlaceholder()">{{ old('description') }}</textarea>
-                </div>
-
-                @if($isPro)
-                    {{-- Repetir (visível só para Pro) --}}
-                    <div class="p-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                        <div class="flex items-center justify-between gap-4 flex-wrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                                    <x-icon name="repeat" style="duotone" class="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <p class="font-bold text-gray-900 dark:text-white text-sm">Repetir todo mês</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ plan_pro_name() }}: esta transação será criada automaticamente todo mês na mesma data.</p>
-                                </div>
+                        @if(isset($activeGoals) && $activeGoals->isNotEmpty())
+                        <div x-show="type === 'expense'">
+                            <label for="goal_id" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Vincular à meta (opcional)</label>
+                            <select name="goal_id" id="goal_id" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-white/10 focus:border-primary-500 font-medium text-gray-800 dark:text-gray-200">
+                                <option value="">Nenhuma</option>
+                                @foreach($activeGoals as $g)
+                                    <option value="{{ $g->id }}">{{ $g->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+                        @if($isPro)
+                        <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                            <div>
+                                <p class="font-bold text-gray-900 dark:text-white text-sm">Repetir todo mês</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ plan_pro_name() }}</p>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full peer-checked:bg-emerald-500 transition-colors"></div>
-                                <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full border border-gray-200 shadow transition-transform peer-checked:translate-x-5 pointer-events-none"></div>
-                            </label>
+                            <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500/20">
                         </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
 
-            <div class="px-8 sm:p-10 py-6 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-white/5 flex flex-wrap items-center gap-4">
-                <button type="submit" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+            <div class="px-6 sm:p-8 py-5 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-white/5 flex flex-wrap items-center gap-4">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary-500/20">
                     <x-icon name="check" style="solid" class="w-5 h-5" />
-                    Registrar transação
+                    Registrar
                 </button>
-                <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 font-medium rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <x-icon name="arrow-left" style="solid" class="w-4 h-4" />
+                <a href="{{ route('core.transactions.index') }}" class="inline-flex items-center gap-2 px-5 py-3 text-gray-600 dark:text-gray-400 font-medium hover:underline">
                     Voltar ao extrato
                 </a>
             </div>

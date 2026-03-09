@@ -36,7 +36,7 @@
     $sectionLabelClass = 'px-3 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest';
     $proSectionLabel = 'px-4 text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-wider';
 @endphp
-<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen {{ $isPro ? 'pt-0' : 'pt-20' }} transition-transform duration-300 ease-in-out -translate-x-full sm:translate-x-0 shadow-xl {{ $isPro ? 'bg-white dark:bg-slate-900 border-r-2 border-amber-400/20 dark:border-amber-500/10' : 'bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700' }}" aria-label="Menu lateral" style="contain:layout paint;">
+<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-0 transition-transform duration-300 ease-in-out -translate-x-full sm:translate-x-0 shadow-xl {{ $isPro ? 'bg-white dark:bg-slate-900 border-r-2 border-amber-400/20 dark:border-amber-500/10' : 'bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700' }}" aria-label="Menu lateral" style="contain:layout paint; padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left);">
     @if($isPro)
         {{-- Bloco da logo no topo (estilo Vertex CBAV) --}}
         <div class="h-16 shrink-0 flex items-center justify-center px-6 border-b border-gray-200 dark:border-amber-500/10">
@@ -251,7 +251,9 @@
                         <a href="{{ route('core.transactions.index') }}" class="{{ $navItemClass }} {{ (request()->routeIs('core.transactions.index') || request()->routeIs('core.transactions.show') || request()->routeIs('core.transactions.edit')) ? $navItemActiveClass : '' }}">
                             <x-icon name="receipt" style="duotone" class="w-5 h-5 shrink-0 transition duration-75 {{ (request()->routeIs('core.transactions.*') && !request()->routeIs('core.transactions.transfer') && !request()->routeIs('core.transactions.create')) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300' }}" />
                             <span class="ms-3 flex-1">Extrato</span>
+                            @if($transactionLimitDisplay !== '∞')
                             <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded" title="Receitas/Despesas">{{ $transactionCount }}/{{ $transactionLimitDisplay }}</span>
+                            @endif
                         </a>
                     </li>
                     @endif

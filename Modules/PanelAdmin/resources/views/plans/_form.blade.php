@@ -31,6 +31,7 @@
 
 <div class="mt-8">
     <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Limites (-1 ou vazio = Ilimitado)</h3>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Recomendado para o plano gratuito: Receitas e Despesas = -1 (ilimitado), Contas = 3, Metas = 1, Orçamentos = 1. Para o Pro: use -1 onde quiser ilimitado.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Contas</label>

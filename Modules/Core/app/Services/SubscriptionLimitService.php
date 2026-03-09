@@ -19,10 +19,10 @@ class SubscriptionLimitService
     private const FREE_LIMITS = [
         'income' => 5,
         'expense' => 5,
-        'goal' => 1,
+        'goal' => 3,
         'budget' => 1,
-        'account' => 1,
-        'category' => 0, // Custom categories
+        'account' => 2,
+        'category' => 0, // Custom categories (bloqueadas no Free)
     ];
 
     /**
@@ -42,14 +42,44 @@ class SubscriptionLimitService
      */
     public function canCreate(User $user, string $entity): bool
     {
+        $result = $this->checkLimit($user, $entity);
+
+        return $result['can_proceed'];
+    }
+
+    /**
+     * Rich limit check used by Mentor Financeiro and paywalls.
+     *
+     * @return array{
+     *     can_proceed: bool,
+     *     current_usage: int,
+     *     limit: int|string,
+     *     upsell_message: string
+     * }
+     */
+    public function checkLimit(User $user, string $entity): array
+    {
         $limit = $this->getLimit($user, $entity);
+        $current = $this->getCurrentCount($user, $entity);
+
         if ($limit === 'unlimited') {
-            return true;
+            return [
+                'can_proceed' => true,
+                'current_usage' => $current,
+                'limit' => 'unlimited',
+                'upsell_message' => '',
+            ];
         }
 
-        $currentCount = $this->getCurrentCount($user, $entity);
+        $canProceed = $current < (int) $limit;
+        $upsellMessage = $canProceed ? '' : $this->getLimitReachedMessage($user, $entity);
 
-        return $currentCount < $limit;
+        return [
+            'can_proceed' => $canProceed,
+            'current_usage' => $current,
+            'limit' => (int) $limit,
+            'upsell_message' => $upsellMessage,
+        ];
     }
 
     /**

@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Models\Account;
+use Modules\Core\Models\Budget;
 use Modules\Core\Models\Goal;
 use Modules\Core\Models\RecurringTransaction;
 use Modules\Core\Models\Ticket;
@@ -151,6 +152,39 @@ class FinancialHealthService
             ->whereNotNull('contribution_account_id')
             ->whereNotNull('contribution_category_id')
             ->sum('monthly_contribution');
+    }
+
+    /**
+     * Dinheiro livre para planejar: Renda prevista − orçamentos fixos (recorrentes) − metas automáticas.
+     * Free: exibe alerta no dashboard. Pro: valor disponível para VertexBot sugerir onde investir.
+     *
+     * @return array{available: float, baseline_income: float, fixed_budgets: float, goal_contributions: float}
+     */
+    public function calculateAvailableToPlan(User $user): array
+    {
+        $baselineIncome = $this->getBaselineIncome($user);
+        $goalContributions = $this->getMonthlyGoalContributions($user);
+
+        $fixedBudgets = (float) Budget::query()
+            ->where('user_id', $user->id)
+            ->where(function ($q) {
+                $q->where('is_recurring', true)->orWhereNull('is_recurring');
+            })
+            ->get()
+            ->sum(function (Budget $budget) {
+                return $budget->period === 'monthly'
+                    ? (float) $budget->limit_amount
+                    : (float) $budget->limit_amount / 12;
+            });
+
+        $available = max(0, $baselineIncome - $fixedBudgets - $goalContributions);
+
+        return [
+            'available' => round($available, 2),
+            'baseline_income' => round($baselineIncome, 2),
+            'fixed_budgets' => round($fixedBudgets, 2),
+            'goal_contributions' => round($goalContributions, 2),
+        ];
     }
 
     /**
@@ -324,6 +358,161 @@ class FinancialHealthService
         }
 
         return $baseline;
+    }
+
+    /**
+     * Native 50/30/20 distribution for a given month.
+     * Groups expenses by pillar (necessidades, desejos, futuro) and compares against ideal rule.
+     *
+     * @return array{
+     *     income: float,
+     *     total_expenses: float,
+     *     savings_pct: float,
+     *     pillars: array<string, array{
+     *         title: string,
+     *         amount: float,
+     *         percentage: float,
+     *         target: int,
+     *         deviation: float,
+     *         status: string
+     *     }>
+     * }
+     */
+    public function calculate503020Distribution(int $userId, int $month, int $year): array
+    {
+        $user = User::findOrFail($userId);
+
+        $start = Carbon::create($year, $month, 1)->startOfMonth();
+        $end = Carbon::create($year, $month, 1)->endOfMonth();
+
+        $incomeBase = $this->getBaselineIncome($user);
+        if ($incomeBase <= 0) {
+            $incomeBase = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'income')
+                ->where('status', 'completed')
+                ->whereBetween('date', [$start, $end])
+                ->sum('amount');
+        }
+
+        if ($incomeBase <= 0) {
+            return [
+                'income' => 0.0,
+                'total_expenses' => 0.0,
+                'savings_pct' => 0.0,
+                'pillars' => [
+                    'necessities' => [
+                        'title' => 'Necessidades (50%)',
+                        'amount' => 0.0,
+                        'percentage' => 0.0,
+                        'target' => 50,
+                        'deviation' => 0.0,
+                        'status' => 'no_income',
+                    ],
+                    'wants' => [
+                        'title' => 'Desejos (30%)',
+                        'amount' => 0.0,
+                        'percentage' => 0.0,
+                        'target' => 30,
+                        'deviation' => 0.0,
+                        'status' => 'no_income',
+                    ],
+                    'future' => [
+                        'title' => 'Futuro e Metas (20%)',
+                        'amount' => 0.0,
+                        'percentage' => 0.0,
+                        'target' => 20,
+                        'deviation' => 0.0,
+                        'status' => 'no_income',
+                    ],
+                ],
+            ];
+        }
+
+        $expensesByPillar = Transaction::query()
+            ->where('transactions.user_id', $user->id)
+            ->where('transactions.type', 'expense')
+            ->where('transactions.status', 'completed')
+            ->whereBetween('transactions.date', [$start, $end])
+            ->whereNull('transactions.destination_account_id')
+            ->whereNull('transactions.parent_id')
+            ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
+            ->select(DB::raw('COALESCE(NULLIF(categories.type_group, ""), "lifestyle") as pillar'), DB::raw('SUM(transactions.amount) as total'))
+            ->groupBy('pillar')
+            ->get()
+            ->keyBy('pillar');
+
+        $essentialTotal = (float) ($expensesByPillar->get('essential')?->total ?? 0);
+        $lifestyleTotal = (float) ($expensesByPillar->get('lifestyle')?->total ?? 0);
+        $financialTotal = (float) ($expensesByPillar->get('financial')?->total ?? 0);
+
+        $totalExpenses = $essentialTotal + $lifestyleTotal + $financialTotal;
+        $savingsPct = max(0.0, (($incomeBase - $totalExpenses) / $incomeBase) * 100);
+
+        $map = [
+            'necessities' => [
+                'title' => 'Necessidades (50%)',
+                'amount' => $essentialTotal,
+                'raw_pct' => $incomeBase > 0 ? ($essentialTotal / $incomeBase) * 100 : 0.0,
+                'target' => 50,
+            ],
+            'wants' => [
+                'title' => 'Desejos (30%)',
+                'amount' => $lifestyleTotal,
+                'raw_pct' => $incomeBase > 0 ? ($lifestyleTotal / $incomeBase) * 100 : 0.0,
+                'target' => 30,
+            ],
+            'future' => [
+                'title' => 'Futuro e Metas (20%)',
+                'amount' => $financialTotal,
+                'raw_pct' => $incomeBase > 0 ? ($financialTotal / $incomeBase) * 100 : 0.0,
+                'target' => 20,
+            ],
+        ];
+
+        $pillars = [];
+        foreach ($map as $key => $data) {
+            $percentage = round($data['raw_pct'], 2);
+            $target = $data['target'];
+            $deviation = round($percentage - $target, 2);
+
+            // Status rules: queremos ser mais rígidos com "Desejos" e acolhedores com "Futuro".
+            $status = 'ok';
+            if ($key === 'wants') {
+                if ($percentage > 40) {
+                    $status = 'danger';
+                } elseif ($percentage > 30) {
+                    $status = 'warning';
+                }
+            } elseif ($key === 'future') {
+                if ($percentage < 10) {
+                    $status = 'danger';
+                } elseif ($percentage < 20) {
+                    $status = 'warning';
+                }
+            } else {
+                if ($percentage > $target + 15) {
+                    $status = 'danger';
+                } elseif ($percentage > $target + 5) {
+                    $status = 'warning';
+                }
+            }
+
+            $pillars[$key] = [
+                'title' => $data['title'],
+                'amount' => round($data['amount'], 2),
+                'percentage' => $percentage,
+                'target' => $target,
+                'deviation' => $deviation,
+                'status' => $status,
+            ];
+        }
+
+        return [
+            'income' => round($incomeBase, 2),
+            'total_expenses' => round($totalExpenses, 2),
+            'savings_pct' => round($savingsPct, 2),
+            'pillars' => $pillars,
+        ];
     }
 
     /**
@@ -579,6 +768,77 @@ class FinancialHealthService
                 'description' => $rt->description ?? 'Receita',
                 'amount' => $this->getNormalizedMonthlyAmount($rt),
             ]);
+    }
+
+    /**
+     * PRO-only insights based on 50/30/20 deviations.
+     *
+     * @return array{
+     *     available: bool,
+     *     message: string,
+     *     highlights?: array<int, string>,
+     *     actions?: array<int, string>
+     * }
+     */
+    public function getProInsights(int $userId): array
+    {
+        $user = User::findOrFail($userId);
+
+        if (! $user->isPro()) {
+            return [
+                'available' => false,
+                'message' => 'Consultoria detalhada com base na regra 50/30/20 é exclusiva do Vertex Pro. Assim que você fizer o upgrade, o sistema passa a sugerir ajustes personalizados, passo a passo.',
+            ];
+        }
+
+        $now = now();
+        $distribution = $this->calculate503020Distribution($user->id, (int) $now->month, (int) $now->year);
+
+        $pillars = $distribution['pillars'] ?? [];
+        $highlights = [];
+        $actions = [];
+
+        $necessities = $pillars['necessities'] ?? null;
+        $wants = $pillars['wants'] ?? null;
+        $future = $pillars['future'] ?? null;
+
+        if ($wants && $wants['percentage'] > 30) {
+            $highlights[] = sprintf(
+                'Seus gastos com desejos estão em %.1f%% da renda, acima dos 30%% recomendados.',
+                $wants['percentage']
+            );
+            $actions[] = 'Escolha 1 ou 2 categorias de lazer para reduzir suavemente por 1 ou 2 meses, sem abrir mão total do que te faz bem.';
+        }
+
+        if ($future && $future['percentage'] < 20) {
+            $highlights[] = sprintf(
+                'Hoje apenas %.1f%% da sua renda está indo para futuro e metas, abaixo da meta de 20%%.',
+                $future['percentage']
+            );
+            $actions[] = 'Defina um valor fixo mensal pequeno para reserva ou metas (mesmo que seja simbólico) e programe uma transferência automática após receber sua renda.';
+        }
+
+        if ($necessities && $necessities['percentage'] > 60) {
+            $highlights[] = sprintf(
+                'Suas necessidades básicas consomem %.1f%% da renda, o que reduz a folga para sonhos e metas.',
+                $necessities['percentage']
+            );
+            $actions[] = 'Avalie contas fixas como aluguel, planos de telefone e serviços recorrentes para buscar renegociação ou alternativas mais leves no curto prazo.';
+        }
+
+        if (empty($highlights)) {
+            $highlights[] = 'Sua distribuição está próxima da regra 50/30/20. Excelente! Agora o foco pode ser acelerar a construção de reservas e metas específicas.';
+            $actions[] = 'Escolha uma meta principal (ex.: reserva de emergência ou um objetivo importante) e concentre a maior parte dos 20% nela até alcançá-la.';
+        }
+
+        $message = 'Estas são sugestões automáticas com base na regra 50/30/20. Use-as como um guia gentil: pequenos ajustes mensais já fazem muita diferença ao longo do tempo.';
+
+        return [
+            'available' => true,
+            'message' => $message,
+            'highlights' => $highlights,
+            'actions' => $actions,
+        ];
     }
     /**
      * Centralized logic to sync user budget planning (Baseline).

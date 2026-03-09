@@ -21,6 +21,8 @@ class CoreDatabaseSeeder extends Seeder
             SettingSeeder::class,
             LegalDocumentSeeder::class,
             CategorySeeder::class,
+            CorePermissionsSeeder::class,
+            PlanSeeder::class,
             EmailTemplatesSeeder::class,
         ]);
     }

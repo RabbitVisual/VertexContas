@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Anti-FOUC: deve ser o primeiro script (Flowbite/Tailwind dark mode + modo privacidade) --}}
@@ -57,17 +57,19 @@
             </div>
         </div>
     @else
-        {{-- Layout FREE: navbar full width, sidebar lateral --}}
-        <div class="antialiased bg-gray-50 dark:bg-gray-900 min-h-screen">
-            <x-paneluser::layouts.navbar />
+        {{-- Layout FREE: mesma estrutura que PRO — sidebar à esquerda, navbar + conteúdo à direita (sem sobreposição) --}}
+        <div class="flex min-h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
             <x-paneluser::layouts.sidebar />
-            <main id="main-content" class="p-4 md:ml-64 h-auto pt-20">
-                <x-core::inspection-banner />
-                @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
-                {{ $slot }}
-                <x-paneluser::inspection-modal />
-                <x-notifications::toast />
-            </main>
+            <div class="flex-1 flex flex-col min-h-screen sm:ml-64 transition-[margin] duration-300">
+                <x-paneluser::layouts.navbar />
+                <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
+                    <x-core::inspection-banner />
+                    @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
+                    {{ $slot }}
+                    <x-paneluser::inspection-modal />
+                    <x-notifications::toast />
+                </main>
+            </div>
         </div>
     @endif
     <x-loading-overlay />
@@ -80,10 +82,10 @@
 
     @if(config('pwa.enabled', true))
     {{-- Banner "Instalar app" (escondido se já instalado ou se usuário dispensou) --}}
-    <div id="pwa-install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg safe-area-bottom md:left-64" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));" role="region" aria-label="Instalar aplicativo">
+    <div id="pwa-install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg safe-area-bottom md:left-64" style="padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); padding-bottom: max(1rem, env(safe-area-inset-bottom));" role="region" aria-label="Instalar aplicativo">
         <div class="flex flex-wrap items-center justify-between gap-3 max-w-4xl mx-auto">
             <div class="flex items-center gap-3 min-w-0">
-                <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#11C76F]/10 text-[#11C76F] shrink-0">
+                <span class="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-[#11C76F]/10 text-[#11C76F] shrink-0">
                     <i class="fa-pro fa-solid fa-mobile-screen"></i>
                 </span>
                 <div class="min-w-0">
@@ -92,10 +94,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-                <button type="button" id="pwa-install-btn" class="hidden px-4 py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors text-sm">
+                <button type="button" id="pwa-install-btn" class="hidden min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-4 py-2.5 bg-[#11C76F] text-white font-bold rounded-xl hover:bg-[#0EA85A] transition-colors text-sm">
                     Instalar
                 </button>
-                <button type="button" id="pwa-install-dismiss" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors" aria-label="Dispensar">
+                <button type="button" id="pwa-install-dismiss" class="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors" aria-label="Dispensar">
                     <i class="fa-pro fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>

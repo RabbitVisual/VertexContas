@@ -41,14 +41,16 @@ class AchievementController extends Controller
             ];
         });
 
+        // FREE: exibir catálogo de medalhas não-Pro (bloqueadas + desbloqueadas). PRO: exibir todas.
         if (! $isPro) {
-            $medals = $medals->filter(fn (array $m) => $m['unlocked'] && ! $m['is_pro_only']);
+            $medals = $medals->filter(fn (array $m) => ! $m['is_pro_only']);
         }
 
-        $earnedCount = $medals->count();
-        $totalCount = $isPro ? $allMedals->count() : $medals->count();
+        $earnedCount = $medals->filter(fn (array $m) => $m['unlocked'])->count();
+        $totalCount = $medals->count();
+        $hasMedalsInSystem = $allMedals->isNotEmpty();
 
-        return view('paneluser::achievements.index', compact('medals', 'earnedCount', 'totalCount'));
+        return view('paneluser::achievements.index', compact('medals', 'earnedCount', 'totalCount', 'hasMedalsInSystem'));
     }
 
     public function show(Medal $medal)
