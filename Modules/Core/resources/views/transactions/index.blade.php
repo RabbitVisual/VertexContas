@@ -59,7 +59,7 @@
                     Filtros
                 </button>
                 @can('create', \Modules\Core\Models\Transaction::class)
-                    @if(!($inspectionReadOnly ?? false))
+                    @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                         <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
                             Nova transação
@@ -265,7 +265,7 @@
                                     <p class="sensitive-value text-xl font-black tabular-nums {{ $transaction->type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
                                         {{ $transaction->type === 'income' ? '+' : '-' }} <x-core::financial-value :value="$transaction->amount" />
                                     </p>
-                                    @if(!($inspectionReadOnly ?? false))
+                                    @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <a href="{{ route('core.transactions.edit', $transaction) }}" class="w-9 h-9 rounded-lg flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-500 hover:bg-emerald-500 hover:text-white transition-colors" title="Editar">
                                                 <x-icon name="pen" style="solid" class="w-4 h-4" />
@@ -289,10 +289,10 @@
                     <div class="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-gray-300 dark:text-gray-700 mb-6 ring-1 ring-black/5 dark:ring-white/10">
                         <x-icon name="receipt" style="duotone" class="w-12 h-12 opacity-50" />
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nenhuma movimentação</h3>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-4">Registre receitas e despesas aqui; sua <strong>capacidade mensal</strong> vem do planejamento em <a href="{{ route('core.income.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Minha Renda</a>, não da soma do Extrato.</p>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-8">Não há transações no período ou filtros selecionados.</p>
-                    @if(!($inspectionReadOnly ?? false))
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Sua jornada começa aqui</h3>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-4">Cada gasto ou recebimento registrado aqui alimenta a sua bússola da regra <strong>50/30/20</strong>: necessidades, desejos e futuro. É com esse extrato que o Vertex consegue enxergar seus hábitos reais.</p>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm mb-8">Sua <strong>capacidade mensal</strong> continua vindo do planejamento em <a href="{{ route('core.income.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Minha Renda</a>; o Extrato mostra como você está colocando esse plano em prática, mês a mês.</p>
+                    @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                         <div class="flex flex-wrap items-center justify-center gap-3">
                             <a href="{{ route('core.income.index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                                 <x-icon name="wallet" style="duotone" class="w-4 h-4" />
@@ -300,7 +300,7 @@
                             </a>
                             <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20">
                                 <x-icon name="plus" style="solid" class="w-5 h-5" />
-                                Nova transação
+                                Registrar minha primeira transação
                             </a>
                         </div>
                     @endif

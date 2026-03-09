@@ -27,7 +27,7 @@
                     <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
                 @endif
                 @can('create', \Modules\Core\Models\Goal::class)
-                    @if(!($inspectionReadOnly ?? false))
+                    @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                         <a href="{{ route('core.goals.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
                             Nova Meta
@@ -306,7 +306,8 @@
                     <x-icon name="bullseye" style="duotone" class="w-10 h-10" />
                 </div>
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem metas ativas</h3>
-                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Planeje seu futuro: crie metas com valor alvo e prazo. Você pode usar <strong>contribuição automática</strong> (valor mensal debitado no Extrato) ou <strong>vincular despesas</strong> ao registrar no Extrato. Uma meta clássica é a <strong>Reserva de emergência</strong> (3 a 6 meses de despesas).</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Planeje seu futuro: crie metas com valor alvo e prazo. Parte daqueles <strong>20% da regra 50/30/20</strong> pode ir para reserva de emergência e objetivos importantes.</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Você pode usar <strong>contribuição automática</strong> (valor mensal debitado no Extrato) ou <strong>vincular despesas</strong> ao registrar no Extrato — assim, cada gasto aparece tanto na meta quanto nos relatórios mensais.</p>
                 @can('create', \Modules\Core\Models\Goal::class)
                     @if(!($inspectionReadOnly ?? false))
                         <a href="{{ route('core.goals.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
@@ -318,7 +319,7 @@
             </div>
         @endforelse
 
-        @if($goals->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Goal::class) && !($inspectionReadOnly ?? false))
+        @if($goals->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Goal::class) && !($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
             <a href="{{ route('core.goals.create') }}" class="group flex flex-col items-center justify-center min-h-[280px] rounded-3xl border-2 border-dashed border-gray-200 dark:border-white/10 hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                 <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-3 transition-colors">
                     <x-icon name="plus" style="solid" class="w-7 h-7 text-gray-400 dark:text-gray-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />

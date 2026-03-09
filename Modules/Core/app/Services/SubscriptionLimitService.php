@@ -231,6 +231,64 @@ class SubscriptionLimitService
     }
 
     /**
+     * Detect which resources are above the limit of the user's current plan (typically after downgrade).
+     * Returns an array of exceeded entities with helpful labels and management URLs.
+     *
+     * @return array<int, array{entity: string,label: string,current: int,limit: int,exceeded_by: int,manage_route: string|null}>
+     */
+    public function getExceededResources(User $user): array
+    {
+        $entities = ['income', 'expense', 'goal', 'budget', 'account', 'category'];
+        $labels = [
+            'income' => 'Receitas',
+            'expense' => 'Despesas',
+            'goal' => 'Metas',
+            'budget' => 'Orçamentos',
+            'account' => 'Contas',
+            'category' => 'Categorias personalizadas',
+        ];
+
+        $manageRoutes = [
+            'income' => route('core.income.index'),
+            'expense' => route('core.transactions.index'),
+            'goal' => route('core.goals.index'),
+            'budget' => route('core.budgets.index'),
+            'account' => route('core.accounts.index'),
+            'category' => route('core.categories.index'),
+        ];
+
+        $exceeded = [];
+
+        foreach ($entities as $entity) {
+            $limit = $this->getLimit($user, $entity);
+            if ($limit === 'unlimited') {
+                continue;
+            }
+
+            $limitInt = (int) $limit;
+            if ($limitInt <= 0) {
+                continue;
+            }
+
+            $current = $this->getCurrentCount($user, $entity);
+            if ($current <= $limitInt) {
+                continue;
+            }
+
+            $exceeded[] = [
+                'entity' => $entity,
+                'label' => $labels[$entity] ?? ucfirst($entity),
+                'current' => $current,
+                'limit' => $limitInt,
+                'exceeded_by' => $current - $limitInt,
+                'manage_route' => $manageRoutes[$entity] ?? null,
+            ];
+        }
+
+        return $exceeded;
+    }
+
+    /**
      * Check if user reached a limit threshold and notify them.
      */
     public function checkAndNotify(User $user, string $entity): void

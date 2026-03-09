@@ -122,7 +122,14 @@ class TransactionController extends Controller
 
     public function store(StoreTransactionRequest $request)
     {
-        // Check limit
+        // Global read-only guard when user is acima do limite do plano atual
+        $exceeded = $this->limitService->getExceededResources(Auth::user());
+        if (! empty($exceeded)) {
+            return redirect()->route('core.transactions.index')
+                ->with('error', 'Você possui recursos acima do limite do seu plano atual. Faça upgrade ou remova itens para voltar a editar.');
+        }
+
+        // Check per-entity limit
         if (! $this->limitService->canCreate(Auth::user(), $request->type)) {
             return view('core::limits.reached-transaction', ['type' => $request->type]);
         }
@@ -218,6 +225,12 @@ class TransactionController extends Controller
     {
         $this->authorize('update', $transaction);
 
+        $exceeded = $this->limitService->getExceededResources(Auth::user());
+        if (! empty($exceeded)) {
+            return redirect()->route('core.transactions.index')
+                ->with('error', 'Você possui recursos acima do limite do seu plano atual. Faça upgrade ou remova itens para voltar a editar.');
+        }
+
         if ($request->type === 'expense' && $request->status === 'completed') {
             $blocking = Budget::getBlockingBudgetIfExceeded(
                 (int) Auth::id(),
@@ -255,6 +268,12 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         $this->authorize('delete', $transaction);
+
+        $exceeded = $this->limitService->getExceededResources(Auth::user());
+        if (! empty($exceeded)) {
+            return redirect()->route('core.transactions.index')
+                ->with('error', 'Você possui recursos acima do limite do seu plano atual. Faça upgrade ou remova itens para voltar a editar.');
+        }
 
         $transaction->delete();
 

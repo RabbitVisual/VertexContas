@@ -15,16 +15,21 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Core\Models\Account;
 use Modules\Core\Models\AiConsultingReport;
 use Modules\Core\Models\Transaction;
+use Modules\Core\Services\FinancialHealthService;
 use Modules\Core\Services\ReportService;
 use Modules\Core\Services\SettingService;
 use Modules\Core\Services\TemplateDocumentService;
+use Modules\Gamification\Models\UserMedal;
+use Modules\Core\Services\GamificationService;
 
 class ReportsController extends Controller
 {
     public function __construct(
         protected ReportService $reportService,
         protected TemplateDocumentService $templateService,
-        protected SettingService $settingService
+        protected SettingService $settingService,
+        protected FinancialHealthService $financialHealthService,
+        protected GamificationService $gamificationService
     ) {
         $this->middleware(['auth', 'verified']);
         $this->middleware('pro')->only([
@@ -49,6 +54,65 @@ class ReportsController extends Controller
         $transactionCount = Transaction::where('user_id', $user->id)->count();
 
         return view('core::reports.index', compact('transactionCount'));
+    }
+
+    /**
+     * Monthly \"Wrapped\" style summary for the previous month (or selected month).
+     * Highlights 50/30/20 distribution, medals and a PRO-only Mentor VIP focus block.
+     */
+    public function monthlyWrap(Request $request)
+    {
+        $user = Auth::user();
+        $now = now();
+
+        $requestedMonth = (int) $request->input('month', 0);
+        $requestedYear = (int) $request->input('year', 0);
+
+        if ($requestedMonth >= 1 && $requestedMonth <= 12 && $requestedYear > 2000) {
+            $targetDate = Carbon::create($requestedYear, $requestedMonth, 1)->startOfMonth();
+        } else {
+            $targetDate = $now->copy()->subMonthNoOverflow()->startOfMonth();
+        }
+
+        $targetMonth = (int) $targetDate->month;
+        $targetYear = (int) $targetDate->year;
+
+        $distribution = $this->financialHealthService->calculate503020Distribution(
+            (int) $user->id,
+            $targetMonth,
+            $targetYear
+        );
+
+        $startOfPeriod = $targetDate->copy()->startOfMonth();
+        $endOfPeriod = $targetDate->copy()->endOfMonth();
+
+        $medals = UserMedal::where('user_id', $user->id)
+            ->whereBetween('unlocked_at', [$startOfPeriod, $endOfPeriod])
+            ->with('medal')
+            ->orderByDesc('unlocked_at')
+            ->get()
+            ->map(fn (UserMedal $um) => [
+                'title' => $um->medal?->title ?? '—',
+                'description' => $um->medal?->description ?? '',
+                'icon' => $um->medal?->icon_name ?? 'medal',
+                'color' => medal_color_hex($um->medal?->color ?? 'slate'),
+                'unlocked_at' => $um->unlocked_at,
+            ]);
+
+        $periodLabel = $targetDate->locale('pt_BR')->translatedFormat('F \\d\\e Y');
+        $isPro = $user->isPro();
+
+        $mentorInsights = $this->gamificationService->getProInsights((int) $user->id);
+
+        return view('core::reports.monthly-wrap', [
+            'distribution' => $distribution,
+            'medals' => $medals,
+            'targetMonth' => $targetMonth,
+            'targetYear' => $targetYear,
+            'periodLabel' => $periodLabel,
+            'isPro' => $isPro,
+            'mentorInsights' => $mentorInsights,
+        ]);
     }
 
     /**

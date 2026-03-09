@@ -32,7 +32,7 @@
                     <x-core::tour-guide :tour-id="$pageTourId" label="Ver tour desta página" />
                 @endif
                 @can('create', \Modules\Core\Models\Budget::class)
-                    @if(!($inspectionReadOnly ?? false))
+                    @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                         <a href="{{ route('core.budgets.create') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
                             <x-icon name="plus" style="solid" class="w-5 h-5" />
                             Novo orçamento
@@ -241,7 +241,8 @@
                     <x-icon name="chart-pie" style="duotone" class="w-10 h-10" />
                 </div>
                 <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem orçamentos</h3>
-                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-4">Defina limites por categoria para controlar seus gastos. Os gastos são contabilizados pelas transações do <a href="{{ route('core.transactions.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Extrato</a> na mesma categoria.</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-4">Defina limites por categoria para controlar seus gastos. É aqui que você traduz os <strong>50% de Necessidades</strong> e os <strong>30% de Desejos</strong> da regra 50/30/20 em valores práticos para o seu mês.</p>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-4">Os gastos são contabilizados pelas transações do <a href="{{ route('core.transactions.index') }}" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">Extrato</a> na mesma categoria, alimentando seus relatórios e o resumo mensal do Vertex.</p>
                 @can('create', \Modules\Core\Models\Budget::class)
                     @if(!($inspectionReadOnly ?? false))
                         <div class="flex flex-wrap items-center justify-center gap-3">
@@ -259,7 +260,7 @@
             </div>
         @endforelse
 
-        @if($budgets->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Budget::class) && !($inspectionReadOnly ?? false))
+        @if($budgets->count() > 0 && auth()->user()?->can('create', \Modules\Core\Models\Budget::class) && !($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
             <a href="{{ route('core.budgets.create') }}" class="group flex flex-col items-center justify-center min-h-[280px] rounded-3xl border-2 border-dashed border-gray-200 dark:border-white/10 hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                 <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:bg-emerald-500/10 flex items-center justify-center mb-3 transition-colors">
                     <x-icon name="plus" style="solid" class="w-7 h-7 text-gray-400 dark:text-gray-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />

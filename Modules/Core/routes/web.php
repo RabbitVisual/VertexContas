@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Reports (Pro only exports)
     Route::prefix('reports')->name('core.reports.')->group(function () {
         Route::get('/', [\Modules\Core\Http\Controllers\ReportsController::class, 'index'])->name('index');
+        Route::get('/monthly-wrap', [\Modules\Core\Http\Controllers\ReportsController::class, 'monthlyWrap'])->name('monthly-wrap');
         Route::get('/cashflow', [\Modules\Core\Http\Controllers\ReportsController::class, 'cashFlow'])->name('cashflow');
         Route::get('/categories', [\Modules\Core\Http\Controllers\ReportsController::class, 'categoryRanking'])->name('categories');
         Route::get('/extrato', [\Modules\Core\Http\Controllers\ReportsController::class, 'extrato'])->middleware('pro')->name('extrato');

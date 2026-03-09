@@ -69,14 +69,6 @@
         </div>
     </div>
 
-    {{-- FAB: Nova Transação (fixo canto inferior direito) --}}
-    @if(!($inspectionReadOnly ?? false))
-    <a href="{{ route('core.transactions.create') }}" class="fixed bottom-6 right-6 z-40 flex items-center gap-3 px-6 py-4 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-base shadow-xl shadow-primary-500/30 hover:scale-105 active:scale-100 transition-all focus:ring-4 focus:ring-primary-500/30" aria-label="Nova transação">
-        <x-icon name="plus" style="solid" class="w-6 h-6" />
-        <span class="hidden sm:inline">Nova Transação</span>
-    </a>
-    @endif
-
     {{-- Minhas Contas + Transações - grid 1/3 + 2/3 (estilo VertexCBAV) --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-8">
         {{-- Minhas Contas --}}
@@ -88,7 +80,7 @@
                     </div>
                     Minhas Contas
                 </h3>
-                @if(Route::has('core.accounts.create') && !($inspectionReadOnly ?? false))
+                @if(Route::has('core.accounts.create') && !($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                     <a href="{{ route('core.accounts.create') }}" class="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline uppercase tracking-wider">Nova</a>
                 @endif
             </div>
@@ -108,7 +100,7 @@
                         </div>
                         <p class="text-sm font-bold text-gray-900 dark:text-white mb-1">Nenhuma conta</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-xs">Cadastre sua primeira conta para começar.</p>
-                        @if(Route::has('core.accounts.create') && !($inspectionReadOnly ?? false))
+                        @if(Route::has('core.accounts.create') && !($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                             <a href="{{ route('core.accounts.create') }}" class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 text-sm font-semibold hover:underline">
                                 <x-icon name="plus-circle" style="duotone" class="w-4 h-4" /> Criar conta
                             </a>
@@ -155,7 +147,7 @@
                         </div>
                         <p class="font-bold text-gray-900 dark:text-white mb-1">Nenhuma transação recente</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Registre sua primeira movimentação.</p>
-                        @if(!($inspectionReadOnly ?? false))
+                        @if(!($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false))
                             <a href="{{ route('core.transactions.create') }}" class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 text-sm font-semibold hover:underline">
                                 <x-icon name="plus-circle" style="duotone" class="w-4 h-4" /> Nova transação
                             </a>

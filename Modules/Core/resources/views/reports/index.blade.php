@@ -103,6 +103,36 @@
         </div>
         @endif
 
+        {{-- Resumo Mensal (Wrapped) --}}
+        <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/40 shadow-sm hover:shadow-xl">
+            <div class="absolute right-4 top-4">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase tracking-[0.18em]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                    Novo
+                </span>
+            </div>
+            <div class="flex flex-col lg:flex-row items-stretch">
+                <div class="lg:w-48 bg-gray-50 dark:bg-gray-900 p-8 flex flex-row lg:flex-col items-center justify-center gap-4 lg:gap-1 text-center border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/5">
+                    <span class="text-xs font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.2em]">Resumo</span>
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <x-icon name="chart-pie" style="duotone" class="w-7 h-7" />
+                    </div>
+                </div>
+                <div class="flex-1 p-8">
+                    <h3 class="text-2xl font-black text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-2">Resumo Mensal (Wrapped)</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                        Uma visão de story do mês: quanto foi para necessidades, desejos e futuro na prática, junto com as medalhas conquistadas.
+                    </p>
+                </div>
+                <div class="lg:w-64 p-8 flex items-center justify-center bg-gray-50 dark:bg-gray-900/30 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5">
+                    <a href="{{ route('core.reports.monthly-wrap') }}" class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 text-white font-black text-xs uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                        Ver meu mês
+                        <x-icon name="arrow-right" style="solid" class="w-4 h-4" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
         {{-- Fluxo de Caixa --}}
         <div class="group relative overflow-hidden bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-500 rounded-3xl border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 shadow-sm hover:shadow-xl">
             <div class="flex flex-col lg:flex-row items-stretch">

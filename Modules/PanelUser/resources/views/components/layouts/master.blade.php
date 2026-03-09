@@ -39,7 +39,13 @@
         @vite('resources/js/charts-apex.js')
     @endif
 </head>
-@php $isPro = auth()->user()?->isPro() ?? false; @endphp
+@php
+    $user = auth()->user();
+    $isPro = $user?->isPro() ?? false;
+    $limitService = $user ? app(\Modules\Core\Services\SubscriptionLimitService::class) : null;
+    $exceededResources = $user && $limitService ? $limitService->getExceededResources($user) : [];
+    $subscriptionReadOnly = !empty($exceededResources);
+@endphp
 <body class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased">
     @if($isPro)
         {{-- Layout PRO: Vertex CBAV style - sidebar com logo, navbar complementar --}}
@@ -49,6 +55,30 @@
                 <x-paneluser::layouts.navbar />
                 <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
                     <x-core::inspection-banner />
+                    @if(!empty($subscriptionReadOnly))
+                        <div class="mb-4 rounded-2xl border border-amber-300/70 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 sm:px-5 sm:py-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+                            <div class="flex items-start gap-3 flex-1">
+                                <div class="mt-0.5 shrink-0 w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-700 dark:text-amber-300">
+                                    <x-icon name="triangle-exclamation" style="duotone" class="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                        Você possui recursos acima do limite do seu plano atual.
+                                    </p>
+                                    <p class="text-xs text-amber-800/90 dark:text-amber-100/80 mt-0.5">
+                                        Enquanto essa folga existir, o sistema entra em modo somente leitura:
+                                        você continua vendo tudo, mas precisa <strong>remover itens</strong> ou <strong>fazer upgrade</strong> para voltar a criar e editar.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 text-xs font-black uppercase tracking-[0.18em] shadow-sm transition-colors">
+                                    <x-icon name="crown" style="solid" class="w-4 h-4 mr-1" />
+                                    Fazer upgrade
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                     @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
                     {{ $slot }}
                     <x-paneluser::inspection-modal />
@@ -64,6 +94,29 @@
                 <x-paneluser::layouts.navbar />
                 <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
                     <x-core::inspection-banner />
+                    @if(!empty($subscriptionReadOnly))
+                        <div class="mb-4 rounded-2xl border border-amber-300/70 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 sm:px-5 sm:py-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+                            <div class="flex items-start gap-3 flex-1">
+                                <div class="mt-0.5 shrink-0 w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-700 dark:text-amber-300">
+                                    <x-icon name="triangle-exclamation" style="duotone" class="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                        Você possui recursos acima do limite do seu plano atual.
+                                    </p>
+                                    <p class="text-xs text-amber-800/90 dark:text-amber-100/80 mt-0.5">
+                                        Você pode continuar consultando seus dados, mas novas criações e edições ficam temporariamente bloqueadas até ajustar seus cadastros ou atualizar o plano.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('user.subscription.index') }}" class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 text-xs font-black uppercase tracking-[0.18em] shadow-sm transition-colors">
+                                    <x-icon name="crown" style="solid" class="w-4 h-4 mr-1" />
+                                    Ver planos
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                     @include('paneluser::components.flash-messages', ['class' => 'mb-6'])
                     {{ $slot }}
                     <x-paneluser::inspection-modal />
@@ -79,6 +132,15 @@
     @endif
 
     <x-vertexchat::widget />
+
+    @if(auth()->check() && !($inspectionReadOnly ?? false) && !($subscriptionReadOnly ?? false) && Route::has('core.transactions.create'))
+        <a href="{{ route('core.transactions.create') }}"
+           class="fixed bottom-6 right-6 z-40 flex items-center gap-3 px-6 py-4 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-base shadow-xl shadow-primary-500/30 hover:scale-105 active:scale-100 transition-all focus:ring-4 focus:ring-primary-500/30"
+           aria-label="Nova transação">
+            <x-icon name="plus" style="solid" class="w-6 h-6" />
+            <span class="hidden sm:inline">Nova Transação</span>
+        </a>
+    @endif
 
     @if(config('pwa.enabled', true))
         <x-pwa::install-banner />
