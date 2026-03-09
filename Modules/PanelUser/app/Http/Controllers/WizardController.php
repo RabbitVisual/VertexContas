@@ -153,6 +153,10 @@ class WizardController extends Controller
 
     /**
      * Store income and redirect to done.
+     *
+     * Durante o onboarding, o objetivo é registrar ao menos uma fonte de renda principal
+     * de forma simples, que servirá como base para o motor 50/30/20 e para os cálculos do dashboard.
+     * Detalhamentos adicionais de renda podem ser feitos depois na tela \"Minha Renda\".
      */
     public function storeIncome(Request $request): RedirectResponse
     {

@@ -45,6 +45,7 @@ class NotificationsServiceProvider extends ServiceProvider
     {
         $this->commands([
             \Modules\Notifications\Console\Commands\PruneNotifications::class,
+            \Modules\Notifications\App\Console\Commands\SendSmartInsights::class,
         ]);
     }
 

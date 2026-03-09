@@ -7,27 +7,31 @@
     </div>
     <div>
         <h1 class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-4">
-            Bem-vindo ao Vertex Contas
+            Bem-vindo ao seu novo jeito de olhar para o dinheiro
         </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed mb-6">
-            Vamos configurar seu planejamento em poucos passos. Assim você usa o sistema com clareza desde o início.
+        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed mb-4">
+            Aqui você não precisa amar planilhas, fórmulas nem termos difíceis. O Vertex Contas foi pensado para pessoas reais, com uma rotina cheia e pouco tempo.
+        </p>
+        <p class="text-base text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed mb-6">
+            A partir de agora, vamos usar a <strong>Regra 50/30/20</strong> como uma espécie de bússola mágica: ela divide sua renda em
+            <strong>Necessidades</strong>, <strong>Desejos</strong> e <strong>Metas de Futuro</strong>. Você só precisa contar um pouco sobre sua vida; o Vertex traduz os números em próximos passos simples.
         </p>
         <ul class="text-left max-w-sm mx-auto space-y-2 text-gray-700 dark:text-gray-300 font-medium" role="list">
             <li class="flex items-center gap-2">
                 <x-icon name="circle-check" style="solid" class="w-5 h-5 text-primary-500 dark:text-primary-400 shrink-0" />
-                <span>Renda mensal (para calcular sua capacidade)</span>
+                <span>Sua renda mensal (para desenhar sua bússola 50/30/20)</span>
             </li>
             <li class="flex items-center gap-2">
                 <x-icon name="circle-check" style="solid" class="w-5 h-5 text-primary-500 dark:text-primary-400 shrink-0" />
-                <span>Primeira conta (saldo e tipo)</span>
+                <span>Sua primeira conta principal (onde o dinheiro entra)</span>
             </li>
             <li class="flex items-center gap-2">
                 <x-icon name="circle-check" style="solid" class="w-5 h-5 text-primary-500 dark:text-primary-400 shrink-0" />
-                <span>Orçamento por categoria (opcional)</span>
+                <span>Um rascunho de orçamentos por categoria (se você quiser)</span>
             </li>
             <li class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                 <x-icon name="circle-info" style="solid" class="w-5 h-5 shrink-0" />
-                <span>Despesas fixas (opcional, em Minha Renda depois)</span>
+                <span>Despesas fixas mais detalhadas você pode ajustar depois, com calma, em Minha Renda.</span>
             </li>
         </ul>
     </div>

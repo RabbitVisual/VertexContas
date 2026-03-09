@@ -18,17 +18,18 @@
                 </nav>
                 <h1 class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-3">
                     @if($isPro)
-                        Seu plano <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-400">{{ plan_pro_name() }}</span>
+                        Seu plano <br><span class="text-transparent bg-clip-text bg-linear-to-r from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-400">{{ plan_pro_name() }}</span>
                     @else
-                        Planos e <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">Assinatura</span>
+                        Um mentor financeiro <br><span class="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">que cabe na sua rotina</span>
                     @endif
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-md leading-relaxed">
                     @if($isPro)
-                        Obrigado por fazer parte do {{ plan_pro_name() }}. Aproveite todos os benefícios configurados pelo painel.
+                        Obrigado por confiar no {{ plan_pro_name() }}. Seu Mentor Vertex VIP já está usando seus números para sugerir próximos passos gentis.
                     @else
                         @php $proAmount = $planPro ? number_format((float) $planPro->amount, 2, ',', '.') : '29,90'; @endphp
-                        Evolua seu controle financeiro. {{ $hasUsedTrial ? "R$ {$proAmount}/mês. Cancele quando quiser." : "7 dias grátis, depois R$ {$proAmount}/mês. Cancele quando quiser." }}
+                        O Vertex já organiza sua vida com a regra <strong>50/30/20</strong>. No plano Pro, você ganha um mentor inteligente que lê seus números e transforma tudo em passos simples.
+                        {{ $hasUsedTrial ? "Um investimento em você de R$ {$proAmount}/mês, que tende a se pagar com as economias do primeiro mês." : "Você pode testar por 7 dias, depois R$ {$proAmount}/mês. Cancele quando quiser." }}
                     @endif
                 </p>
             </div>
@@ -162,9 +163,9 @@
         </div>
 
     @else
-        {{-- FREE: Comparação com limites dinâmicos do PanelAdmin + todos os planos pagos --}}
+        {{-- FREE: Página de transformação – Plano Grátis vs Vertex Pro --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {{-- Plano Grátis --}}
+            {{-- Plano Grátis – base sólida para começar --}}
             <div class="relative overflow-hidden bg-white dark:bg-gray-900/50 rounded-3xl border border-gray-200 dark:border-white/5 shadow-sm flex flex-col">
                 <div class="p-8 border-b border-gray-200 dark:border-white/5">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Plano Grátis</h2>
@@ -172,32 +173,30 @@
                         <span class="text-4xl font-black text-gray-900 dark:text-white">Grátis</span>
                         <span class="ml-1 text-gray-500 dark:text-gray-400">/sempre</span>
                     </p>
-                    <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Limites definidos pelo painel administrativo.</p>
+                    <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                        Para começar a enxergar seus números com clareza, sem custo e sem compromisso.
+                    </p>
                 </div>
                 <ul class="p-8 space-y-4 flex-1">
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">Controle de receitas e despesas</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Organização básica com a regra <strong>50/30/20</strong> no dashboard.</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['account'] < 0)Contas ilimitadas @else {{ $limits['account'] }} {{ $limits['account'] === 1 ? 'conta' : 'contas' }} @endif</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Até <strong>2 contas</strong> para controlar seu dia a dia.</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['income'] < 0 || $limits['expense'] < 0)Transações ilimitadas @else Até {{ $limits['income'] + $limits['expense'] }} transações (receitas + despesas) @endif</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">@if($limits['goal'] < 0 && $limits['budget'] < 0)Metas e orçamentos ilimitados @elseif($limits['goal'] < 0)Orçamentos: {{ $limits['budget'] }} {{ $limits['budget'] === 1 ? 'orçamento' : 'orçamentos' }}, metas ilimitadas @elseif($limits['budget'] < 0)Metas: {{ $limits['goal'] }} {{ $limits['goal'] === 1 ? 'meta' : 'metas' }}, orçamentos ilimitados @else {{ $limits['goal'] }} {{ $limits['goal'] === 1 ? 'meta' : 'metas' }}, {{ $limits['budget'] }} {{ $limits['budget'] === 1 ? 'orçamento' : 'orçamentos' }} @endif</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Até <strong>1 orçamento</strong> e <strong>3 metas</strong> ativas.</span>
                     </li>
                     <li class="flex items-start gap-3 text-gray-400 dark:text-gray-500">
                         <x-icon name="xmark" style="solid" class="w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-sm line-through">Relatórios exportáveis (PDF/CSV)</span>
+                        <span class="text-sm">Categorias personalizadas ilimitadas</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <x-icon name="check" style="solid" class="text-emerald-500 w-5 h-5 shrink-0 mt-0.5" />
-                        <span class="text-gray-600 dark:text-gray-300 text-sm">Suporte via Ticket</span>
+                        <span class="text-gray-600 dark:text-gray-300 text-sm">Suporte padrão via tickets.</span>
                     </li>
                 </ul>
                 <div class="p-8 pt-0">
@@ -225,27 +224,29 @@
                 $intervalLabel = $plan->billing_interval === 'yearly' ? 'ano' : 'mês';
             @endphp
             <div class="relative">
-                <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 rounded-[1.75rem] blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div class="relative bg-gray-900 dark:bg-gray-950 rounded-3xl p-8 flex flex-col h-full border-2 border-amber-500/30 shadow-xl">
+                <div class="absolute -inset-1 bg-linear-to-r from-amber-400 via-amber-500 to-violet-600 rounded-[1.75rem] blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                <div class="relative bg-gray-900 dark:bg-gray-950 rounded-3xl p-8 flex flex-col h-full border-2 border-amber-500/40 shadow-xl">
                     <div class="absolute top-0 right-0 flex flex-col gap-1">
                         @if(!($hasUsedTrial ?? false) && $plan->billing_interval === 'monthly')
                             <span class="inline-block bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">7 dias grátis</span>
                         @endif
                         @if($index === 0)
-                        <span class="inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">Popular</span>
+                        <span class="inline-block bg-linear-to-r from-amber-400 to-violet-500 text-gray-900 text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-xl rounded-tr-3xl">Transformação</span>
                         @endif
                     </div>
 
                     <div class="mt-6">
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <x-icon name="crown" style="solid" class="text-amber-400 w-6 h-6" />
-                            {{ $plan->name }}
+                            {{ $plan->name }} · Mentor Financeiro VIP
                         </h2>
                         <p class="mt-4 flex items-baseline">
                             <span class="text-4xl font-black text-white">R$ {{ $plan->amount ? number_format((float) $plan->amount, 2, ',', '.') : '29,90' }}</span>
                             <span class="ml-1 text-gray-400">/{{ $intervalLabel }}</span>
                         </p>
-                        <p class="mt-2 text-sm text-gray-400">{{ ($hasUsedTrial ?? false) ? 'Cobrança. Cancele quando quiser.' : ($plan->billing_interval === 'monthly' ? 'Após 7 dias grátis. Cancele quando quiser.' : 'Pagamento anual. Cancele quando quiser.') }}</p>
+                        <p class="mt-2 text-sm text-gray-400">
+                            {{ ($hasUsedTrial ?? false) ? 'Cobrança recorrente, com cancelamento simples a qualquer momento.' : ($plan->billing_interval === 'monthly' ? 'Você testa por 7 dias. Depois, a cobrança é mensal e você pode cancelar quando quiser.' : 'Pagamento anual com cancelamento simplificado.') }}
+                        </p>
                     </div>
 
                     <ul class="mt-8 space-y-4 flex-1">
@@ -253,31 +254,31 @@
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitAccounts }}</span>
+                            <span class="text-gray-300 text-sm font-medium">Liberdade total de contas, categorias e metas para organizar toda a sua vida financeira.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitTransactions }}</span>
+                            <span class="text-gray-300 text-sm font-medium">Mentor Inteligente VIP: IA que analisa seus números (50/30/20, metas, reservas) e sugere próximos passos gentis.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">Relatórios PDF/CSV</span>
+                            <span class="text-gray-300 text-sm font-medium">Relatórios e projeções preditivas mensais para enxergar o efeito das suas escolhas ao longo do tempo.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">{{ $planBenefitGoals }}, {{ $planBenefitBudgets }}</span>
+                            <span class="text-gray-300 text-sm font-medium">Multiplicadores de XP, medalhas especiais e Desafios de Coaching conectados ao seu comportamento financeiro.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <div class="w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-amber-500/20">
                                 <x-icon name="check" style="solid" class="text-amber-400 w-3.5 h-3.5" />
                             </div>
-                            <span class="text-gray-300 text-sm font-medium">Suporte Prioritário</span>
+                            <span class="text-gray-300 text-sm font-medium">Suporte prioritário e acesso ao Chat VIP para tirar dúvidas sobre o uso do app e das ferramentas avançadas.</span>
                         </li>
                     </ul>
 
@@ -287,8 +288,8 @@
                                 Compra desabilitada (inspeção)
                             </button>
                         @else
-                            <button @click="open = !open" type="button" class="w-full py-4 px-6 rounded-2xl text-gray-900 font-bold bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-600 shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide hover:-translate-y-0.5 active:scale-[0.98]">
-                                <span x-text="open ? 'Selecionar método' : 'Assinar {{ $plan->name }}'"></span>
+                            <button @click="open = !open" type="button" class="w-full py-4 px-6 rounded-2xl text-gray-900 font-bold bg-linear-to-r from-amber-300 via-amber-400 to-violet-500 hover:from-amber-400 hover:to-violet-600 shadow-xl shadow-amber-500/30 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide hover:-translate-y-0.5 active:scale-[0.98]">
+                                <span x-text="open ? 'Selecionar método' : 'Quero meu Mentor Vertex VIP'"></span>
                                 <x-icon name="arrow-right" style="solid" class="w-5 h-5" x-show="!open" />
                                 <x-icon name="chevron-down" style="solid" class="w-5 h-5" x-show="open" />
                             </button>

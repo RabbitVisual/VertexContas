@@ -5,12 +5,17 @@
     <button @click.stop="toggleDropdown()" class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-800 transition-colors focus:outline-none">
         <x-icon name="bell" style="duotone" class="w-6 h-6" />
 
-        <!-- Badge -->
-        <span x-show="count > 0"
-              x-transition.scale
-              class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900"
-              x-text="count > 9 ? '9+' : count">
-        </span>
+        <!-- Badge + Ping -->
+        <template x-if="count > 0">
+            <div class="absolute -top-1 -right-1">
+                <span class="absolute inline-flex h-4 w-4 rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                <span
+                    x-transition.scale
+                    class="relative flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900"
+                    x-text="count > 9 ? '9+' : count">
+                </span>
+            </div>
+        </template>
     </button>
 
     <!-- Dropdown Panel (x-cloak evita flash ao trocar de página antes do Alpine hidratar) -->
@@ -59,15 +64,23 @@
             <template x-for="notification in notifications" :key="notification.id">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors group relative">
                     <div class="flex gap-3">
-                        <div class="flex-shrink-0 mt-1 w-5 h-5 flex items-center justify-center" :class="notification.color || 'text-slate-500'">
-                            <span x-show="(notification.icon || 'bell') === 'bell'"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
-                            <span x-show="(notification.icon || 'bell') === 'circle-info'"><x-icon name="circle-info" style="duotone" class="w-5 h-5" /></span>
-                            <span x-show="(notification.icon || 'bell') === 'circle-check'"><x-icon name="circle-check" style="duotone" class="w-5 h-5" /></span>
-                            <span x-show="(notification.icon || 'bell') === 'triangle-exclamation'"><x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5" /></span>
-                            <span x-show="(notification.icon || 'bell') === 'circle-xmark'"><x-icon name="circle-xmark" style="duotone" class="w-5 h-5" /></span>
-                            <span x-show="!['bell','circle-info','circle-check','triangle-exclamation','circle-xmark'].includes(notification.icon || 'bell')"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
+                        <div class="flex-shrink-0 mt-1 w-6 h-6 flex items-center justify-center"
+                             :class="(notification.title && notification.title.startsWith('Mentor VIP')) ? 'text-amber-400' : (notification.color || 'text-slate-500')">
+                            <template x-if="notification.title && notification.title.startsWith('Mentor VIP')">
+                                <x-icon name="crown" style="duotone" class="w-5 h-5" />
+                            </template>
+                            <template x-if="!(notification.title && notification.title.startsWith('Mentor VIP'))">
+                                <span>
+                                    <span x-show="(notification.icon || 'bell') === 'bell'"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
+                                    <span x-show="(notification.icon || 'bell') === 'circle-info'"><x-icon name="circle-info" style="duotone" class="w-5 h-5" /></span>
+                                    <span x-show="(notification.icon || 'bell') === 'circle-check'"><x-icon name="circle-check" style="duotone" class="w-5 h-5" /></span>
+                                    <span x-show="(notification.icon || 'bell') === 'triangle-exclamation'"><x-icon name="triangle-exclamation" style="duotone" class="w-5 h-5" /></span>
+                                    <span x-show="(notification.icon || 'bell') === 'circle-xmark'"><x-icon name="circle-xmark" style="duotone" class="w-5 h-5" /></span>
+                                    <span x-show="!['bell','circle-info','circle-check','triangle-exclamation','circle-xmark'].includes(notification.icon || 'bell')"><x-icon name="bell" style="duotone" class="w-5 h-5" /></span>
+                                </span>
+                            </template>
                         </div>
-                        <div class="flex-1 min-w-0">
+                        <div class="flex-1 min-w-0" :class="notification.title && notification.title.startsWith('Mentor VIP') ? 'bg-amber-500/5 rounded-xl px-2 py-1 -mx-2' : ''">
                             <p class="text-sm font-semibold text-gray-900 dark:text-white" x-text="notification.title"></p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2" x-text="notification.message"></p>
                             <p class="text-xs text-gray-400 mt-1" x-text="notification.created_at_human"></p>

@@ -102,4 +102,30 @@ class CheckoutController extends Controller
         }
         return $plan;
     }
+
+    /**
+     * Retorno de sucesso do gateway após criação/ativação da assinatura.
+     * Redireciona o usuário de volta ao painel com uma mensagem memorável.
+     */
+    public function success(Request $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $returnUrl = $request->query('return_url');
+        if (! is_string($returnUrl) || $returnUrl === '') {
+            $returnUrl = route(
+                $user->isPro() && \Illuminate\Support\Facades\Route::has('core.dashboard')
+                    ? 'core.dashboard'
+                    : 'paneluser.index'
+            );
+        }
+
+        return redirect()->to($returnUrl)->with(
+            'success',
+            'Parabéns! Você acaba de dar o passo mais importante para a sua liberdade financeira. Seu Mentor Vertex VIP e todos os Desafios de Coaching foram desbloqueados. Vamos juntos!'
+        );
+    }
 }

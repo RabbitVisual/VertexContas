@@ -437,7 +437,7 @@ class FinancialHealthService
             ->whereNull('transactions.parent_id')
             ->leftJoin('categories', 'transactions.category_id', '=', 'categories.id')
             ->select(DB::raw('COALESCE(NULLIF(categories.type_group, ""), "lifestyle") as pillar'), DB::raw('SUM(transactions.amount) as total'))
-            ->groupBy('pillar')
+            ->groupBy('categories.type_group')
             ->get()
             ->keyBy('pillar');
 
